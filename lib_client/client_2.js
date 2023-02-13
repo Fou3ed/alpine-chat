@@ -297,11 +297,10 @@ export default class event {
   onMessageDelivered = () => {
     return new Promise((resolve,reject)=>{
     this.socket.on('onMessageDelivered', (data, error) => {
-      console.log(data)
+      console.log("message delivered:",data)
       resolve(data)
     })
     })
-
   }
   /**
    * 
@@ -406,17 +405,16 @@ export default class event {
    *  message received event 
    */
   messageReceived = (data) => {
-    this.socket.emit('MessageReceived', (data, error) => {
-      if (error) {
-        setError(error)
-      }
-    })
-  }
+    this.socket.emit('MessageReceived', data);
+}
+
+
   onMessageReceived = (data) => {
+    console.log("foued.onMessageReceived function called");
     this.socket.on('onMessageReceived', (data, error) => {
       console.log(data)
-    })
-  }
+    });
+  };
 
   /**
    * pin message event
