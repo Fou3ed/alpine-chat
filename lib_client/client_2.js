@@ -281,10 +281,11 @@ export default class event {
    */
 
   /**
-   *  send  message 
-   */
-  createMessage = (data, recipient_id) => {
-    this.socket.emit('onMessageCreated', data, recipient_id, error => {
+     *  send  message 
+    */
+  createMessage = (data) => {
+
+    this.socket.emit('onMessageCreated', data, error => {
       if (error) {
         setError(error)
       }
@@ -292,16 +293,18 @@ export default class event {
       console.log("conversation created");
       console.log('====================================');
     })
+    
   }
   
   onMessageDelivered = () => {
     return new Promise((resolve,reject)=>{
     this.socket.on('onMessageDelivered', (data, error) => {
-      console.log("message delivered:",data)
+        console.log(data)
       resolve(data)
     })
     })
   }
+  
   /**
    * 
    * update message
@@ -318,8 +321,8 @@ export default class event {
     })
   }
   onMessageUpdated = (data) => {
-    this.socket.on('onMessageUpdated', (data, error) => {
 
+    this.socket.on('onMessageUpdated', (data, error) => {
     })
   }
   /**

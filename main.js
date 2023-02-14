@@ -34,8 +34,32 @@ window.createConversation = async () => {
 
 }
 
+// window.sendMsg=async()=>{
+//   const info={
+//     app: "638dc76312488c6bf67e8fc0",
+//     user: "6390b2efdfb49a27e7e3c0b9",
+//     action: "message.create",
+//     metaData: {
+//         type: "MSG",
+//         conversation_id: "63971dd761f3ef13725a96d2",
+//         user:"6390b2efdfb49a27e7e3c0b9",
+//         message: messageInput.value,
+//         data:"non other data",
+//         origin:"web",
+//     },
+//   }
 
-window.sendMsg=async()=>{
+//     foued.createMessage(info)
+//     document.querySelector("#message").innerText=info.metaData.message
+//     document.querySelector("#date_msg").innerText=fullDate
+//     messageInput.value = "";
+//     createMsg(info.metaData.message)
+ 
+    
+// }
+
+
+document.querySelector('#send-message').addEventListener('click', () => {
   const info={
     app: "638dc76312488c6bf67e8fc0",
     user: "6390b2efdfb49a27e7e3c0b9",
@@ -48,16 +72,20 @@ window.sendMsg=async()=>{
         data:"non other data",
         origin:"web",
     },
-  };
-   await foued.createMessage(info)
+  }
+
+    foued.createMessage(info)
     document.querySelector("#message").innerText=info.metaData.message
     document.querySelector("#date_msg").innerText=fullDate
     messageInput.value = "";
     createMsg(info.metaData.message)
-  
-}
-foued.onMessageDelivered((res=>{
-}))
+})
+
+foued.onMessageDelivered().then(res => {
+  let direction = "out";
+  console.log("res", res);
+  createMsg(res.content, direction);
+})
 
 window.createMsg=function(msg,direction="in"){
 messagesContainer.insertAdjacentHTML("beforeend", `<div class="flex items-start ${direction == 'in' ? 'justify-end' : ''} space-x-2.5 sm:space-x-5">
