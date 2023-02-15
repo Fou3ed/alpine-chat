@@ -327,6 +327,7 @@ video {
     --main-sidebar-width: 4.5rem;
     --sidebar-panel-width: 280px;
     --sidebar-panel-min-width: 64px
+    
 }
 
 @media (min-width:768px) {
@@ -558,6 +559,7 @@ body.is-monochrome:before {
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
     flex-shrink: 0;
     height: 100%;
+   
     position: fixed;
     transform: translate3d(var(--tw-translate-x), var(--tw-translate-y), 0) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
     transition-duration: .15s;
@@ -566,7 +568,7 @@ body.is-monochrome:before {
     transition-timing-function: cubic-bezier(.4, 0, .2, 1);
     transition-timing-function: cubic-bezier(.4, 0, 1, 1);
     width: var(--sidebar-panel-min-width);
-    z-index: 40
+    z-index: 40;
 }
 
 .dark .sidebar-panel-min {
