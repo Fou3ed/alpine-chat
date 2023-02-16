@@ -1,5 +1,12 @@
 import io from "https://cdn.socket.io/4.5.4/socket.io.esm.min.js";
 
+const currentDate = new Date();
+const hours = currentDate.getHours();
+const minutes = currentDate.getMinutes();
+const timeString = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0');
+const messagesContainer = document.getElementById("big-container-message")
+const messageInput = document.querySelector('#message-input');
+const sendButton = document.querySelector('#send-message');
 
 export default class event {
 
@@ -303,7 +310,93 @@ export default class event {
       resolve(data)
     })
     })
+
   }
+
+  /**
+   *   
+   *  message received event 
+   */
+  messageReceived = (data) => {
+    this.socket.emit('MessageReceived', data);
+}
+
+
+
+onMessageReceived = () => {
+  this.socket.on('onMessageReceived', (data, error) => {
+    const messageId = data.id; // Assuming your message object has an `id` field
+    const messageContainer = document.getElementById(`message-${messageId}`);
+    if (!messageContainer) {
+      let direction = data.isSender ? 'flex-row-reverse' : '';
+      messagesContainer.insertAdjacentHTML("beforeend", `
+        <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
+        <div class="flex flex-col items-end space-y-3.5">
+        <div class="flex flex-row">
+          <div x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex mt-2">
+            <button x-ref="popperRef" @click="isShowPopper = !isShowPopper" class="btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z">
+                </path>
+              </svg>
+            </button>
+            
+            <div x-ref="popperRoot" class="popper-root" :class="isShowPopper &amp;&amp; 'show'" style="position: fixed; inset: 0px 0px auto auto; margin: 0px; transform: translate(-594px, 231px);" data-popper-placement="bottom-end">
+              <div class="popper-box rounded-md border border-slate-150 bg-white py-1.5 font-inter dark:border-navy-500 dark:bg-navy-700">
+                <ul>
+                  <li>
+                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Edit</a>
+                  </li>
+                  <li>
+                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Forward</a>
+                  </li>
+                  <li>
+                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Copy</a>
+                  </li>
+                  <li>
+                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Reply</a>
+                  </li>
+                </ul>
+                <div class="my-1 h-px bg-slate-150 dark:bg-navy-500"></div>
+                <ul>
+                  <li>
+                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Delete</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="ml-2 max-w-lg sm:ml-5">
+            <div class="rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white">
+              ${data.content}
+            </div>
+            <p  id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
+                  ${timeString}      
+            </p>
+          </div>
+        
+        </div>
+        
+        <div class="flex flex-row">
+            </div>
+          </div>
+        </div>
+      </div>
+        </div>
+      `);
+    }
+  });
+};
+
+
+
+
+
+
+
+
+
+
   
   /**
    * 
@@ -403,21 +496,7 @@ export default class event {
     })
   }
 
-  /**
-   *   
-   *  message received event 
-   */
-  messageReceived = (data) => {
-    this.socket.emit('MessageReceived', data);
-}
 
-
-  onMessageReceived = (data) => {
-    console.log("foued.onMessageReceived function called");
-    this.socket.on('onMessageReceived', (data, error) => {
-      console.log(data)
-    });
-  };
 
   /**
    * pin message event
