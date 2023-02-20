@@ -127,6 +127,7 @@ export default class event {
   onConversationStart = () => {
     return new Promise((resolve,reject)=>{
       this.socket.on("onConversationStarted", (data, newData) => {
+        console.log(data,newData)
        resolve(newData)
     })
     })
@@ -360,7 +361,8 @@ export default class event {
 onMessageReceived = () => {
 
   this.socket.on('onMessageReceived', (data, error) => {
-    const messageId = data.id; // Assuming your message object has an `id` field
+    console.log(data)
+    const messageId = data.id; 
     const messageContainer = document.getElementById(`message-${messageId}`);
     if (!messageContainer) {
       console.log(data.direction=="in")
