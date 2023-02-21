@@ -64,12 +64,17 @@ export default class event {
       }
     })
   }
+  
   onConnected = function() {
-    return new Promise((resolve, reject) => {
       this.socket.on("onConnected", (data, newData) => {
-        resolve(newData);
+        if (newData) {   
+          console.log(newData)
+          window.location.href = "./index.html"
+        } else {
+          alert("error")
+        }
+    
       });
-    });
   };
 
   /**
@@ -359,9 +364,7 @@ export default class event {
 
 
 onMessageReceived = () => {
-
   this.socket.on('onMessageReceived', (data, error) => {
-    console.log(data)
     const messageId = data.id; 
     const messageContainer = document.getElementById(`message-${messageId}`);
     if (!messageContainer) {

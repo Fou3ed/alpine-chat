@@ -122,50 +122,20 @@
        
 
                   <!-- chat  conversations left side  -->
-                <div x-show="activeTab === 'tabHome'" x-transition:enter="transition-all duration-500 easy-in-out"
-                x-transition:enter-start="opacity-0 [transform:translate3d(1rem,0,0)]"
-                x-transition:enter-end="opacity-100 [transform:translate3d(0,0,0)]">
-                <div>
-                  <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
-                    <div
-                      @click="$dispatch('change-active-chat',{chatId:'chat-1',avatar_url:'images/avatar/avatar-19.jpg',name:'Alfredo Elliott'})"
-                      class="flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
-                      <div class="avatar h-10 w-10">
-                        <img class="rounded-full" src="images/avatar/avatar-19.jpg" alt="avatar" />
-                        <div
-                          class="absolute right-0 h-3 w-3 rounded-full border-2 border-white bg-slate-300 dark:border-navy-700">
-                        </div>
-                      </div>
-                      <div class="flex flex-1 flex-col">
-                        <div class="flex items-baseline justify-between space-x-1.5">
-                          <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
-                            Alfredo Elliott
-                          </p>
-                          <span class="text-tiny+ text-slate-400 dark:text-navy-300">11:03</span>
-                        </div>
-                        <div class="mt-1 flex items-center justify-between space-x-1">
-                          <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300">
-                            😂 Lorem ipsum dolor
-                          </p>
-                          <div
-                            class="flex h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-slate-200 px-1.5 text-tiny+ font-medium leading-none text-slate-800 dark:bg-navy-450 dark:text-white">
-                            5
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              
+
+                  <div x-show="activeTab === 'tabHome'" x-transition:enter="transition-all duration-500 easy-in-out"
+                  x-transition:enter-start="opacity-0 [transform:translate3d(1rem,0,0)]"
+                  x-transition:enter-end="opacity-100 [transform:translate3d(0,0,0)]" id="left-conversation">
+            
                 </div>
-              </div>
-
-
-
+  
 
               
 
 
 
-
+                  <!--  agents -->
 
                 <div x-show="activeTab === 'tabProfile'" x-transition:enter="transition-all duration-500 easy-in-out"
                   x-transition:enter-start="opacity-0 [transform:translate3d(1rem,0,0)]"
@@ -248,6 +218,8 @@
                   </div>
                 </div>
 
+
+                
 
               </div>
               <div
