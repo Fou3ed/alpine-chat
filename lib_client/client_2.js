@@ -51,7 +51,10 @@ export default class event {
       transports: ['websocket']
     });
   }
+// In the onConnected function:
 
+// In the index.html page:
+// Retrieve the newData value from localStorage
 
   
   /**
@@ -66,14 +69,17 @@ export default class event {
   }
   
   onConnected = function() {
-      this.socket.on("onConnected", (data, newData) => {
+      this.socket.on("onConnected", (info,newData,data) => {
         if (newData) {   
-          console.log(newData)
-          window.location.href = "./index.html"
+          const concatenated = { ...info,...newData,...data };
+
+          console.log(newData);
+          // Store the newData value in localStorage
+          localStorage.setItem('newData', JSON.stringify(concatenated));
+          window.location.href = "./index.html";
         } else {
-          alert("error")
+          alert("error");
         }
-    
       });
   };
 

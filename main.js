@@ -43,7 +43,10 @@ const msgButt = `<div x-data="usePopper({placement:'bottom-end',offset:4})" @cli
               </div>
             </div>
           </div>`
-const user_id = document.querySelector("#user-id")
+let user_id = document.querySelector("#user-id")
+
+
+
 
 //log in 
 window.connected = async () => {
@@ -53,7 +56,7 @@ window.connected = async () => {
     action: "connect",
     metaData: {
       app_id: "638dc76312488c6bf67e8fc0",
-      user_id: "6391f3fbbac5ef031945cf51",
+      user_id: user_id.value,
       api_token: "123456789123456"
     },
     "device": {
@@ -67,7 +70,9 @@ window.connected = async () => {
   foued.connect(connectionInfo)
 };
   foued.onConnected()
-
+  const newData = JSON.parse(localStorage.getItem('newData'));
+  console.log(newData);
+  
 //disable the send message button if it's empty .
 messageInput.addEventListener('input', () => {
   if (messageInput.value.trim() === '') {
@@ -101,13 +106,16 @@ sendButton.addEventListener('click', () => {
     messageInput.value = "";
   }
 })
-
 foued.onMessageReceived()
 
 /**
  * Get the experts  and by clicking on someone a new conversation start if it's empty else continue the conversation 
  */
 $(document).ready(function () {
+
+      /**
+       * Get the list of users (experts)
+       */
   axios.get('http://127.0.0.1:3000/users')
     .then(function (response) {
       if (response.data.message === 'success') {
@@ -117,21 +125,78 @@ $(document).ready(function () {
           let name = user.full_name;
           // Generate a unique ID for each avatar element
           let avatarId = users[i]._id;
-          $('.swiper-wrapper').append('<div id="' + avatarId + '" data-name="' + name + '" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center"><div class="h-13 w-13  p-0.5"><img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/avatar-20.jpg" alt="avatar" /></div><p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">' + name + '</p></div>');
-        }
-
-        $('.swiper-wrapper').on('click', '.swiper-slide', function () {
+          $('.swiper-wrapper').append('<div id="' + avatarId + '" data-name="' + name + '" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center"><div class="h-13 w-13  p-0.5"><img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/avatar-20.jpg" alt="avatar" /></div><p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">' + name + '</p></div>');}          
+          $('.swiper-wrapper').on('click', '.swiper-slide', function () {
           // Get the unique ID of the clicked avatar element
           let avatarId = $(this).attr('id');
           let username = $(this).data('name');
           console.log('Clicked on avatar with ID: ' + avatarId);
-
           $('#big-container-message').html(`
           <div class="mx-4 flex items-center space-x-3">
             <div class="h-px flex-1 bg-slate-200 dark:bg-navy-500"></div>
             <p>${username}</p>
             <div class="h-px flex-1 bg-slate-200 dark:bg-navy-500"></div>
           </div>`);
+
+
+
+          
+            //get all the conversations the user connected have 
+                  
+
+            $("#left-conversation").html("");
+            axios.get(`http://127.0.0.1:3000/conversation/${newData.user}`)
+              .then(function(response){
+                const conversations = response.data;
+                conversations.forEach(conversation => {
+                  const { name, description } = conversation;
+                  const html = `<div>
+                    <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
+                      <div
+                        @click="$dispatch('change-active-chat',{chatId:'chat-1',avatar_url:'images/avatar/avatar-19.jpg',name:'Alfredo Elliott'})"
+                        class="flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
+                        <div class="avatar h-10 w-10">
+                          <img class="rounded-full" src="images/avatar/avatar-19.jpg" alt="avatar" />
+                          <div
+                            class="absolute right-0 h-3 w-3 rounded-full border-2 border-white bg-slate-300 dark:border-navy-700">
+                          </div>
+                        </div>
+                        <div class="flex flex-1 flex-col">
+                          <div class="flex items-baseline justify-between space-x-1.5">
+                            <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
+                              ${name}
+                            </p>
+                            <span class="text-tiny+ text-slate-400 dark:text-navy-300">11:03</span>
+                          </div>
+                          <div class="mt-1 flex items-center justify-between space-x-1">
+                            <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300">
+                              ${description}
+                            </p>
+                            <div
+                              class="flex h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-slate-200 px-1.5 text-tiny+ font-medium leading-none text-slate-800 dark:bg-navy-450 dark:text-white">
+                              5
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>`;
+                  $("#left-conversation").append(html);
+                });
+              });
+            
+            
+
+              //get the messages  between the user connected and the avatar(2nd user)
+              //user connected :  user_id.value
+
+
+
+
+
+
+
+
 
           let currentPage = 1;
           const limit = 10;
@@ -146,13 +211,16 @@ $(document).ready(function () {
           });
 
           function loadMessages(page, scrollToBottom = false) {
+           
+
+            //id conversation 
             axios.get(`http://127.0.0.1:3000/messages/63971dd761f3ef13725a96d2?page=${page}&limit=${limit}`)
               .then(function (response) {
                 if (response.data.message === 'success') {
                   let messages = response.data.data;
                   displayMessages(messages, scrollToBottom);
                   let lastMessage = messages.messages[0].message
-                  createLeftConvo(username, lastMessage)
+                  //createLeftConvo(username, lastMessage)
                 }
               })
               .catch(function (error) {
@@ -254,4 +322,9 @@ function createLeftConvo(username, lastMessage) {
     </div>
   </div>
 </div>`)
+}
+
+function checkConversation(user){
+  
+
 }
