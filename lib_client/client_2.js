@@ -211,6 +211,7 @@ export default class event {
    * add member to a conversation 
    */
   addMembers = (data) => {
+    console.log(data)
     this.socket.emit('onConversationMemberJoin', data, error => {
       if (error) {
         setError(error)
