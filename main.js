@@ -6,13 +6,15 @@ const hours = currentDate.getHours();
 const minutes = currentDate.getMinutes();
 const timeString =
   hours.toString().padStart(2, "0") + ":" + minutes.toString().padStart(2, "0");
+
 const messagesContainer = document.getElementById("big-container-message");
 const messageInput = document.querySelector("#message-input");
 const sendButton = document.querySelector("#send-message");
 const conversationContainer = document.getElementById("conversation-container");
-
 const newData = JSON.parse(localStorage.getItem("newData"));
-console.log(newData);
+console.log("LOCAL STORAGE",newData);
+
+
 //message configuration : delete,edit,reply,forward ..
 const msgButt = `<div x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex mt-2">
             <button x-ref="popperRef" @click="isShowPopper = !isShowPopper" class="btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
@@ -47,8 +49,11 @@ const msgButt = `<div x-data="usePopper({placement:'bottom-end',offset:4})" @cli
             </div>
           </div>`;
 
+//global variables
 let user_id = document.querySelector("#user-id");
-
+let conversation_id;
+let to;
+let receiverUserName;
 //log in
 window.connected = async () => {
   const connectionInfo = {
@@ -80,34 +85,10 @@ messageInput.addEventListener("input", () => {
   }
 });
 
-// send message by pressing the send button
-sendButton.addEventListener("click", () => {
-  if (messageInput.value.trim() !== "") {
-    const info = {
-      app: "638dc76312488c6bf67e8fc0",
-      user: user_id,
-      action: "message.create",
-      metaData: {
-        type: "MSG",
-        conversation_id: "63971dd761f3ef13725a96d2",
-        user: "6390b4d54a1ba0044836d613",
-        message: messageInput.value,
-        data: "non other data",
-        origin: "web",
-      },
-      to: "recipient_socket_id", // replace with the recipient's socket ID
-    };
 
-    foued.createMessage(info);
-
-    messageInput.value = "";
-  }
-});
-foued.onMessageReceived();
 /**
- * Get the experts 
+ * Get the experts and when click to an avatar it direct the user to the left conversation  
  */
-
 function getExperts() {
   axios.get("http://127.0.0.1:3000/users").then(function (response) {
     if (response.data.message === "success") {
@@ -127,103 +108,93 @@ function getExperts() {
           "</p></div>"
         );
       }
-      $(".swiper-wrapper").on("click", ".swiper-slide", function () {
-        // Get the unique ID of the clicked avatar element
-        let avatarId = $(this).attr("id");
-        let username = $(this).data("name");
-        checkConversation(newData.user,avatarId)
-
-        console.log("Clicked on avatar with ID: " + avatarId);
-        $("#big-container-message").html(`
-        <div class="mx-4 flex items-center space-x-3">
-          <div class="h-px flex-1 bg-slate-200 dark:bg-navy-500"></div>
-          <p>${username}</p>
-          <div class="h-px flex-1 bg-slate-200 dark:bg-navy-500"></div>
-        </div>`);
-      });
     }
   });
 }
 
-/**
- * get all the conversation the user connected have 
- */
-function getMyConversations(newData) {
-  $("#left-conversation").html("");
-  axios.get(`http://127.0.0.1:3000/conversation/${newData.user}`)
-    .then(function (response) {
-      const conversations = response.data.data;
-      console.log(conversations)
-      conversations.forEach((conversation) => {
-        const {
-          name,
-          description
-        } = conversation;
-        const html = `<div>
-          <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
-            <div
-              @click="$dispatch('change-active-chat',{chatId:'chat-1',avatar_url:'images/avatar/avatar-19.jpg',name:'Alfredo Elliott'})"
-              class="flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
-              <div class="avatar h-10 w-10">
-                <img class="rounded-full" src="images/avatar/avatar-19.jpg" alt="avatar" />
-                <div
-                  class="absolute right-0 h-3 w-3 rounded-full border-2 border-white bg-slate-300 dark:border-navy-700">
-                </div>
-              </div>
-              <div class="flex flex-1 flex-col">
-                <div class="flex items-baseline justify-between space-x-1.5">
-                  <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
-                    ${name}
-                  </p>
-                  <span class="text-tiny+ text-slate-400 dark:text-navy-300">11:03</span>
-                </div>
-                <div class="mt-1 flex items-center justify-between space-x-1">
-                  <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300">
-                    ${description}
-                  </p>
-                  <div
-                    class="flex h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-slate-200 px-1.5 text-tiny+ font-medium leading-none text-slate-800 dark:bg-navy-450 dark:text-white">
-                    5
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>`;
-        $("#left-conversation").append(html);
-      });
-    });
+function selectExpert(){
+  $(".swiper-wrapper").on("click", ".swiper-slide", function () {
+    // Get the unique ID of the clicked avatar element
+    let avatarId = $(this).attr("id");
+    let name = $(this).data("name");
+
+    checkConversation(newData.user, avatarId)
+    console.log("Clicked on avatar with ID: " + avatarId + name);
+
+    //route to left conversation then e left conversation display the big container message 
+    return to = avatarId ,receiverUserName=name
+  });
 }
 
 
 
 
+
+/**to check later  */
+function leftConversation(){
+  $("#big-container-message").html(`
+  <div class="mx-4 flex items-center space-x-3">
+    <div class="h-px flex-1 bg-slate-200 dark:bg-navy-500"></div>
+    <p>${receiverUserName}</p>
+    <div class="h-px flex-1 bg-slate-200 dark:bg-navy-500"></div>
+  </div>`);
+}
 // check  the conversation between the first(connected user ) and the second user 
+// get the conversation , if there is no conversation between them , create for both the users a conversation member then a conversation 
 function checkConversation(user_id, avatarId) {
   axios.get(`http://192.168.1.19:3000/conv/?user1=${user_id}&user2=${avatarId}`)
     .then(function (response) {
-      if (response.data.data.length==0) {
-        createConversation().then(function (res) {
+      if (response.data.data.length == 0) {
+        createConversation(user_id).then(function (res) {
           const memberInfo = {
             conversation_id: res._id,
             user_id: user_id,
             conversation_name: avatarId,
           };
           foued.addMembers(memberInfo);
-          foued.addMembers({conversation_id:res._id,user_id:avatarId,conversation_name:user_id})
+          foued.addMembers({
+            conversation_id: res._id,
+            user_id: avatarId,
+            conversation_name: user_id
+          })
         });
-      }else{
+      } else {
+       
+        let conversation_id = response.data.data[0]._id
         let currentPage = 1;
-
-            // Load the first page of messages on page load
-          loadMessages(currentPage, true);
+        // Load the first page of messages on page load
+        loadMessages(currentPage, conversation_id, true);
       }
+      return conversation_id = response.data.data[0]._id
     });
 }
 
+// create conversation function 
+function createConversation(user_id,avatar_id) {
+  const   conversationInfo={
+      app: "638dc76312488c6bf67e8fc0",
+      user: user_id,
+      action: "conversation.create",
+      metaData: {
+          name: receiverUserName,
+          channel_url: "foued/test",
+          conversation_type: "private",
+          description: "private chat",
+          operators: [1],
+          members: [user_id,avatar_id],
+          permissions: {"key":"value"},
+          members_count:2,
+          max_length_message: "256",
+      },
+    }
+  foued.createConversation(conversationInfo);
+  return foued.onConversationStart()
+}
+foued.onConversationMemberJoined();
 
 //display the messages  
 function displayMessages(messages, scrollToBottom = false) {
+  console.log(messages)
   // Reverse the messages array to display them in the opposite order
   const reversedMessages = messages.messages.reverse();
   for (let i = 0; i < reversedMessages.length; i++) {
@@ -232,7 +203,7 @@ function displayMessages(messages, scrollToBottom = false) {
     const messageContainer = document.getElementById(`message-${messageId}`);
     if (!messageContainer) {
       let direction =
-        message.user === "6390b4d54a1ba0044836d613" ?
+        message.user === user_id ?
         "justify-end" :
         "justify-start";
       const msgStyle =
@@ -271,51 +242,120 @@ function displayMessages(messages, scrollToBottom = false) {
   }
 }
 
-  //get the messages  between the user connected and the avatar(2nd user)
-
-  function loadMessages(page, scrollToBottom = false) {
-    const limit = 10;
-    //id conversation
-    axios
-      .get(
-        `http://127.0.0.1:3000/messages/63971dd761f3ef13725a96d2?page=${page}&limit=${limit}`
-      )
-      .then(function (response) {
-        if (response.data.message === "success") {
-          let messages = response.data.data;
-          displayMessages(messages, scrollToBottom);
-
-          let lastMessage = messages.messages[0].message;
-
-          let currentPage = 1;
-
-          // Add an event listener to the conversation container for scrolling up
-          conversationContainer.addEventListener("scroll", function () {
-            const scrollPosition = conversationContainer.scrollTop;
-            if (scrollPosition === 0) {
-              currentPage++;
-              loadMessages(currentPage, true);
-            }
-          });
-        }
-      })
-      .catch(function (error) {
-        console.log(error);
+/**
+ * get all the conversation the user connected have 
+ */
+function getMyConversations(newData) {
+  $("#left-conversation").html("");
+  axios.get(`http://127.0.0.1:3000/conversation/${newData.user}`)
+    .then(function (response) {
+      const conversations = response.data.data;
+      console.log(conversations)
+      conversations.forEach((conversation) => {
+        const {
+          name,
+          description
+        } = conversation;
+        const html = `<div>
+          <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
+            <div
+              @click="$dispatch('change-active-chat',{chatId:'${conversation._id}',avatar_url:'images/avatar/avatar-19.jpg',name:'${name}'})"
+              class="flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
+              <div class="avatar h-10 w-10">
+                <img class="rounded-full" src="images/avatar/avatar-19.jpg" alt="avatar" />
+                <div
+                  class="absolute right-0 h-3 w-3 rounded-full border-2 border-white bg-slate-300 dark:border-navy-700">
+                </div>
+              </div>
+              <div class="flex flex-1 flex-col">
+                <div class="flex items-baseline justify-between space-x-1.5">
+                  <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
+                    ${name}
+                  </p>
+                  <span class="text-tiny+ text-slate-400 dark:text-navy-300">11:03</span>
+                </div>
+                <div class="mt-1 flex items-center justify-between space-x-1">
+                  <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300">
+                    ${description}
+                  </p>
+                  <div
+                    class="flex h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-slate-200 px-1.5 text-tiny+ font-medium leading-none text-slate-800 dark:bg-navy-450 dark:text-white">
+                    5
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>`
+        $("#left-conversation").append(html);
       });
+    });
+}
+
+//get the messages  between the user connected and the avatar(2nd user)
+
+function loadMessages(page, conversation, scrollToBottom = false) {
+  const limit = 10;
+  //id conversation
+  axios
+    .get(
+      `http://127.0.0.1:3000/messages/${conversation}?page=${page}&limit=${limit}`
+    )
+    .then(function (response) {
+      if (response.data.message === "success") {
+        let messages = response.data.data;
+        displayMessages(messages, scrollToBottom);
+        let lastMessage = messages.messages[0].message;
+        let currentPage = 1;
+
+        // Add an event listener to the conversation container for scrolling up
+        conversationContainer.addEventListener("scroll", function () {
+          const scrollPosition = conversationContainer.scrollTop;
+          if (scrollPosition === 0) {
+            currentPage++;
+            loadMessages(currentPage, true);
+          }
+        });
+      }
+
+    })
+
+    .catch(function (error) {
+      console.log(error);
+    });
+}
+
+// send message by pressing the send button
+sendButton.addEventListener("click", () => {
+  if (messageInput.value.trim() !== "") {
+    const info = {
+      app: "638dc76312488c6bf67e8fc0",
+      user: newData.user,
+      action: "message.create",
+      metaData: {
+        type: "MSG",
+        conversation_id: conversation_id,
+        user: newData.user,
+        message: messageInput.value,
+        data: "non other data",
+        origin: "web",
+      },
+      to: to, // the id of the receiver 
+    };
+
+    foued.createMessage(info);
+    messageInput.value = "";
   }
-
-
-
-
+});
+foued.onMessageReceived();
 
 $(document).ready(function () {
-
-
   //Get the list of users (experts)
   getExperts();
-  //get all the conversations the user connected have
+  //select expert to start communicating 
+  selectExpert()
+  //get all the conversations the user connected have 
   getMyConversations(newData);
-
 
   
 
@@ -323,13 +363,6 @@ $(document).ready(function () {
 
 
 
-});
+  //get the first left conversation  
 
-
-function createConversation() {
-  foued.createConversation(data.onConversationCreate);
-  return foued.onConversationStart()
-}
-
-
-foued.onConversationMemberJoined();
+}); 
