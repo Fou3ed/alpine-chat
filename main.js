@@ -1,6 +1,5 @@
 import event from "./lib_client/client_2.js";
 const foued = new event();
-import * as data from "./lib_client/data.js";
 const currentDate = new Date();
 const hours = currentDate.getHours();
 const minutes = currentDate.getMinutes();
@@ -86,6 +85,8 @@ messageInput.addEventListener("input", () => {
 });
 
 
+/**after login  display the main page with the  latest conversation   */
+
 /**
  * Get the experts and when click to an avatar it direct the user to the left conversation  
  */
@@ -111,7 +112,6 @@ function getExperts() {
     }
   });
 }
-
 function selectExpert(){
   $(".swiper-wrapper").on("click", ".swiper-slide", function () {
     // Get the unique ID of the clicked avatar element
@@ -120,25 +120,12 @@ function selectExpert(){
 
     checkConversation(newData.user, avatarId)
     console.log("Clicked on avatar with ID: " + avatarId + name);
-
     //route to left conversation then e left conversation display the big container message 
     return to = avatarId ,receiverUserName=name
   });
 }
 
 
-
-
-
-/**to check later  */
-function leftConversation(){
-  $("#big-container-message").html(`
-  <div class="mx-4 flex items-center space-x-3">
-    <div class="h-px flex-1 bg-slate-200 dark:bg-navy-500"></div>
-    <p>${receiverUserName}</p>
-    <div class="h-px flex-1 bg-slate-200 dark:bg-navy-500"></div>
-  </div>`);
-}
 // check  the conversation between the first(connected user ) and the second user 
 // get the conversation , if there is no conversation between them , create for both the users a conversation member then a conversation 
 function checkConversation(user_id, avatarId) {
@@ -194,7 +181,10 @@ foued.onConversationMemberJoined();
 
 //display the messages  
 function displayMessages(messages, scrollToBottom = false) {
-  console.log(messages)
+  if (!messages || !messages.messages) {
+    console.log('No messages to display');
+    return;
+  }
   // Reverse the messages array to display them in the opposite order
   const reversedMessages = messages.messages.reverse();
   for (let i = 0; i < reversedMessages.length; i++) {
@@ -202,6 +192,7 @@ function displayMessages(messages, scrollToBottom = false) {
     const messageId = reversedMessages[i]._id;
     const messageContainer = document.getElementById(`message-${messageId}`);
     if (!messageContainer) {
+      console.log(message.message)
       let direction =
         message.user === user_id ?
         "justify-end" :
@@ -219,7 +210,7 @@ function displayMessages(messages, scrollToBottom = false) {
                 ${direction == "justify-end" ? msgButt : ""}
                   <div class="ml-2 max-w-lg sm:ml-5">
                     <div class="${msgStyle}">
-                      ${message.message}
+                      ${message.message} hhhhhh
                     </div>
                     <p  id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
                           ${timeString}      
@@ -292,11 +283,15 @@ function getMyConversations(newData) {
     });
 }
 
-//get the messages  between the user connected and the avatar(2nd user)
 
+//get the messages  between the user connected and the avatar(2nd user)
 function loadMessages(page, conversation, scrollToBottom = false) {
+  console.log("load page ", page, conversation);
   const limit = 10;
-  //id conversation
+  const spinner = document.createElement("span");
+  spinner.classList.add("loader");
+  conversationContainer.appendChild(spinner); // add the spinner to the conversation container
+
   axios
     .get(
       `http://127.0.0.1:3000/messages/${conversation}?page=${page}&limit=${limit}`
@@ -305,7 +300,6 @@ function loadMessages(page, conversation, scrollToBottom = false) {
       if (response.data.message === "success") {
         let messages = response.data.data;
         displayMessages(messages, scrollToBottom);
-        let lastMessage = messages.messages[0].message;
         let currentPage = 1;
 
         // Add an event listener to the conversation container for scrolling up
@@ -313,17 +307,26 @@ function loadMessages(page, conversation, scrollToBottom = false) {
           const scrollPosition = conversationContainer.scrollTop;
           if (scrollPosition === 0) {
             currentPage++;
-            loadMessages(currentPage, true);
+            loadMessages(currentPage, conversation, true);
           }
         });
       }
-
     })
-
     .catch(function (error) {
       console.log(error);
+    })
+    .then(function () {
+      conversationContainer.removeChild(spinner); // remove the spinner once the API request is completed
     });
 }
+
+
+
+
+
+
+
+
 
 // send message by pressing the send button
 sendButton.addEventListener("click", () => {
@@ -349,20 +352,67 @@ sendButton.addEventListener("click", () => {
 });
 foued.onMessageReceived();
 
+
+
+function selectConversation(conversationId, avatarUrl, name) {
+  //loadMessages(1,conversationId,true)
+//displayConversation(conversationId)
+  console.log("Selected conversation:", conversationId, avatarUrl, name);
+}
+
+function displayConversation(conversation) {
+  const { _id, name } = conversation;
+
+  // Update the conversation name in the big message container
+  $("#conversation-name").text(name);
+
+  // Clear the messages container
+  // $("#conversation-container").empty();
+
+  // Show the big message container
+  //$("#big-container-message").show();
+
+    loadMessages(1,conversation,true)
+ 
+ 
+}
+
 $(document).ready(function () {
   //Get the list of users (experts)
   getExperts();
   //select expert to start communicating 
-  selectExpert()
+  selectExpert();
   //get all the conversations the user connected have 
-  getMyConversations(newData);
+  getMyConversations(newData, function(conversations) { 
+    //select the first conversation if there are any
+    if (conversations.length > 0) {
+      const firstConversation = conversations[0];
+      const { chatId, avatar_url, name } = firstConversation;
+      selectConversation(chatId, avatar_url, name);
+      displayConversation(firstConversation);
+    }
+  });
+  // Listen for the "change-active-chat" event and call selectConversation function
+  document.addEventListener("change-active-chat", function(event) {
+    const { chatId, avatar_url, name } = event.detail;
+   conversation_id = chatId
+    selectConversation(conversation_id, avatar_url, name);
+    console.log(chatId)
+  });
+});
 
-  
 
 
 
 
 
-  //get the first left conversation  
 
-}); 
+
+
+
+
+
+
+
+
+
