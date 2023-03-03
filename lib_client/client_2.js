@@ -352,30 +352,48 @@ export default class event {
   }
   
   onMessageDelivered = () => {
-    return new Promise((resolve,reject)=>{
     this.socket.on('onMessageDelivered', (data, error) => {
-        console.log(data)
-      resolve(data)
+        console.log("message delivered : ",data)
+        const messageId = data.id; 
+        const messageContainer = document.getElementById(`message-${messageId}`);
+        if (!messageContainer) {
+           let direction = data.direction =="in" ?'justify-end' : '';
+           const msgStyle=data.direction =="out" ? `rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100`:'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white'
+          messagesContainer.insertAdjacentHTML("beforeend", `
+            <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
+            <div class="flex flex-col items-end space-y-3.5">
+            <div class="flex flex-row">
+            ${data.direction =="in" ? butt :'' }
+              <div class="ml-2 max-w-lg sm:ml-5">
+                <div class="${msgStyle}">
+                  ${data.content}
+                </div>
+                <p  id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
+                      ${timeString}      
+                </p>
+              </div>
+            ${data.direction =="out" ? butt :''}
+            </div>
+            <div class="flex flex-row">
+                </div>
+              </div>
+            </div>
+          </div>
+            </div>
+          `);
+        }
     })
-    })
-
+  
   }
 
-  /**
-   *   
-   *  message received event 
-   */
-  messageReceived = (data) => {
-    this.socket.emit('MessageReceived', data);
-}
 
 
 onMessageReceived = () => {
   this.socket.on('onMessageReceived', (data, error) => {
+    console.log("message received : ",data)
     const messageId = data.id; 
     const messageContainer = document.getElementById(`message-${messageId}`);
     if (!messageContainer) {
-      console.log(data.direction=="in")
        let direction = data.direction =="in" ?'justify-end' : '';
        const msgStyle=data.direction =="out" ? `rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100`:'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white'
       messagesContainer.insertAdjacentHTML("beforeend", `
@@ -403,6 +421,8 @@ onMessageReceived = () => {
     }
   });
 };
+
+
 
 
 
@@ -549,16 +569,17 @@ onMessageReceived = () => {
   /**
    * react message event 
    */
+
   reactMsg = (data) => {
-    this.socket.emit('reactMsg', (data, error) => {
+    this.socket.emit('reactMsg', data, (error) => {
       if (error) {
         setError(error)
       }
     })
   }
-  onReactMsg = (data) => {
-    this.socket.on('onMsgReacted', (data, error) => {
-      console.log(data)
+  onReactMsg = () => {
+    this.socket.on('onMsgReacted',(data,error) => {
+      console.log("reacted",data)
     })
   }
 
@@ -567,7 +588,7 @@ onMessageReceived = () => {
    * unReact message event 
    */
   unReactMsg = (data) => {
-    this.socket.emit('unReactMsg', (data, error) => {
+    this.socket.emit('unReactMsg', data,(error) => {
       if (error) {
         setError(error)
       }

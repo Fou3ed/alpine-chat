@@ -5,11 +5,11 @@ const hours = currentDate.getHours();
 const minutes = currentDate.getMinutes();
 const timeString =
   hours.toString().padStart(2, "0") + ":" + minutes.toString().padStart(2, "0");
+  const conversationContainer = document.getElementById('conversation-container');
+  const messagesContainer = document.getElementById("big-container-message")
 
-const messagesContainer = document.getElementById("big-container-message");
 const messageInput = document.querySelector("#message-input");
 const sendButton = document.querySelector("#send-message");
-const conversationContainer = document.getElementById("conversation-container");
 const newData = JSON.parse(localStorage.getItem("newData"));
 console.log("LOCAL STORAGE",newData);
 
@@ -51,8 +51,8 @@ const msgButt = `<div x-data="usePopper({placement:'bottom-end',offset:4})" @cli
 //global variables
 let user_id = document.querySelector("#user-id");
 let conversation_id;
-let to;
 let receiverUserName;
+let to;
 //log in
 window.connected = async () => {
   const connectionInfo = {
@@ -73,7 +73,7 @@ window.connected = async () => {
   };
   foued.connect(connectionInfo);
 };
-foued.onConnected();
+foued.onConnected();      
 
 //disable the send message button if it's empty .
 messageInput.addEventListener("input", () => {
@@ -87,6 +87,8 @@ messageInput.addEventListener("input", () => {
 
 /**after login  display the main page with the  latest conversation   */
 
+
+
 /**
  * Get the experts and when click to an avatar it direct the user to the left conversation  
  */
@@ -97,6 +99,7 @@ function getExperts() {
       for (let i = 0; i < users.length; i++) {
         let user = users[i];
         let name = user.full_name;
+
         // Generate a unique ID for each avatar element
         let avatarId = users[i]._id;
         $(".swiper-wrapper").append(
@@ -113,30 +116,37 @@ function getExperts() {
   });
 }
 function selectExpert(){
+  document.getElementById('big-container-message').style.display = 'block'
+
   $(".swiper-wrapper").on("click", ".swiper-slide", function () {
     // Get the unique ID of the clicked avatar element
     let avatarId = $(this).attr("id");
     let name = $(this).data("name");
-
+    receiverUserName=name
+    to=avatarId
     checkConversation(newData.user, avatarId)
-    console.log("Clicked on avatar with ID: " + avatarId + name);
+    
+    console.log("Clicked on avatar with ID: " + avatarId + '  ' + name);
     //route to left conversation then e left conversation display the big container message 
-    return to = avatarId ,receiverUserName=name
+      
+    // Update the active chat with the conversation data
+    let activeChat = { chatId: avatarId, name: name, avatar_url: 'images/avatar/avatar-19.jpg' };
+    $(document).trigger('change-active-chat', { detail: activeChat });
   });
 }
 
 
 // check  the conversation between the first(connected user ) and the second user 
 // get the conversation , if there is no conversation between them , create for both the users a conversation member then a conversation 
-function checkConversation(user_id, avatarId) {
-  axios.get(`http://192.168.1.19:3000/conv/?user1=${user_id}&user2=${avatarId}`)
+function checkConversation(user_id, to) {
+  axios.get(`http://192.168.1.19:3000/conv/?user1=${user_id}&user2=${to}`)
     .then(function (response) {
       if (response.data.data.length == 0) {
-        createConversation(user_id).then(function (res) {
+        createConversation(user_id,to).then(function (res) {
           const memberInfo = {
             conversation_id: res._id,
             user_id: user_id,
-            conversation_name: avatarId,
+            conversation_name: receiverUserName,
           };
           foued.addMembers(memberInfo);
           foued.addMembers({
@@ -144,20 +154,23 @@ function checkConversation(user_id, avatarId) {
             user_id: avatarId,
             conversation_name: user_id
           })
+          conversation_id = res._id
         });
       } else {
-       
-        let conversation_id = response.data.data[0]._id
+        conversation_id = response.data.data[0]._id
         let currentPage = 1;
         // Load the first page of messages on page load
         loadMessages(currentPage, conversation_id, true);
+        console.log("conversation : " ,conversation_id)
       }
-      return conversation_id = response.data.data[0]._id
+     
     });
 }
 
+
+
 // create conversation function 
-function createConversation(user_id,avatar_id) {
+function createConversation(user_id,to) {
   const   conversationInfo={
       app: "638dc76312488c6bf67e8fc0",
       user: user_id,
@@ -168,7 +181,7 @@ function createConversation(user_id,avatar_id) {
           conversation_type: "private",
           description: "private chat",
           operators: [1],
-          members: [user_id,avatar_id],
+          members: [user_id,to],
           permissions: {"key":"value"},
           members_count:2,
           max_length_message: "256",
@@ -179,8 +192,7 @@ function createConversation(user_id,avatar_id) {
 }
 foued.onConversationMemberJoined();
 
-//display the messages  
-function displayMessages(messages, scrollToBottom = false) {
+function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
   if (!messages || !messages.messages) {
     console.log('No messages to display');
     return;
@@ -210,7 +222,7 @@ function displayMessages(messages, scrollToBottom = false) {
                 ${direction == "justify-end" ? msgButt : ""}
                   <div class="ml-2 max-w-lg sm:ml-5">
                     <div class="${msgStyle}">
-                      ${message.message} hhhhhh
+                      ${message.message} 
                     </div>
                     <p  id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
                           ${timeString}      
@@ -228,79 +240,128 @@ function displayMessages(messages, scrollToBottom = false) {
       );
     }
   }
-  if (scrollToBottom) {
-    conversationContainer.scrollTop = conversationContainer.scrollHeight;
-  }
+  // Set the scroll position to the previous position or bottom of the container
+  conversationContainer.scrollTop = scrollToBottom ? conversationContainer.scrollHeight : currentScrollPos;
 }
+
+
 
 /**
  * get all the conversation the user connected have 
  */
+
 function getMyConversations(newData) {
-  $("#left-conversation").html("");
+  const leftConversationContainer = document.getElementById('left-conversation');
+  let latestConversationId = null;
   axios.get(`http://127.0.0.1:3000/conversation/${newData.user}`)
     .then(function (response) {
       const conversations = response.data.data;
-      console.log(conversations)
+      console.log(conversations);
       conversations.forEach((conversation) => {
         const {
+          _id: conversationId,
           name,
-          description
+          description,
         } = conversation;
-        const html = `<div>
-          <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
-            <div
-              @click="$dispatch('change-active-chat',{chatId:'${conversation._id}',avatar_url:'images/avatar/avatar-19.jpg',name:'${name}'})"
-              class="flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600">
-              <div class="avatar h-10 w-10">
-                <img class="rounded-full" src="images/avatar/avatar-19.jpg" alt="avatar" />
-                <div
-                  class="absolute right-0 h-3 w-3 rounded-full border-2 border-white bg-slate-300 dark:border-navy-700">
-                </div>
-              </div>
-              <div class="flex flex-1 flex-col">
-                <div class="flex items-baseline justify-between space-x-1.5">
-                  <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
-                    ${name}
-                  </p>
-                  <span class="text-tiny+ text-slate-400 dark:text-navy-300">11:03</span>
-                </div>
-                <div class="mt-1 flex items-center justify-between space-x-1">
-                  <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300">
-                    ${description}
-                  </p>
+        const html = `
+          <div class="conversation" data-conversation-id="${conversationId}" data-name="${name}">
+            <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
+              <div
+                class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
+                data-conversation-id="${conversationId}"
+                data-name="${name}">
+                <div class="avatar h-10 w-10">
+                  <img class="rounded-full" src="images/avatar/avatar-5.jpg" alt="avatar" />
                   <div
-                    class="flex h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-slate-200 px-1.5 text-tiny+ font-medium leading-none text-slate-800 dark:bg-navy-450 dark:text-white">
-                    5
+                    class="absolute right-0 h-3 w-3 rounded-full border-2 border-white bg-slate-300 dark:border-navy-700">
+                  </div>
+                </div>
+                <div class="flex flex-1 flex-col">
+                  <div class="flex items-baseline justify-between space-x-1.5">
+                    <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
+                      ${name}
+                    </p>
+                    <span class="text-tiny+ text-slate-400 dark:text-navy-300">11:03</span>
+                  </div>
+                  <div class="mt-1 flex items-center justify-between space-x-1">
+                    <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300">
+                      ${description}
+                    </p>
+                    <div
+                      class="flex h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-slate-200 px-1.5 text-tiny+ font-medium leading-none text-slate-800 dark:bg-navy-450 dark:text-white">
+                      5
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>`
-        $("#left-conversation").append(html);
+          </div>`;
+        leftConversationContainer.innerHTML += html;
+
+        // Update the latest conversation ID
+        latestConversationId = conversationId;
       });
+
+      // Trigger a click event on the latest conversation
+      if (latestConversationId) {
+        $(`[data-conversation-id="${latestConversationId}"]`).trigger('click');
+      }
     });
 }
 
 
+function handleConversationClick() {
+  document.getElementById('big-container-message').style.display = 'block'
+
+  const conversationId = $(this).data('conversation-id');
+  const name = $(this).data('name');
+  conversation_id=conversationId
+  const conversationName=document.getElementById('conversation-name')
+  conversationName.textContent=name
+
+  // Load the first page of messages on page load
+  let currentPage=1
+   loadMessages(currentPage, conversationId, true);
+  console.log("Clicked on conversation with ID: " + conversationId + " " + name);
+          
+  // Update the active chat with the conversation data
+
+  let activeChat = { chatId: conversationId, name: name, avatar_url: 'images/avatar/avatar-19.jpg' };
+  // window.dispatchEvent(new CustomEvent('change-active-chat', { detail: activeChat }));
+  $(document).trigger('change-active-chat', { detail: activeChat });
+}
 //get the messages  between the user connected and the avatar(2nd user)
+let prevScrollHeight = 0;
+
 function loadMessages(page, conversation, scrollToBottom = false) {
-  console.log("load page ", page, conversation);
   const limit = 10;
   const spinner = document.createElement("span");
   spinner.classList.add("loader");
   conversationContainer.appendChild(spinner); // add the spinner to the conversation container
+
+  // Store the previous scroll height
+  prevScrollHeight = conversationContainer.scrollHeight;
+  // Remove all child elements from the messages container
+  messagesContainer.innerHTML = '';
 
   axios
     .get(
       `http://127.0.0.1:3000/messages/${conversation}?page=${page}&limit=${limit}`
     )
     .then(function (response) {
+      
       if (response.data.message === "success") {
         let messages = response.data.data;
-        displayMessages(messages, scrollToBottom);
-        let currentPage = 1;
+        console.log(messages)
+        const currentScrollPos = conversationContainer.scrollTop;
+
+        displayMessages(messages, currentScrollPos, scrollToBottom);
+
+        // Set the scroll position to the previous position
+        conversationContainer.scrollTop += conversationContainer.scrollHeight - prevScrollHeight;
+
+        // Set currentPage to the current page number minus 1
+        let currentPage = page - 1;
 
         // Add an event listener to the conversation container for scrolling up
         conversationContainer.addEventListener("scroll", function () {
@@ -316,20 +377,16 @@ function loadMessages(page, conversation, scrollToBottom = false) {
       console.log(error);
     })
     .then(function () {
-      conversationContainer.removeChild(spinner); // remove the spinner once the API request is completed
+      conversationContainer.removeChild(spinner); // remove the spinner once the GET request is completed
     });
 }
 
 
 
 
-
-
-
-
-
 // send message by pressing the send button
 sendButton.addEventListener("click", () => {
+  console.log("me:",newData.user,"he:",to,"conversation",conversation_id)
   if (messageInput.value.trim() !== "") {
     const info = {
       app: "638dc76312488c6bf67e8fc0",
@@ -343,62 +400,27 @@ sendButton.addEventListener("click", () => {
         data: "non other data",
         origin: "web",
       },
-      to: to, // the id of the receiver 
+      to:receiverUserName, // the id of the receiver(to change later ) 
     };
 
     foued.createMessage(info);
     messageInput.value = "";
   }
 });
+foued.onMessageDelivered()
 foued.onMessageReceived();
 
-
-
-function selectConversation(conversationId, avatarUrl, name) {
-  //loadMessages(1,conversationId,true)
-//displayConversation(conversationId)
-  console.log("Selected conversation:", conversationId, avatarUrl, name);
-}
-
-function displayConversation(conversation) {
-  const { _id, name } = conversation;
-
-  // Update the conversation name in the big message container
-  $("#conversation-name").text(name);
-
-  // Clear the messages container
-  // $("#conversation-container").empty();
-
-  // Show the big message container
-  //$("#big-container-message").show();
-
-    loadMessages(1,conversation,true)
- 
- 
-}
 
 $(document).ready(function () {
   //Get the list of users (experts)
   getExperts();
   //select expert to start communicating 
   selectExpert();
-  //get all the conversations the user connected have 
-  getMyConversations(newData, function(conversations) { 
-    //select the first conversation if there are any
-    if (conversations.length > 0) {
-      const firstConversation = conversations[0];
-      const { chatId, avatar_url, name } = firstConversation;
-      selectConversation(chatId, avatar_url, name);
-      displayConversation(firstConversation);
-    }
-  });
-  // Listen for the "change-active-chat" event and call selectConversation function
-  document.addEventListener("change-active-chat", function(event) {
-    const { chatId, avatar_url, name } = event.detail;
-   conversation_id = chatId
-    selectConversation(conversation_id, avatar_url, name);
-    console.log(chatId)
-  });
+  getMyConversations(newData)
+// Add a click event listener to each conversation element
+  $(document).on('click', '.conversation-click', handleConversationClick);
+
+
 });
 
 

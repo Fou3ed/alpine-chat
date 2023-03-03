@@ -16,6 +16,7 @@
 <script src="lib_client/client_2.js" type="module" >
 
 </script>
+
   <!-- CSS Assets -->
   <link rel="stylesheet" href="css/app.css" />
  <!-- jQuery -->
@@ -23,7 +24,7 @@
 
 <!-- Axios -->
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
+<script src="moment/moment.js"></script>
   <!-- Javascript Assets -->
   <script src="js/app.js" defer></script>
 
@@ -1418,14 +1419,18 @@
 
     
     <!-- Main Content Wrapper -->
-    <main
-      x-data="{isShowChatInfo : !$store.breakpoints.mdAndDown ,activeChat:{chatId:'chat-1',name:'Alfredo Elliott',avatar_url:'images/avatar/avatar-19.jpg'}}"
-      x-effect="$store.breakpoints.mdAndDown === true &amp;&amp; (isShowChatInfo = false)"
-      class="main-content h-100vh chat-app mt-0 flex w-full flex-col"
-      @change-active-chat.window="activeChat=$event.detail">
+   <main
+  x-data="{ isShowChatInfo: !$store.breakpoints.mdAndDown, activeChat: { chatId: 'chat-1', name: '', avatar_url: 'images/avatar/avatar-19.jpg' } }"
+  x-effect="$store.breakpoints.mdAndDown === true && (isShowChatInfo = false)"
+  class="main-content h-100vh chat-app mt-0 flex w-full flex-col"
+  x-on:change-active-chat.window="activeChat=$event.detail"
+  x-init="function() { activeChat.name = '' }"
+>
+
+
 
       <!-- l bar lfou9ani  -->
-      <div
+      <div 
         class="chat-header relative z-10 flex h-[61px] w-full shrink-0 items-center justify-between border-b border-slate-150 bg-white px-[calc(var(--margin-x)-.5rem)] shadow-sm transition-[padding,width] duration-[.25s] dark:border-navy-700 dark:bg-navy-800">
         <div class="flex items-center space-x-5">
           <div class="ml-1 h-7 w-7">
@@ -1443,7 +1448,7 @@
               <img class="rounded-full"  :src="activeChat.avatar_url" alt="avatar" />
             </div>
             <div>
-              <p class="font-medium text-slate-700 line-clamp-1 dark:text-navy-100" x-text="activeChat.name"></p>
+              <p class="font-medium text-slate-700 line-clamp-1 dark:text-navy-100"  id="conversation-name" x-text="activeChat.name"></p>
               <p class="mt-0.5 text-xs">Last seen recently</p>
             </div>
           </div>
@@ -1702,13 +1707,12 @@
 
           <!-- l conversation  -->
       
-      <div :class="$store.breakpoints.smAndUp && 'scrollbar-sm'" id="conversation-container"
-        class="grow overflow-y-auto px-[calc(var(--margin-x)-.5rem)] py-5 transition-all duration-[.25s]">
-        <div x-show="activeChat.chatId === 'chat-1'" x-transition:enter="transition-all duration-500 easy-in-out"
-          x-transition:enter-start="opacity-0 [transform:translate3d(0,1rem,0)]"
-          x-transition:enter-end="opacity-100 [transform:translate3d(0,0,0)]" class="space-y-5" id="big-container-message"></div>
-      </div>
-
+          <div :class="$store.breakpoints.smAndUp && 'scrollbar-sm'" id="conversation-container"
+          class="grow overflow-y-auto px-[calc(var(--margin-x)-.5rem)] py-5 transition-all duration-[.25s]">
+          <div x-show="activeChat.chatId === 'chat-1'" x-transition:enter="transition-all duration-500 easy-in-out"
+            x-transition:enter-start="opacity-0 [transform:translate3d(0,1rem,0)]"
+            x-transition:enter-end="opacity-100 [transform:translate3d(0,0,0)]" class="space-y-5" id="big-container-message"></div>
+        </div>
 
 
 
