@@ -21721,12 +21721,13 @@ code.hljs {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    display: inline-block;
+    /* display: inline-block; */
     position: relative;
     border: 10px solid;
     border-color: rgba(255, 255, 255, 0.15) rgba(255, 255, 255, 0.25) rgba(255, 255, 255, 0.35) rgba(255, 255, 255, 0.5);
     box-sizing: border-box;
     animation: rotation 1s linear infinite;
+    
   }
   
   @keyframes rotation {

@@ -538,14 +538,14 @@ onMessageReceived = () => {
    * pin message event
    */
   pinMsg = (data) => {
-    this.socket.emit('pinMsg', (data, error) => {
+    this.socket.emit('pinMsg', data, (error) => {
       if (error) {
         setError(error)
       }
     })
   }
   onPinnedMsg = (data) => {
-    this.socket.on('onMsgPinned', (data, error) => {
+    this.socket.on('onMsgPinned',(data, error) => {
       console.log(data)
     })
   }
@@ -554,7 +554,7 @@ onMessageReceived = () => {
    * unPin message event 
    */
   unPinMsg = (data) => {
-    this.socket.emit('unPinMsg', (data, error) => {
+    this.socket.emit('unPinMsg', data,(error) => {
       if (error) {
         setError(error)
       }

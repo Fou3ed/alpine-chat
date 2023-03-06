@@ -13,7 +13,6 @@ const sendButton = document.querySelector("#send-message");
 const newData = JSON.parse(localStorage.getItem("newData"));
 console.log("LOCAL STORAGE",newData);
 
-
 //message configuration : delete,edit,reply,forward ..
 const msgButt = `<div x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex mt-2">
             <button x-ref="popperRef" @click="isShowPopper = !isShowPopper" class="btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
@@ -49,7 +48,7 @@ const msgButt = `<div x-data="usePopper({placement:'bottom-end',offset:4})" @cli
           </div>`;
 
 //global variables
-let user_id = document.querySelector("#user-id");
+let user_id = newData.user_id
 let conversation_id;
 let receiverUserName;
 let to;
@@ -85,8 +84,6 @@ messageInput.addEventListener("input", () => {
 });
 
 
-/**after login  display the main page with the  latest conversation   */
-
 
 
 /**
@@ -116,56 +113,68 @@ function getExperts() {
   });
 }
 function selectExpert(){
-  document.getElementById('big-container-message').style.display = 'block'
-
   $(".swiper-wrapper").on("click", ".swiper-slide", function () {
+
     // Get the unique ID of the clicked avatar element
     let avatarId = $(this).attr("id");
     let name = $(this).data("name");
-    receiverUserName=name
-    to=avatarId
-    checkConversation(newData.user, avatarId)
+    receiverUserName=name 
+    to=avatarId      
+    
+    
+    checkConversation(newData.user, to)
     
     console.log("Clicked on avatar with ID: " + avatarId + '  ' + name);
     //route to left conversation then e left conversation display the big container message 
       
     // Update the active chat with the conversation data
     let activeChat = { chatId: avatarId, name: name, avatar_url: 'images/avatar/avatar-19.jpg' };
-    $(document).trigger('change-active-chat', { detail: activeChat });
+    window.dispatchEvent(new CustomEvent('change-active-chat', { detail: activeChat }));
+
+    // $(document).trigger('change-active-chat', { detail: activeChat }); 
+    to=avatarId;
+
   });
 }
+
+/**
+ * open a new blank conversation 
+ */
 
 
 // check  the conversation between the first(connected user ) and the second user 
 // get the conversation , if there is no conversation between them , create for both the users a conversation member then a conversation 
 function checkConversation(user_id, to) {
+  console.log("check conversation","me",user_id,"he",to)
   axios.get(`http://192.168.1.19:3000/conv/?user1=${user_id}&user2=${to}`)
     .then(function (response) {
       if (response.data.data.length == 0) {
-        createConversation(user_id,to).then(function (res) {
-          const memberInfo = {
-            conversation_id: res._id,
-            user_id: user_id,
-            conversation_name: receiverUserName,
-          };
-          foued.addMembers(memberInfo);
-          foued.addMembers({
-            conversation_id: res._id,
-            user_id: avatarId,
-            conversation_name: user_id
-          })
-          conversation_id = res._id
-        });
+        messagesContainer.innerHTML = '' 
+        console.log("hahaahahah")
+        // createConversation(user_id,to).then(function (res) {
+        //   const memberInfo = {
+        //     conversation_id: res._id,
+        //     user_id: user_id,
+        //     conversation_name: receiverUserName,
+        //   };
+        //   foued.addMembers(memberInfo);
+        //   foued.addMembers({
+        //     conversation_id: res._id,
+        //     user_id: to,
+        //     conversation_name: user_id
+        //   })
+        //   conversation_id = res._id
+        // });
       } else {
         conversation_id = response.data.data[0]._id
         let currentPage = 1;
         // Load the first page of messages on page load
         loadMessages(currentPage, conversation_id, true);
-        console.log("conversation : " ,conversation_id)
+        console.log("conversation : ",conversation_id)
       }
-     
     });
 }
+
 
 
 
@@ -192,19 +201,23 @@ function createConversation(user_id,to) {
 }
 foued.onConversationMemberJoined();
 
+
 function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
+  console.log("display messages")
+  document.getElementById('big-container-message').style.display = 'block'
+
   if (!messages || !messages.messages) {
     console.log('No messages to display');
     return;
   }
   // Reverse the messages array to display them in the opposite order
   const reversedMessages = messages.messages.reverse();
+  const oldHeight = messagesContainer.scrollHeight;
   for (let i = 0; i < reversedMessages.length; i++) {
     let message = reversedMessages[i];
     const messageId = reversedMessages[i]._id;
     const messageContainer = document.getElementById(`message-${messageId}`);
     if (!messageContainer) {
-      console.log(message.message)
       let direction =
         message.user === user_id ?
         "justify-end" :
@@ -240,11 +253,92 @@ function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
       );
     }
   }
-  // Set the scroll position to the previous position or bottom of the container
-  conversationContainer.scrollTop = scrollToBottom ? conversationContainer.scrollHeight : currentScrollPos;
+  // Calculate the height of the new messages
+  const newHeight = messagesContainer.scrollHeight;
+  const addedHeight = newHeight - oldHeight;
+  // Set the scroll position to keep the container in the same position if scrollToBottom is false
+  if (!scrollToBottom) {
+    conversationContainer.scrollTop = currentScrollPos + addedHeight;
+  }
+}
+
+let isLoading = false;
+let currentPage = 1;
+let limit = 10;
+
+const spinner = document.getElementById('conversation-spinner')
+/**
+ * load messages of a conversation 
+ */
+async function loadMessages(page, conversation, scrollToBottom = false) {
+  console.log("load Messages")
+  document.getElementById('big-container-message').style.display = 'block'
+
+  console.log(conversation,page,limit)
+  // Don't make multiple requests if a request is already in progress
+  if (isLoading) {
+    return;
+  }
+
+  try {
+    isLoading = true;
+    
+    // Show the spinner
+    spinner.classList.remove("hidden");
+
+    // Fetch the messages from the server
+    const response = await axios.get(`http://127.0.0.1:3000/messages/${conversation}?page=${page}&limit=${limit}`);
+    if (response.data.message !== "success") {
+      throw new Error("Failed to load messages");
+    }
+    const messages = response.data.data;
+
+    // Get the current scroll position and height of the conversation container
+    const containerScrollHeight = conversationContainer.scrollHeight;
+    const containerClientHeight = conversationContainer.clientHeight;
+
+    // Determine if the user has scrolled up or down
+    const isScrolledDown = conversationContainer.scrollTop + containerClientHeight >= containerScrollHeight;
+
+    // Display the messages
+    const currentScrollPos = conversationContainer.scrollTop;
+    displayMessages(messages, currentScrollPos, scrollToBottom);
+
+    // If the user was scrolled down, adjust the scroll position to keep the container at the bottom
+    if (isScrolledDown) {
+      conversationContainer.scrollTop = conversationContainer.scrollHeight;
+    } else {
+      // Otherwise, adjust the scroll position to keep the same relative position
+      const newContainerScrollHeight = conversationContainer.scrollHeight;
+      const addedHeight = newContainerScrollHeight - containerScrollHeight;
+      conversationContainer.scrollTop = currentScrollPos + addedHeight;
+    }
+
+    // Set the current page number
+    currentPage = page;
+
+    // Add an event listener to the conversation container for scrolling up
+    conversationContainer.addEventListener("scroll", onScrollUp);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    // Hide the spinner and mark the request as complete
+    spinner.classList.add("hidden");
+    isLoading = false;
+  }
 }
 
 
+function onScrollUp() {
+  const scrollPosition = conversationContainer.scrollTop;
+  if (scrollPosition === 0) {
+    // Remove the event listener to prevent additional requests
+    conversationContainer.removeEventListener("scroll", onScrollUp);
+
+    // Load the next page of messages
+    loadMessages(currentPage + 1, conversation_id, true);
+  }
+}
 
 /**
  * get all the conversation the user connected have 
@@ -256,7 +350,6 @@ function getMyConversations(newData) {
   axios.get(`http://127.0.0.1:3000/conversation/${newData.user}`)
     .then(function (response) {
       const conversations = response.data.data;
-      console.log(conversations);
       conversations.forEach((conversation) => {
         const {
           _id: conversationId,
@@ -308,11 +401,10 @@ function getMyConversations(newData) {
       }
     });
 }
-
-
 function handleConversationClick() {
+  messagesContainer.innerHTML = '' 
   document.getElementById('big-container-message').style.display = 'block'
-
+    
   const conversationId = $(this).data('conversation-id');
   const name = $(this).data('name');
   conversation_id=conversationId
@@ -327,66 +419,20 @@ function handleConversationClick() {
   // Update the active chat with the conversation data
 
   let activeChat = { chatId: conversationId, name: name, avatar_url: 'images/avatar/avatar-19.jpg' };
-  // window.dispatchEvent(new CustomEvent('change-active-chat', { detail: activeChat }));
-  $(document).trigger('change-active-chat', { detail: activeChat });
+  to=name
+  window.dispatchEvent(new CustomEvent('change-active-chat', { detail: activeChat }));
+
+
+  // $(document).trigger('change-active-chat', { detail: activeChat });
 }
-//get the messages  between the user connected and the avatar(2nd user)
-let prevScrollHeight = 0;
-
-function loadMessages(page, conversation, scrollToBottom = false) {
-  const limit = 10;
-  const spinner = document.createElement("span");
-  spinner.classList.add("loader");
-  conversationContainer.appendChild(spinner); // add the spinner to the conversation container
-
-  // Store the previous scroll height
-  prevScrollHeight = conversationContainer.scrollHeight;
-  // Remove all child elements from the messages container
-  messagesContainer.innerHTML = '';
-
-  axios
-    .get(
-      `http://127.0.0.1:3000/messages/${conversation}?page=${page}&limit=${limit}`
-    )
-    .then(function (response) {
-      
-      if (response.data.message === "success") {
-        let messages = response.data.data;
-        console.log(messages)
-        const currentScrollPos = conversationContainer.scrollTop;
-
-        displayMessages(messages, currentScrollPos, scrollToBottom);
-
-        // Set the scroll position to the previous position
-        conversationContainer.scrollTop += conversationContainer.scrollHeight - prevScrollHeight;
-
-        // Set currentPage to the current page number minus 1
-        let currentPage = page - 1;
-
-        // Add an event listener to the conversation container for scrolling up
-        conversationContainer.addEventListener("scroll", function () {
-          const scrollPosition = conversationContainer.scrollTop;
-          if (scrollPosition === 0) {
-            currentPage++;
-            loadMessages(currentPage, conversation, true);
-          }
-        });
-      }
-    })
-    .catch(function (error) {
-      console.log(error);
-    })
-    .then(function () {
-      conversationContainer.removeChild(spinner); // remove the spinner once the GET request is completed
-    });
-}
-
 
 
 
 // send message by pressing the send button
 sendButton.addEventListener("click", () => {
+
   console.log("me:",newData.user,"he:",to,"conversation",conversation_id)
+
   if (messageInput.value.trim() !== "") {
     const info = {
       app: "638dc76312488c6bf67e8fc0",
