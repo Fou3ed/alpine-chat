@@ -13,6 +13,9 @@ const sendButton = document.querySelector("#send-message");
 const newData = JSON.parse(localStorage.getItem("newData"));
 console.log("LOCAL STORAGE",newData);
 
+
+
+
 //message configuration : delete,edit,reply,forward ..
 const msgButt = `<div x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex mt-2">
             <button x-ref="popperRef" @click="isShowPopper = !isShowPopper" class="btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
@@ -48,10 +51,11 @@ const msgButt = `<div x-data="usePopper({placement:'bottom-end',offset:4})" @cli
           </div>`;
 
 //global variables
-let user_id = newData.user_id
+let user_id = document.querySelector("#user-id");
 let conversation_id;
 let receiverUserName;
 let to;
+
 //log in
 window.connected = async () => {
   const connectionInfo = {
@@ -83,9 +87,6 @@ messageInput.addEventListener("input", () => {
   }
 });
 
-
-
-
 /**
  * Get the experts and when click to an avatar it direct the user to the left conversation  
  */
@@ -114,14 +115,14 @@ function getExperts() {
 }
 function selectExpert(){
   $(".swiper-wrapper").on("click", ".swiper-slide", function () {
+    messagesContainer.innerHTML = '' 
 
     // Get the unique ID of the clicked avatar element
     let avatarId = $(this).attr("id");
     let name = $(this).data("name");
     receiverUserName=name 
     to=avatarId      
-    
-    
+  
     checkConversation(newData.user, to)
     
     console.log("Clicked on avatar with ID: " + avatarId + '  ' + name);
@@ -141,36 +142,50 @@ function selectExpert(){
  * open a new blank conversation 
  */
 
+async function firstMessage(user_id, to) {
+  if (conversation_id === '') {
+    // return the promise returned by createConversation()
+    const res = await createConversation(user_id, to);
+    const memberInfo = {
+      conversation_id: res._id,
+      user_id: user_id,
+      conversation_name: receiverUserName,
+    };
+    foued.addMembers(memberInfo);
+    foued.addMembers({
+      conversation_id: res._id,
+      user_id: to,
+      conversation_name: user_id
+    });
+    conversation_id = res._id;
+    return { conversation_id: res._id };
+  } else {
+    // if the conversation_id is not empty, return it immediately
+    return Promise.resolve({ conversation_id });
+  }
+}
+
+
 
 // check  the conversation between the first(connected user ) and the second user 
 // get the conversation , if there is no conversation between them , create for both the users a conversation member then a conversation 
 function checkConversation(user_id, to) {
-  console.log("check conversation","me",user_id,"he",to)
-  axios.get(`http://192.168.1.19:3000/conv/?user1=${user_id}&user2=${to}`)
+
+  console.log("check conversation","me :",user_id,"he :",to)
+  axios.get(`http://127.0.0.1:3000/conv/?user1=${user_id}&user2=${to}`)
     .then(function (response) {
       if (response.data.data.length == 0) {
+        conversation_id=''
         messagesContainer.innerHTML = '' 
-        console.log("hahaahahah")
-        // createConversation(user_id,to).then(function (res) {
-        //   const memberInfo = {
-        //     conversation_id: res._id,
-        //     user_id: user_id,
-        //     conversation_name: receiverUserName,
-        //   };
-        //   foued.addMembers(memberInfo);
-        //   foued.addMembers({
-        //     conversation_id: res._id,
-        //     user_id: to,
-        //     conversation_name: user_id
-        //   })
-        //   conversation_id = res._id
-        // });
+        console.log(" 'there is no conversation between the both of them yet',start a conversation by sending a message")
+      
+      
       } else {
+     
         conversation_id = response.data.data[0]._id
         let currentPage = 1;
         // Load the first page of messages on page load
         loadMessages(currentPage, conversation_id, true);
-        console.log("conversation : ",conversation_id)
       }
     });
 }
@@ -203,8 +218,7 @@ foued.onConversationMemberJoined();
 
 
 function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
-  console.log("display messages")
-  document.getElementById('big-container-message').style.display = 'block'
+    document.getElementById('big-container-message').style.display = 'block'
 
   if (!messages || !messages.messages) {
     console.log('No messages to display');
@@ -271,10 +285,9 @@ const spinner = document.getElementById('conversation-spinner')
  * load messages of a conversation 
  */
 async function loadMessages(page, conversation, scrollToBottom = false) {
-  console.log("load Messages")
   document.getElementById('big-container-message').style.display = 'block'
 
-  console.log(conversation,page,limit)
+  console.log("conversation : ",conversation,"page number:",page,limit)
   // Don't make multiple requests if a request is already in progress
   if (isLoading) {
     return;
@@ -390,7 +403,7 @@ function getMyConversations(newData) {
             </div>
           </div>`;
         leftConversationContainer.innerHTML += html;
-
+         
         // Update the latest conversation ID
         latestConversationId = conversationId;
       });
@@ -423,36 +436,40 @@ function handleConversationClick() {
   window.dispatchEvent(new CustomEvent('change-active-chat', { detail: activeChat }));
 
 
-  // $(document).trigger('change-active-chat', { detail: activeChat });
 }
 
 
 
 // send message by pressing the send button
 sendButton.addEventListener("click", () => {
-
-  console.log("me:",newData.user,"he:",to,"conversation",conversation_id)
-
   if (messageInput.value.trim() !== "") {
-    const info = {
-      app: "638dc76312488c6bf67e8fc0",
-      user: newData.user,
-      action: "message.create",
-      metaData: {
-        type: "MSG",
-        conversation_id: conversation_id,
-        user: newData.user,
-        message: messageInput.value,
-        data: "non other data",
-        origin: "web",
-      },
-      to:receiverUserName, // the id of the receiver(to change later ) 
-    };
-
-    foued.createMessage(info);
-    messageInput.value = "";
+    firstMessage(newData.user, to)
+      .then(function(res) {
+        const info = {
+          app: "638dc76312488c6bf67e8fc0",
+          user: newData.user,
+          action: "message.create",
+          metaData: {
+            type: "MSG",
+            conversation_id: res.conversation_id,
+            user: newData.user,
+            message: messageInput.value,
+            data: "non other data",
+            origin: "web",
+          },
+          to: receiverUserName, // the id of the receiver(to change later ) 
+        };
+        
+        foued.createRoom(res.conversation_id)
+        foued.createMessage(info);
+        messageInput.value = "";
+      })
+      .catch(function(error) {
+        console.error(error);
+      });
   }
 });
+
 foued.onMessageDelivered()
 foued.onMessageReceived();
 

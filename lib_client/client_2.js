@@ -120,6 +120,21 @@ export default class event {
 
 
   /**
+   * create room 
+   */
+  createRoom=(data)=>{
+    this.socket.emit("joinRoom",data,error=>{
+      if(error){
+        setError(error)
+      }
+    })
+  }
+  onRoomCreated=()=>{
+    this.socket.on("roomJoined",(data,error)=>{
+        console.log("room created",data)
+    })
+  }
+  /**
    *                                        Conversation Events
    */
 
@@ -211,7 +226,6 @@ export default class event {
    * add member to a conversation 
    */
   addMembers = (data) => {
-    console.log(data)
     this.socket.emit('onConversationMemberJoin', data, error => {
       if (error) {
         setError(error)
@@ -226,6 +240,10 @@ export default class event {
         console.log(data)
     })
   }
+
+
+
+  
 
   /**
    * update member in a conversation 
@@ -348,7 +366,6 @@ export default class event {
       console.log("conversation created");
       console.log('====================================');
     })
-    
   }
   
   onMessageDelivered = () => {
@@ -382,7 +399,11 @@ export default class event {
             </div>
           `);
         }
+        const conversationContainer = document.getElementById('conversation-container');
+        conversationContainer.scrollTop = conversationContainer.scrollHeight;
     })
+
+   
   
   }
 
@@ -419,7 +440,10 @@ onMessageReceived = () => {
         </div>
       `);
     }
+    const conversationContainer = document.getElementById('conversation-container');
+        conversationContainer.scrollTop = conversationContainer.scrollHeight;
   });
+
 };
 
 
