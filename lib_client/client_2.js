@@ -131,7 +131,7 @@ export default class event {
   }
   onRoomCreated=()=>{
     this.socket.on("roomJoined",(data,error)=>{
-        console.log("room created",data)
+        console.log("room joined",data)
     })
   }
   /**
@@ -367,6 +367,8 @@ export default class event {
       console.log('====================================');
     })
   }
+
+  
   
   onMessageDelivered = () => {
     this.socket.on('onMessageDelivered', (data, error) => {
@@ -519,7 +521,7 @@ onMessageReceived = () => {
    * Start typing event  
    */
   startTyping = (data) => {
-    this.socket.emit('onTypingStarted', data, error => {
+    this.socket.emit('onTypingStart', data, error => {
       if (error) {
         setError(error)
       }
@@ -539,7 +541,7 @@ onMessageReceived = () => {
    */
 
   stopTyping = (data) => {
-    this.socket.emit('onTypingStopped', data, error => {
+    this.socket.emit('onTypingStop', data, error => {
       if (error) {
         setError(error)
       }

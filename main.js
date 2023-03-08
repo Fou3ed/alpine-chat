@@ -13,9 +13,6 @@ const sendButton = document.querySelector("#send-message");
 const newData = JSON.parse(localStorage.getItem("newData"));
 console.log("LOCAL STORAGE",newData);
 
-
-
-
 //message configuration : delete,edit,reply,forward ..
 const msgButt = `<div x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex mt-2">
             <button x-ref="popperRef" @click="isShowPopper = !isShowPopper" class="btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
@@ -158,6 +155,7 @@ async function firstMessage(user_id, to) {
       conversation_name: user_id
     });
     conversation_id = res._id;
+      
     return { conversation_id: res._id };
   } else {
     // if the conversation_id is not empty, return it immediately
@@ -218,58 +216,60 @@ foued.onConversationMemberJoined();
 
 
 function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
-    document.getElementById('big-container-message').style.display = 'block'
+  document.getElementById('big-container-message').style.display = 'block';
 
   if (!messages || !messages.messages) {
     console.log('No messages to display');
     return;
   }
-  // Reverse the messages array to display them in the opposite order
-  const reversedMessages = messages.messages.reverse();
+
+  // Reverse the messages array to display them in the newest to oldest order
+  const reversedMessages = messages.messages.slice()
   const oldHeight = messagesContainer.scrollHeight;
+
+  // Loop through the messages in the newest to oldest order
   for (let i = 0; i < reversedMessages.length; i++) {
     let message = reversedMessages[i];
     const messageId = reversedMessages[i]._id;
     const messageContainer = document.getElementById(`message-${messageId}`);
+
     if (!messageContainer) {
       let direction =
-        message.user === user_id ?
-        "justify-end" :
-        "justify-start";
+        message.user === newData.user ? "justify-end" : "justify-start";
       const msgStyle =
-        direction === "justify-start" ?
-        "rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100" :
-        "rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white";
+        direction === "justify-start"
+          ? "rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100"
+          : "rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white";
+
       messagesContainer.insertAdjacentHTML(
-        "afterbegin",
+        "afterbegin", 
         `
-                <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
-                <div class="flex flex-col items-end space-y-3.5">
-                <div class="flex flex-row">
+          <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
+            <div class="flex flex-col items-end space-y-3.5">
+              <div class="flex flex-row">
                 ${direction == "justify-end" ? msgButt : ""}
-                  <div class="ml-2 max-w-lg sm:ml-5">
-                    <div class="${msgStyle}">
-                      ${message.message} 
-                    </div>
-                    <p  id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
-                          ${timeString}      
-                    </p>
+                <div class="ml-2 max-w-lg sm:ml-5">
+                  <div class="${msgStyle}">
+                    ${message.message} 
                   </div>
+                  <p id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
+                    ${timeString}      
+                  </p>
+                </div>
                 ${direction == "justify-start" ? msgButt : ""}
-                </div>
-                <div class="flex flex-row">
-                    </div>
-                  </div>
-                </div>
               </div>
-                </div>
-              `
+              <div class="flex flex-row"></div>
+            </div>
+          </div>
+        `
       );
     }
   }
+
   // Calculate the height of the new messages
   const newHeight = messagesContainer.scrollHeight;
   const addedHeight = newHeight - oldHeight;
+
   // Set the scroll position to keep the container in the same position if scrollToBottom is false
   if (!scrollToBottom) {
     conversationContainer.scrollTop = currentScrollPos + addedHeight;
@@ -295,7 +295,6 @@ async function loadMessages(page, conversation, scrollToBottom = false) {
 
   try {
     isLoading = true;
-    
     // Show the spinner
     spinner.classList.remove("hidden");
 
@@ -341,7 +340,6 @@ async function loadMessages(page, conversation, scrollToBottom = false) {
   }
 }
 
-
 function onScrollUp() {
   const scrollPosition = conversationContainer.scrollTop;
   if (scrollPosition === 0) {
@@ -356,6 +354,13 @@ function onScrollUp() {
 /**
  * get all the conversation the user connected have 
  */
+function getTheLastMsg(conversationId){
+  return axios.get(`http://127.0.0.1:3000/messages/lastMsg/${conversationId}`)
+    .then(function (response) {
+      const lastMessage = response.data.data.message;
+      return lastMessage;
+    });
+}
 
 function getMyConversations(newData) {
   const leftConversationContainer = document.getElementById('left-conversation');
@@ -367,8 +372,10 @@ function getMyConversations(newData) {
         const {
           _id: conversationId,
           name,
-          description,
+          
         } = conversation;
+        getTheLastMsg(conversationId)
+        .then((lastMessage) => {
         const html = `
           <div class="conversation" data-conversation-id="${conversationId}" data-name="${name}">
             <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
@@ -391,7 +398,7 @@ function getMyConversations(newData) {
                   </div>
                   <div class="mt-1 flex items-center justify-between space-x-1">
                     <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300">
-                      ${description}
+                    ${lastMessage}   
                     </p>
                     <div
                       class="flex h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-slate-200 px-1.5 text-tiny+ font-medium leading-none text-slate-800 dark:bg-navy-450 dark:text-white">
@@ -402,18 +409,21 @@ function getMyConversations(newData) {
               </div>
             </div>
           </div>`;
+        
         leftConversationContainer.innerHTML += html;
-         
+        
         // Update the latest conversation ID
         latestConversationId = conversationId;
-      });
-
+     
+        
       // Trigger a click event on the latest conversation
       if (latestConversationId) {
         $(`[data-conversation-id="${latestConversationId}"]`).trigger('click');
       }
     });
-}
+     });
+} )}
+
 function handleConversationClick() {
   messagesContainer.innerHTML = '' 
   document.getElementById('big-container-message').style.display = 'block'
@@ -434,7 +444,6 @@ function handleConversationClick() {
   let activeChat = { chatId: conversationId, name: name, avatar_url: 'images/avatar/avatar-19.jpg' };
   to=name
   window.dispatchEvent(new CustomEvent('change-active-chat', { detail: activeChat }));
-
 
 }
 
