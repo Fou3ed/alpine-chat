@@ -5,13 +5,13 @@ const hours = currentDate.getHours();
 const minutes = currentDate.getMinutes();
 const timeString =
   hours.toString().padStart(2, "0") + ":" + minutes.toString().padStart(2, "0");
-  const conversationContainer = document.getElementById('conversation-container');
-  const messagesContainer = document.getElementById("big-container-message")
+const conversationContainer = document.getElementById('conversation-container');
+const messagesContainer = document.getElementById("big-container-message")
 
 const messageInput = document.querySelector("#message-input");
 const sendButton = document.querySelector("#send-message");
 const newData = JSON.parse(localStorage.getItem("newData"));
-console.log("LOCAL STORAGE",newData);
+console.log("LOCAL STORAGE", newData);
 
 //message configuration : delete,edit,reply,forward ..
 const msgButt = `<div x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex mt-2">
@@ -63,6 +63,7 @@ window.connected = async () => {
       app_id: "638dc76312488c6bf67e8fc0",
       user_id: user_id.value,
       api_token: "123456789123456",
+      socket_id:String,
     },
     device: {
       ip: "192.168.1.1",
@@ -73,7 +74,7 @@ window.connected = async () => {
   };
   foued.connect(connectionInfo);
 };
-foued.onConnected();      
+foued.onConnected();
 
 //disable the send message button if it's empty .
 messageInput.addEventListener("input", () => {
@@ -110,27 +111,34 @@ function getExperts() {
     }
   });
 }
-function selectExpert(){
+
+function selectExpert() {
   $(".swiper-wrapper").on("click", ".swiper-slide", function () {
-    messagesContainer.innerHTML = '' 
+    messagesContainer.innerHTML = ''
 
     // Get the unique ID of the clicked avatar element
     let avatarId = $(this).attr("id");
     let name = $(this).data("name");
-    receiverUserName=name 
-    to=avatarId      
-  
+    receiverUserName = name
+    to = avatarId
+
     checkConversation(newData.user, to)
-    
+
     console.log("Clicked on avatar with ID: " + avatarId + '  ' + name);
     //route to left conversation then e left conversation display the big container message 
-      
+
     // Update the active chat with the conversation data
-    let activeChat = { chatId: avatarId, name: name, avatar_url: 'images/avatar/avatar-19.jpg' };
-    window.dispatchEvent(new CustomEvent('change-active-chat', { detail: activeChat }));
+    let activeChat = {
+      chatId: avatarId,
+      name: name,
+      avatar_url: 'images/avatar/avatar-19.jpg'
+    };
+    window.dispatchEvent(new CustomEvent('change-active-chat', {
+      detail: activeChat
+    }));
 
     // $(document).trigger('change-active-chat', { detail: activeChat }); 
-    to=avatarId;
+    to = avatarId;
 
   });
 }
@@ -140,6 +148,7 @@ function selectExpert(){
  */
 
 async function firstMessage(user_id, to) {
+  console.log("aa", user_id, to)
   if (conversation_id === '') {
     // return the promise returned by createConversation()
     const res = await createConversation(user_id, to);
@@ -155,11 +164,18 @@ async function firstMessage(user_id, to) {
       conversation_name: user_id
     });
     conversation_id = res._id;
-      
-    return { conversation_id: res._id };
+
+
+
+
+    return {
+      conversation_id: res._id
+    };
   } else {
     // if the conversation_id is not empty, return it immediately
-    return Promise.resolve({ conversation_id });
+    return Promise.resolve({
+      conversation_id
+    });
   }
 }
 
@@ -169,17 +185,17 @@ async function firstMessage(user_id, to) {
 // get the conversation , if there is no conversation between them , create for both the users a conversation member then a conversation 
 function checkConversation(user_id, to) {
 
-  console.log("check conversation","me :",user_id,"he :",to)
+  console.log("check conversation", "me :", user_id, "he :", to)
   axios.get(`http://127.0.0.1:3000/conv/?user1=${user_id}&user2=${to}`)
     .then(function (response) {
       if (response.data.data.length == 0) {
-        conversation_id=''
-        messagesContainer.innerHTML = '' 
+        conversation_id = ''
+        messagesContainer.innerHTML = ''
         console.log(" 'there is no conversation between the both of them yet',start a conversation by sending a message")
-      
-      
+
+
       } else {
-     
+
         conversation_id = response.data.data[0]._id
         let currentPage = 1;
         // Load the first page of messages on page load
@@ -192,23 +208,25 @@ function checkConversation(user_id, to) {
 
 
 // create conversation function 
-function createConversation(user_id,to) {
-  const   conversationInfo={
-      app: "638dc76312488c6bf67e8fc0",
-      user: user_id,
-      action: "conversation.create",
-      metaData: {
-          name: receiverUserName,
-          channel_url: "foued/test",
-          conversation_type: "private",
-          description: "private chat",
-          operators: [1],
-          members: [user_id,to],
-          permissions: {"key":"value"},
-          members_count:2,
-          max_length_message: "256",
+function createConversation(user_id, to) {
+  const conversationInfo = {
+    app: "638dc76312488c6bf67e8fc0",
+    user: user_id,
+    action: "conversation.create",
+    metaData: {
+      name: receiverUserName,
+      channel_url: "foued/test",
+      conversation_type: "private",
+      description: "private chat",
+      operators: [1],
+      members: [user_id, to],
+      permissions: {
+        "key": "value"
       },
-    }
+      members_count: 2,
+      max_length_message: "256",
+    },
+  }
   foued.createConversation(conversationInfo);
   return foued.onConversationStart()
 }
@@ -237,12 +255,12 @@ function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
       let direction =
         message.user === newData.user ? "justify-end" : "justify-start";
       const msgStyle =
-        direction === "justify-start"
-          ? "rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100"
-          : "rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white";
+        direction === "justify-start" ?
+        "rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100" :
+        "rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white";
 
       messagesContainer.insertAdjacentHTML(
-        "afterbegin", 
+        "afterbegin",
         `
           <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
             <div class="flex flex-col items-end space-y-3.5">
@@ -287,7 +305,7 @@ const spinner = document.getElementById('conversation-spinner')
 async function loadMessages(page, conversation, scrollToBottom = false) {
   document.getElementById('big-container-message').style.display = 'block'
 
-  console.log("conversation : ",conversation,"page number:",page,limit)
+  console.log("conversation : ", conversation, "page number:", page, limit)
   // Don't make multiple requests if a request is already in progress
   if (isLoading) {
     return;
@@ -354,7 +372,7 @@ function onScrollUp() {
 /**
  * get all the conversation the user connected have 
  */
-function getTheLastMsg(conversationId){
+function getTheLastMsg(conversationId) {
   return axios.get(`http://127.0.0.1:3000/messages/lastMsg/${conversationId}`)
     .then(function (response) {
       const lastMessage = response.data.data.message;
@@ -372,11 +390,11 @@ function getMyConversations(newData) {
         const {
           _id: conversationId,
           name,
-          
+
         } = conversation;
         getTheLastMsg(conversationId)
-        .then((lastMessage) => {
-        const html = `
+          .then((lastMessage) => {
+            const html = `
           <div class="conversation" data-conversation-id="${conversationId}" data-name="${name}">
             <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
               <div
@@ -409,41 +427,49 @@ function getMyConversations(newData) {
               </div>
             </div>
           </div>`;
-        
-        leftConversationContainer.innerHTML += html;
-        
-        // Update the latest conversation ID
-        latestConversationId = conversationId;
-     
-        
-      // Trigger a click event on the latest conversation
-      if (latestConversationId) {
-        $(`[data-conversation-id="${latestConversationId}"]`).trigger('click');
-      }
-    });
-     });
-} )}
+
+            leftConversationContainer.innerHTML += html;
+
+            // Update the latest conversation ID
+            latestConversationId = conversationId;
+
+
+            // Trigger a click event on the latest conversation
+            if (latestConversationId) {
+              $(`[data-conversation-id="${latestConversationId}"]`).trigger('click');
+            }
+          });
+      });
+    })
+}
 
 function handleConversationClick() {
-  messagesContainer.innerHTML = '' 
+  messagesContainer.innerHTML = ''
   document.getElementById('big-container-message').style.display = 'block'
-    
+
   const conversationId = $(this).data('conversation-id');
   const name = $(this).data('name');
-  conversation_id=conversationId
-  const conversationName=document.getElementById('conversation-name')
-  conversationName.textContent=name
+  conversation_id = conversationId
+
+  const conversationName = document.getElementById('conversation-name')
+  conversationName.textContent = name
 
   // Load the first page of messages on page load
-  let currentPage=1
-   loadMessages(currentPage, conversationId, true);
+  let currentPage = 1
+  loadMessages(currentPage, conversationId, true);
   console.log("Clicked on conversation with ID: " + conversationId + " " + name);
-          
+
   // Update the active chat with the conversation data
 
-  let activeChat = { chatId: conversationId, name: name, avatar_url: 'images/avatar/avatar-19.jpg' };
-  to=name
-  window.dispatchEvent(new CustomEvent('change-active-chat', { detail: activeChat }));
+  let activeChat = {
+    chatId: conversationId,
+    name: name,
+    avatar_url: 'images/avatar/avatar-19.jpg'
+  };
+  to = name
+  window.dispatchEvent(new CustomEvent('change-active-chat', {
+    detail: activeChat
+  }));
 
 }
 
@@ -453,7 +479,7 @@ function handleConversationClick() {
 sendButton.addEventListener("click", () => {
   if (messageInput.value.trim() !== "") {
     firstMessage(newData.user, to)
-      .then(function(res) {
+      .then(function (res) {
         const info = {
           app: "638dc76312488c6bf67e8fc0",
           user: newData.user,
@@ -468,12 +494,12 @@ sendButton.addEventListener("click", () => {
           },
           to: receiverUserName, // the id of the receiver(to change later ) 
         };
-        
+
         foued.createRoom(res.conversation_id)
         foued.createMessage(info);
         messageInput.value = "";
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.error(error);
       });
   }
@@ -489,24 +515,8 @@ $(document).ready(function () {
   //select expert to start communicating 
   selectExpert();
   getMyConversations(newData)
-// Add a click event listener to each conversation element
+  // Add a click event listener to each conversation element
   $(document).on('click', '.conversation-click', handleConversationClick);
 
 
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
