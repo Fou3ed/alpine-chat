@@ -61,9 +61,10 @@ window.connected = async () => {
     action: "connect",
     metaData: {
       app_id: "638dc76312488c6bf67e8fc0",
+      socket_id:"123",
       user_id: user_id.value,
       api_token: "123456789123456",
-      socket_id:String,
+    
     },
     device: {
       ip: "192.168.1.1",
@@ -495,7 +496,7 @@ sendButton.addEventListener("click", () => {
           to: receiverUserName, // the id of the receiver(to change later ) 
         };
 
-        foued.createRoom(res.conversation_id)
+        //foued.createRoom(res.conversation_id)
         foued.createMessage(info);
         messageInput.value = "";
       })
@@ -507,7 +508,6 @@ sendButton.addEventListener("click", () => {
 
 foued.onMessageDelivered()
 foued.onMessageReceived();
-
 
 $(document).ready(function () {
   //Get the list of users (experts)

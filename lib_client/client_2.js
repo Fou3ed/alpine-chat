@@ -69,11 +69,10 @@ export default class event {
   }
   
   onConnected = function() {
-      this.socket.on("onConnected", (info,newData,data) => {
+      this.socket.on("onConnected", (info,newData,data,socketData) => {
         if (newData) {   
-          const concatenated = { ...info,...newData,...data };
-
-          console.log(newData);
+          const concatenated = { ...info,...newData,...data,...socketData };
+          console.log(concatenated);
           // Store the newData value in localStorage
           localStorage.setItem('newData', JSON.stringify(concatenated));
           window.location.href = "./index.html";
@@ -129,11 +128,7 @@ export default class event {
       }
     })
   }
-  onRoomCreated=()=>{
-    this.socket.on("roomJoined",(data,error)=>{
-        console.log("room joined",data)
-    })
-  }
+ 
   /**
    *                                        Conversation Events
    */
