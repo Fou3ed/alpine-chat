@@ -517,6 +517,4 @@ $(document).ready(function () {
   getMyConversations(newData)
   // Add a click event listener to each conversation element
   $(document).on('click', '.conversation-click', handleConversationClick);
-
-
 });
