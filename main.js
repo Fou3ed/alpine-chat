@@ -158,17 +158,13 @@ async function firstMessage(user_id, to) {
       user_id: user_id,
       conversation_name: receiverUserName,
     };
-    foued.addMembers(memberInfo);
-    foued.addMembers({
+    foued.createMembers(memberInfo);
+    foued.createMembers({
       conversation_id: res._id,
       user_id: to,
       conversation_name: user_id
     });
     conversation_id = res._id;
-
-
-
-
     return {
       conversation_id: res._id
     };
@@ -231,7 +227,6 @@ function createConversation(user_id, to) {
   foued.createConversation(conversationInfo);
   return foued.onConversationStart()
 }
-foued.onConversationMemberJoined();
 
 
 function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
@@ -474,30 +469,29 @@ function handleConversationClick() {
 
 }
 
-
-
-// send message by pressing the send button
 sendButton.addEventListener("click", () => {
   if (messageInput.value.trim() !== "") {
     firstMessage(newData.user, to)
       .then(function (res) {
+        const conversationId = res.conversation_id; // Store the conversation ID
         const info = {
           app: "638dc76312488c6bf67e8fc0",
           user: newData.user,
           action: "message.create",
           metaData: {
             type: "MSG",
-            conversation_id: res.conversation_id,
+            conversation_id: conversationId, // Include the conversation ID
             user: newData.user,
             message: messageInput.value,
             data: "non other data",
             origin: "web",
           },
-          to: receiverUserName, // the id of the receiver(to change later ) 
+          to: receiverUserName,
         };
-
-        //foued.createRoom(res.conversation_id)
+        foued.conversationMemberRequest(conversationId)
+        foued.joinMembers(conversationId)
         foued.createMessage(info);
+
         messageInput.value = "";
       })
       .catch(function (error) {
@@ -505,7 +499,7 @@ sendButton.addEventListener("click", () => {
       });
   }
 });
-
+foued.onConversationMemberJoined();
 foued.onMessageDelivered()
 foued.onMessageReceived();
 

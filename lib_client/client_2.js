@@ -82,6 +82,7 @@ export default class event {
       });
   };
 
+
   /**
    * on disconnect
    */
@@ -215,12 +216,12 @@ export default class event {
   /**
    *                       Conversation Members
    */
-
+     
 
   /***
    * add member to a conversation 
    */
-  addMembers = (data) => {
+  joinMembers = (data) => {
     this.socket.emit('onConversationMemberJoin', data, error => {
       if (error) {
         setError(error)
@@ -230,19 +231,48 @@ export default class event {
       console.log('====================================');
     })
   }
+
+
   onConversationMemberJoined = (data) => {
     this.socket.on("onConversationMemberJoined", (data) => {
-        console.log(data)
+      console.log(data)      
     })
   }
 
+createMembers=(data)=>{
+  this.socket.emit('onConversationMemberCreate',data,error=>{
+    if (error){
+      setError(error)
+    }
+    console.log('====================================');
+    console.log(" member created into the conversation ");
+    console.log('====================================')
+  })
+}
+onConversationMemberCreated = (data) => {
+  this.socket.on("onConversationMemberCreated", (data) => {
+      console.log(data)
+  })
+}
 
-
-  
-
+    /**
+   *  request member to join a  conversation 
+   */
+//data:conversation_id/user_id
+  conversationMemberRequest = (data) => {
+      this.socket.emit('onConversationMemberRequest', data, error => {
+        if (error) {
+          setError(error)
+        }
+      })
+    }
+    onConversationMemberRequest = (data) => {
+      this.socket.on("onConversationMemberRequest", () => {
+        console.log("onConversationMemberRequest")
+      })
+    }
   /**
    * update member in a conversation 
-   *  
    */
   updateMember = (data) => {
     this.socket.emit('onConversationMemberUpdated', data, error => {
@@ -279,20 +309,7 @@ export default class event {
     })
   }
 
-  /**
-   *  request member to join a  conversation 
-   */
 
-  conversationMemberRequest = (data) => {
-    this.socket.emit('conversationMemberRequest', data, error => {
-      if (error) {
-        setError(error)
-      }
-    })
-  }
-  onConversationMemberRequest = (data) => {
-    this.socket.on("onConversationMemberRequest", () => {})
-  }
   /**
    * conversation member left
    */
