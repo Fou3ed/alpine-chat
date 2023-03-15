@@ -231,11 +231,20 @@ export default class event {
       console.log('====================================');
     })
   }
+// client-side
 
+  userId=(userId)=>{
+    this.socket.on("connect", () => {
+      console.log(userId)
+      this.socket.emit("user-connected", userId);
 
+    });
+        
+  }
   onConversationMemberJoined = (data) => {
-    this.socket.on("onConversationMemberJoined", (data) => {
-      console.log(data)      
+    this.socket.on("onConversationMemberJoined", (socket_id,conversationId) => {
+        console.log("conversation member joined",socket_id,conversationId)  
+         this.socket.emit("onConversationMemberJoined",socket_id,conversationId)    
     })
   }
 
@@ -244,6 +253,7 @@ createMembers=(data)=>{
     if (error){
       setError(error)
     }
+
     console.log('====================================');
     console.log(" member created into the conversation ");
     console.log('====================================')
@@ -266,11 +276,12 @@ onConversationMemberCreated = (data) => {
         }
       })
     }
-    onConversationMemberRequest = (data) => {
-      this.socket.on("onConversationMemberRequest", () => {
-        console.log("onConversationMemberRequest")
+    onConversationMemberRequest = () => {
+      this.socket.on("onConversationMemberRequest", (data,error) => {
+        console.log("onConversationMemberRequest",data)
       })
     }
+    
   /**
    * update member in a conversation 
    */
@@ -369,13 +380,12 @@ onConversationMemberCreated = (data) => {
      *  send  message 
     */
   createMessage = (data) => {
-
     this.socket.emit('onMessageCreated', data, error => {
       if (error) {
         setError(error)
       }
       console.log('====================================');
-      console.log("conversation created");
+      console.log("message created");
       console.log('====================================');
     })
   }

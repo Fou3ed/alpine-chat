@@ -149,7 +149,6 @@ function selectExpert() {
  */
 
 async function firstMessage(user_id, to) {
-  console.log("aa", user_id, to)
   if (conversation_id === '') {
     // return the promise returned by createConversation()
     const res = await createConversation(user_id, to);
@@ -157,17 +156,19 @@ async function firstMessage(user_id, to) {
       conversation_id: res._id,
       user_id: user_id,
       conversation_name: receiverUserName,
-    };
-    foued.createMembers(memberInfo);
+    }
+    foued.createMembers(memberInfo); //just gonna add them in the data base 
     foued.createMembers({
       conversation_id: res._id,
       user_id: to,
       conversation_name: user_id
     });
     conversation_id = res._id;
+
     return {
       conversation_id: res._id
     };
+
   } else {
     // if the conversation_id is not empty, return it immediately
     return Promise.resolve({
@@ -209,7 +210,7 @@ function createConversation(user_id, to) {
   const conversationInfo = {
     app: "638dc76312488c6bf67e8fc0",
     user: user_id,
-    action: "conversation.create",
+    action: "conversation.create", 
     metaData: {
       name: receiverUserName,
       channel_url: "foued/test",
@@ -488,10 +489,8 @@ sendButton.addEventListener("click", () => {
           },
           to: receiverUserName,
         };
-        foued.conversationMemberRequest(conversationId)
-        foued.joinMembers(conversationId)
         foued.createMessage(info);
-
+        foued.conversationMemberRequest(conversationId)
         messageInput.value = "";
       })
       .catch(function (error) {
@@ -502,7 +501,7 @@ sendButton.addEventListener("click", () => {
 foued.onConversationMemberJoined();
 foued.onMessageDelivered()
 foued.onMessageReceived();
-
+foued.userId(newData.user)
 $(document).ready(function () {
   //Get the list of users (experts)
   getExperts();
