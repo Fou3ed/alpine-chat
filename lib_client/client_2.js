@@ -222,6 +222,7 @@ export default class event {
    * add member to a conversation 
    */
   joinMembers = (data) => {
+    //data=conversationId
     this.socket.emit('onConversationMemberJoin', data, error => {
       if (error) {
         setError(error)
@@ -231,6 +232,16 @@ export default class event {
       console.log('====================================');
     })
   }
+
+  onConversationMemberJoined = () => {
+    this.socket.on("onConversationMemberJoined", (socket_id,conversationId) => {
+        console.log("conversation member joined",socket_id,conversationId)  
+         this.socket.emit("onConversationMemberJoined",socket_id,conversationId)    
+    })
+  }
+
+
+
 // client-side
 
   userId=(userId)=>{
@@ -241,12 +252,7 @@ export default class event {
     });
         
   }
-  onConversationMemberJoined = (data) => {
-    this.socket.on("onConversationMemberJoined", (socket_id,conversationId) => {
-        console.log("conversation member joined",socket_id,conversationId)  
-         this.socket.emit("onConversationMemberJoined",socket_id,conversationId)    
-    })
-  }
+
 
 createMembers=(data)=>{
   this.socket.emit('onConversationMemberCreate',data,error=>{
@@ -392,9 +398,9 @@ onConversationMemberCreated = (data) => {
 
   
   
-  onMessageDelivered = () => {
-    this.socket.on('onMessageDelivered', (data, error) => {
-        console.log("message delivered : ",data)
+  onMessageSent = () => {
+    this.socket.on('onMessageSent', (data, error) => {
+        console.log("message Sent : ",data)
         const messageId = data.id; 
         const messageContainer = document.getElementById(`message-${messageId}`);
         if (!messageContainer) {
@@ -435,7 +441,6 @@ onConversationMemberCreated = (data) => {
 
 onMessageReceived = () => {
   this.socket.on('onMessageReceived', (data, error) => {
-    console.log("message received : ",data)
     const messageId = data.id; 
     const messageContainer = document.getElementById(`message-${messageId}`);
     if (!messageContainer) {
@@ -463,25 +468,20 @@ onMessageReceived = () => {
       </div>
         </div>
       `);
+      console.log("message received",data)
+     this.socket.emit('onMessageDelivered',data)
     }
     const conversationContainer = document.getElementById('conversation-container');
         conversationContainer.scrollTop = conversationContainer.scrollHeight;
   });
 
-};
+}
 
-
-
-
-
-
-
-
-
-
-
-
-  
+messageDelivered=(data)=>{
+  this.socket.on('messageDelivered',(data,error)=>{
+    console.log("message Delivered : ",data)
+  })
+}
   /**
    * 
    * update message

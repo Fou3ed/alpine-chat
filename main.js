@@ -470,37 +470,49 @@ function handleConversationClick() {
 
 }
 
-sendButton.addEventListener("click", () => {
+async function joinRoom(conversationId){
+  foued.joinMembers(conversationId)
+
+}
+
+sendButton.addEventListener("click", async () => {
   if (messageInput.value.trim() !== "") {
-    firstMessage(newData.user, to)
-      .then(function (res) {
-        const conversationId = res.conversation_id; // Store the conversation ID
-        const info = {
-          app: "638dc76312488c6bf67e8fc0",
+    firstMessage(newData.user, to).then(async function (res) {
+      const conversationId = res.conversation_id; // Store the conversation ID
+      const info = {
+        app: "638dc76312488c6bf67e8fc0",
+        user: newData.user,
+        action: "message.create",
+        metaData: {
+          type: "MSG",
+          conversation_id: conversationId, // Include the conversation ID
           user: newData.user,
-          action: "message.create",
-          metaData: {
-            type: "MSG",
-            conversation_id: conversationId, // Include the conversation ID
-            user: newData.user,
-            message: messageInput.value,
-            data: "non other data",
-            origin: "web",
-          },
-          to: receiverUserName,
-        };
-        foued.createMessage(info);
-        foued.conversationMemberRequest(conversationId)
-        messageInput.value = "";
-      })
-      .catch(function (error) {
-        console.error(error);
-      });
+          message: messageInput.value,
+          data: "non other data",
+          origin: "web",
+        },
+        to: receiverUserName,
+      };
+      
+      // Check if room exists or create a new one
+      await joinRoom(conversationId);
+
+      // Create the message
+      foued.createMessage(info);
+
+      
+
+      messageInput.value = "";
+    }).catch(function (error) {
+      console.error(error);
+    });
   }
 });
+
 foued.onConversationMemberJoined();
-foued.onMessageDelivered()
+foued.onMessageSent()
 foued.onMessageReceived();
+foued.messageDelivered()
 foued.userId(newData.user)
 $(document).ready(function () {
   //Get the list of users (experts)
