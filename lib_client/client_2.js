@@ -221,9 +221,9 @@ export default class event {
   /***
    * add member to a conversation 
    */
-  joinMembers = (data) => {
+  joinMembers = (info,conversationId) => {
     //data=conversationId
-    this.socket.emit('onConversationMemberJoin', data, error => {
+    this.socket.emit('onConversationMemberJoin', info,conversationId, error => {
       if (error) {
         setError(error)
       }
@@ -233,16 +233,16 @@ export default class event {
     })
   }
 
-  onConversationMemberJoined = () => {
-    this.socket.on("onConversationMemberJoined", (socket_id,conversationId) => {
-        console.log("conversation member joined",socket_id,conversationId)  
-         this.socket.emit("onConversationMemberJoined",socket_id,conversationId)    
+  onConversationMemberJoined =() => {
+    this.socket.on("onConversationMemberJoined", (socket_id,info,conversationId) => {
+        console.log("conversation member joined")  
+          this.socket.emit("onConversationMemberJoined",socket_id,info,conversationId)    
     })
   }
 
 
 
-// client-side
+// store the socket.id whenever it change
 
   userId=(userId)=>{
     this.socket.on("connect", () => {
@@ -400,7 +400,6 @@ onConversationMemberCreated = (data) => {
   
   onMessageSent = () => {
     this.socket.on('onMessageSent', (data, error) => {
-        console.log("message Sent : ",data)
         const messageId = data.id; 
         const messageContainer = document.getElementById(`message-${messageId}`);
         if (!messageContainer) {
@@ -431,10 +430,7 @@ onConversationMemberCreated = (data) => {
         }
         const conversationContainer = document.getElementById('conversation-container');
         conversationContainer.scrollTop = conversationContainer.scrollHeight;
-    })
-
-   
-  
+    }) 
   }
 
 
@@ -453,7 +449,7 @@ onMessageReceived = () => {
         ${data.direction =="in" ? butt :'' }
           <div class="ml-2 max-w-lg sm:ml-5">
             <div class="${msgStyle}">
-              ${data.content}
+              ${data.metaData.message}
             </div>
             <p  id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
                   ${timeString}      

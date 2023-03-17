@@ -470,10 +470,7 @@ function handleConversationClick() {
 
 }
 
-async function joinRoom(conversationId){
-  foued.joinMembers(conversationId)
 
-}
 
 sendButton.addEventListener("click", async () => {
   if (messageInput.value.trim() !== "") {
@@ -495,13 +492,12 @@ sendButton.addEventListener("click", async () => {
       };
       
       // Check if room exists or create a new one
-      await joinRoom(conversationId);
+      foued.joinMembers(info,conversationId)
 
       // Create the message
       foued.createMessage(info);
 
-      
-
+    
       messageInput.value = "";
     }).catch(function (error) {
       console.error(error);
