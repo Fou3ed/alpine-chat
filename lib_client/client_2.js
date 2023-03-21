@@ -385,14 +385,28 @@ onConversationMemberCreated = (data) => {
   /**
      *  send  message 
     */
-  createMessage = (data) => {
-    this.socket.emit('onMessageCreated', data, error => {
-      if (error) {
-        setError(error)
-      }
-      console.log('====================================');
-      console.log("message created");
-      console.log('====================================');
+  // createMessage = (data) => {
+  //   this.socket.emit('onMessageCreated', data, error => {
+  //     if (error) {
+  //       setError(error)
+  //     }
+  //     console.log('====================================');
+  //     console.log("message created");
+  //     console.log('====================================');
+  //   })
+  // }
+  onCreateMessage=(data)=>{
+    this.socket.on('onMessageCreated',(data,error)=>{
+      
+      this.socket.emit('onMessageCreated', data, error => {
+        if (error) {
+          setError(error)
+        }
+        console.log('====================================');
+        console.log("message created");
+        console.log('====================================');
+      })
+
     })
   }
 
@@ -400,6 +414,7 @@ onConversationMemberCreated = (data) => {
   
   onMessageSent = () => {
     this.socket.on('onMessageSent', (data, error) => {
+      console.log('onMessageSent',data)
         const messageId = data.id; 
         const messageContainer = document.getElementById(`message-${messageId}`);
         if (!messageContainer) {
@@ -437,6 +452,7 @@ onConversationMemberCreated = (data) => {
 
 onMessageReceived = () => {
   this.socket.on('onMessageReceived', (data, error) => {
+    console.log('onMessageReceived',data)
     const messageId = data.id; 
     const messageContainer = document.getElementById(`message-${messageId}`);
     if (!messageContainer) {
@@ -449,7 +465,7 @@ onMessageReceived = () => {
         ${data.direction =="in" ? butt :'' }
           <div class="ml-2 max-w-lg sm:ml-5">
             <div class="${msgStyle}">
-              ${data.metaData.message}
+              ${data.content}
             </div>
             <p  id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
                   ${timeString}      
@@ -464,13 +480,13 @@ onMessageReceived = () => {
       </div>
         </div>
       `);
-      console.log("message received",data)
+      
      this.socket.emit('onMessageDelivered',data)
     }
     const conversationContainer = document.getElementById('conversation-container');
-        conversationContainer.scrollTop = conversationContainer.scrollHeight;
+     console.log(conversationContainer)
+         conversationContainer.scrollTop = conversationContainer.scrollHeight;
   });
-
 }
 
 messageDelivered=(data)=>{
