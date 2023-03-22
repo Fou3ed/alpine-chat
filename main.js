@@ -76,6 +76,7 @@ window.connected = async () => {
 };
 foued.onConnected();
 
+
 //disable the send message button if it's empty .
 messageInput.addEventListener("input", () => {
   if (messageInput.value.trim() === "") {
@@ -95,7 +96,6 @@ function getExperts() {
       for (let i = 0; i < users.length; i++) {
         let user = users[i];
         let name = user.full_name;
-
         // Generate a unique ID for each avatar element
         let avatarId = users[i]._id;
         $(".swiper-wrapper").append(
@@ -115,17 +115,14 @@ function getExperts() {
 async function selectExpert() {
   $(".swiper-wrapper").on("click", ".swiper-slide", async function () {
     messagesContainer.innerHTML = ''
-
     // Get the unique ID of the clicked avatar element
     let avatarId = $(this).attr("id");
     let name = $(this).data("name");
     receiverUserName = name
     to = avatarId
-
     checkConversation(newData.user, to)
 
     console.log("Clicked on avatar with ID: " + avatarId + '  ' + name);
-    //route to left conversation then e left conversation display the big container message 
     // Update the active chat with the conversation data
     let activeChat = {
       chatId: conversation_id,
@@ -140,6 +137,27 @@ async function selectExpert() {
     to = avatarId;
 
   });
+}
+
+// check  the conversation between the first(connected user ) and the second user 
+// get the conversation , if there is no conversation between them , create a conversation  then for both  users a conversation member  
+function checkConversation(user_id, to) {
+  console.log("check conversation", "me :", user_id, "he :", to)
+  axios.get(`http://127.0.0.1:3000/conv/?user1=${user_id}&user2=${to}`)
+    .then(function (response) {
+      if (response.data.data.length == 0) {
+        conversation_id = ''
+        messagesContainer.innerHTML = ''
+        console.log(" 'there is no conversation between the both of them yet',start a conversation by sending a message")
+      } else {
+        conversation_id = response.data.data[0]._id
+        let currentPage = 1;
+        const $conversationContainer = $('#conversation-container');
+        $conversationContainer.attr('id', `${response.data.data[0]._id}`);
+          // Load the first page of messages on page load
+        loadMessages(currentPage, conversation_id, true);
+      }
+    });
 }
 
 /**
@@ -177,27 +195,6 @@ async function firstMessage(user_id, to) {
 
 
 
-// check  the conversation between the first(connected user ) and the second user 
-// get the conversation , if there is no conversation between them , create for both the users a conversation member then a conversation 
-function checkConversation(user_id, to) {
-  console.log("check conversation", "me :", user_id, "he :", to)
-  axios.get(`http://127.0.0.1:3000/conv/?user1=${user_id}&user2=${to}`)
-    .then(function (response) {
-      if (response.data.data.length == 0) {
-        conversation_id = ''
-        messagesContainer.innerHTML = ''
-        console.log(" 'there is no conversation between the both of them yet',start a conversation by sending a message")
-      } else {
-        conversation_id = response.data.data[0]._id
-        let currentPage = 1;
-
-        conversationContainer.id = `conversation-container-${conversation_id}`;
-
-        // Load the first page of messages on page load
-        loadMessages(currentPage, conversation_id, true);
-      }
-    });
-}
 
 // create conversation function 
 function createConversation(user_id, to) {
@@ -225,6 +222,7 @@ function createConversation(user_id, to) {
 
 
 function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
+  
   document.getElementById('big-container-message').style.display = 'block';
 
   if (!messages || !messages.messages) {
@@ -236,11 +234,37 @@ function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
   const reversedMessages = messages.messages.slice()
   const oldHeight = messagesContainer.scrollHeight;
 
+  // Initialize variables to keep track of the current day and the last message's day
+  let currentDay = null;
+  let lastDay = null;
+
   // Loop through the messages in the newest to oldest order
   for (let i = 0; i < reversedMessages.length; i++) {
     let message = reversedMessages[i];
     const messageId = reversedMessages[i]._id;
     const messageContainer = document.getElementById(`message-${messageId}`);
+
+    const timestamp = message.created_at;
+    const date = new Date(timestamp);
+    const day = date.toLocaleString('en-us', { weekday: 'long' });
+    const hour = date.getHours();
+    const minute = date.getMinutes(); 
+    const time=`${hour}:${minute}`
+
+    // Create the day div if a new day is encountered
+    if (day !== lastDay) {
+      lastDay = day;
+      messagesContainer.insertAdjacentHTML(
+        "afterbegin",
+        `
+          <div class="mx-4 flex items-center space-x-3">
+            <div class="h-px flex-1 bg-slate-200 dark:bg-navy-500"></div>
+            <p>${day}</p>
+            <div class="h-px flex-1 bg-slate-200 dark:bg-navy-500"></div>
+          </div>
+        `
+      );
+    }
 
     if (!messageContainer) {
       let direction =
@@ -262,7 +286,7 @@ function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
                     ${message.message} 
                   </div>
                   <p id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
-                    ${timeString}      
+                    ${time}      
                   </p>
                 </div>
                 ${direction == "justify-start" ? msgButt : ""}
@@ -367,13 +391,20 @@ function onScrollUp() {
 function getTheLastMsg(conversationId) {
   return axios.get(`http://127.0.0.1:3000/messages/lastMsg/${conversationId}`)
     .then(function (response) {
-      const lastMessage = response.data.data.message;
+      console.log(response.data.data.created_at)
+      const lastMessage = response.data.data;
+  
       return lastMessage;
     });
 }
 
-async function getMyConversations(newData) {
+
+
+export async function getMyConversations() {
+
   const leftConversationContainer = document.getElementById('left-conversation');
+  leftConversationContainer.innerHTML = ''
+
   let latestConversationId = null;
   const conversationsResponse = await axios.get(`http://127.0.0.1:3000/conversation/${newData.user}`);
   const conversations = conversationsResponse.data.data;
@@ -382,9 +413,17 @@ async function getMyConversations(newData) {
       _id: conversationId,
       name,
     } = conversation;
+
     const lastMessage = await getTheLastMsg(conversationId);
+    const timestamp = lastMessage.created_at;
+    const date = new Date(timestamp);
+    const hour = date.getHours();
+    const minute = date.getMinutes();
+   
+    const time=`${hour}:${minute}`
+
     const html = `
-      <div class="conversation" data-conversation-id="${conversationId}" data-name="${name}">
+      <div class="conversation" data-conversation-id="${conversationId}" data-name="${name}" data-timestamp="${time}">
         <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
           <div
             class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
@@ -401,11 +440,11 @@ async function getMyConversations(newData) {
                 <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
                   ${name}
                 </p>
-                <span class="text-tiny+ text-slate-400 dark:text-navy-300">11:03</span>
+                <span class="text-tiny+ text-slate-400 dark:text-navy-300">${time}</span>
               </div>
               <div class="mt-1 flex items-center justify-between space-x-1">
                 <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300">
-                  ${lastMessage}   
+                  ${lastMessage.message}   
                 </p>
                 <div
                   class="flex h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-slate-200 px-1.5 text-tiny+ font-medium leading-none text-slate-800 dark:bg-navy-450 dark:text-white">
@@ -416,17 +455,31 @@ async function getMyConversations(newData) {
           </div>
         </div>
       </div>`;
+        // Append the HTML to the container
+
     leftConversationContainer.innerHTML += html;
-    // Update the latest conversation ID
-    latestConversationId = conversationId;
-    // Trigger a click event on the latest conversation
-    if (latestConversationId) {
-      $(`[data-conversation-id="${latestConversationId}"]`).trigger('click');
-    }
+ // Sort the conversations based on the latest message timestamp
+  const conversationElements = Array.from(leftConversationContainer.children);
+  conversationElements.sort((a, b) => {
+    const aTimestamp = parseInt(a.getAttribute('data-timestamp'));
+    const bTimestamp = parseInt(b.getAttribute('data-timestamp'));
+    return bTimestamp - aTimestamp;
+  });
+  // Re-append the sorted elements to the container
+  leftConversationContainer.innerHTML = '';
+  conversationElements.forEach(element => {
+    leftConversationContainer.appendChild(element);
+  });
+
+  // Update the latest conversation ID
+  latestConversationId = conversationId;
+  // Trigger a click event on the latest conversation
+  if (latestConversationId) {
+    $(`[data-conversation-id="${latestConversationId}"]`).trigger('click');
+  }
   });
   await Promise.all(conversationPromises);
 }
-
 
 
 function handleConversationClick() {
@@ -438,7 +491,9 @@ function handleConversationClick() {
   conversation_id = conversationId;
   to = name;
 
-
+ // Set the conversation ID as an attribute of the conversation container element
+ const $conversationContainer = $('#conversation-container');
+ $conversationContainer.attr('data-conversation-id', conversationId);
 
   const conversationName = document.getElementById('conversation-name');
   conversationName.textContent = name;
@@ -500,14 +555,14 @@ foued.onMessageSent()
 foued.onMessageReceived();
 foued.messageDelivered()
 foued.userId(newData.user)
-
+foued.onConversationUpdated()
 
 $(document).ready(function () {
   //Get the list of users (experts)
   getExperts();
   //select expert to start communicating 
   selectExpert();
-  getMyConversations(newData)
+  getMyConversations()
   // Add a click event listener to each conversation element
   $(document).on('click', '.conversation-click', handleConversationClick);
 });

@@ -1,13 +1,13 @@
 import io from "https://cdn.socket.io/4.5.4/socket.io.esm.min.js";
-
+import {getMyConversations} from '../main.js'
 const currentDate = new Date();
 const hours = currentDate.getHours();
 const minutes = currentDate.getMinutes();
 const timeString = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0');
 const messagesContainer = document.getElementById("big-container-message")
 const messageInput = document.querySelector('#message-input');
-const sendButton = document.querySelector('#send-message'); 
-const butt=`<div x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex mt-2">
+const sendButton = document.querySelector('#send-message');
+const butt = `<div x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex mt-2">
             <button x-ref="popperRef" @click="isShowPopper = !isShowPopper" class="btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z">
@@ -51,12 +51,12 @@ export default class event {
       transports: ['websocket']
     });
   }
-// In the onConnected function:
+  // In the onConnected function:
 
-// In the index.html page:
-// Retrieve the newData value from localStorage
+  // In the index.html page:
+  // Retrieve the newData value from localStorage
 
-  
+
   /**
    * on connect
    */
@@ -67,19 +67,24 @@ export default class event {
       }
     })
   }
-  
-  onConnected = function() {
-      this.socket.on("onConnected", (info,newData,data,socketData) => {
-        if (newData) {   
-          const concatenated = { ...info,...newData,...data,...socketData };
-          console.log(concatenated);
-          // Store the newData value in localStorage
-          localStorage.setItem('newData', JSON.stringify(concatenated));
-          window.location.href = "./index.html";
-        } else {
-          alert("error");
-        }
-      });
+
+  onConnected = function () {
+    this.socket.on("onConnected", (info, newData, data, socketData) => {
+      if (newData) {
+        const concatenated = {
+          ...info,
+          ...newData,
+          ...data,
+          ...socketData
+        };
+        console.log(concatenated);
+        // Store the newData value in localStorage
+        localStorage.setItem('newData', JSON.stringify(concatenated));
+        window.location.href = "./index.html";
+      } else {
+        alert("error");
+      }
+    });
   };
 
 
@@ -122,14 +127,14 @@ export default class event {
   /**
    * create room 
    */
-  createRoom=(data)=>{
-    this.socket.emit("joinRoom",data,error=>{
-      if(error){
+  createRoom = (data) => {
+    this.socket.emit("joinRoom", data, error => {
+      if (error) {
         setError(error)
       }
     })
   }
- 
+
   /**
    *                                        Conversation Events
    */
@@ -147,11 +152,11 @@ export default class event {
     })
   }
   onConversationStart = () => {
-    return new Promise((resolve,reject)=>{
+    return new Promise((resolve, reject) => {
       this.socket.on("onConversationStarted", (data, newData) => {
-        console.log(data,newData)
-       resolve(newData)
-    })
+        console.log(data, newData)
+        resolve(newData)
+      })
     })
   }
 
@@ -169,11 +174,12 @@ export default class event {
     })
   }
   onConversationUpdated = (data) => {
-    this.socket.on("onConversationUpdated", (data, newData) => {
-      console.log(data, newData)
+    this.socket.on("onConversationUpdated", async (data, newData) => {
+      // call the getMyConversations function here
+      await getMyConversations(newData);
+      // your code here
     })
   }
-
   /**
    *  delete Conversation  
    */
@@ -216,14 +222,14 @@ export default class event {
   /**
    *                       Conversation Members
    */
-     
+
 
   /***
    * add member to a conversation 
    */
-  joinMembers = (info,conversationId) => {
+  joinMembers = (info, conversationId) => {
     //data=conversationId
-    this.socket.emit('onConversationMemberJoin', info,conversationId, error => {
+    this.socket.emit('onConversationMemberJoin', info, conversationId, error => {
       if (error) {
         setError(error)
       }
@@ -233,61 +239,61 @@ export default class event {
     })
   }
 
-  onConversationMemberJoined =() => {
-    this.socket.on("onConversationMemberJoined", (socket_id,info,conversationId) => {
-        console.log("conversation member joined")  
-          this.socket.emit("onConversationMemberJoined",socket_id,info,conversationId)    
+  onConversationMemberJoined = () => {
+    this.socket.on("onConversationMemberJoined", (socket_id, info, conversationId) => {
+      console.log("conversation member joined")
+      this.socket.emit("onConversationMemberJoined", socket_id, info, conversationId)
     })
   }
 
 
 
-// store the socket.id whenever it change
+  // store the socket.id whenever it change
 
-  userId=(userId)=>{
+  userId = (userId) => {
     this.socket.on("connect", () => {
       console.log(userId)
       this.socket.emit("user-connected", userId);
 
     });
-        
+
   }
 
 
-createMembers=(data)=>{
-  this.socket.emit('onConversationMemberCreate',data,error=>{
-    if (error){
-      setError(error)
-    }
+  createMembers = (data) => {
+    this.socket.emit('onConversationMemberCreate', data, error => {
+      if (error) {
+        setError(error)
+      }
 
-    console.log('====================================');
-    console.log(" member created into the conversation ");
-    console.log('====================================')
-  })
-}
-onConversationMemberCreated = (data) => {
-  this.socket.on("onConversationMemberCreated", (data) => {
+      console.log('====================================');
+      console.log(" member created into the conversation ");
+      console.log('====================================')
+    })
+  }
+  onConversationMemberCreated = (data) => {
+    this.socket.on("onConversationMemberCreated", (data) => {
       console.log(data)
-  })
-}
+    })
+  }
 
-    /**
+  /**
    *  request member to join a  conversation 
    */
-//data:conversation_id/user_id
+  //data:conversation_id/user_id
   conversationMemberRequest = (data) => {
-      this.socket.emit('onConversationMemberRequest', data, error => {
-        if (error) {
-          setError(error)
-        }
-      })
-    }
-    onConversationMemberRequest = () => {
-      this.socket.on("onConversationMemberRequest", (data,error) => {
-        console.log("onConversationMemberRequest",data)
-      })
-    }
-    
+    this.socket.emit('onConversationMemberRequest', data, error => {
+      if (error) {
+        setError(error)
+      }
+    })
+  }
+  onConversationMemberRequest = () => {
+    this.socket.on("onConversationMemberRequest", (data, error) => {
+      console.log("onConversationMemberRequest", data)
+    })
+  }
+
   /**
    * update member in a conversation 
    */
@@ -383,8 +389,8 @@ onConversationMemberCreated = (data) => {
    */
 
   /**
-     *  send  message 
-    */
+   *  send  message 
+   */
   // createMessage = (data) => {
   //   this.socket.emit('onMessageCreated', data, error => {
   //     if (error) {
@@ -395,9 +401,9 @@ onConversationMemberCreated = (data) => {
   //     console.log('====================================');
   //   })
   // }
-  onCreateMessage=(data)=>{
-    this.socket.on('onMessageCreated',(data,error)=>{
-      
+  onCreateMessage = (data) => {
+    this.socket.on('onMessageCreated', (data, error) => {
+
       this.socket.emit('onMessageCreated', data, error => {
         if (error) {
           setError(error)
@@ -410,17 +416,17 @@ onConversationMemberCreated = (data) => {
     })
   }
 
-  
-  
+
+
   onMessageSent = () => {
     this.socket.on('onMessageSent', (data, error) => {
-      console.log('onMessageSent',data)
-        const messageId = data.id; 
-        const messageContainer = document.getElementById(`message-${messageId}`);
-        if (!messageContainer) {
-           let direction = data.direction =="in" ?'justify-end' : '';
-           const msgStyle=data.direction =="out" ? `rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100`:'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white'
-          messagesContainer.insertAdjacentHTML("beforeend", `
+      console.log('onMessageSent', data)
+      const messageId = data.id;
+      const messageContainer = document.getElementById(`message-${messageId}`);
+      if (!messageContainer) {
+        let direction = data.direction == "in" ? 'justify-end' : '';
+        const msgStyle = data.direction == "out" ? `rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100` : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white'
+        messagesContainer.insertAdjacentHTML("beforeend", `
             <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
             <div class="flex flex-col items-end space-y-3.5">
             <div class="flex flex-row">
@@ -442,23 +448,27 @@ onConversationMemberCreated = (data) => {
           </div>
             </div>
           `);
-        }
-        const conversationContainer = document.getElementById('conversation-container');
-        conversationContainer.scrollTop = conversationContainer.scrollHeight;
-    }) 
+      }
+      const conversationContainer = document.getElementById('conversation-container');
+      conversationContainer.scrollTop = conversationContainer.scrollHeight;
+    })
   }
 
 
 
-onMessageReceived = () => {
-  this.socket.on('onMessageReceived', (data, error) => {
-    console.log('onMessageReceived',data)
-    const messageId = data.id; 
-    const messageContainer = document.getElementById(`message-${messageId}`);
-    if (!messageContainer) {
-       let direction = data.direction =="in" ?'justify-end' : '';
-       const msgStyle=data.direction =="out" ? `rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100`:'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white'
-      messagesContainer.insertAdjacentHTML("beforeend", `
+  onMessageReceived = () => {
+    const conversationContainer = document.getElementById('conversation-container');
+    this.socket.on('onMessageReceived', (data, error) => {
+      const messageId = data.id;
+      const messageContainer = document.getElementById(`message-${messageId}`);
+
+      // Get the conversation ID from the conversation container element
+      const conversationId = conversationContainer.getAttribute('data-conversation-id');
+      if (!messageContainer) {
+        if (data.conversation === conversationId) {
+          let direction = data.direction == "in" ? 'justify-end' : '';
+          const msgStyle = data.direction == "out" ? `rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100` : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white'
+          messagesContainer.insertAdjacentHTML("beforeend", `
         <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
         <div class="flex flex-col items-end space-y-3.5">
         <div class="flex flex-row">
@@ -466,7 +476,7 @@ onMessageReceived = () => {
           <div class="ml-2 max-w-lg sm:ml-5">
             <div class="${msgStyle}">
               ${data.content}
-            </div>
+            </div> 
             <p  id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
                   ${timeString}      
             </p>
@@ -480,20 +490,22 @@ onMessageReceived = () => {
       </div>
         </div>
       `);
-      
-     this.socket.emit('onMessageDelivered',data)
-    }
-    const conversationContainer = document.getElementById('conversation-container');
-     console.log(conversationContainer)
-         conversationContainer.scrollTop = conversationContainer.scrollHeight;
-  });
-}
 
-messageDelivered=(data)=>{
-  this.socket.on('messageDelivered',(data,error)=>{
-    console.log("message Delivered : ",data)
-  })
-}
+          this.socket.emit('onMessageDelivered', data)
+        } else {
+          console.log("received but not selected")
+        }
+        this.socket.emit('onConversationUpdated',data)
+      }
+      conversationContainer.scrollTop = conversationContainer.scrollHeight;
+    });
+  }
+
+  messageDelivered = (data) => {
+    this.socket.on('messageDelivered', (data, error) => {
+      console.log("message Delivered : ", data)
+    })
+  }
   /**
    * 
    * update message
@@ -511,8 +523,7 @@ messageDelivered=(data)=>{
   }
   onMessageUpdated = (data) => {
 
-    this.socket.on('onMessageUpdated', (data, error) => {
-    })
+    this.socket.on('onMessageUpdated', (data, error) => {})
   }
   /**
    * 
@@ -605,7 +616,7 @@ messageDelivered=(data)=>{
     })
   }
   onPinnedMsg = (data) => {
-    this.socket.on('onMsgPinned',(data, error) => {
+    this.socket.on('onMsgPinned', (data, error) => {
       console.log(data)
     })
   }
@@ -614,7 +625,7 @@ messageDelivered=(data)=>{
    * unPin message event 
    */
   unPinMsg = (data) => {
-    this.socket.emit('unPinMsg', data,(error) => {
+    this.socket.emit('unPinMsg', data, (error) => {
       if (error) {
         setError(error)
       }
@@ -638,8 +649,8 @@ messageDelivered=(data)=>{
     })
   }
   onReactMsg = () => {
-    this.socket.on('onMsgReacted',(data,error) => {
-      console.log("reacted",data)
+    this.socket.on('onMsgReacted', (data, error) => {
+      console.log("reacted", data)
     })
   }
 
@@ -648,7 +659,7 @@ messageDelivered=(data)=>{
    * unReact message event 
    */
   unReactMsg = (data) => {
-    this.socket.emit('unReactMsg', data,(error) => {
+    this.socket.emit('unReactMsg', data, (error) => {
       if (error) {
         setError(error)
       }
