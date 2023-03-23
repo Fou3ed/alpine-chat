@@ -11,6 +11,38 @@ const messageInput = document.querySelector("#message-input");
 const sendButton = document.querySelector("#send-message");
 const newData = JSON.parse(localStorage.getItem("newData"));
 console.log("LOCAL STORAGE", newData);
+const butt = `<div x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex mt-2">
+            <button x-ref="popperRef" @click="isShowPopper = !isShowPopper" class="btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z">
+                </path>
+              </svg>
+            </button>       
+            <div x-ref="popperRoot" class="popper-root" :class="isShowPopper &amp;&amp; 'show'" style="position: fixed; inset: 0px 0px auto auto; margin: 0px; transform: translate(-594px, 231px);" data-popper-placement="bottom-end">
+              <div class="popper-box rounded-md border border-slate-150 bg-white py-1.5 font-inter dark:border-navy-500 dark:bg-navy-700">
+                <ul>
+                  <li>
+                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Edit</a>
+                  </li>
+                  <li>
+                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Forward</a>
+                  </li>
+                  <li>
+                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Copy</a>
+                  </li>
+                  <li>
+                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Reply</a>
+                  </li>
+                </ul>
+                <div class="my-1 h-px bg-slate-150 dark:bg-navy-500"></div>
+                <ul>
+                  <li>
+                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Delete</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>`
 
 //message configuration : delete,edit,reply,forward ..
 const msgButt = `<div x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex mt-2">
@@ -121,8 +153,8 @@ async function selectExpert() {
     receiverUserName = name
     to = avatarId
     checkConversation(newData.user, to)
-
-    console.log("Clicked on avatar with ID: " + avatarId + '  ' + name);
+    const $conversationContainer = $('#conversation-container');
+    $conversationContainer.attr('data-conversation-id', conversation_id);
     // Update the active chat with the conversation data
     let activeChat = {
       chatId: conversation_id,
@@ -142,7 +174,6 @@ async function selectExpert() {
 // check  the conversation between the first(connected user ) and the second user 
 // get the conversation , if there is no conversation between them , create a conversation  then for both  users a conversation member  
 function checkConversation(user_id, to) {
-  console.log("check conversation", "me :", user_id, "he :", to)
   axios.get(`http://127.0.0.1:3000/conv/?user1=${user_id}&user2=${to}`)
     .then(function (response) {
       if (response.data.data.length == 0) {
@@ -152,9 +183,8 @@ function checkConversation(user_id, to) {
       } else {
         conversation_id = response.data.data[0]._id
         let currentPage = 1;
-        const $conversationContainer = $('#conversation-container');
-        $conversationContainer.attr('id', `${response.data.data[0]._id}`);
-          // Load the first page of messages on page load
+
+        // Load the first page of messages on page load
         loadMessages(currentPage, conversation_id, true);
       }
     });
@@ -165,34 +195,27 @@ function checkConversation(user_id, to) {
  */
 
 async function firstMessage(user_id, to) {
-  if (conversation_id === '') {
-    // return the promise returned by createConversation()
-    const res = await createConversation(user_id, to);
-    const memberInfo = {
-      conversation_id: res._id,
-      user_id: user_id,
-      conversation_name: receiverUserName,
-    }
-    foued.createMembers(memberInfo); //just gonna add them in the data base 
-    foued.createMembers({
-      conversation_id: res._id,
-      user_id: to,
-      conversation_name: user_id
-    });
-    conversation_id = res._id;
-
-    return {
-      conversation_id: res._id
-    };
-
-  } else {
-    // if the conversation_id is not empty, return it immediately
-    return Promise.resolve({
-      conversation_id
-    });
+  // return the promise returned by createConversation()
+  const res = await createConversation(user_id, to);
+  const memberInfo = {
+    conversation_id: res._id,
+    user_id: user_id,
+    conversation_name: receiverUserName,
   }
-}
+  foued.createMembers(memberInfo); //just gonna add them in the data base 
+  foued.createMembers({
+    conversation_id: res._id,
+    user_id: to,
+    conversation_name: user_id
+  });
+  conversation_id = res._id;
 
+  return {
+    conversation_id: res._id
+  };
+
+
+}
 
 
 
@@ -222,7 +245,7 @@ function createConversation(user_id, to) {
 
 
 function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
-  
+
   document.getElementById('big-container-message').style.display = 'block';
 
   if (!messages || !messages.messages) {
@@ -234,9 +257,6 @@ function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
   const reversedMessages = messages.messages.slice()
   const oldHeight = messagesContainer.scrollHeight;
 
-  // Initialize variables to keep track of the current day and the last message's day
-  let currentDay = null;
-  let lastDay = null;
 
   // Loop through the messages in the newest to oldest order
   for (let i = 0; i < reversedMessages.length; i++) {
@@ -246,25 +266,12 @@ function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
 
     const timestamp = message.created_at;
     const date = new Date(timestamp);
-    const day = date.toLocaleString('en-us', { weekday: 'long' });
+    const day = date.toLocaleString('en-us', {
+      weekday: 'long'
+    });
     const hour = date.getHours();
-    const minute = date.getMinutes(); 
-    const time=`${hour}:${minute}`
-
-    // Create the day div if a new day is encountered
-    if (day !== lastDay) {
-      lastDay = day;
-      messagesContainer.insertAdjacentHTML(
-        "afterbegin",
-        `
-          <div class="mx-4 flex items-center space-x-3">
-            <div class="h-px flex-1 bg-slate-200 dark:bg-navy-500"></div>
-            <p>${day}</p>
-            <div class="h-px flex-1 bg-slate-200 dark:bg-navy-500"></div>
-          </div>
-        `
-      );
-    }
+    const minute = date.getMinutes();
+    const time = `${day}:${hour}:${minute}`;
 
     if (!messageContainer) {
       let direction =
@@ -321,7 +328,6 @@ async function loadMessages(page, conversation, scrollToBottom = false) {
   document.getElementById('big-container-message').style.display = 'block'
   // Set the ID of the conversation container to the conversation ID
 
-  console.log("conversation : ", conversation, "page number:", page, limit)
   // Don't make multiple requests if a request is already in progress
   if (isLoading) {
     return;
@@ -391,9 +397,8 @@ function onScrollUp() {
 function getTheLastMsg(conversationId) {
   return axios.get(`http://127.0.0.1:3000/messages/lastMsg/${conversationId}`)
     .then(function (response) {
-      console.log(response.data.data.created_at)
       const lastMessage = response.data.data;
-  
+
       return lastMessage;
     });
 }
@@ -419,11 +424,11 @@ export async function getMyConversations() {
     const date = new Date(timestamp);
     const hour = date.getHours();
     const minute = date.getMinutes();
-   
-    const time=`${hour}:${minute}`
+
+    const time = `${hour}:${minute}`
 
     const html = `
-      <div class="conversation" data-conversation-id="${conversationId}" data-name="${name}" data-timestamp="${time}">
+      <div class="conversation" data-conversation-id="${conversationId}" data-name="${name}" data-timestamp="${timestamp}">
         <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
           <div
             class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
@@ -455,45 +460,130 @@ export async function getMyConversations() {
           </div>
         </div>
       </div>`;
-        // Append the HTML to the container
+    // Append the HTML to the container
 
     leftConversationContainer.innerHTML += html;
- // Sort the conversations based on the latest message timestamp
-  const conversationElements = Array.from(leftConversationContainer.children);
-  conversationElements.sort((a, b) => {
-    const aTimestamp = parseInt(a.getAttribute('data-timestamp'));
-    const bTimestamp = parseInt(b.getAttribute('data-timestamp'));
-    return bTimestamp - aTimestamp;
-  });
-  // Re-append the sorted elements to the container
-  leftConversationContainer.innerHTML = '';
-  conversationElements.forEach(element => {
-    leftConversationContainer.appendChild(element);
-  });
+    // Sort the conversations based on the latest message timestamp
+    const conversationElements = Array.from(leftConversationContainer.children);
 
-  // Update the latest conversation ID
-  latestConversationId = conversationId;
-  // Trigger a click event on the latest conversation
-  if (latestConversationId) {
-    $(`[data-conversation-id="${latestConversationId}"]`).trigger('click');
-  }
+    conversationElements.sort((a, b) => {
+      const aTimestamp = parseInt(a.getAttribute('data-timestamp'));
+      const bTimestamp = parseInt(b.getAttribute('data-timestamp'));
+      return bTimestamp - aTimestamp;
+    });
+    // Re-append the sorted elements to the container
+    leftConversationContainer.innerHTML = '';
+    conversationElements.forEach(element => {
+      leftConversationContainer.appendChild(element);
+    });
+
+    // Update the latest conversation ID
+    latestConversationId = conversationId;
+    // Trigger a click event on the latest conversation
+    if (latestConversationId) {
+      $(`[data-conversation-id="${latestConversationId}"]`).trigger('click');
+    }
   });
   await Promise.all(conversationPromises);
+}
+
+
+
+
+export async function sentMessage(data){
+  let conv = document.querySelector('#conversation-container').dataset['conversationId']
+
+  if (data.conversation === conv) {
+  const messageId = data.id;
+  const messageContainer = document.getElementById(`message-${messageId}`);
+  if (!messageContainer) {
+    let direction = data.direction == "in" ? 'justify-end' : '';
+    const msgStyle = data.direction == "out" ? `rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100` : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white'
+    messagesContainer.insertAdjacentHTML("beforeend", `
+        <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
+        <div class="flex flex-col items-end space-y-3.5">
+        <div class="flex flex-row">
+        ${data.direction =="in" ? butt :'' }
+          <div class="ml-2 max-w-lg sm:ml-5">
+            <div class="${msgStyle}">
+              ${data.content}
+            </div>
+            <p  id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
+                  ${timeString}      
+            </p>
+          </div>
+        ${data.direction =="out" ? butt :''}
+        </div>
+        <div class="flex flex-row">
+            </div>
+          </div>
+        </div>
+      </div>
+        </div>
+      `);
+  }
+  const conversationContainer = document.getElementById('conversation-container');
+  conversationContainer.scrollTop = conversationContainer.scrollHeight;
+}
+
+}
+export async function receiveMessage(data) {
+
+ 
+  let conv = document.querySelector('#conversation-container').dataset['conversationId']
+
+  const conversationContainer = document.getElementById('conversation-container');
+  const messageId = data.id;
+  const messageContainer = document.getElementById(`message-${messageId}`);
+
+  // Get the conversation ID from the conversation container element
+  const conversationId = conversationContainer.getAttribute('data-conversation-id');
+  if (conversationId === conv) {
+    if (!messageContainer) {
+      if (data.conversation === conversationId) {
+        let direction = data.direction == "in" ? 'justify-end' : '';
+        const msgStyle = data.direction == "out" ? `rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100` : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white'
+        messagesContainer.insertAdjacentHTML("beforeend", `
+    <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
+    <div class="flex flex-col items-end space-y-3.5">
+    <div class="flex flex-row">
+    ${data.direction =="in" ? butt :'' }
+      <div class="ml-2 max-w-lg sm:ml-5">
+        <div class="${msgStyle}">
+          ${data.content}
+        </div> 
+        <p  id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
+              ${timeString}      
+        </p>
+      </div>
+    ${data.direction =="out" ? butt :''}
+    </div>
+    <div class="flex flex-row">
+        </div>
+      </div>
+    </div>
+  </div>
+    </div>
+  `);
+        conversationContainer.scrollTop = conversationContainer.scrollHeight;
+      }
+    }
+  }
 }
 
 
 function handleConversationClick() {
   messagesContainer.innerHTML = '';
   document.getElementById('big-container-message').style.display = 'block';
-
+  const $conversationContainer = $('#conversation-container');
+  $conversationContainer.attr('data-conversation-id', conversation_id);
   const conversationId = $(this).data('conversation-id');
   const name = $(this).data('name');
   conversation_id = conversationId;
   to = name;
 
- // Set the conversation ID as an attribute of the conversation container element
- const $conversationContainer = $('#conversation-container');
- $conversationContainer.attr('data-conversation-id', conversationId);
+  // Set the conversation ID as an attribute of the conversation container element
+
 
   const conversationName = document.getElementById('conversation-name');
   conversationName.textContent = name;
@@ -502,7 +592,6 @@ function handleConversationClick() {
   let currentPage = 1;
   loadMessages(currentPage, conversationId, true);
 
-  console.log("Clicked on conversation with ID: " + conversationId + " " + name);
 
   // Update the active chat with the conversation data
   let activeChat = {
@@ -514,46 +603,67 @@ function handleConversationClick() {
   window.dispatchEvent(new CustomEvent('change-active-chat', {
     detail: activeChat
   }));
+
 }
+
+
+
 
 sendButton.addEventListener("click", async () => {
   if (messageInput.value.trim() !== "") {
-    firstMessage(newData.user, to).then(async function (res) {
-      const conversationId = res.conversation_id; // Store the conversation ID
+    if (conversation_id == '') {
+      await firstMessage(newData.user, to).then(async function (res) {
+        const conversationId = await res.conversation_id; // Store the conversation ID
+        const info = {
+          app: "638dc76312488c6bf67e8fc0",
+          user: newData.user,
+          action: "message.create",
+          from:newData.socket_id,
+          metaData: {
+            type: "MSG",
+            conversation_id: conversationId, // Include the conversation ID
+            user: newData.user,
+            message: messageInput.value,
+            data: "non other data",
+            origin: "web",
+          },
+          to: receiverUserName,
+        };
+        // Check if room exists or create a new one
+
+
+        foued.joinMembers(info, conversationId)
+        messageInput.value = "";
+
+      })
+    } else {
       const info = {
         app: "638dc76312488c6bf67e8fc0",
         user: newData.user,
         action: "message.create",
         metaData: {
           type: "MSG",
-          conversation_id: conversationId, // Include the conversation ID
+          conversation_id: conversation_id, // Include the conversation ID
           user: newData.user,
           message: messageInput.value,
           data: "non other data",
           origin: "web",
         },
         to: receiverUserName,
+
       };
-
-      // Check if room exists or create a new one
-      foued.joinMembers(info, conversationId)
-
-      // Create the message
-      // foued.createMessage(info);
-      console.log("aaa", conversationContainer.id)
-
+      foued.joinMembers(info, conversation_id)
       messageInput.value = "";
-    }).catch(function (error) {
-      console.error(error);
-    });
+
+    }
   }
-});
+})
 
 foued.onCreateMessage()
 foued.onConversationMemberJoined();
 foued.onMessageSent()
 foued.onMessageReceived();
-foued.messageDelivered()
+foued.onMessageDelivered()
 foued.userId(newData.user)
 foued.onConversationUpdated()
 

@@ -1,5 +1,12 @@
 import io from "https://cdn.socket.io/4.5.4/socket.io.esm.min.js";
-import {getMyConversations} from '../main.js'
+import {
+  receiveMessage,
+  sentMessage
+} from "../main.js";
+
+import {
+  getMyConversations
+} from '../main.js'
 const currentDate = new Date();
 const hours = currentDate.getHours();
 const minutes = currentDate.getMinutes();
@@ -240,8 +247,8 @@ export default class event {
   }
 
   onConversationMemberJoined = () => {
-    this.socket.on("onConversationMemberJoined", (socket_id, info, conversationId) => {
-      console.log("conversation member joined")
+    this.socket.on("JoinConversationMember", (socket_id, info, conversationId) => {
+      console.log("conversation member join request sent ")
       this.socket.emit("onConversationMemberJoined", socket_id, info, conversationId)
     })
   }
@@ -252,7 +259,6 @@ export default class event {
 
   userId = (userId) => {
     this.socket.on("connect", () => {
-      console.log(userId)
       this.socket.emit("user-connected", userId);
 
     });
@@ -391,19 +397,8 @@ export default class event {
   /**
    *  send  message 
    */
-  // createMessage = (data) => {
-  //   this.socket.emit('onMessageCreated', data, error => {
-  //     if (error) {
-  //       setError(error)
-  //     }
-  //     console.log('====================================');
-  //     console.log("message created");
-  //     console.log('====================================');
-  //   })
-  // }
-  onCreateMessage = (data) => {
-    this.socket.on('onMessageCreated', (data, error) => {
-
+  onCreateMessage = () => {
+    this.socket.on('createMessage', (data, error) => {
       this.socket.emit('onMessageCreated', data, error => {
         if (error) {
           setError(error)
@@ -420,94 +415,36 @@ export default class event {
 
   onMessageSent = () => {
     this.socket.on('onMessageSent', (data, error) => {
-      console.log('onMessageSent', data)
-      const messageId = data.id;
-      const messageContainer = document.getElementById(`message-${messageId}`);
-      if (!messageContainer) {
-        let direction = data.direction == "in" ? 'justify-end' : '';
-        const msgStyle = data.direction == "out" ? `rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100` : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white'
-        messagesContainer.insertAdjacentHTML("beforeend", `
-            <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
-            <div class="flex flex-col items-end space-y-3.5">
-            <div class="flex flex-row">
-            ${data.direction =="in" ? butt :'' }
-              <div class="ml-2 max-w-lg sm:ml-5">
-                <div class="${msgStyle}">
-                  ${data.content}
-                </div>
-                <p  id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
-                      ${timeString}      
-                </p>
-              </div>
-            ${data.direction =="out" ? butt :''}
-            </div>
-            <div class="flex flex-row">
-                </div>
-              </div>
-            </div>
-          </div>
-            </div>
-          `);
-      }
-      const conversationContainer = document.getElementById('conversation-container');
-      conversationContainer.scrollTop = conversationContainer.scrollHeight;
+      console.log("message sent", this.socket.id)
+      sentMessage(data)
     })
   }
-
-
-
+  
   onMessageReceived = () => {
-    const conversationContainer = document.getElementById('conversation-container');
     this.socket.on('onMessageReceived', (data, error) => {
-      const messageId = data.id;
-      const messageContainer = document.getElementById(`message-${messageId}`);
-
-      // Get the conversation ID from the conversation container element
-      const conversationId = conversationContainer.getAttribute('data-conversation-id');
-      if (!messageContainer) {
-        if (data.conversation === conversationId) {
-          let direction = data.direction == "in" ? 'justify-end' : '';
-          const msgStyle = data.direction == "out" ? `rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100` : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white'
-          messagesContainer.insertAdjacentHTML("beforeend", `
-        <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
-        <div class="flex flex-col items-end space-y-3.5">
-        <div class="flex flex-row">
-        ${data.direction =="in" ? butt :'' }
-          <div class="ml-2 max-w-lg sm:ml-5">
-            <div class="${msgStyle}">
-              ${data.content}
-            </div> 
-            <p  id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
-                  ${timeString}      
-            </p>
-          </div>
-        ${data.direction =="out" ? butt :''}
-        </div>
-        <div class="flex flex-row">
-            </div>
-          </div>
-        </div>
-      </div>
-        </div>
-      `);
-
-          this.socket.emit('onMessageDelivered', data)
-        } else {
-          console.log("received but not selected")
-        }
-        this.socket.emit('onConversationUpdated',data)
+        receiveMessage(data)
+      // Check if the message was sent by the current user
+      if (data.from === this.socket.id) {
+       
+        // Emit an event to the UI to indicate that the message was delivered
+        this.socket.emit('onMessageDelivered', data.id);
+        console.log('Message delivered');
+      } else {
+        console.log('Message received');
       }
-      conversationContainer.scrollTop = conversationContainer.scrollHeight;
-    });
+  
+      // Update UI with messageData
+      this.socket.emit('onConversationUpdated', data)
+    })
   }
-
-  messageDelivered = (data) => {
-    this.socket.on('messageDelivered', (data, error) => {
+  
+  onMessageDelivered = () => {
+    this.socket.on('onMessageDelivered', (data, error) => {
       console.log("message Delivered : ", data)
     })
   }
+  
   /**
-   * 
    * update message
    */
 
