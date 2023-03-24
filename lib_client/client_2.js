@@ -234,9 +234,9 @@ export default class event {
   /***
    * add member to a conversation 
    */
-  joinMembers = (info, conversationId) => {
+  joinMembers = (conversationId) => {
     //data=conversationId
-    this.socket.emit('onConversationMemberJoin', info, conversationId, error => {
+    this.socket.on('onConversationMemberJoin', info, conversationId, error => {
       if (error) {
         setError(error)
       }
@@ -264,7 +264,14 @@ export default class event {
     });
 
   }
-
+  
+  onDisconnect = (userId) => {
+    this.socket.on("disconnect", () => {
+      console.log("disconnected")
+      this.socket.emit("user-disconnected", userId,this.socket.id);
+    });
+  };
+  
 
   createMembers = (data) => {
     this.socket.emit('onConversationMemberCreate', data, error => {
@@ -397,8 +404,7 @@ export default class event {
   /**
    *  send  message 
    */
-  onCreateMessage = () => {
-    this.socket.on('createMessage', (data, error) => {
+  onCreateMessage = (data) => {
       this.socket.emit('onMessageCreated', data, error => {
         if (error) {
           setError(error)
@@ -408,9 +414,7 @@ export default class event {
         console.log('====================================');
       })
 
-    })
-  }
-
+    }
 
 
   onMessageSent = () => {

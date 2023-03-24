@@ -83,7 +83,6 @@ let user_id = document.querySelector("#user-id");
 let conversation_id;
 let receiverUserName;
 let to;
-
 //log in
 window.connected = async () => {
   const connectionInfo = {
@@ -152,6 +151,8 @@ async function selectExpert() {
     let name = $(this).data("name");
     receiverUserName = name
     to = avatarId
+    console.log(to)
+
     checkConversation(newData.user, to)
     const $conversationContainer = $('#conversation-container');
     $conversationContainer.attr('data-conversation-id', conversation_id);
@@ -630,9 +631,7 @@ sendButton.addEventListener("click", async () => {
           to: receiverUserName,
         };
         // Check if room exists or create a new one
-
-
-        foued.joinMembers(info, conversationId)
+         foued.onCreateMessage(info)
         messageInput.value = "";
 
       })
@@ -649,15 +648,15 @@ sendButton.addEventListener("click", async () => {
           data: "non other data",
           origin: "web",
         },
-        to: receiverUserName,
-
+        to: to,
       };
-      foued.joinMembers(info, conversation_id)
+      foued.onCreateMessage(info)
+     
       messageInput.value = "";
-
     }
   }
 })
+ // foued.joinMembers(info, conversation_id)
 
 foued.onCreateMessage()
 foued.onConversationMemberJoined();
@@ -665,7 +664,8 @@ foued.onMessageSent()
 foued.onMessageReceived();
 foued.onMessageDelivered()
 foued.userId(newData.user)
-foued.onConversationUpdated()
+foued.onDisconnect(newData.user)
+// foued.onConversationUpdated()
 
 $(document).ready(function () {
   //Get the list of users (experts)
