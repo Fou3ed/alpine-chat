@@ -212,6 +212,7 @@ export default class event {
    */
   conversationEnd = (data) => {
     this.socket.emit('onConversationEnd', data, error => {
+
       if (error) {
         setError(error)
       }
@@ -234,22 +235,24 @@ export default class event {
   /***
    * add member to a conversation 
    */
-  joinMembers = (conversationId) => {
+  joinMembers = () => {
     //data=conversationId
-    this.socket.on('onConversationMemberJoin', info, conversationId, error => {
-      if (error) {
-        setError(error)
-      }
-      console.log('====================================');
-      console.log(" member joined into the conversation ");
-      console.log('====================================');
+    this.socket.on('joinConversationMember', (conversationId, error) => {
+      console.log("conversation join", conversationId)
+      this.socket.emit("onConversationMemberJoined", conversationId)
+
     })
   }
 
-  onConversationMemberJoined = () => {
-    this.socket.on("JoinConversationMember", (socket_id, info, conversationId) => {
-      console.log("conversation member join request sent ")
-      this.socket.emit("onConversationMemberJoined", socket_id, info, conversationId)
+  // onConversationMemberJoined = () => {
+  //   this.socket.on("JoinConversationMember", (socket_id, info, conversationId) => {
+  //     console.log("conversation member join request sent ")
+  //     this.socket.emit("onConversationMemberJoined", socket_id, info, conversationId)
+  //   })
+  // }
+  joinedDone=()=>{
+    this.socket.on('memberJoinedDone',(data)=>{
+      console.log("aa",data)
     })
   }
 
@@ -264,14 +267,14 @@ export default class event {
     });
 
   }
-  
+
   onDisconnect = (userId) => {
-    this.socket.on("disconnect", () => {
-      console.log("disconnected")
-      this.socket.emit("user-disconnected", userId,this.socket.id);
+    this.socket.on("disconnect", (reason) => {
+      console.log("disconnected", reason)
+      this.socket.emit("user-disconnected", userId, this.socket.id);
     });
   };
-  
+
 
   createMembers = (data) => {
     this.socket.emit('onConversationMemberCreate', data, error => {
@@ -405,49 +408,64 @@ export default class event {
    *  send  message 
    */
   onCreateMessage = (data) => {
-      this.socket.emit('onMessageCreated', data, error => {
-        if (error) {
-          setError(error)
-        }
-        console.log('====================================');
-        console.log("message created");
-        console.log('====================================');
-      })
-
-    }
-
-
-  onMessageSent = () => {
-    this.socket.on('onMessageSent', (data, error) => {
-      console.log("message sent", this.socket.id)
-      sentMessage(data)
-    })
-  }
-  
-  onMessageReceived = () => {
-    this.socket.on('onMessageReceived', (data, error) => {
-        receiveMessage(data)
-      // Check if the message was sent by the current user
-      if (data.from === this.socket.id) {
-       
-        // Emit an event to the UI to indicate that the message was delivered
-        this.socket.emit('onMessageDelivered', data.id);
-        console.log('Message delivered');
-      } else {
-        console.log('Message received');
+    this.socket.emit('onMessageCreated', data, error => {
+      if (error) {
+        setError(error)
       }
-  
-      // Update UI with messageData
-      this.socket.emit('onConversationUpdated', data)
+      console.log('====================================');
+      console.log("message created");
+      console.log('====================================');
+    })
+
+  }
+
+
+  onMessageSent = async () => {
+    await this.socket.on('onMessageSent', async (data, online, error) => {
+      console.log("message sent", this.socket.id)
+      if (online === 0) {
+        await sentMessage(data)
+      } else {
+        await sentMessage(data)
+        await this.socket.emit('receiveMessage', data.conversation)
+      }
+
+
     })
   }
-  
+
+  receiveMessage = async () => {
+    await this.socket.on('onMessageReceived', async (data, error) => {
+      console.log("message received  aaa",data)
+      // Check if the message was sent by the current user
+      receiveMessage(data)
+      // Update UI with messageData
+      // await this.socket.emit('onConversationUpdated', data)
+    })
+  }
+
+
+  // onMessageReceived = async (data) => {
+  //   this.socket.on('onMessageReceived', (data, error) => {
+  //     console.log("ok")
+  //     if (data.from === this.socket.id) {
+  //       // Emit an event to the UI to indicate that the message was delivered
+  //       this.socket.emit('onMessageDelivered', data.id);
+  //       console.log('Message delivered');
+  //     } else {
+  //       receiveMessage(data)
+  //       console.log('Message received');
+  //     }
+  //   })
+  // }
   onMessageDelivered = () => {
     this.socket.on('onMessageDelivered', (data, error) => {
+
+
       console.log("message Delivered : ", data)
     })
   }
-  
+
   /**
    * update message
    */

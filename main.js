@@ -492,6 +492,7 @@ export async function getMyConversations() {
 
 
 export async function sentMessage(data){
+  console.log("onMessage Send",data)
   let conv = document.querySelector('#conversation-container').dataset['conversationId']
 
   if (data.conversation === conv) {
@@ -527,50 +528,86 @@ export async function sentMessage(data){
   conversationContainer.scrollTop = conversationContainer.scrollHeight;
 }
 
-}
-export async function receiveMessage(data) {
 
+}
+export async function receiveMessage(data){
  
   let conv = document.querySelector('#conversation-container').dataset['conversationId']
-
-  const conversationContainer = document.getElementById('conversation-container');
-  const messageId = data.id;
+  console.log("main.js",data.messageData.conversation)
+  if (data.messageData.conversation === conv) {
+  const messageId = data.messageData.id;
   const messageContainer = document.getElementById(`message-${messageId}`);
-
-  // Get the conversation ID from the conversation container element
-  const conversationId = conversationContainer.getAttribute('data-conversation-id');
-  if (conversationId === conv) {
-    if (!messageContainer) {
-      if (data.conversation === conversationId) {
-        let direction = data.direction == "in" ? 'justify-end' : '';
-        const msgStyle = data.direction == "out" ? `rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100` : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white'
-        messagesContainer.insertAdjacentHTML("beforeend", `
-    <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
-    <div class="flex flex-col items-end space-y-3.5">
-    <div class="flex flex-row">
-    ${data.direction =="in" ? butt :'' }
-      <div class="ml-2 max-w-lg sm:ml-5">
-        <div class="${msgStyle}">
-          ${data.content}
-        </div> 
-        <p  id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
-              ${timeString}      
-        </p>
-      </div>
-    ${data.direction =="out" ? butt :''}
-    </div>
-    <div class="flex flex-row">
+  if (!messageContainer) {
+    let direction = data.direction == "in" ? 'justify-end' : '';
+    const msgStyle = data.direction == "out" ? `rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100` : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white'
+    messagesContainer.insertAdjacentHTML("beforeend", `
+        <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
+        <div class="flex flex-col items-end space-y-3.5">
+        <div class="flex flex-row">
+        ${data.direction =="in" ? butt :'' }
+          <div class="ml-2 max-w-lg sm:ml-5">
+            <div class="${msgStyle}">
+              ${data.messageData.content}
+            </div>
+            <p  id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
+                  ${timeString}      
+            </p>
+          </div>
+        ${data.direction =="out" ? butt :''}
+        </div>
+        <div class="flex flex-row">
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-    </div>
-  `);
-        conversationContainer.scrollTop = conversationContainer.scrollHeight;
-      }
-    }
+        </div>
+      `);
   }
-}
+  const conversationContainer = document.getElementById('conversation-container');
+  conversationContainer.scrollTop = conversationContainer.scrollHeight;
+}}
+
+// export async function receiveMessage(data) {
+//   let conv = document.querySelector('#conversation-container').dataset['conversationId']
+//   const conversationContainer = document.getElementById('conversation-container');
+//   const messageId = data.messageData.id;
+//   const messageContainer = document.getElementById(`message-${messageId}`);
+//   // Get the conversation ID from the conversation container element
+//   const conversationId = conversationContainer.getAttribute('data-conversation-id');
+//   console.log(conversationContainer,messageContainer,messageId,conversationId)
+
+//   if (conversationId === conv) {
+//     if (!messageContainer) {
+//       if (data.conversation === conversationId) {
+//         let direction = data.direction == "in" ? 'justify-end' : '';
+//         const msgStyle = data.direction == "out" ? `rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100` : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white'
+//         messagesContainer.insertAdjacentHTML("beforeend", `
+//     <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
+//     <div class="flex flex-col items-end space-y-3.5">
+//     <div class="flex flex-row">
+//     ${data.direction =="in" ? butt :'' }
+//       <div class="ml-2 max-w-lg sm:ml-5">
+//         <div class="${msgStyle}">
+//           ${data.content}
+//         </div> 
+//         <p  id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
+//               ${timeString}      
+//         </p>
+//       </div>
+//     ${data.direction =="out" ? butt :''}
+//     </div>
+//     <div class="flex flex-row">
+//         </div>
+//       </div>
+//     </div>
+//   </div>
+//     </div>
+//   `);
+//         conversationContainer.scrollTop = conversationContainer.scrollHeight;
+//       }
+//     }
+//   }
+// }
 
 
 function handleConversationClick() {
@@ -659,12 +696,13 @@ sendButton.addEventListener("click", async () => {
  // foued.joinMembers(info, conversation_id)
 
 foued.onCreateMessage()
-foued.onConversationMemberJoined();
 foued.onMessageSent()
-foued.onMessageReceived();
+// foued.onMessageReceived();
 foued.onMessageDelivered()
 foued.userId(newData.user)
 foued.onDisconnect(newData.user)
+foued.joinMembers()
+foued.receiveMessage()
 // foued.onConversationUpdated()
 
 $(document).ready(function () {
