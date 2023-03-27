@@ -409,6 +409,7 @@ export default class event {
    */
   onCreateMessage = (data) => {
     this.socket.emit('onMessageCreated', data, error => {
+      
       if (error) {
         setError(error)
       }
@@ -424,7 +425,10 @@ export default class event {
     await this.socket.on('onMessageSent', async (data, online, error) => {
       console.log("message sent", this.socket.id)
       if (online === 0) {
-        await sentMessage(data)
+        await sentMessage(data)      
+        console.log("aa",data.conversation)
+        await this.socket.emit('onConversationUpdated', data)
+
       } else {
         await sentMessage(data)
         await this.socket.emit('receiveMessage', data.conversation)
@@ -440,7 +444,7 @@ export default class event {
       // Check if the message was sent by the current user
       receiveMessage(data)
       // Update UI with messageData
-      // await this.socket.emit('onConversationUpdated', data)
+       await this.socket.emit('onConversationUpdated', data.messageData.conversation)
     })
   }
 
@@ -558,6 +562,7 @@ export default class event {
 
   onTypingStopped = (data) => {
     this.socket.on('onTypingStopped', (data, error) => {
+      console.log(data)
 
     })
   }

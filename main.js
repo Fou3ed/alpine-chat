@@ -1,5 +1,6 @@
 import event from "./lib_client/client_2.js";
 const foued = new event();
+
 const currentDate = new Date();
 const hours = currentDate.getHours();
 const minutes = currentDate.getMinutes();
@@ -118,7 +119,7 @@ messageInput.addEventListener("input", () => {
 });
 
 /**
- * Get the experts and when click to an avatar it direct the user to the left conversation  
+ * Display connected Agents
  */
 function getExperts() {
   axios.get("http://127.0.0.1:3000/users").then(function (response) {
@@ -126,31 +127,35 @@ function getExperts() {
       let users = response.data.data;
       for (let i = 0; i < users.length; i++) {
         let user = users[i];
-        let name = user.full_name;
-        // Generate a unique ID for each avatar element
-        let avatarId = users[i]._id;
-        $(".swiper-wrapper").append(
-          '<div id="' +
-          avatarId +
-          '" data-name="' +
-          name +
-          '" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center"><div class="h-13 w-13  p-0.5"><img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/avatar-20.jpg" alt="avatar" /></div><p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">' +
-          name +
-          "</p></div>"
-        );
+        if (user.is_active === true) {
+          let name = user.full_name;
+          // Generate a unique ID for each avatar element
+          let agent = users[i]._id;
+          $(".swiper-wrapper").append(
+            '<div id="' +
+            agent +
+            '" data-name="' +
+            name +
+            '" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center"><div class="h-13 w-13  p-0.5"><img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/avatar-20.jpg" alt="avatar" /></div><p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">' +
+            name +
+            "</p></div>"
+          );
+        }
       }
     }
   });
 }
 
+
+
 async function selectExpert() {
   $(".swiper-wrapper").on("click", ".swiper-slide", async function () {
     messagesContainer.innerHTML = ''
     // Get the unique ID of the clicked avatar element
-    let avatarId = $(this).attr("id");
+    let agent = $(this).attr("id");
     let name = $(this).data("name");
     receiverUserName = name
-    to = avatarId
+    to = agent
     console.log(to)
 
     checkConversation(newData.user, to)
@@ -167,7 +172,7 @@ async function selectExpert() {
     }));
 
     // $(document).trigger('change-active-chat', { detail: activeChat }); 
-    to = avatarId;
+    to = agent;
 
   });
 }
@@ -326,6 +331,7 @@ const spinner = document.getElementById('conversation-spinner')
  * load messages of a conversation 
  */
 async function loadMessages(page, conversation, scrollToBottom = false) {
+  console.log(page)
   document.getElementById('big-container-message').style.display = 'block'
   // Set the ID of the conversation container to the conversation ID
 
@@ -567,47 +573,6 @@ export async function receiveMessage(data){
   conversationContainer.scrollTop = conversationContainer.scrollHeight;
 }}
 
-// export async function receiveMessage(data) {
-//   let conv = document.querySelector('#conversation-container').dataset['conversationId']
-//   const conversationContainer = document.getElementById('conversation-container');
-//   const messageId = data.messageData.id;
-//   const messageContainer = document.getElementById(`message-${messageId}`);
-//   // Get the conversation ID from the conversation container element
-//   const conversationId = conversationContainer.getAttribute('data-conversation-id');
-//   console.log(conversationContainer,messageContainer,messageId,conversationId)
-
-//   if (conversationId === conv) {
-//     if (!messageContainer) {
-//       if (data.conversation === conversationId) {
-//         let direction = data.direction == "in" ? 'justify-end' : '';
-//         const msgStyle = data.direction == "out" ? `rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100` : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white'
-//         messagesContainer.insertAdjacentHTML("beforeend", `
-//     <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
-//     <div class="flex flex-col items-end space-y-3.5">
-//     <div class="flex flex-row">
-//     ${data.direction =="in" ? butt :'' }
-//       <div class="ml-2 max-w-lg sm:ml-5">
-//         <div class="${msgStyle}">
-//           ${data.content}
-//         </div> 
-//         <p  id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
-//               ${timeString}      
-//         </p>
-//       </div>
-//     ${data.direction =="out" ? butt :''}
-//     </div>
-//     <div class="flex flex-row">
-//         </div>
-//       </div>
-//     </div>
-//   </div>
-//     </div>
-//   `);
-//         conversationContainer.scrollTop = conversationContainer.scrollHeight;
-//       }
-//     }
-//   }
-// }
 
 
 function handleConversationClick() {
@@ -711,6 +676,173 @@ $(document).ready(function () {
   //select expert to start communicating 
   selectExpert();
   getMyConversations()
+  startTyping()
+  stopTyping()
   // Add a click event listener to each conversation element
   $(document).on('click', '.conversation-click', handleConversationClick);
 });
+
+
+
+
+
+function onStartTyping() {
+   const onTypingStart = {
+    app: "638dc76312488c6bf67e8fc0",
+    user: newData.user,
+    action: "typing.start",
+    metaData: {
+        conversation: conversation_id,
+    },
+};
+  foued.startTyping(onTypingStart)
+};
+let typingBlock = document.getElementById("typing-block-message");
+
+
+function startTyping() {
+  const messageContent = document.getElementById("messagesContent");
+  const typingIcon = document.getElementById("typing-icon-header")
+  foued.onTypingStarted(function (data) {
+    console.log("startTyping", data)
+    messageContent.scrollTo({
+      top: messageContent.scrollHeight,
+      behavior: "smooth",
+    });
+    if (!typingBlock) {
+      typingIcon.classList.remove("hidden")
+      typingBlock = document.createElement("div");
+      typingBlock.className = "w-100 p-3 d-flex";
+      typingBlock.id = "typing-block-message";
+      typingBlock.innerHTML = `                    <div class="d-flex px-3">
+                      <div id="avatar-user">js</div>
+                    </div>
+                    <div>
+                      <div class="d-flex" class="pe-3">
+                        <div
+                          id="typing-display"
+                          class="receiveMessage py-2 rounded"
+                        >
+                          <div class="d-flex">
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              xmlns:xlink="http://www.w3.org/1999/xlink"
+                              viewBox="0 0 100 100"
+                              preserveAspectRatio="xMidYMid"
+                              style="background: none"
+                              width="50px"
+                              height="23px"
+                            >
+                              <circle
+                                cy="62.5"
+                                fill="#C4C4C46b"
+                                r="20"
+                                cx="1.5"
+                              >
+                                <animate
+                                  attributeName="cy"
+                                  calcMode="spline"
+                                  keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+                                  repeatCount="indefinite"
+                                  values="62.5;37.5;62.5;62.5"
+                                  keyTimes="0;0.25;0.5;1"
+                                  dur="1s"
+                                  begin="-0.5s"
+                                ></animate>
+                              </circle>
+                              <circle
+                                cy="62.5"
+                                fill="#c4c4c498"
+                                r="20"
+                                cx="52.5"
+                              >
+                                <animate
+                                  attributeName="cy"
+                                  calcMode="spline"
+                                  keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+                                  repeatCount="indefinite"
+                                  values="62.5;37.5;62.5;62.5"
+                                  keyTimes="0;0.25;0.5;1"
+                                  dur="1s"
+                                  begin="-0.375s"
+                                ></animate>
+                              </circle>
+                              <circle
+                                cy="62.5"
+                                fill="#c4c4c4"
+                                r="20"
+                                cx="107.5"
+                              >
+                                <animate
+                                  attributeName="cy"
+                                  calcMode="spline"
+                                  keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+                                  repeatCount="indefinite"
+                                  values="62.5;37.5;62.5;62.5"
+                                  keyTimes="0;0.25;0.5;1"
+                                  dur="1s"
+                                  begin="-0.25s"
+                                ></animate>
+                              </circle>
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                    </div>`
+      messageContent.appendChild(typingBlock)
+    }
+
+  })
+};
+
+/**
+ * It stops the typing of the user.
+ * @param user - The user object of the user who is typing.
+ */
+
+messageInput.onkeydown = function (event) {
+  onStartTyping()
+}
+
+
+messageInput.onkeyup = function () {
+  setTimeout(() => {
+    onStopTyping()
+  }, 3000)
+}
+
+
+function onStopTyping() {
+   const onTypingStop = {
+    app: "638dc76312488c6bf67e8fc0",
+    user: newData.user,
+    action: "typing.start",
+    metaData: {
+        conversation:conversation_id,
+    },
+};
+  console.log("stop typing")
+
+  foued.stopTyping(onTypingStop)
+};
+
+function stopTyping() {
+  const typingIcon = document.getElementById("typing-icon-header")
+
+  foued.onTypingStopped(function (data) {
+    
+    console.log("stopTyping", data)
+    if (typingBlock) {
+      const divMessages = document.querySelectorAll("div#typing-block-message");
+      console.log(divMessages)
+      // Loop through all selected elements and remove each one
+      for (let i = 0; i < divMessages.length; i++) {
+        divMessages[i].remove();
+      }
+      typingIcon.classList.add("hidden")
+      typingBlock = null
+    }
+  })
+};
+
+
