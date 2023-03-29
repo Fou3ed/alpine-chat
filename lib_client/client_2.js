@@ -7,46 +7,6 @@ import {
 import {
   getMyConversations
 } from '../main.js'
-const currentDate = new Date();
-const hours = currentDate.getHours();
-const minutes = currentDate.getMinutes();
-const timeString = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0');
-const messagesContainer = document.getElementById("big-container-message")
-const messageInput = document.querySelector('#message-input');
-const sendButton = document.querySelector('#send-message');
-const butt = `<div x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex mt-2">
-            <button x-ref="popperRef" @click="isShowPopper = !isShowPopper" class="btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z">
-                </path>
-              </svg>
-            </button>       
-            <div x-ref="popperRoot" class="popper-root" :class="isShowPopper &amp;&amp; 'show'" style="position: fixed; inset: 0px 0px auto auto; margin: 0px; transform: translate(-594px, 231px);" data-popper-placement="bottom-end">
-              <div class="popper-box rounded-md border border-slate-150 bg-white py-1.5 font-inter dark:border-navy-500 dark:bg-navy-700">
-                <ul>
-                  <li>
-                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Edit</a>
-                  </li>
-                  <li>
-                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Forward</a>
-                  </li>
-                  <li>
-                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Copy</a>
-                  </li>
-                  <li>
-                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Reply</a>
-                  </li>
-                </ul>
-                <div class="my-1 h-px bg-slate-150 dark:bg-navy-500"></div>
-                <ul>
-                  <li>
-                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Delete</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>`
-
 
 
 
@@ -67,11 +27,47 @@ export default class event {
   /**
    * on connect
    */
-  connect = (data) => {
-    this.socket.emit('onConnect', data, error => {
-      if (error) {
-        setError(error)
+
+  //receive a connect  event from the socket 
+
+  connect = (userId) => {
+
+    this.socket.on("connect", () => {
+
+      const onConnectData = {
+        app_id: "638dc76312488c6bf67e8fc0",
+        user: userId,
+        action: "user-connected",
+        metaData: {
+          app_id: "638dc76312488c6bf67e8fc0",
+          api_token: "123456789123456",
+          user_id: userId,
+        },
+        "device": {
+          "ip": "123.213.121",
+          "timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+          "platform": navigator.platform,
+          "userAgent": navigator.userAgent
+        }
       }
+
+      this.socket.emit("user-connected", onConnectData);
+
+    });
+  }
+
+  //receive user connection (other user)
+
+  userConnection = () => {
+    this.socket.on("user-connection", (userId) => {
+      console.log("user-connection : ", userId)
+    })
+  }
+
+
+  onDisconnected = () => {
+    this.socket.on("onDisconnected", (reason,socket_id) => {
+      console.log( "user-disconnected :  ",socket_id, "reason : ",reason)
     })
   }
 
@@ -106,27 +102,18 @@ export default class event {
     })
   }
 
-  onDisconnected = () => {
-    this.socket.on("onDisconnected", (data) => {
-      console.log(data)
-    })
-  }
 
   /**
    * on reconnect
    */
   reconnect = (data) => {
-    this.socket.emit('onReconnect', (data, error) => {
-      if (error) {
-        setError(error)
-      }
-    })
+    this.socket.io.on("reconnect", () => {
+     console.log("socket reconnected",data)
+    });
   }
   onReconnected = () => {
     this.socket.on("onReconnected", (data, error) => {
-      if (error) {
-        setError(error)
-      }
+      console.log("recon")
     })
   }
 
@@ -250,30 +237,13 @@ export default class event {
   //     this.socket.emit("onConversationMemberJoined", socket_id, info, conversationId)
   //   })
   // }
-  joinedDone=()=>{
-    this.socket.on('memberJoinedDone',(data)=>{
-      console.log("aa",data)
+  joinedDone = () => {
+    this.socket.on('memberJoinedDone', (data) => {
+      console.log("aa", data)
     })
   }
 
 
-
-  // store the socket.id whenever it change
-
-  userId = (userId) => {
-    this.socket.on("connect", () => {
-      this.socket.emit("user-connected", userId);
-
-    });
-
-  }
-
-  onDisconnect = (userId) => {
-    this.socket.on("disconnect", (reason) => {
-      console.log("disconnected", reason)
-      this.socket.emit("user-disconnected", userId, this.socket.id);
-    });
-  };
 
 
   createMembers = (data) => {
@@ -409,7 +379,7 @@ export default class event {
    */
   onCreateMessage = (data) => {
     this.socket.emit('onMessageCreated', data, error => {
-      
+
       if (error) {
         setError(error)
       }
@@ -423,11 +393,11 @@ export default class event {
 
   onMessageSent = async () => {
     await this.socket.on('onMessageSent', async (data, online, error) => {
-      console.log("message sent", this.socket.id)
+
       if (online === 0) {
-        await sentMessage(data)      
-        console.log("aa",data.conversation)
-        await this.socket.emit('onConversationUpdated', data)
+        await sentMessage(data)
+        console.log("aa", data.conversation)
+        // await this.socket.emit('onConversationUpdated', data)
 
       } else {
         await sentMessage(data)
@@ -440,28 +410,22 @@ export default class event {
 
   receiveMessage = async () => {
     await this.socket.on('onMessageReceived', async (data, error) => {
-      console.log("message received  aaa",data)
+      console.log("message received  aaa", data)
       // Check if the message was sent by the current user
       receiveMessage(data)
       // Update UI with messageData
-       await this.socket.emit('onConversationUpdated', data.messageData.conversation)
+      await this.socket.emit('onConversationUpdated', data.messageData.conversation)
+        })
+  }
+
+  onMessageDelivered = () => {
+    this.socket.on('onMessageDelivered', (data, error) => {
+
+
+      console.log("message Delivered : ", data)
     })
   }
 
-
-  // onMessageReceived = async (data) => {
-  //   this.socket.on('onMessageReceived', (data, error) => {
-  //     console.log("ok")
-  //     if (data.from === this.socket.id) {
-  //       // Emit an event to the UI to indicate that the message was delivered
-  //       this.socket.emit('onMessageDelivered', data.id);
-  //       console.log('Message delivered');
-  //     } else {
-  //       receiveMessage(data)
-  //       console.log('Message received');
-  //     }
-  //   })
-  // }
   onMessageDelivered = () => {
     this.socket.on('onMessageDelivered', (data, error) => {
 
@@ -475,18 +439,14 @@ export default class event {
    */
 
   updateMessage = (data) => {
-    this.socket.emit('onMessageUpdated', data, error => {
-      if (error) {
-        setError(error)
-      }
-      console.log('====================================');
-      console.log("conversation created");
-      console.log('====================================');
-    })
+    this.socket.emit('updateMessage', data, error => {
+         })
   }
-  onMessageUpdated = (data) => {
 
-    this.socket.on('onMessageUpdated', (data, error) => {})
+  onMessageUpdated = (data) => {
+    this.socket.on('onMessageUpdated', (data, error) => {
+      console.log("message Updated ",data)
+    })
   }
   /**
    * 
@@ -504,7 +464,7 @@ export default class event {
   }
   onMessageDeleted = (data) => {
     this.socket.on('onMessageDeleted', (data, error) => {
-
+      console.log(data)
     })
   }
 
@@ -530,17 +490,12 @@ export default class event {
    */
   startTyping = (data) => {
     this.socket.emit('onTypingStart', data, error => {
-      if (error) {
-        setError(error)
-      }
-      console.log('====================================');
-      console.log("conversation created");
-      console.log('====================================');
+  
     })
   }
   onTypingStarted = (data) => {
     this.socket.on('onTypingStarted', (data, error) => {
-      console.log(data)
+      console.log("onTypingStarted")
     })
   }
   /**
@@ -550,19 +505,14 @@ export default class event {
 
   stopTyping = (data) => {
     this.socket.emit('onTypingStop', data, error => {
-      if (error) {
-        setError(error)
-      }
-      console.log('====================================');
-      console.log("conversation created");
-      console.log('====================================');
+      
     })
   }
 
 
   onTypingStopped = (data) => {
     this.socket.on('onTypingStopped', (data, error) => {
-      console.log(data)
+      console.log("onTypingStopped")
 
     })
   }
@@ -581,7 +531,7 @@ export default class event {
   }
   onPinnedMsg = (data) => {
     this.socket.on('onMsgPinned', (data, error) => {
-      console.log(data)
+      console.log("message pinned",data)
     })
   }
 
@@ -595,9 +545,9 @@ export default class event {
       }
     })
   }
-  onUnPinnedMsg = (data) => {
+  onUnPinnedMsg = () => {
     this.socket.on('onMsgUnPinned', (data, error) => {
-      console.log(data)
+      console.log("message unPinned",data)
     })
   }
 
@@ -612,6 +562,7 @@ export default class event {
       }
     })
   }
+
   onReactMsg = () => {
     this.socket.on('onMsgReacted', (data, error) => {
       console.log("reacted", data)
@@ -629,9 +580,9 @@ export default class event {
       }
     })
   }
-  onUnReactMsg = (data) => {
+  onUnReactMsg = () => {
     this.socket.on('onUnReactMsg', (data, error) => {
-      console.log(data)
+      console.log("unReacted",data)
     })
   }
 

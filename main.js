@@ -84,6 +84,7 @@ let user_id = document.querySelector("#user-id");
 let conversation_id;
 let receiverUserName;
 let to;
+newData.user="63aec1a90412b157c3ef3c1d"
 //log in
 window.connected = async () => {
   const connectionInfo = {
@@ -104,7 +105,8 @@ window.connected = async () => {
       userAgent: navigator.userAgent,
     },
   };
-  foued.connect(connectionInfo);
+
+  foued.connect(newData.user);
 };
 foued.onConnected();
 
@@ -219,8 +221,6 @@ async function firstMessage(user_id, to) {
   return {
     conversation_id: res._id
   };
-
-
 }
 
 
@@ -497,17 +497,17 @@ export async function getMyConversations() {
 
 
 
-export async function sentMessage(data){
-  console.log("onMessage Send",data)
+export async function sentMessage(data) {
+  console.log("onMessage Send", data)
   let conv = document.querySelector('#conversation-container').dataset['conversationId']
 
   if (data.conversation === conv) {
-  const messageId = data.id;
-  const messageContainer = document.getElementById(`message-${messageId}`);
-  if (!messageContainer) {
-    let direction = data.direction == "in" ? 'justify-end' : '';
-    const msgStyle = data.direction == "out" ? `rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100` : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white'
-    messagesContainer.insertAdjacentHTML("beforeend", `
+    const messageId = data.id;
+    const messageContainer = document.getElementById(`message-${messageId}`);
+    if (!messageContainer) {
+      let direction = data.direction == "in" ? 'justify-end' : '';
+      const msgStyle = data.direction == "out" ? `rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100` : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white'
+      messagesContainer.insertAdjacentHTML("beforeend", `
         <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
         <div class="flex flex-col items-end space-y-3.5">
         <div class="flex flex-row">
@@ -529,24 +529,24 @@ export async function sentMessage(data){
       </div>
         </div>
       `);
+    }
+    const conversationContainer = document.getElementById('conversation-container');
+    conversationContainer.scrollTop = conversationContainer.scrollHeight;
   }
-  const conversationContainer = document.getElementById('conversation-container');
-  conversationContainer.scrollTop = conversationContainer.scrollHeight;
-}
 
 
 }
-export async function receiveMessage(data){
- 
+export async function receiveMessage(data) {
+
   let conv = document.querySelector('#conversation-container').dataset['conversationId']
-  console.log("main.js",data.messageData.conversation)
+  console.log("main.js", data.messageData.conversation)
   if (data.messageData.conversation === conv) {
-  const messageId = data.messageData.id;
-  const messageContainer = document.getElementById(`message-${messageId}`);
-  if (!messageContainer) {
-    let direction = data.direction == "in" ? 'justify-end' : '';
-    const msgStyle = data.direction == "out" ? `rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100` : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white'
-    messagesContainer.insertAdjacentHTML("beforeend", `
+    const messageId = data.messageData.id;
+    const messageContainer = document.getElementById(`message-${messageId}`);
+    if (!messageContainer) {
+      let direction = data.direction == "in" ? 'justify-end' : '';
+      const msgStyle = data.direction == "out" ? `rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100` : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white'
+      messagesContainer.insertAdjacentHTML("beforeend", `
         <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
         <div class="flex flex-col items-end space-y-3.5">
         <div class="flex flex-row">
@@ -568,10 +568,11 @@ export async function receiveMessage(data){
       </div>
         </div>
       `);
+    }
+    const conversationContainer = document.getElementById('conversation-container');
+    conversationContainer.scrollTop = conversationContainer.scrollHeight;
   }
-  const conversationContainer = document.getElementById('conversation-container');
-  conversationContainer.scrollTop = conversationContainer.scrollHeight;
-}}
+}
 
 
 
@@ -621,7 +622,7 @@ sendButton.addEventListener("click", async () => {
           app: "638dc76312488c6bf67e8fc0",
           user: newData.user,
           action: "message.create",
-          from:newData.socket_id,
+          from: newData.socket_id,
           metaData: {
             type: "MSG",
             conversation_id: conversationId, // Include the conversation ID
@@ -633,7 +634,7 @@ sendButton.addEventListener("click", async () => {
           to: receiverUserName,
         };
         // Check if room exists or create a new one
-         foued.onCreateMessage(info)
+        foued.onCreateMessage(info)
         messageInput.value = "";
 
       })
@@ -653,24 +654,16 @@ sendButton.addEventListener("click", async () => {
         to: to,
       };
       foued.onCreateMessage(info)
-     
+
       messageInput.value = "";
     }
   }
 })
- // foued.joinMembers(info, conversation_id)
+// foued.joinMembers(info, conversation_id)
 
-foued.onCreateMessage()
-foued.onMessageSent()
-// foued.onMessageReceived();
-foued.onMessageDelivered()
-foued.userId(newData.user)
-foued.onDisconnect(newData.user)
-foued.joinMembers()
-foued.receiveMessage()
-// foued.onConversationUpdated()
 
 $(document).ready(function () {
+
   //Get the list of users (experts)
   getExperts();
   //select expert to start communicating 
@@ -678,6 +671,23 @@ $(document).ready(function () {
   getMyConversations()
   startTyping()
   stopTyping()
+  //connect event (it receive an emit from the socket )
+  foued.connect(newData.user)
+  //inform the other users except the sender about the new connection 
+  foued.userConnection()
+  foued.onDisconnected(newData.user)
+
+  foued.onReactMsg()
+foued.onUnReactMsg()
+foued.onPinnedMsg()
+foued.onUnPinnedMsg()
+  foued.onMessageSent()
+  foued.onMessageDelivered()
+  foued.onMessageUpdated()
+  foued.joinMembers()
+  foued.receiveMessage()
+  foued.onConversationUpdated()
+
   // Add a click event listener to each conversation element
   $(document).on('click', '.conversation-click', handleConversationClick);
 });
@@ -687,14 +697,14 @@ $(document).ready(function () {
 
 
 function onStartTyping() {
-   const onTypingStart = {
+  const onTypingStart = {
     app: "638dc76312488c6bf67e8fc0",
     user: newData.user,
     action: "typing.start",
     metaData: {
-        conversation: conversation_id,
+      conversation: conversation_id,
     },
-};
+  };
   foued.startTyping(onTypingStart)
 };
 let typingBlock = document.getElementById("typing-block-message");
@@ -813,14 +823,14 @@ messageInput.onkeyup = function () {
 
 
 function onStopTyping() {
-   const onTypingStop = {
+  const onTypingStop = {
     app: "638dc76312488c6bf67e8fc0",
     user: newData.user,
     action: "typing.start",
     metaData: {
-        conversation:conversation_id,
+      conversation: conversation_id,
     },
-};
+  };
   console.log("stop typing")
 
   foued.stopTyping(onTypingStop)
@@ -830,7 +840,7 @@ function stopTyping() {
   const typingIcon = document.getElementById("typing-icon-header")
 
   foued.onTypingStopped(function (data) {
-    
+
     console.log("stopTyping", data)
     if (typingBlock) {
       const divMessages = document.querySelectorAll("div#typing-block-message");
@@ -844,5 +854,3 @@ function stopTyping() {
     }
   })
 };
-
-
