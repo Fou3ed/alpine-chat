@@ -676,7 +676,7 @@ $(document).ready(function () {
   //inform the other users except the sender about the new connection 
   foued.userConnection()
   foued.onDisconnected(newData.user)
-
+  
   foued.onReactMsg()
 foued.onUnReactMsg()
 foued.onPinnedMsg()

@@ -711,7 +711,7 @@ export default class event {
   }
   onConversationTransferAccept = (data) => {
     this.socket.on('onAcceptCnvTransfer', (data, error) => {
-      console.log(data)
+      this.socket.emit('onConversationTransferAccepted')
     })
   }
 
