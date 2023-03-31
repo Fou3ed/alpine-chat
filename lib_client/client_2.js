@@ -1,7 +1,9 @@
 import io from "https://cdn.socket.io/4.5.4/socket.io.esm.min.js";
 import {
+  getExperts,
   receiveMessage,
-  sentMessage
+  sentMessage,
+  startTyping
 } from "../main.js";
 
 import {
@@ -61,6 +63,7 @@ export default class event {
   userConnection = () => {
     this.socket.on("user-connection", (userId) => {
       console.log("user-connection : ", userId)
+        getExperts()
     })
   }
 
@@ -68,6 +71,8 @@ export default class event {
   onDisconnected = () => {
     this.socket.on("onDisconnected", (reason,socket_id) => {
       console.log( "user-disconnected :  ",socket_id, "reason : ",reason)
+      getExperts()
+
     })
   }
 
@@ -379,6 +384,7 @@ export default class event {
    */
   onCreateMessage = (data) => {
     this.socket.emit('onMessageCreated', data, error => {
+      console.log("data data",data)
 
       if (error) {
         setError(error)
@@ -452,6 +458,7 @@ export default class event {
    * 
    *  delete message 
    */
+  
   deleteMessage = (data) => {
     this.socket.emit('onMessageDeleted', data, error => {
       if (error) {
@@ -462,9 +469,14 @@ export default class event {
       console.log('====================================');
     })
   }
-  onMessageDeleted = (data) => {
+
+  onMessageDeleted = () => {
     this.socket.on('onMessageDeleted', (data, error) => {
-      console.log(data)
+      if (error) {
+        setError(error)
+        return
+      }
+      console.log('Message deleted:', data)
     })
   }
 
@@ -482,7 +494,9 @@ export default class event {
     })
   }
   onMessageRead = (data) => {
-    this.socket.on('onMessageRead', (data, error) => {})
+    this.socket.on('onMessageRead', (data, error) => {
+      console.log("message read",data)
+    })
   }
   /**
    * 
@@ -490,12 +504,12 @@ export default class event {
    */
   startTyping = (data) => {
     this.socket.emit('onTypingStart', data, error => {
-  
+      
     })
   }
   onTypingStarted = (data) => {
     this.socket.on('onTypingStarted', (data, error) => {
-      console.log("onTypingStarted")
+     startTyping()
     })
   }
   /**
@@ -505,7 +519,7 @@ export default class event {
 
   stopTyping = (data) => {
     this.socket.emit('onTypingStop', data, error => {
-      
+
     })
   }
 

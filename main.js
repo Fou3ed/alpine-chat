@@ -12,41 +12,10 @@ const messageInput = document.querySelector("#message-input");
 const sendButton = document.querySelector("#send-message");
 const newData = JSON.parse(localStorage.getItem("newData"));
 console.log("LOCAL STORAGE", newData);
-const butt = `<div x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex mt-2">
-            <button x-ref="popperRef" @click="isShowPopper = !isShowPopper" class="btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z">
-                </path>
-              </svg>
-            </button>       
-            <div x-ref="popperRoot" class="popper-root" :class="isShowPopper &amp;&amp; 'show'" style="position: fixed; inset: 0px 0px auto auto; margin: 0px; transform: translate(-594px, 231px);" data-popper-placement="bottom-end">
-              <div class="popper-box rounded-md border border-slate-150 bg-white py-1.5 font-inter dark:border-navy-500 dark:bg-navy-700">
-                <ul>
-                  <li>
-                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Edit</a>
-                  </li>
-                  <li>
-                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Forward</a>
-                  </li>
-                  <li>
-                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Copy</a>
-                  </li>
-                  <li>
-                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Reply</a>
-                  </li>
-                </ul>
-                <div class="my-1 h-px bg-slate-150 dark:bg-navy-500"></div>
-                <ul>
-                  <li>
-                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Delete</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>`
 
 //message configuration : delete,edit,reply,forward ..
-const msgButt = `<div x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex mt-2">
+
+const msgButt = `<div   id="message-options" x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex mt-2">
             <button x-ref="popperRef" @click="isShowPopper = !isShowPopper" class="btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z">
@@ -72,7 +41,7 @@ const msgButt = `<div x-data="usePopper({placement:'bottom-end',offset:4})" @cli
                 <div class="my-1 h-px bg-slate-150 dark:bg-navy-500"></div>
                 <ul>
                   <li>
-                    <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Delete</a>
+                    <a id="delete-message" href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Delete</a>
                   </li>
                 </ul>
               </div>
@@ -84,7 +53,7 @@ let user_id = document.querySelector("#user-id");
 let conversation_id;
 let receiverUserName;
 let to;
-newData.user="63aec1a90412b157c3ef3c1d"
+newData.user = "63aec1a90412b157c3ef3c1d"
 //log in
 window.connected = async () => {
   const connectionInfo = {
@@ -96,7 +65,6 @@ window.connected = async () => {
       socket_id: "123",
       user_id: user_id.value,
       api_token: "123456789123456",
-
     },
     device: {
       ip: "192.168.1.1",
@@ -120,33 +88,49 @@ messageInput.addEventListener("input", () => {
   }
 });
 
+
 /**
  * Display connected Agents
  */
-function getExperts() {
+
+let displayedUsers = [];
+
+export function getExperts() {
   axios.get("http://127.0.0.1:3000/users").then(function (response) {
     if (response.data.message === "success") {
       let users = response.data.data;
       for (let i = 0; i < users.length; i++) {
         let user = users[i];
-        if (user.is_active === true) {
+        if (user.is_active === true && user._id !== newData.user) {
           let name = user.full_name;
-          // Generate a unique ID for each avatar element
           let agent = users[i]._id;
-          $(".swiper-wrapper").append(
-            '<div id="' +
-            agent +
-            '" data-name="' +
-            name +
-            '" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center"><div class="h-13 w-13  p-0.5"><img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/avatar-20.jpg" alt="avatar" /></div><p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">' +
-            name +
-            "</p></div>"
-          );
+
+          // Check if user is already displayed
+          const alreadyDisplayed = displayedUsers.includes(agent);
+
+          // If not, add new element and update displayed users
+          if (!alreadyDisplayed) {
+            displayedUsers.push(agent);
+
+            $(".swiper-wrapper").append(
+              '<div id="' +
+              agent +
+              '" data-name="' +
+              name +
+              '" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center"><div class="h-13 w-13  p-0.5"><img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/avatar-20.jpg" alt="avatar" /></div><p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">' +
+              name +
+              "</p></div>"
+            );
+          }
         }
       }
     }
   });
 }
+
+
+$('#delete-message').on('click', foued.deleteMessage);
+
 
 
 
@@ -158,9 +142,9 @@ async function selectExpert() {
     let name = $(this).data("name");
     receiverUserName = name
     to = agent
-    console.log(to)
 
     checkConversation(newData.user, to)
+
     const $conversationContainer = $('#conversation-container');
     $conversationContainer.attr('data-conversation-id', conversation_id);
     // Update the active chat with the conversation data
@@ -190,11 +174,10 @@ function checkConversation(user_id, to) {
         console.log(" 'there is no conversation between the both of them yet',start a conversation by sending a message")
       } else {
         conversation_id = response.data.data[0]._id
-        let currentPage = 1;
 
-        // Load the first page of messages on page load
-        loadMessages(currentPage, conversation_id, true);
+        return conversation_id
       }
+      return;
     });
 }
 
@@ -494,9 +477,6 @@ export async function getMyConversations() {
   await Promise.all(conversationPromises);
 }
 
-
-
-
 export async function sentMessage(data) {
   console.log("onMessage Send", data)
   let conv = document.querySelector('#conversation-container').dataset['conversationId']
@@ -511,7 +491,7 @@ export async function sentMessage(data) {
         <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
         <div class="flex flex-col items-end space-y-3.5">
         <div class="flex flex-row">
-        ${data.direction =="in" ? butt :'' }
+        ${data.direction =="in" ? msgButt :'' }
           <div class="ml-2 max-w-lg sm:ml-5">
             <div class="${msgStyle}">
               ${data.content}
@@ -520,7 +500,7 @@ export async function sentMessage(data) {
                   ${timeString}      
             </p>
           </div>
-        ${data.direction =="out" ? butt :''}
+        ${data.direction =="out" ? msgButt :''}
         </div>
         <div class="flex flex-row">
             </div>
@@ -550,7 +530,7 @@ export async function receiveMessage(data) {
         <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
         <div class="flex flex-col items-end space-y-3.5">
         <div class="flex flex-row">
-        ${data.direction =="in" ? butt :'' }
+        ${data.direction =="in" ? msgButt :'' }
           <div class="ml-2 max-w-lg sm:ml-5">
             <div class="${msgStyle}">
               ${data.messageData.content}
@@ -559,7 +539,7 @@ export async function receiveMessage(data) {
                   ${timeString}      
             </p>
           </div>
-        ${data.direction =="out" ? butt :''}
+        ${data.direction =="out" ? msgButt :''}
         </div>
         <div class="flex flex-row">
             </div>
@@ -575,6 +555,14 @@ export async function receiveMessage(data) {
 }
 
 
+async function markMessageAsSeen(conversationId,message){
+  if(conversationId==conversation_id){
+    foued.markMessageAsRead()
+  }else {
+    console.log("ok seen")
+  }
+}
+
 
 function handleConversationClick() {
   messagesContainer.innerHTML = '';
@@ -587,11 +575,10 @@ function handleConversationClick() {
   to = name;
 
   // Set the conversation ID as an attribute of the conversation container element
-
+  foued.markMessageAsRead(conversationId)
 
   const conversationName = document.getElementById('conversation-name');
   conversationName.textContent = name;
-
   // Load the first page of messages on page load
   let currentPage = 1;
   loadMessages(currentPage, conversationId, true);
@@ -676,17 +663,18 @@ $(document).ready(function () {
   //inform the other users except the sender about the new connection 
   foued.userConnection()
   foued.onDisconnected(newData.user)
-  
+  foued.onMessageDeleted()
   foued.onReactMsg()
-foued.onUnReactMsg()
-foued.onPinnedMsg()
-foued.onUnPinnedMsg()
+  foued.onUnReactMsg()
+  foued.onPinnedMsg()
+  foued.onUnPinnedMsg()
   foued.onMessageSent()
   foued.onMessageDelivered()
   foued.onMessageUpdated()
   foued.joinMembers()
   foued.receiveMessage()
-  foued.onConversationUpdated()
+  foued.onMessageRead()
+  //foued.onConversationUpdated()
 
   // Add a click event listener to each conversation element
   $(document).on('click', '.conversation-click', handleConversationClick);
@@ -695,7 +683,7 @@ foued.onUnPinnedMsg()
 
 
 
-
+// change it to another file 
 function onStartTyping() {
   const onTypingStart = {
     app: "638dc76312488c6bf67e8fc0",
@@ -710,8 +698,8 @@ function onStartTyping() {
 let typingBlock = document.getElementById("typing-block-message");
 
 
-function startTyping() {
-  const messageContent = document.getElementById("messagesContent");
+export function startTyping() {
+  const messageContent = document.getElementById("big-container-message");
   const typingIcon = document.getElementById("typing-icon-header")
   foued.onTypingStarted(function (data) {
     console.log("startTyping", data)
