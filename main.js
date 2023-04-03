@@ -1,6 +1,5 @@
 import event from "./lib_client/client_2.js";
 const foued = new event();
-
 const currentDate = new Date();
 const hours = currentDate.getHours();
 const minutes = currentDate.getMinutes();
@@ -93,6 +92,7 @@ messageInput.addEventListener("input", () => {
  * Display connected Agents
  */
 
+
 let displayedUsers = [];
 
 export function getExperts() {
@@ -104,7 +104,6 @@ export function getExperts() {
         if (user.is_active === true && user._id !== newData.user) {
           let name = user.full_name;
           let agent = users[i]._id;
-
           // Check if user is already displayed
           const alreadyDisplayed = displayedUsers.includes(agent);
 
@@ -127,7 +126,6 @@ export function getExperts() {
     }
   });
 }
-
 
 $('#delete-message').on('click', foued.deleteMessage);
 
@@ -555,14 +553,15 @@ export async function receiveMessage(data) {
 }
 
 
-async function markMessageAsSeen(conversationId,message){
-  if(conversationId==conversation_id){
-    foued.markMessageAsRead()
+async function markMessageAsSeen(conversationId){
+  console.log("héka",conversationId)
+  if(conversationId){
+   const message= getTheLastMsg(conversationId)
+    foued.markMessageAsRead(conversationId,message)
   }else {
     console.log("ok seen")
   }
 }
-
 
 function handleConversationClick() {
   messagesContainer.innerHTML = '';
@@ -572,21 +571,19 @@ function handleConversationClick() {
   const conversationId = $(this).data('conversation-id');
   const name = $(this).data('name');
   conversation_id = conversationId;
-  to = name;
+  to = name ;
 
   // Set the conversation ID as an attribute of the conversation container element
-  foued.markMessageAsRead(conversationId)
-
   const conversationName = document.getElementById('conversation-name');
   conversationName.textContent = name;
+
   // Load the first page of messages on page load
   let currentPage = 1;
   loadMessages(currentPage, conversationId, true);
 
-
   // Update the active chat with the conversation data
   let activeChat = {
-    chatId: conversationId,
+      chatId: conversationId,
     name: name,
     avatar_url: 'images/avatar/avatar-19.jpg'
   };
@@ -650,7 +647,6 @@ sendButton.addEventListener("click", async () => {
 
 
 $(document).ready(function () {
-
   //Get the list of users (experts)
   getExperts();
   //select expert to start communicating 
@@ -658,6 +654,7 @@ $(document).ready(function () {
   getMyConversations()
   startTyping()
   stopTyping()
+  foued.onPinnedMsg()
   //connect event (it receive an emit from the socket )
   foued.connect(newData.user)
   //inform the other users except the sender about the new connection 
@@ -674,6 +671,7 @@ $(document).ready(function () {
   foued.joinMembers()
   foued.receiveMessage()
   foued.onMessageRead()
+
   //foued.onConversationUpdated()
 
   // Add a click event listener to each conversation element
