@@ -33,9 +33,7 @@ export default class event {
   //receive a connect  event from the socket 
 
   connect = (userId) => {
-
     this.socket.on("connect", () => {
-
       const onConnectData = {
         app_id: "638dc76312488c6bf67e8fc0",
         user: userId,
@@ -52,9 +50,7 @@ export default class event {
           "userAgent": navigator.userAgent
         }
       }
-
       this.socket.emit("user-connected", onConnectData);
-
     });
   }
 
@@ -512,6 +508,7 @@ export default class event {
      startTyping()
     })
   }
+  
   /**
    * 
    * stop typing event  
@@ -596,7 +593,7 @@ export default class event {
   }
   onUnReactMsg = () => {
     this.socket.on('onUnReactMsg', (data, error) => {
-      console.log("unReacted",data)
+      console.log("unReacted client",data)
     })
   }
 
