@@ -236,7 +236,6 @@ export async function getMyConversations() {
   await Promise.all(conversationPromises);
 }
 
-
 // check  the conversation between the first(connected user ) and the second user 
 // get the conversation , if there is no conversation between them , create a conversation  then for both  users a conversation member  
 function checkConversation(user_id, to) {
@@ -248,13 +247,11 @@ function checkConversation(user_id, to) {
         console.log(" 'there is no conversation between the both of them yet',start a conversation by sending a message")
       } else {
         conversation_id = response.data.data[0]._id
-
         return conversation_id
       }
       return;
     });
 }
-
 /**
  * open a new blank conversation 
  */
@@ -639,10 +636,6 @@ sendButton.addEventListener("click", async () => {
 
 
 $(document).ready(function () {
-
-
-
-
   //Get the list of users (experts)
   getExperts();
   //select expert to start communicating 
