@@ -140,12 +140,10 @@ export default class event {
    */
   createConversation = (data) => {
     this.socket.emit('onConversationStart', data, error => {
-      if (error) {
-        setError(error)
-      }
-
+      console.log("onConversationStart",data)
     })
   }
+
   onConversationStart = () => {
     return new Promise((resolve, reject) => {
       this.socket.on("onConversationStarted", (data, newData) => {
@@ -170,8 +168,11 @@ export default class event {
   }
   onConversationUpdated = (data) => {
     this.socket.on("onConversationUpdated", async (data, newData) => {
+      console.log("conversation  updated ")
+
+      
       // call the getMyConversations function here
-      await getMyConversations(newData);
+      // await getMyConversations(newData);
       // your code here
     })
   }
@@ -395,15 +396,16 @@ export default class event {
 
   onMessageSent = async () => {
     await this.socket.on('onMessageSent', async (data, online, error) => {
-
       if (online === 0) {
         await sentMessage(data)
-        console.log("aa", data.conversation)
-        // await this.socket.emit('onConversationUpdated', data)
-
+      
+        await this.socket.emit('updateConversationLM', data.conversation,data.content,data.from)
       } else {
         await sentMessage(data)
         await this.socket.emit('receiveMessage', data.conversation)
+        
+        await this.socket.emit('updateConversationLM', data.conversation,data.content,data.from)
+
       }
 
 
@@ -416,8 +418,8 @@ export default class event {
       // Check if the message was sent by the current user
       receiveMessage(data)
       // Update UI with messageData
-      await this.socket.emit('onConversationUpdated', data.messageData.conversation)
-        })
+      await this.socket.emit('updateConversationLM', data.conversation,data.content)
+    })
   }
 
   onMessageDelivered = () => {

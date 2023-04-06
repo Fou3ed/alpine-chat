@@ -51,7 +51,7 @@ const msgButt = `<div   id="message-options" x-data="usePopper({placement:'botto
 let user_id = document.querySelector("#user-id");
 let conversation_id;
 let receiverUserName;
-let to;
+let expert;
 
 //when a user connected the value changes
 newData.user = "63aec1a90412b157c3ef3c1d"
@@ -134,11 +134,11 @@ async function selectExpert() {
     let agent = $(this).attr("id");
     let name = $(this).data("name");
     receiverUserName = name
-    to = agent
-    const $conversationContainer = $('#conversation-container');
-    $conversationContainer.attr('data-conversation-id', conversation_id);
+    expert = agent
+        const $conversationContainer = $('#conversation-container');
+        $conversationContainer.attr('data-conversation-id', conversation_id);
 
-    checkConversation(newData.user, to)
+    checkConversation(newData.user, expert)
     // Update the active chat with the conversation data
     let activeChat = {
       chatId: conversation_id,
@@ -148,10 +148,7 @@ async function selectExpert() {
     window.dispatchEvent(new CustomEvent('change-active-chat', {
       detail: activeChat
     }));
-
-    // $(document).trigger('change-active-chat', { detail: activeChat }); 
-    to = agent;
-
+    expert = agent;
   });
 }
 
@@ -238,8 +235,8 @@ export async function getMyConversations() {
 
 // check  the conversation between the first(connected user ) and the second user 
 // get the conversation , if there is no conversation between them , create a conversation  then for both  users a conversation member  
-function checkConversation(user_id, to) {
-  axios.get(`http://127.0.0.1:3000/conv/?user1=${user_id}&user2=${to}`)
+function checkConversation(user_id, agent) {
+  axios.get(`http://127.0.0.1:3000/conversation/?user1=${user_id}&user2=${agent}`)
     .then(function (response) {
       if (response.data.data.length == 0) {
         conversation_id = ''
@@ -256,31 +253,36 @@ function checkConversation(user_id, to) {
  * open a new blank conversation 
  */
 
-async function firstMessage(user_id, to) {
-  // return the promise returned by createConversation()
-  const res = await createConversation(user_id, to);
-  const memberInfo = {
-    conversation_id: res._id,
-    user_id: user_id,
-    conversation_name: receiverUserName,
-  }
-  foued.createMembers(memberInfo); //just gonna add them in the data base 
-  foued.createMembers({
-    conversation_id: res._id,
-    user_id: to,
-    conversation_name: user_id
-  });
-  conversation_id = res._id;
+async function firstMessage(user_id, agent) {
 
-  return {
-    conversation_id: res._id
-  };
+  // return the promise returned by createConversation()
+   createConversation(user_id, agent)
+    foued.onConversationStart().then(async (res)=>{
+      const memberInfo = {
+        conversation_id: res._id,
+        user_id: user_id,
+        conversation_name: receiverUserName,
+      }
+      foued.createMembers(memberInfo); //just gonna add them in the data base 
+      foued.createMembers({
+        conversation_id: res._id,
+        user_id: agent,
+        conversation_name: user_id
+      });
+      conversation_id = res._id;
+      return {
+        conversation_id: res._id
+      };
+    })
+   
+ 
+
 }
 
 
 
 // create conversation function 
-function createConversation(user_id, to) {
+function createConversation(user_id, agent) {
   const conversationInfo = {
     app: "638dc76312488c6bf67e8fc0",
     user: user_id,
@@ -291,7 +293,8 @@ function createConversation(user_id, to) {
       conversation_type: "private",
       description: "private chat",
       operators: [1],
-      members: [user_id, to],
+      owner_id:user_id,
+      members: [user_id, agent],
       permissions: {
         "key": "value"
       },
@@ -300,7 +303,7 @@ function createConversation(user_id, to) {
     },
   }
   foued.createConversation(conversationInfo);
-  return foued.onConversationStart()
+ 
 }
 
 
@@ -458,7 +461,6 @@ function getTheLastMsg(conversationId) {
   return axios.get(`http://127.0.0.1:3000/messages/lastMsg/${conversationId}`)
     .then(function (response) {
       const lastMessage = response.data.data;
-
       return lastMessage;
     });
 }
@@ -466,9 +468,7 @@ function getTheLastMsg(conversationId) {
 
 
 export async function sentMessage(data) {
-  console.log("onMessage Send", data)
   let conv = document.querySelector('#conversation-container').dataset['conversationId']
-
   if (data.conversation === conv) {
     const messageId = data.id;
     const messageContainer = document.getElementById(`message-${messageId}`);
@@ -501,11 +501,9 @@ export async function sentMessage(data) {
     const conversationContainer = document.getElementById('conversation-container');
     conversationContainer.scrollTop = conversationContainer.scrollHeight;
   }
-
-
 }
-export async function receiveMessage(data) {
 
+export async function receiveMessage(data) {
   let conv = document.querySelector('#conversation-container').dataset['conversationId']
   console.log("main.js", data.messageData.conversation)
   if (data.messageData.conversation === conv) {
@@ -552,9 +550,7 @@ async function markMessageAsSeen(conversationId) {
 }
 
 
-
 function handleConversationClick() {
-
   messagesContainer.innerHTML = '';
   document.getElementById('big-container-message').style.display = 'block';
   const $conversationContainer = $('#conversation-container');
@@ -562,7 +558,7 @@ function handleConversationClick() {
   const conversationId = $(this).data('conversation-id');
   const name = $(this).data('name');
   conversation_id = conversationId;
-  to = name;
+  expert = name;
 
   // Set the conversation ID as an attribute of the conversation container element
   const conversationName = document.getElementById('conversation-name');
@@ -589,7 +585,8 @@ function handleConversationClick() {
 sendButton.addEventListener("click", async () => {
   if (messageInput.value.trim() !== "") {
     if (conversation_id == '') {
-      await firstMessage(newData.user, to).then(async function (res) {
+    
+      await firstMessage(newData.user, expert).then(async function (res) {
         const conversationId = await res.conversation_id; // Store the conversation ID
         const info = {
           app: "638dc76312488c6bf67e8fc0",
@@ -624,7 +621,7 @@ sendButton.addEventListener("click", async () => {
           data: "non other data",
           origin: "web",
         },
-        to: to,
+        to: expert,
       };
       foued.onCreateMessage(info)
 
@@ -632,7 +629,7 @@ sendButton.addEventListener("click", async () => {
     }
   }
 })
-// foued.joinMembers(info, conversation_id)
+
 
 
 $(document).ready(function () {
@@ -660,7 +657,7 @@ $(document).ready(function () {
   foued.joinMembers()
   foued.receiveMessage()
   foued.onMessageRead()
-  //foued.onConversationUpdated()
+  foued.onConversationUpdated()
 
   // Add a click event listener to each conversation element
   $(document).on('click', '.conversation-click', handleConversationClick);
