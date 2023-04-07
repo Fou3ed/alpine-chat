@@ -1,4 +1,6 @@
 import event from "./lib_client/client_2.js";
+
+
 const foued = new event();
 const currentDate = new Date();
 const hours = currentDate.getHours();
@@ -24,7 +26,7 @@ const msgButt = `<div   id="message-options" x-data="usePopper({placement:'botto
             <div x-ref="popperRoot" class="popper-root" :class="isShowPopper &amp;&amp; 'show'" style="position: fixed; inset: 0px 0px auto auto; margin: 0px; transform: translate(-594px, 231px);" data-popper-placement="bottom-end">
               <div class="popper-box rounded-md border border-slate-150 bg-white py-1.5 font-inter dark:border-navy-500 dark:bg-navy-700">
                 <ul>
-                  <li>
+                   <li>
                     <a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Edit</a>
                   </li>
                   <li>
@@ -135,8 +137,8 @@ async function selectExpert() {
     let name = $(this).data("name");
     receiverUserName = name
     expert = agent
-        const $conversationContainer = $('#conversation-container');
-        $conversationContainer.attr('data-conversation-id', conversation_id);
+    const $conversationContainer = $('#conversation-container');
+    $conversationContainer.attr('data-conversation-id', conversation_id);
 
     checkConversation(newData.user, expert)
     // Update the active chat with the conversation data
@@ -156,7 +158,6 @@ export async function getMyConversations() {
 
   const leftConversationContainer = document.getElementById('left-conversation');
   leftConversationContainer.innerHTML = ''
-
   let latestConversationId = null;
   const conversationsResponse = await axios.get(`http://127.0.0.1:3000/conversation/${newData.user}`);
   const conversations = conversationsResponse.data.data;
@@ -249,6 +250,7 @@ function checkConversation(user_id, agent) {
       return;
     });
 }
+
 /**
  * open a new blank conversation 
  */
@@ -256,26 +258,26 @@ function checkConversation(user_id, agent) {
 async function firstMessage(user_id, agent) {
 
   // return the promise returned by createConversation()
-   createConversation(user_id, agent)
-    foued.onConversationStart().then(async (res)=>{
-      const memberInfo = {
-        conversation_id: res._id,
-        user_id: user_id,
-        conversation_name: receiverUserName,
-      }
-      foued.createMembers(memberInfo); //just gonna add them in the data base 
-      foued.createMembers({
-        conversation_id: res._id,
-        user_id: agent,
-        conversation_name: user_id
-      });
-      conversation_id = res._id;
-      return {
-        conversation_id: res._id
-      };
-    })
-   
- 
+  createConversation(user_id, agent)
+  foued.onConversationStart().then(async (res) => {
+    const memberInfo = {
+      conversation_id: res._id,
+      user_id: user_id,
+      conversation_name: receiverUserName,
+    }
+    foued.createMembers(memberInfo); //just gonna add them in the data base 
+    foued.createMembers({
+      conversation_id: res._id,
+      user_id: agent,
+      conversation_name: user_id
+    });
+    conversation_id = res._id;
+    return {
+      conversation_id: res._id
+    };
+  })
+
+
 
 }
 
@@ -293,7 +295,7 @@ function createConversation(user_id, agent) {
       conversation_type: "private",
       description: "private chat",
       operators: [1],
-      owner_id:user_id,
+      owner_id: user_id,
       members: [user_id, agent],
       permissions: {
         "key": "value"
@@ -303,8 +305,51 @@ function createConversation(user_id, agent) {
     },
   }
   foued.createConversation(conversationInfo);
- 
+
 }
+
+function submitForm(element) {
+  
+  let forms = []
+  const formContact = element.parentNode
+  const formContent = formContact.parentNode
+  const formInputs = formContact.querySelectorAll("input");
+  const successMessage = formContact.querySelector('#text_capture')
+  element.innerHTML = `<div class="d-flex"><span class="loader2"></span></div>`
+  for (let i = 0; i < formInputs.length; i++) {
+  forms = [...forms, { fieldId: formInputs[i].id.replace("field-", ""), value: formInputs[i].value, }]
+  }
+  $.ajax({
+  url:
+  "https://iheb.local.itwise.pro/private-chat-app/public/addcontactforms",
+  method: "POST",
+  contentType: "application/json",
+  data: JSON.stringify({
+  contact: "1",
+  forms
+  })
+  ,
+  headers: {
+  "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Nzg5NzE2OTUsImV4cCI6MTYyMDA1NzIzMzMzLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcm5hbWUiOiJ0ZXN0QGdtYWlsLmNvbSJ9.Yy_dUAEfszEpE-aQkBcUBq6rV9OPaUCNaoLxIfJnoNyCqsVWUfbilWNz2sXXImyDBmsNg1n9YIERHUE2iziJpOdhJdbiT6byWmT7MhuyC_QUxbPCko5NQPfP-KB85BjKVSxpr-CNq-Su8LxZ6fysLc7Qe71A86O0TangvsH4UgUb99WE3fMC_EF0PnvXVVxfzdZkV9p1EUTJa989ENP-ytXwdonUXcFUBznlW5PVEWgw-5dyWcND3LXCGaweAO-gMSU2K1Wp2T_rtqTRsXkAhcwF5T_IODee87w4FVARMfbXHvvIizclqyH0TITU8G_MgcoteObO24bECJCV-KpFWg"
+  },
+  success: function () {
+  formInputs.forEach(input => {
+  input.value = "";
+  input.disabled = true
+  });
+  element.innerHTML = "Sended"
+  successMessage.classList.remove('hidden');
+  element.disabled = true
+  formContent.style.opacity = 0.7
+  },
+  error: function (jqXHR, textStatus, errorThrown) {
+  console.log("Error:", textStatus, errorThrown);
+  }
+  });
+  setTimeout(() => {
+  successMessage.classList.add('hidden');
+  }, 3000)
+  }
 
 
 function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
@@ -335,8 +380,90 @@ function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
     const hour = date.getHours();
     const minute = date.getMinutes();
     const time = `${day}:${hour}:${minute}`;
-
     if (!messageContainer) {
+      let tableRows = ""
+      const myContent = message.type === "plan" || message.type === "form" ? JSON.parse(message.message) : {}
+      if (myContent !== {} && message.type === "plan")
+      tableRows = myContent.plans.map(plan => {
+        return `
+<div class="pricing-table" id="${plan.id}">
+<div class="ptable-item">
+<div class="ptable-single">
+<div class="ptable-header">
+<div class="ptable-title">
+<h3>${plan.title}</h3>
+</div>
+<div class="ptable-price">
+<h3><small>$</small>${plan.price.replace("$", "")}</h3>
+</div>
+</div>
+<div class="ptable-body">
+<div class="ptable-description">
+<ul>
+<li>${plan.time}</li>
+</ul>
+</div>
+</div>
+<div class="ptable-footer">
+<div class="ptable-action">
+<a href="">Buy Now</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+`;
+      });
+    else if (myContent !== {} && message.type === "form") {
+      let inputForms = ""
+      inputForms = myContent.contactFormFields.map(field => {
+        let type = ""
+        switch (+field.field.field_type) {
+          case 1:
+            type = 'text';
+            break;
+          case 2:
+            type = 'number';
+            break;
+          case 3:
+            type = 'date';
+            break;
+          case 4:
+            type = 'datetime-local';
+            break
+          case 5:
+            type = 'number';
+            step = 'any';
+            break;
+        }
+        return `
+<input
+id="field-${field.id}"
+name="${field.field.field_name.replace(" ", "")}"
+placeholder="${field.field.field_name}"
+type="${type}"
+/>
+
+`;
+      });
+      tableRows = `
+<div
+class="contact-form-preview"
+style="background-color: #fff"
+>
+<h3>Contact form</h3>
+<p>
+${myContent.introduction}
+</p>
+<form >
+<div id="text_capture" class="hidden"><p > ${myContent.text_capture}</p></div>
+${inputForms.join('')}
+<button type="button" onclick="submitForm(this)">Submit</button>
+</form>
+</div>
+`
+    }
       let direction =
         message.user === newData.user ? "justify-end" : "justify-start";
       const msgStyle =
@@ -353,7 +480,8 @@ function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
                 ${direction == "justify-end" ? msgButt : ""}
                 <div class="ml-2 max-w-lg sm:ml-5">
                   <div class="${msgStyle}">
-                    ${message.message} 
+                ${message.type=="link"? `<a class="link-msg" href=" ${message.message}">${message.message}</a>`:message.type === "plan"
+                ? tableRows.join('') : message.type === "form" ? tableRows :message.message}
                   </div>
                   <p id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
                     ${time}      
@@ -504,9 +632,94 @@ export async function sentMessage(data) {
 }
 
 export async function receiveMessage(data) {
+
+  let tableRows = ""
+  const myContent = data.messageData.type === "plan" || data.messageData.type === "form" ? JSON.parse(data.messageData.content) : {}
   let conv = document.querySelector('#conversation-container').dataset['conversationId']
   console.log("main.js", data.messageData.conversation)
   if (data.messageData.conversation === conv) {
+
+    if (myContent !== {} && data.messageData.type === "plan")
+      tableRows = myContent.plans.map(plan => {
+        return `
+<div class="pricing-table" id="${plan.id}">
+<div class="ptable-item">
+<div class="ptable-single">
+<div class="ptable-header">
+<div class="ptable-title">
+<h3>${plan.title}</h3>
+</div>
+<div class="ptable-price">
+<h3><small>$</small>${plan.price.replace("$", "")}</h3>
+</div>
+</div>
+<div class="ptable-body">
+<div class="ptable-description">
+<ul>
+<li>${plan.time}</li>
+</ul>
+</div>
+</div>
+<div class="ptable-footer">
+<div class="ptable-action">
+<a href="">Buy Now</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+`;
+      });
+    else if (myContent !== {} && data.messageData.type === "form") {
+      let inputForms = ""
+      inputForms = myContent.contactFormFields.map(field => {
+        let type = ""
+        switch (+field.field.field_type) {
+          case 1:
+            type = 'text';
+            break;
+          case 2:
+            type = 'number';
+            break;
+          case 3:
+            type = 'date';
+            break;
+          case 4:
+            type = 'datetime-local';
+            break
+          case 5:
+            type = 'number';
+            step = 'any';
+            break;
+        }
+        return `
+<input
+id="field-${field.id}"
+name="${field.field.field_name.replace(" ", "")}"
+placeholder="${field.field.field_name}"
+type="${type}"
+/>
+
+`;
+      });
+      tableRows = `
+<div
+class="contact-form-preview"
+style="background-color: #fff"
+>
+<h3>Contact form</h3>
+<p>
+${myContent.introduction}
+</p>
+<form >
+<div id="text_capture" class="hidden"><p > ${myContent.text_capture}</p></div>
+${inputForms.join('')}
+<button type="button" onclick="submitForm(this)">Submit</button>
+</form>
+</div>
+`
+    }
     const messageId = data.messageData.id;
     const messageContainer = document.getElementById(`message-${messageId}`);
     if (!messageContainer) {
@@ -519,7 +732,10 @@ export async function receiveMessage(data) {
         ${data.direction =="in" ? msgButt :'' }
           <div class="ml-2 max-w-lg sm:ml-5">
             <div class="${msgStyle}">
-              ${data.messageData.content}
+            
+              ${data.messageData.type=="link"? `<a class="link-msg" href=" ${data.messageData.content}">${data.messageData.content}</a>`:data.messageData.type === "plan"
+              ? tableRows.join('') : data.messageData.type === "form" ? tableRows :data.messageData.content}
+              
             </div>
             <p  id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
                   ${timeString}      
@@ -579,13 +795,37 @@ function handleConversationClick() {
   }));
 
 }
+//whenever a user click on the message link fire this function 
+async function addLogs() {
+  const logData = {
+    "user_id": 3,
+    "action": "string",
+    "browser": "string",
+    "device": "string",
+    "location": "string",
+    "element": "string",
+    "element_id": 0,
+    "log_date": "2023-04-07T08:18:59.933Z",
+    "source": "string",
+    "userId": "string",
+    "elementId": 0,
+    "logDate": "2023-04-07T08:18:59.934Z"
+  }
+  const
+    headers = {
+      "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Nzg5NzE2OTUsImV4cCI6MTYyMDA1NzIzMzMzLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcm5hbWUiOiJ0ZXN0QGdtYWlsLmNvbSJ9.Yy_dUAEfszEpE-aQkBcUBq6rV9OPaUCNaoLxIfJnoNyCqsVWUfbilWNz2sXXImyDBmsNg1n9YIERHUE2iziJpOdhJdbiT6byWmT7MhuyC_QUxbPCko5NQPfP-KB85BjKVSxpr-CNq-Su8LxZ6fysLc7Qe71A86O0TangvsH4UgUb99WE3fMC_EF0PnvXVVxfzdZkV9p1EUTJa989ENP-ytXwdonUXcFUBznlW5PVEWgw-5dyWcND3LXCGaweAO-gMSU2K1Wp2T_rtqTRsXkAhcwF5T_IODee87w4FVARMfbXHvvIizclqyH0TITU8G_MgcoteObO24bECJCV-KpFWg"
+    }
+  await axios.post(`https://iheb.local.itwise.pro/private-chat-app/api/user_logs`, logData, {
+    headers
+  });
 
 
+}
 
 sendButton.addEventListener("click", async () => {
   if (messageInput.value.trim() !== "") {
     if (conversation_id == '') {
-    
+
       await firstMessage(newData.user, expert).then(async function (res) {
         const conversationId = await res.conversation_id; // Store the conversation ID
         const info = {
@@ -825,3 +1065,4 @@ function stopTyping() {
     }
   })
 };
+

@@ -21740,4 +21740,260 @@ code.hljs {
   } 
 
 
-  
+  .link-msg { text-decoration: underline; cursor: pointer; color: #f5f5f5; }
+
+  .pricing-table .ptable-item {
+    margin: 5px;
+    width: 100%;
+    }
+    
+    .pricing-table .ptable-single {
+    position: relative;
+    width: 200px;
+    overflow: hidden;
+    }
+    
+    .pricing-table .ptable-header,
+    .pricing-table .ptable-body,
+    .pricing-table .ptable-footer {
+    position: relative;
+    width: 100%;
+    text-align: center;
+    overflow: hidden;
+    }
+    
+    .pricing-table .ptable-status,
+    .pricing-table .ptable-title,
+    .pricing-table .ptable-price,
+    .pricing-table .ptable-description,
+    .pricing-table .ptable-action {
+    position: relative;
+    width: 100%;
+    text-align: center;
+    }
+    
+    .pricing-table .ptable-single {
+    background: #fff;
+    }
+    
+    .pricing-table .ptable-single:hover {
+    box-shadow: 0 0 10px #999999;
+    }
+    
+    .pricing-table .ptable-header {
+    margin: 0 40px;
+    padding: 10px 0 25px 0;
+    width: auto;
+    background: #009ef7;
+    }
+    
+    .pricing-table .ptable-header::before,
+    .pricing-table .ptable-header::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    width: 0;
+    height: 0;
+    border-bottom: 100px solid #fff;
+    }
+    
+    .pricing-table .ptable-header::before {
+    right: 50%;
+    border-right: 250px solid transparent;
+    }
+    
+    .pricing-table .ptable-header::after {
+    left: 50%;
+    border-left: 250px solid transparent;
+    }
+    
+    .pricing-table .ptable-status {
+    margin-top: -30px;
+    }
+    
+    .pricing-table .ptable-status span {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 30px;
+    padding: 5px 0;
+    text-align: center;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 1px;
+    background: #009ef7;
+    }
+    
+    .pricing-table .ptable-status span::before,
+    .pricing-table .ptable-status span::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    width: 0;
+    height: 0;
+    border-bottom: 10px solid #009ef7;
+    }
+    
+    .pricing-table .ptable-status span::before {
+    right: 50%;
+    border-right: 25px solid transparent;
+    }
+    
+    .pricing-table .ptable-status span::after {
+    left: 50%;
+    border-left: 25px solid transparent;
+    }
+    
+    .pricing-table .ptable-title h3 {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    }
+    
+    .pricing-table .ptable-price h3 {
+    margin: 0;
+    color: #ffffff;
+    font-size: 25px;
+    font-weight: 700;
+    margin-left: 15px;
+    }
+    
+    .pricing-table .ptable-price h3 small {
+    position: absolute;
+    font-size: 18px;
+    font-weight: 300;
+    margin-top: 5px;
+    margin-left: -12px;
+    }
+    
+    .pricing-table .ptable-price h3 span {
+    font-size: 16px;
+    font-weight: 300;
+    }
+    
+    .pricing-table .ptable-body {
+    padding: 20px 0;
+    }
+    
+    .pricing-table .ptable-description ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    }
+    
+    .pricing-table .ptable-description ul li {
+    color: #2a293e;
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    padding: 7px;
+    border-bottom: 1px solid #dedede;
+    }
+    
+    .pricing-table .ptable-description ul li:last-child {
+    border: none;
+    }
+    
+    .pricing-table .ptable-footer {
+    padding-bottom: 30px;
+    }
+    
+    .pricing-table .ptable-action a {
+    display: inline-block;
+    padding: 10px 20px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-decoration: none;
+    background: #009ef7;
+    border: 1.5px solid #009ef7;
+    }
+    
+    .pricing-table .ptable-action a:hover {
+    color: #009ef7;
+    border: 1.5px solid #009ef7;
+    background: #fff;
+    }
+
+
+    .contact-form-preview {
+display: flex;
+justify-content: center;
+align-items: center;
+flex-direction: column;
+}
+
+.contact-form-preview h3 {
+color: #009ef7;
+font-size: 22px;
+margin-bottom: 20px;
+padding: 10px;
+margin-top: 20px;
+border-left: 3px solid #009ef7;
+width: 100%;
+text-align: center;
+}
+.contact-form-preview p {
+text-align: center;
+color: #526484 !important;
+padding: 10px;
+}
+
+.contact-form-preview form {
+display: flex;
+flex-direction: column;
+align-items: center;
+width: 100%;
+padding: 10px 20px;
+}
+.contact-form-preview form input {
+width: 100%;
+padding: 10px;
+margin: 10px 0px;
+border-radius: 5px;
+border: 1.5px solid #009ef7;
+}
+.loader2 {
+width: 30px;
+height: 30px;
+border-radius: 50%;
+position: relative;
+animation: rotate 1s linear infinite;
+}
+.loader2::before {
+content: "";
+box-sizing: border-box;
+position: absolute;
+inset: 0px;
+border-radius: 50%;
+border: 4px solid #fff;
+animation: prixClipFix 2s linear infinite;
+}
+
+@keyframes rotate {
+100% {
+transform: rotate(360deg);
+}
+}
+
+@keyframes prixClipFix {
+0% {
+clip-path: polygon(50% 50%, 0 0, 0 0, 0 0, 0 0, 0 0);
+}
+25% {
+clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 0, 100% 0, 100% 0);
+}
+50% {
+clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%);
+}
+75% {
+clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 100%);
+}
+100% {
+clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 0);
+}
+}
+
