@@ -1,6 +1,5 @@
 import event from "./lib_client/client_2.js";
 
-
 const foued = new event();
 const currentDate = new Date();
 const hours = currentDate.getHours();
@@ -13,6 +12,7 @@ const messageInput = document.querySelector("#message-input");
 const sendButton = document.querySelector("#send-message");
 const newData = JSON.parse(localStorage.getItem("newData"));
 console.log("LOCAL STORAGE", newData);
+
 
 //message configuration : delete,edit,reply,forward ..
 
@@ -276,9 +276,6 @@ async function firstMessage(user_id, agent) {
       conversation_id: res._id
     };
   })
-
-
-
 }
 
 
@@ -309,7 +306,7 @@ function createConversation(user_id, agent) {
 }
 
 function submitForm(element) {
-  
+  console.log("submit Form")
   let forms = []
   const formContact = element.parentNode
   const formContent = formContact.parentNode
@@ -317,39 +314,40 @@ function submitForm(element) {
   const successMessage = formContact.querySelector('#text_capture')
   element.innerHTML = `<div class="d-flex"><span class="loader2"></span></div>`
   for (let i = 0; i < formInputs.length; i++) {
-  forms = [...forms, { fieldId: formInputs[i].id.replace("field-", ""), value: formInputs[i].value, }]
+    forms = [...forms, {
+      fieldId: formInputs[i].id.replace("field-", ""),
+      value: formInputs[i].value,
+    }]
   }
   $.ajax({
-  url:
-  "https://iheb.local.itwise.pro/private-chat-app/public/addcontactforms",
-  method: "POST",
-  contentType: "application/json",
-  data: JSON.stringify({
-  contact: "1",
-  forms
-  })
-  ,
-  headers: {
-  "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Nzg5NzE2OTUsImV4cCI6MTYyMDA1NzIzMzMzLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcm5hbWUiOiJ0ZXN0QGdtYWlsLmNvbSJ9.Yy_dUAEfszEpE-aQkBcUBq6rV9OPaUCNaoLxIfJnoNyCqsVWUfbilWNz2sXXImyDBmsNg1n9YIERHUE2iziJpOdhJdbiT6byWmT7MhuyC_QUxbPCko5NQPfP-KB85BjKVSxpr-CNq-Su8LxZ6fysLc7Qe71A86O0TangvsH4UgUb99WE3fMC_EF0PnvXVVxfzdZkV9p1EUTJa989ENP-ytXwdonUXcFUBznlW5PVEWgw-5dyWcND3LXCGaweAO-gMSU2K1Wp2T_rtqTRsXkAhcwF5T_IODee87w4FVARMfbXHvvIizclqyH0TITU8G_MgcoteObO24bECJCV-KpFWg"
-  },
-  success: function () {
-  formInputs.forEach(input => {
-  input.value = "";
-  input.disabled = true
-  });
-  element.innerHTML = "Sended"
-  successMessage.classList.remove('hidden');
-  element.disabled = true
-  formContent.style.opacity = 0.7
-  },
-  error: function (jqXHR, textStatus, errorThrown) {
-  console.log("Error:", textStatus, errorThrown);
-  }
+    url: "https://iheb.local.itwise.pro/private-chat-app/public/addcontactforms",
+    method: "POST",
+    contentType: "application/json",
+    data: JSON.stringify({
+      contact: "1",
+      forms
+    }),
+    headers: {
+      "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Nzg5NzE2OTUsImV4cCI6MTYyMDA1NzIzMzMzLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcm5hbWUiOiJ0ZXN0QGdtYWlsLmNvbSJ9.Yy_dUAEfszEpE-aQkBcUBq6rV9OPaUCNaoLxIfJnoNyCqsVWUfbilWNz2sXXImyDBmsNg1n9YIERHUE2iziJpOdhJdbiT6byWmT7MhuyC_QUxbPCko5NQPfP-KB85BjKVSxpr-CNq-Su8LxZ6fysLc7Qe71A86O0TangvsH4UgUb99WE3fMC_EF0PnvXVVxfzdZkV9p1EUTJa989ENP-ytXwdonUXcFUBznlW5PVEWgw-5dyWcND3LXCGaweAO-gMSU2K1Wp2T_rtqTRsXkAhcwF5T_IODee87w4FVARMfbXHvvIizclqyH0TITU8G_MgcoteObO24bECJCV-KpFWg"
+    },
+    success: function () {
+      formInputs.forEach(input => {
+        input.value = "";
+        input.disabled = true
+      });
+      element.innerHTML = "Sended"
+      successMessage.classList.remove('hidden');
+      element.disabled = true
+      formContent.style.opacity = 0.7
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log("Error:", textStatus, errorThrown);
+    }
   });
   setTimeout(() => {
-  successMessage.classList.add('hidden');
+    successMessage.classList.add('hidden');
   }, 3000)
-  }
+}
 
 
 function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
@@ -384,8 +382,8 @@ function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
       let tableRows = ""
       const myContent = message.type === "plan" || message.type === "form" ? JSON.parse(message.message) : {}
       if (myContent !== {} && message.type === "plan")
-      tableRows = myContent.plans.map(plan => {
-        return `
+        tableRows = myContent.plans.map(plan => {
+          return `
 <div class="pricing-table" id="${plan.id}">
 <div class="ptable-item">
 <div class="ptable-single">
@@ -414,30 +412,30 @@ function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
 </div>
 
 `;
-      });
-    else if (myContent !== {} && message.type === "form") {
-      let inputForms = ""
-      inputForms = myContent.contactFormFields.map(field => {
-        let type = ""
-        switch (+field.field.field_type) {
-          case 1:
-            type = 'text';
-            break;
-          case 2:
-            type = 'number';
-            break;
-          case 3:
-            type = 'date';
-            break;
-          case 4:
-            type = 'datetime-local';
-            break
-          case 5:
-            type = 'number';
-            step = 'any';
-            break;
-        }
-        return `
+        });
+      else if (myContent !== {} && message.type === "form") {
+        let inputForms = ""
+        inputForms = myContent.contactFormFields.map(field => {
+          let type = ""
+          switch (+field.field.field_type) {
+            case 1:
+              type = 'text';
+              break;
+            case 2:
+              type = 'number';
+              break;
+            case 3:
+              type = 'date';
+              break;
+            case 4:
+              type = 'datetime-local';
+              break
+            case 5:
+              type = 'number';
+              step = 'any';
+              break;
+          }
+          return `
 <input
 id="field-${field.id}"
 name="${field.field.field_name.replace(" ", "")}"
@@ -446,8 +444,8 @@ type="${type}"
 />
 
 `;
-      });
-      tableRows = `
+        });
+        tableRows = `
 <div
 class="contact-form-preview"
 style="background-color: #fff"
@@ -459,11 +457,11 @@ ${myContent.introduction}
 <form >
 <div id="text_capture" class="hidden"><p > ${myContent.text_capture}</p></div>
 ${inputForms.join('')}
-<button type="button" onclick="submitForm(this)">Submit</button>
+<button id="submit-form" type="button" onclick="submitForm(this)">Submit</button>
 </form>
 </div>
 `
-    }
+      }
       let direction =
         message.user === newData.user ? "justify-end" : "justify-start";
       const msgStyle =
@@ -512,9 +510,11 @@ let currentPage = 1;
 let limit = 10;
 
 const spinner = document.getElementById('conversation-spinner')
+
 /**
  * load messages of a conversation 
  */
+
 async function loadMessages(page, conversation, scrollToBottom = false) {
   document.getElementById('big-container-message').style.display = 'block'
   // Set the ID of the conversation container to the conversation ID
@@ -898,7 +898,9 @@ $(document).ready(function () {
   foued.receiveMessage()
   foued.onMessageRead()
   foued.onConversationUpdated()
-
+  foued.onConversationTransferAccept()
+  foued.onConversationTransferAcceptedJoined()
+  //$(document.on('click','.submit-form',submitForm()))
   // Add a click event listener to each conversation element
   $(document).on('click', '.conversation-click', handleConversationClick);
   $(document).on('click', '.conversation-click', markMessageAsSeen);
@@ -1065,4 +1067,3 @@ function stopTyping() {
     }
   })
 };
-

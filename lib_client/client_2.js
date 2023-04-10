@@ -648,9 +648,20 @@ export default class event {
 
 
 
+/**
+ * forward a message
+ */
+forwardMessage=(data)=>{
+  this.socket.emit('forwardMessage',data,error =>{
 
+  })
+}
+onMessageForwarded=()=>{
+  this.socket.on('onMessageForwarded',(data,error)=>{
+    console.log("message been forwarded ",data)
 
-
+  })
+}
   /**
    * delete media event 
    */
@@ -716,19 +727,28 @@ export default class event {
    * accept transfer conversation 
    */
   conversationTransferAccept = (data) => {
-    this.socket.emit('acceptCnvTransfer', (data, error) => {
-      if (error) {
-        setError(error)
-      }
+    this.socket.emit('acceptCnvTransfer', data,error => {
+      
     })
   }
-  onConversationTransferAccept = (data) => {
-    this.socket.on('onAcceptCnvTransfer', (data, error) => {
-      this.socket.emit('onConversationTransferAccepted')
+  onConversationTransferAccept = async () => {
+   await  this.socket.on('onConversationTransferAccept', (user_id,conversationId, error) => {
+      console.log("conversation Transfer",user_id,conversationId)
+      this.socket.emit('onConversationTransferAccepted',data)
     })
   }
 
+  onConversationTransferAcceptedJoined=async()=>{
+    await this.socket.on('onConversationTransferAcceptedJoined',(user_id,socket_id,error)=>{
+      console.log(user_id ,"joined to the conversation",socket_id)
+    })
+  }
+
+
+
+
   /**
+   * 
    * conversation transfer request 
    */
   conversationTransferRequest = (data) => {
