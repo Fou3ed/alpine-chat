@@ -306,7 +306,7 @@ function createConversation(user_id, agent) {
 }
 
 function submitForm(element) {
-  console.log("submit Form")
+  const form = JSON.parse(element.dataset.content)
   let forms = []
   const formContact = element.parentNode
   const formContent = formContact.parentNode
@@ -315,10 +315,12 @@ function submitForm(element) {
   element.innerHTML = `<div class="d-flex"><span class="loader2"></span></div>`
   for (let i = 0; i < formInputs.length; i++) {
     forms = [...forms, {
-      fieldId: formInputs[i].id.replace("field-", ""),
+      fieldId: formInputs[i].dataset.fieldId,
       value: formInputs[i].value,
     }]
+
   }
+
   $.ajax({
     url: "https://iheb.local.itwise.pro/private-chat-app/public/addcontactforms",
     method: "POST",
@@ -339,7 +341,14 @@ function submitForm(element) {
       successMessage.classList.remove('hidden');
       element.disabled = true
       formContent.style.opacity = 0.7
+
+      addLogs({
+        action: "end form",
+        element: "21",
+        element_id: +form.id
+      })
     },
+
     error: function (jqXHR, textStatus, errorThrown) {
       console.log("Error:", textStatus, errorThrown);
     }
@@ -369,6 +378,7 @@ function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
     let message = reversedMessages[i];
     const messageId = reversedMessages[i]._id;
     const messageContainer = document.getElementById(`message-${messageId}`);
+
 
     const timestamp = message.created_at;
     const date = new Date(timestamp);
@@ -437,10 +447,11 @@ function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
           }
           return `
 <input
-id="field-${field.id}"
+id="field-${messageId}" data-field-id="${field.id}"
 name="${field.field.field_name.replace(" ", "")}"
 placeholder="${field.field.field_name}"
 type="${type}"
+
 />
 
 `;
@@ -457,7 +468,7 @@ ${myContent.introduction}
 <form >
 <div id="text_capture" class="hidden"><p > ${myContent.text_capture}</p></div>
 ${inputForms.join('')}
-<button id="submit-form" type="button" onclick="submitForm(this)">Submit</button>
+<button id="submit-form-${message._id}" data-content='${message.message}'  type="button" >Submit</button>
 </form>
 </div>
 `
@@ -492,8 +503,40 @@ ${inputForms.join('')}
           </div>
         `
       );
+
     }
+    const submitButton = document.querySelector(`#submit-form-${messageId}`);
+    if (submitButton) {
+      submitButton.addEventListener("click", function () {
+        submitForm(this);
+      });
+
+
+    }
+
+
+    const allFormInput = document.querySelectorAll(`#field-${messageId}`);
+
+    if (allFormInput.length > 0) {
+      allFormInput.forEach(input => {
+
+        input.oninput = () => sendTypingNotification(input);
+
+      });
+    }
+
+
+
+    document.querySelectorAll(`#field-${messageId}`).forEach(input => {
+      input.addEventListener('focus', () => {
+        if (isFirstInputFocused) {
+          sendFocusNotification(input);
+        }
+      });
+    });
+
   }
+
 
   // Calculate the height of the new messages
   const newHeight = messagesContainer.scrollHeight;
@@ -504,6 +547,35 @@ ${inputForms.join('')}
     conversationContainer.scrollTop = currentScrollPos + addedHeight;
   }
 }
+let userHasTyped = "";
+
+function sendTypingNotification(input) {
+  console.log(userHasTyped !== input.dataset.fieldId)
+
+  if (userHasTyped !== input.dataset.fieldId) {
+    addLogs({
+      action: "fill",
+      element: "22",
+      element_id: +input.dataset.fieldId
+    });
+    userHasTyped = input.dataset.fieldId;
+  }
+
+
+}
+
+let isFirstInputFocused = true;
+
+function sendFocusNotification(input) {
+  console.log('focused');
+  addLogs({
+    action: "focus",
+    element: "22",
+    element_id: +input.dataset.fieldId
+  });
+  isFirstInputFocused = false;
+}
+
 
 let isLoading = false;
 let currentPage = 1;
@@ -560,6 +632,7 @@ async function loadMessages(page, conversation, scrollToBottom = false) {
     // Set the current page number
     currentPage = page;
 
+
     // Add an event listener to the conversation container for scrolling up
     conversationContainer.addEventListener("scroll", onScrollUp);
   } catch (error) {
@@ -592,6 +665,7 @@ function getTheLastMsg(conversationId) {
       return lastMessage;
     });
 }
+
 
 
 
@@ -695,7 +769,7 @@ export async function receiveMessage(data) {
         }
         return `
 <input
-id="field-${field.id}"
+id="field-${messageId}" data-field-id="${field.id}"
 name="${field.field.field_name.replace(" ", "")}"
 placeholder="${field.field.field_name}"
 type="${type}"
@@ -715,11 +789,12 @@ ${myContent.introduction}
 <form >
 <div id="text_capture" class="hidden"><p > ${myContent.text_capture}</p></div>
 ${inputForms.join('')}
-<button type="button" onclick="submitForm(this)">Submit</button>
+<button id="submit-form-${data.messageData._id}" data-content='${data.messageData.content}' type="button" >Submit</button>
 </form>
 </div>
 `
     }
+
     const messageId = data.messageData.id;
     const messageContainer = document.getElementById(`message-${messageId}`);
     if (!messageContainer) {
@@ -795,32 +870,49 @@ function handleConversationClick() {
   }));
 
 }
+
+
 //whenever a user click on the message link fire this function 
-async function addLogs() {
+async function addLogs(log) {
+  console.log("added to log")
   const logData = {
-    "user_id": 3,
-    "action": "string",
-    "browser": "string",
-    "device": "string",
-    "location": "string",
-    "element": "string",
-    "element_id": 0,
-    "log_date": "2023-04-07T08:18:59.933Z",
-    "source": "string",
-    "userId": "string",
-    "elementId": 0,
-    "logDate": "2023-04-07T08:18:59.934Z"
+    "user_id": "3",
+    "action": log.action,
+    "element": log.element,
+    "element_id": log.element_id,
+    "log_date": currentDate,
+    "source": "3"
   }
   const
     headers = {
       "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Nzg5NzE2OTUsImV4cCI6MTYyMDA1NzIzMzMzLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcm5hbWUiOiJ0ZXN0QGdtYWlsLmNvbSJ9.Yy_dUAEfszEpE-aQkBcUBq6rV9OPaUCNaoLxIfJnoNyCqsVWUfbilWNz2sXXImyDBmsNg1n9YIERHUE2iziJpOdhJdbiT6byWmT7MhuyC_QUxbPCko5NQPfP-KB85BjKVSxpr-CNq-Su8LxZ6fysLc7Qe71A86O0TangvsH4UgUb99WE3fMC_EF0PnvXVVxfzdZkV9p1EUTJa989ENP-ytXwdonUXcFUBznlW5PVEWgw-5dyWcND3LXCGaweAO-gMSU2K1Wp2T_rtqTRsXkAhcwF5T_IODee87w4FVARMfbXHvvIizclqyH0TITU8G_MgcoteObO24bECJCV-KpFWg"
     }
-  await axios.post(`https://iheb.local.itwise.pro/private-chat-app/api/user_logs`, logData, {
+  await axios.post(`https://iheb.local.itwise.pro/private-chat-app/public/api/user_logs`, logData, {
     headers
+  }).then((res) => {
+
+    //send message to agent 
+    const info = {
+      app: "638dc76312488c6bf67e8fc0",
+      user: newData.user,
+      action: "message.create",
+      metaData: {
+        type: "log",
+        conversation_id: conversation_id, // Include the conversation ID
+        user: newData.user,
+        message: JSON.stringify(res.data),
+        data: "non other data",
+        origin: "web",
+      },
+      to: expert,
+    };
+    foued.onCreateMessage(info)
+
   });
 
 
 }
+
 
 sendButton.addEventListener("click", async () => {
   if (messageInput.value.trim() !== "") {
@@ -871,7 +963,6 @@ sendButton.addEventListener("click", async () => {
 })
 
 
-
 $(document).ready(function () {
   //Get the list of users (experts)
   getExperts();
@@ -900,10 +991,12 @@ $(document).ready(function () {
   foued.onConversationUpdated()
   foued.onConversationTransferAccept()
   foued.onConversationTransferAcceptedJoined()
-  //$(document.on('click','.submit-form',submitForm()))
+
   // Add a click event listener to each conversation element
   $(document).on('click', '.conversation-click', handleConversationClick);
   $(document).on('click', '.conversation-click', markMessageAsSeen);
+
+
 });
 
 
