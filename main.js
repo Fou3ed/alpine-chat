@@ -52,7 +52,7 @@ const msgButt = `<div   id="message-options" x-data="usePopper({placement:'botto
 //global variables
 let user_id = document.querySelector("#user-id");
 let conversation_id;
-let receiverUserName;
+let agentName;
 let expert;
 
 //when a user connected the value changes
@@ -98,8 +98,9 @@ messageInput.addEventListener("input", () => {
  */
 
 let displayedUsers = [];
-export function getExperts() {
-  axios.get("http://127.0.0.1:3000/users/connected").then(function (response) {
+export async function getExperts() {
+  //get all the connected user (the agents)
+  await axios.get("http://127.0.0.1:3000/users/connected").then(function (response) {
     if (response.data.message === "success") {
       let users = response.data.data;
       for (let i = 0; i < users.length; i++) {
@@ -132,27 +133,43 @@ export function getExperts() {
 async function selectExpert() {
   $(".swiper-wrapper").on("click", ".swiper-slide", async function () {
     messagesContainer.innerHTML = ''
-    // Get the unique ID of the clicked avatar element
+    // Get the unique ID of the agent clicked
     let agent = $(this).attr("id");
     let name = $(this).data("name");
-    receiverUserName = name
+    agentName = name
     expert = agent
     const $conversationContainer = $('#conversation-container');
-    $conversationContainer.attr('data-conversation-id', conversation_id);
+      $conversationContainer.attr('data-conversation-id', conversation_id);
+    //check if they both have conversation , if yes , just handelclick to left conversation
+    await axios.get(`http://127.0.0.1:3000/conversation/?user1=${newData.user}&user2=${agent}`)
+      .then(function (response) {
+        if (response.data.data.length == 0) {
+          conversation_id = ''
+          messagesContainer.innerHTML = ''
+          console.log(" 'there is no conversation between the both of them yet',start a conversation by sending a message")
+        } else {
+          conversationId=res.data.data[0]._id
+          
+        //
 
-    checkConversation(newData.user, expert)
-    // Update the active chat with the conversation data
-    let activeChat = {
-      chatId: conversation_id,
-      name: name,
-      avatar_url: 'images/avatar/avatar-18.jpg'
-    };
-    window.dispatchEvent(new CustomEvent('change-active-chat', {
-      detail: activeChat
-    }));
-    expert = agent;
+
+          // Update the active chat with the conversation data
+          let activeChat = {
+            chatId: conversation_id,
+            name: name,
+            avatar_url: 'images/avatar/avatar-18.jpg'
+          };
+          window.dispatchEvent(new CustomEvent('change-active-chat', {
+            detail: activeChat
+          }));
+          expert = agent;
+        }
+      })
+
   });
 }
+
+
 
 export async function getMyConversations() {
 
@@ -263,7 +280,7 @@ async function firstMessage(user_id, agent) {
     const memberInfo = {
       conversation_id: res._id,
       user_id: user_id,
-      conversation_name: receiverUserName,
+      conversation_name: agentName,
     }
     foued.createMembers(memberInfo); //just gonna add them in the data base 
     foued.createMembers({
@@ -287,7 +304,7 @@ function createConversation(user_id, agent) {
     user: user_id,
     action: "conversation.create",
     metaData: {
-      name: receiverUserName,
+      name: agentName,
       channel_url: "foued/test",
       conversation_type: "private",
       description: "private chat",
@@ -302,7 +319,6 @@ function createConversation(user_id, agent) {
     },
   }
   foued.createConversation(conversationInfo);
-
 }
 
 function submitForm(element) {
@@ -341,7 +357,6 @@ function submitForm(element) {
       successMessage.classList.remove('hidden');
       element.disabled = true
       formContent.style.opacity = 0.7
-
       addLogs({
         action: "end form",
         element: "21",
@@ -390,11 +405,11 @@ function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
     const time = `${day}:${hour}:${minute}`;
     if (!messageContainer) {
       let tableRows = ""
-      const myContent = message.type === "plan" || message.type === "form" ? JSON.parse(message.message) : {}
+      const myContent = message.type === "plan" || message.type === "form" || message.type === "link" ? JSON.parse(message.message) : {}
       if (myContent !== {} && message.type === "plan")
         tableRows = myContent.plans.map(plan => {
           return `
-<div class="pricing-table" id="${plan.id}">
+<div class="pricing-table" id="plan-${messageId}" data-plan-id="${plan.id}">
 <div class="ptable-item">
 <div class="ptable-single">
 <div class="ptable-header">
@@ -414,7 +429,7 @@ function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
 </div>
 <div class="ptable-footer">
 <div class="ptable-action">
-<a href="">Buy Now</a>
+<button >Buy Now</button>
 </div>
 </div>
 </div>
@@ -489,7 +504,7 @@ ${inputForms.join('')}
                 ${direction == "justify-end" ? msgButt : ""}
                 <div class="ml-2 max-w-lg sm:ml-5">
                   <div class="${msgStyle}">
-                ${message.type=="link"? `<a class="link-msg" href=" ${message.message}">${message.message}</a>`:message.type === "plan"
+                ${message.type=="link"? `<a class="link-msg"  id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}" href=" ${myContent.userLink.link?.url}">${myContent.userLink.link?.url}</a>`:message.type === "plan"
                 ? tableRows.join('') : message.type === "form" ? tableRows :message.message}
                   </div>
                   <p id="date_msg" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
@@ -535,6 +550,23 @@ ${inputForms.join('')}
       });
     });
 
+
+
+
+    const linkedMessage = document.querySelector(`#linked-msg-${messageId}`)
+    if (linkedMessage) {
+      linkedMessage.addEventListener("click", function () {
+        sendClickingNotification(this)
+      })
+    }
+
+
+    const planMessage = document.querySelectorAll(`#plan-${messageId}`)
+    if (planMessage.length > 0) {
+      planMessage.forEach(plan => {
+        plan.querySelector("button").onclick = () => sendPlanClickNotification(plan)
+      })
+    }
   }
 
 
@@ -564,6 +596,7 @@ function sendTypingNotification(input) {
 
 }
 
+
 let isFirstInputFocused = true;
 
 function sendFocusNotification(input) {
@@ -575,6 +608,31 @@ function sendFocusNotification(input) {
   });
   isFirstInputFocused = false;
 }
+
+
+
+
+function sendClickingNotification(data) {
+  console.log("clicked", data)
+
+  addLogs({
+    action: "link click",
+    element: "7",
+    element_id: +data.dataset.linkId
+  });
+}
+
+
+
+function sendPlanClickNotification(data) {
+  console.log("clicked to buy ", data)
+  addLogs({
+    action: "start purchase",
+    element: "3",
+    element_id: +data.dataset.planId
+  });
+}
+
 
 
 let isLoading = false;
@@ -708,7 +766,7 @@ export async function sentMessage(data) {
 export async function receiveMessage(data) {
 
   let tableRows = ""
-  const myContent = data.messageData.type === "plan" || data.messageData.type === "form" ? JSON.parse(data.messageData.content) : {}
+  const myContent = data.messageData.type === "plan" || data.messageData.type === "form" || data.messageData.type === "link" ? JSON.parse(data.messageData.message) : {}
   let conv = document.querySelector('#conversation-container').dataset['conversationId']
   console.log("main.js", data.messageData.conversation)
   if (data.messageData.conversation === conv) {
@@ -716,7 +774,7 @@ export async function receiveMessage(data) {
     if (myContent !== {} && data.messageData.type === "plan")
       tableRows = myContent.plans.map(plan => {
         return `
-<div class="pricing-table" id="${plan.id}">
+<div class="pricing-table" id="plan-${messageId}" data-plan-id="${plan.id}">
 <div class="ptable-item">
 <div class="ptable-single">
 <div class="ptable-header">
@@ -736,7 +794,7 @@ export async function receiveMessage(data) {
 </div>
 <div class="ptable-footer">
 <div class="ptable-action">
-<a href="">Buy Now</a>
+<button>Buy Now</button>
 </div>
 </div>
 </div>
@@ -808,7 +866,7 @@ ${inputForms.join('')}
           <div class="ml-2 max-w-lg sm:ml-5">
             <div class="${msgStyle}">
             
-              ${data.messageData.type=="link"? `<a class="link-msg" href=" ${data.messageData.content}">${data.messageData.content}</a>`:data.messageData.type === "plan"
+              ${data.messageData.type=="link"? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}"  href=" ${myContent.userLink.link?.url}">${myContent.userLink.link?.url}</a>`:data.messageData.type === "plan"
               ? tableRows.join('') : data.messageData.type === "form" ? tableRows :data.messageData.content}
               
             </div>
@@ -933,7 +991,7 @@ sendButton.addEventListener("click", async () => {
             data: "non other data",
             origin: "web",
           },
-          to: receiverUserName,
+          to: agentName,
         };
         // Check if room exists or create a new one
         foued.onCreateMessage(info)

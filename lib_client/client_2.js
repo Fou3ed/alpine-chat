@@ -331,9 +331,9 @@ export default class event {
       }
     })
   }
-  onConversationMemberLeft = (data) => {
-    this.socket.on("onConversationMemberLeft", () => {
-
+  onConversationMemberLeft = () => {
+    this.socket.on("onConversationMemberLeft",data => {
+      console.log("member left the conversation ",data)
     })
   }
 
@@ -723,11 +723,16 @@ onMessageForwarded=()=>{
       console.log(data)
     })
   }
+
+
+
+
+
   /**
    * accept transfer conversation 
    */
   conversationTransferAccept = (data) => {
-    this.socket.emit('acceptCnvTransfer', data,error => {
+    this.socket.emit('transferConversation', data,error => {
       
     })
   }
