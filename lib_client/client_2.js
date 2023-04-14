@@ -737,9 +737,9 @@ onMessageForwarded=()=>{
     })
   }
   onConversationTransferAccept = async () => {
-   await  this.socket.on('onConversationTransferAccept', (user_id,conversationId, error) => {
-      console.log("conversation Transfer",user_id,conversationId)
-      this.socket.emit('onConversationTransferAccepted',data)
+   await  this.socket.on('onConversationTransferAccept', (conversationId, error) => {
+      console.log("conversation Transfer",conversationId)
+      this.socket.emit('onConversationTransferAccepted',conversationId)
     })
   }
 

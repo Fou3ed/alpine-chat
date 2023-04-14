@@ -76,7 +76,6 @@ window.connected = async () => {
       userAgent: navigator.userAgent,
     },
   };
-
   foued.connect(newData.user);
 };
 foued.onConnected();
@@ -139,20 +138,18 @@ async function selectExpert() {
     agentName = name
     expert = agent
     const $conversationContainer = $('#conversation-container');
-      $conversationContainer.attr('data-conversation-id', conversation_id);
+    $conversationContainer.attr('data-conversation-id', conversation_id);
     //check if they both have conversation , if yes , just handelclick to left conversation
     await axios.get(`http://127.0.0.1:3000/conversation/?user1=${newData.user}&user2=${agent}`)
-      .then(function (response) {
+      .then( (response)=> {
+        console.log("houuni",response.data.data)
         if (response.data.data.length == 0) {
           conversation_id = ''
           messagesContainer.innerHTML = ''
           console.log(" 'there is no conversation between the both of them yet',start a conversation by sending a message")
         } else {
-          conversationId=res.data.data[0]._id
-          
-        //
-
-
+       
+         conversation_id=response.data.data[0]._id
           // Update the active chat with the conversation data
           let activeChat = {
             chatId: conversation_id,
@@ -165,7 +162,6 @@ async function selectExpert() {
           expert = agent;
         }
       })
-
   });
 }
 
