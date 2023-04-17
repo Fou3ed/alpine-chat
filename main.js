@@ -142,14 +142,27 @@ async function selectExpert() {
     //check if they both have conversation , if yes , just handelclick to left conversation
     await axios.get(`http://127.0.0.1:3000/conversation/?user1=${newData.user}&user2=${agent}`)
       .then( (response)=> {
-        console.log("houuni",response.data.data)
         if (response.data.data.length == 0) {
           conversation_id = ''
           messagesContainer.innerHTML = ''
+          let activeChat = {
+            chatId: conversation_id,
+            name: name,
+            avatar_url: 'images/avatar/avatar-18.jpg'
+          };
+          window.dispatchEvent(new CustomEvent('change-active-chat', {
+            detail: activeChat
+          }));
           console.log(" 'there is no conversation between the both of them yet',start a conversation by sending a message")
-        } else {
-       
+        } else {     
          conversation_id=response.data.data[0]._id
+         //jump to left conversation 
+           // Move to conversation container
+          //  const $conversation = $(`[data-conversation-id="${conversation_id}"]`);
+          //  if ($conversation.length) {
+          //    $conversation[0].scrollIntoView({ behavior: 'smooth' });
+          //  }
+         
           // Update the active chat with the conversation data
           let activeChat = {
             chatId: conversation_id,
@@ -159,6 +172,7 @@ async function selectExpert() {
           window.dispatchEvent(new CustomEvent('change-active-chat', {
             detail: activeChat
           }));
+
           expert = agent;
         }
       })
@@ -179,14 +193,12 @@ export async function getMyConversations() {
       _id: conversationId,
       name,
     } = conversation;
-
     const lastMessage = await getTheLastMsg(conversationId);
     const timestamp = lastMessage.created_at;
     const date = new Date(timestamp);
     const hour = date.getHours();
     const minute = date.getMinutes();
     const time = `${hour}:${minute}`
-
     const html = `
       <div class="conversation" data-conversation-id="${conversationId}" data-name="${name}" data-timestamp="${timestamp}">
         <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
@@ -273,6 +285,7 @@ async function firstMessage(user_id, agent) {
   // return the promise returned by createConversation()
   createConversation(user_id, agent)
   foued.onConversationStart().then(async (res) => {
+
     const memberInfo = {
       conversation_id: res._id,
       user_id: user_id,
@@ -295,6 +308,7 @@ async function firstMessage(user_id, agent) {
 
 // create conversation function 
 function createConversation(user_id, agent) {
+
   const conversationInfo = {
     app: "638dc76312488c6bf67e8fc0",
     user: user_id,
@@ -925,7 +939,6 @@ function handleConversationClick() {
 
 }
 
-
 //whenever a user click on the message link fire this function 
 async function addLogs(log) {
   console.log("added to log")
@@ -971,8 +984,8 @@ async function addLogs(log) {
 sendButton.addEventListener("click", async () => {
   if (messageInput.value.trim() !== "") {
     if (conversation_id == '') {
-
       await firstMessage(newData.user, expert).then(async function (res) {
+   
         const conversationId = await res.conversation_id; // Store the conversation ID
         const info = {
           app: "638dc76312488c6bf67e8fc0",
@@ -992,7 +1005,6 @@ sendButton.addEventListener("click", async () => {
         // Check if room exists or create a new one
         foued.onCreateMessage(info)
         messageInput.value = "";
-
       })
     } else {
       const info = {
@@ -1049,8 +1061,6 @@ $(document).ready(function () {
   // Add a click event listener to each conversation element
   $(document).on('click', '.conversation-click', handleConversationClick);
   $(document).on('click', '.conversation-click', markMessageAsSeen);
-
-
 });
 
 
@@ -1180,7 +1190,6 @@ messageInput.onkeyup = function () {
     onStopTyping()
   }, 3000)
 }
-
 
 function onStopTyping() {
   const onTypingStop = {

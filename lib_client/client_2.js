@@ -380,6 +380,7 @@ export default class event {
    *  send  message 
    */
   onCreateMessage = (data) => {
+    console.log("4")
     this.socket.emit('onMessageCreated', data, error => {
       console.log("data data",data)
 
