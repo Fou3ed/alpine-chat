@@ -13,7 +13,6 @@ const sendButton = document.querySelector("#send-message");
 const newData = JSON.parse(localStorage.getItem("newData"));
 console.log("LOCAL STORAGE", newData);
 
-
 //message configuration : delete,edit,reply,forward ..
 
 const msgButt = `<div   id="message-options" x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex mt-2">
@@ -316,7 +315,7 @@ function createConversation(user_id, agent) {
     metaData: {
       name: agentName,
       channel_url: "foued/test",
-      conversation_type: "private",
+      conversation_type: "1",
       description: "private chat",
       operators: [1],
       owner_id: user_id,
@@ -619,9 +618,6 @@ function sendFocusNotification(input) {
   isFirstInputFocused = false;
 }
 
-
-
-
 function sendClickingNotification(data) {
   console.log("clicked", data)
 
@@ -631,8 +627,6 @@ function sendClickingNotification(data) {
     element_id: +data.dataset.linkId
   });
 }
-
-
 
 function sendPlanClickNotification(data) {
   console.log("clicked to buy ", data)
@@ -672,6 +666,7 @@ async function loadMessages(page, conversation, scrollToBottom = false) {
     // Fetch the messages from the server
     const response = await axios.get(`http://127.0.0.1:3000/messages/${conversation}?page=${page}&limit=${limit}`);
     if (response.data.message !== "success") {
+
       throw new Error("Failed to load messages");
     }
     const messages = response.data.data;
@@ -734,9 +729,6 @@ function getTheLastMsg(conversationId) {
     });
 }
 
-
-
-
 export async function sentMessage(data) {
   let conv = document.querySelector('#conversation-container').dataset['conversationId']
   if (data.conversation === conv) {
@@ -780,7 +772,6 @@ export async function receiveMessage(data) {
   let conv = document.querySelector('#conversation-container').dataset['conversationId']
   console.log("main.js", data.messageData.conversation)
   if (data.messageData.conversation === conv) {
-
     if (myContent !== {} && data.messageData.type === "plan")
       tableRows = myContent.plans.map(plan => {
         return `
@@ -1035,8 +1026,8 @@ $(document).ready(function () {
   //select expert to start communicating 
   selectExpert();
   getMyConversations()
-  startTyping()
-  stopTyping()
+  // startTyping()
+  // stopTyping()
   foued.onPinnedMsg()
   //connect event (it receive an emit from the socket )
   foued.connect(newData.user)
@@ -1066,160 +1057,160 @@ $(document).ready(function () {
 
 
 
-function onStartTyping() {
-  const onTypingStart = {
-    app: "638dc76312488c6bf67e8fc0",
-    user: newData.user,
-    action: "typing.start",
-    metaData: {
-      conversation: conversation_id,
-    },
-  };
-  foued.startTyping(onTypingStart)
-};
-let typingBlock = document.getElementById("typing-block-message");
+// function onStartTyping() {
+//   const onTypingStart = {
+//     app: "638dc76312488c6bf67e8fc0",
+//     user: newData.user,
+//     action: "typing.start",
+//     metaData: {
+//       conversation: conversation_id,
+//     },
+//   };
+//   foued.startTyping(onTypingStart)
+// };
+// let typingBlock = document.getElementById("typing-block-message");
 
 
-export function startTyping() {
-  const messageContent = document.getElementById("big-container-message");
-  const typingIcon = document.getElementById("typing-icon-header")
-  foued.onTypingStarted(function (data) {
-    console.log("startTyping", data)
-    messageContent.scrollTo({
-      top: messageContent.scrollHeight,
-      behavior: "smooth",
-    });
-    if (!typingBlock) {
-      typingIcon.classList.remove("hidden")
-      typingBlock = document.createElement("div");
-      typingBlock.className = "w-100 p-3 d-flex";
-      typingBlock.id = "typing-block-message";
-      typingBlock.innerHTML = `                    <div class="d-flex px-3">
-                      <div id="avatar-user">js</div>
-                    </div>
-                    <div>
-                      <div class="d-flex" class="pe-3">
-                        <div
-                          id="typing-display"
-                          class="receiveMessage py-2 rounded"
-                        >
-                          <div class="d-flex">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              xmlns:xlink="http://www.w3.org/1999/xlink"
-                              viewBox="0 0 100 100"
-                              preserveAspectRatio="xMidYMid"
-                              style="background: none"
-                              width="50px"
-                              height="23px"
-                            >
-                              <circle
-                                cy="62.5"
-                                fill="#C4C4C46b"
-                                r="20"
-                                cx="1.5"
-                              >
-                                <animate
-                                  attributeName="cy"
-                                  calcMode="spline"
-                                  keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
-                                  repeatCount="indefinite"
-                                  values="62.5;37.5;62.5;62.5"
-                                  keyTimes="0;0.25;0.5;1"
-                                  dur="1s"
-                                  begin="-0.5s"
-                                ></animate>
-                              </circle>
-                              <circle
-                                cy="62.5"
-                                fill="#c4c4c498"
-                                r="20"
-                                cx="52.5"
-                              >
-                                <animate
-                                  attributeName="cy"
-                                  calcMode="spline"
-                                  keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
-                                  repeatCount="indefinite"
-                                  values="62.5;37.5;62.5;62.5"
-                                  keyTimes="0;0.25;0.5;1"
-                                  dur="1s"
-                                  begin="-0.375s"
-                                ></animate>
-                              </circle>
-                              <circle
-                                cy="62.5"
-                                fill="#c4c4c4"
-                                r="20"
-                                cx="107.5"
-                              >
-                                <animate
-                                  attributeName="cy"
-                                  calcMode="spline"
-                                  keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
-                                  repeatCount="indefinite"
-                                  values="62.5;37.5;62.5;62.5"
-                                  keyTimes="0;0.25;0.5;1"
-                                  dur="1s"
-                                  begin="-0.25s"
-                                ></animate>
-                              </circle>
-                            </svg>
-                          </div>
-                        </div>
-                      </div>
-                    </div>`
-      messageContent.appendChild(typingBlock)
-    }
+// export function startTyping() {
+//   const messageContent = document.getElementById("big-container-message");
+//   const typingIcon = document.getElementById("typing-icon-header")
+//   foued.onTypingStarted(function (data) {
+//     console.log("startTyping", data)
+//     messageContent.scrollTo({
+//       top: messageContent.scrollHeight,
+//       behavior: "smooth",
+//     });
+//     if (!typingBlock) {
+//       typingIcon.classList.remove("hidden")
+//       typingBlock = document.createElement("div");
+//       typingBlock.className = "w-100 p-3 d-flex";
+//       typingBlock.id = "typing-block-message";
+//       typingBlock.innerHTML = `                    <div class="d-flex px-3">
+//                       <div id="avatar-user">js</div>
+//                     </div>
+//                     <div>
+//                       <div class="d-flex" class="pe-3">
+//                         <div
+//                           id="typing-display"
+//                           class="receiveMessage py-2 rounded"
+//                         >
+//                           <div class="d-flex">
+//                             <svg
+//                               xmlns="http://www.w3.org/2000/svg"
+//                               xmlns:xlink="http://www.w3.org/1999/xlink"
+//                               viewBox="0 0 100 100"
+//                               preserveAspectRatio="xMidYMid"
+//                               style="background: none"
+//                               width="50px"
+//                               height="23px"
+//                             >
+//                               <circle
+//                                 cy="62.5"
+//                                 fill="#C4C4C46b"
+//                                 r="20"
+//                                 cx="1.5"
+//                               >
+//                                 <animate
+//                                   attributeName="cy"
+//                                   calcMode="spline"
+//                                   keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+//                                   repeatCount="indefinite"
+//                                   values="62.5;37.5;62.5;62.5"
+//                                   keyTimes="0;0.25;0.5;1"
+//                                   dur="1s"
+//                                   begin="-0.5s"
+//                                 ></animate>
+//                               </circle>
+//                               <circle
+//                                 cy="62.5"
+//                                 fill="#c4c4c498"
+//                                 r="20"
+//                                 cx="52.5"
+//                               >
+//                                 <animate
+//                                   attributeName="cy"
+//                                   calcMode="spline"
+//                                   keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+//                                   repeatCount="indefinite"
+//                                   values="62.5;37.5;62.5;62.5"
+//                                   keyTimes="0;0.25;0.5;1"
+//                                   dur="1s"
+//                                   begin="-0.375s"
+//                                 ></animate>
+//                               </circle>
+//                               <circle
+//                                 cy="62.5"
+//                                 fill="#c4c4c4"
+//                                 r="20"
+//                                 cx="107.5"
+//                               >
+//                                 <animate
+//                                   attributeName="cy"
+//                                   calcMode="spline"
+//                                   keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+//                                   repeatCount="indefinite"
+//                                   values="62.5;37.5;62.5;62.5"
+//                                   keyTimes="0;0.25;0.5;1"
+//                                   dur="1s"
+//                                   begin="-0.25s"
+//                                 ></animate>
+//                               </circle>
+//                             </svg>
+//                           </div>
+//                         </div>
+//                       </div>
+//                     </div>`
+//       messageContent.appendChild(typingBlock)
+//     }
+// console.log("start typing")
+//   })
+// };
 
-  })
-};
+// /**
+//  * It stops the typing of the user.
+//  * @param user - The user object of the user who is typing.
+//  */
 
-/**
- * It stops the typing of the user.
- * @param user - The user object of the user who is typing.
- */
-
-messageInput.onkeydown = function (event) {
-  onStartTyping()
-}
+// messageInput.onkeydown = function (event) {
+//   onStartTyping()
+// }
 
 
-messageInput.onkeyup = function () {
-  setTimeout(() => {
-    onStopTyping()
-  }, 3000)
-}
+// messageInput.onkeyup = function () {
+//   setTimeout(() => {
+//     onStopTyping()
+//   }, 3000)
+// }
 
-function onStopTyping() {
-  const onTypingStop = {
-    app: "638dc76312488c6bf67e8fc0",
-    user: newData.user,
-    action: "typing.start",
-    metaData: {
-      conversation: conversation_id,
-    },
-  };
-  console.log("stop typing")
+// function onStopTyping() {
+//   const onTypingStop = {
+//     app: "638dc76312488c6bf67e8fc0",
+//     user: newData.user,
+//     action: "typing.start",
+//     metaData: {
+//       conversation: conversation_id,
+//     },
+//   };
+//   console.log("stop typing")
 
-  foued.stopTyping(onTypingStop)
-};
+//   foued.stopTyping(onTypingStop)
+// };
 
-function stopTyping() {
-  const typingIcon = document.getElementById("typing-icon-header")
+// function stopTyping() {
+//   const typingIcon = document.getElementById("typing-icon-header")
 
-  foued.onTypingStopped(function (data) {
+//   foued.onTypingStopped(function (data) {
 
-    console.log("stopTyping", data)
-    if (typingBlock) {
-      const divMessages = document.querySelectorAll("div#typing-block-message");
-      console.log(divMessages)
-      // Loop through all selected elements and remove each one
-      for (let i = 0; i < divMessages.length; i++) {
-        divMessages[i].remove();
-      }
-      typingIcon.classList.add("hidden")
-      typingBlock = null
-    }
-  })
-};
+//     console.log("stopTyping", data)
+//     if (typingBlock) {
+//       const divMessages = document.querySelectorAll("div#typing-block-message");
+//       console.log(divMessages)
+//       // Loop through all selected elements and remove each one
+//       for (let i = 0; i < divMessages.length; i++) {
+//         divMessages[i].remove();
+//       }
+//       typingIcon.classList.add("hidden")
+//       typingBlock = null
+//     }
+//   })
+// };

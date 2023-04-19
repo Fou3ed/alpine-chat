@@ -3,12 +3,12 @@ import {
   getExperts,
   receiveMessage,
   sentMessage,
-  startTyping
+
 } from "../main.js";
 
-import {
-  getMyConversations
-} from '../main.js'
+// import {
+//   getMyConversations
+// } from '../main.js'
 
 
 
@@ -380,7 +380,7 @@ export default class event {
    *  send  message 
    */
   onCreateMessage = (data) => {
-    console.log("4")
+
     this.socket.emit('onMessageCreated', data, error => {
       console.log("data data",data)
 
@@ -508,6 +508,7 @@ export default class event {
   }
   onTypingStarted = (data) => {
     this.socket.on('onTypingStarted', (data, error) => {
+      console.log("typing ")
      startTyping()
     })
   }
