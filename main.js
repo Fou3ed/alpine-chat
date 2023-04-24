@@ -95,35 +95,34 @@ messageInput.addEventListener("input", () => {
  * 
  */
 
-let displayedUsers = [];
+const displayedAgents = [];
+
 export async function getExperts() {
-  //get all the connected user (the agents)
-  await axios.get("http://127.0.0.1:3000/users/connected").then(function (response) {
+  try {
+    const response = await axios.get("http://127.0.0.1:3000/users/connected");
     if (response.data.message === "success") {
-      let users = response.data.data;
-      for (let i = 0; i < users.length; i++) {
-        let user = users[i];
-        let name = user.full_name;
-        let agent = users[i]._id;
-        // Check if user is already displayed
-        const alreadyDisplayed = displayedUsers.includes(agent);
-        // If not, add new element and update displayed users
+      const users = response.data.data;
+      for (const { _id: agent, full_name: name } of users) {
+        const alreadyDisplayed = displayedAgents.includes(agent);
         if (!alreadyDisplayed) {
-          displayedUsers.push(agent);
-          $(".swiper-wrapper").append(
-            '<div id="' +
-            agent +
-            '" data-name="' +
-            name +
-            '" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center"><div class="h-13 w-13  p-0.5"><img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/avatar-20.jpg" alt="avatar" /></div><p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">' +
-            name +
-            "</p></div>"
-          );
+          displayedAgents.push(agent);
+          const slide = `
+            <div id="${agent}" data-name="${name}" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center">
+              <div class="h-13 w-13  p-0.5">
+                <img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/avatar-20.jpg" alt="avatar" />
+              </div>
+              <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">${name}</p>
+            </div>
+          `;
+          $(".swiper-wrapper").append(slide);
         }
       }
     }
-  });
+  } catch (error) {
+    console.error(error);
+  }
 }
+
 
 /**
  * Select agent to start a conversation 
@@ -132,8 +131,8 @@ async function selectExpert() {
   $(".swiper-wrapper").on("click", ".swiper-slide", async function () {
     messagesContainer.innerHTML = ''
     // Get the unique ID of the agent clicked
-    let agent = $(this).attr("id");
-    let name = $(this).data("name");
+    const agent = $(this).attr("id");
+    const name = $(this).data("name");
     agentName = name
     expert = agent
     const $conversationContainer = $('#conversation-container');
@@ -141,7 +140,7 @@ async function selectExpert() {
     //check if they both have conversation , if yes , just handelclick to left conversation
     await axios.get(`http://127.0.0.1:3000/conversation/?user1=${newData.user}&user2=${agent}`)
       .then( (response)=> {
-        if (response.data.data.length == 0) {
+        if (response.data.data.length === 0) {
           conversation_id = ''
           messagesContainer.innerHTML = ''
           let activeChat = {
@@ -155,15 +154,9 @@ async function selectExpert() {
           console.log(" 'there is no conversation between the both of them yet',start a conversation by sending a message")
         } else {     
          conversation_id=response.data.data[0]._id
-         //jump to left conversation 
-           // Move to conversation container
-          //  const $conversation = $(`[data-conversation-id="${conversation_id}"]`);
-          //  if ($conversation.length) {
-          //    $conversation[0].scrollIntoView({ behavior: 'smooth' });
-          //  }
-         
+          markMessageAsSeen(conversation_id)
           // Update the active chat with the conversation data
-          let activeChat = {
+          const activeChat = {
             chatId: conversation_id,
             name: name,
             avatar_url: 'images/avatar/avatar-18.jpg'
@@ -171,7 +164,6 @@ async function selectExpert() {
           window.dispatchEvent(new CustomEvent('change-active-chat', {
             detail: activeChat
           }));
-
           expert = agent;
         }
       })
@@ -282,15 +274,15 @@ function checkConversation(user_id, agent) {
 async function firstMessage(user_id, agent) {
 
   // return the promise returned by createConversation()
-  createConversation(user_id, agent)
-  foued.onConversationStart().then(async (res) => {
+ createConversation(user_id, agent)
+ await foued.onConversationStart().then(async (res) => {
 
     const memberInfo = {
       conversation_id: res._id,
       user_id: user_id,
       conversation_name: agentName,
     }
-    foued.createMembers(memberInfo); //just gonna add them in the data base 
+   foued.createMembers(memberInfo); //just gonna add them in the data base 
     foued.createMembers({
       conversation_id: res._id,
       user_id: agent,
@@ -343,7 +335,6 @@ function submitForm(element) {
       fieldId: formInputs[i].dataset.fieldId,
       value: formInputs[i].value,
     }]
-
   }
 
   $.ajax({
@@ -384,7 +375,6 @@ function submitForm(element) {
 
 
 function displayMessages(messages, currentScrollPos, scrollToBottom = false) {
-
   document.getElementById('big-container-message').style.display = 'block';
 
   if (!messages || !messages.messages) {
@@ -650,6 +640,7 @@ const spinner = document.getElementById('conversation-spinner')
  */
 
 async function loadMessages(page, conversation, scrollToBottom = false) {
+  console.log("page ",page,conversation)
   document.getElementById('big-container-message').style.display = 'block'
   // Set the ID of the conversation container to the conversation ID
 
@@ -724,6 +715,7 @@ function onScrollUp() {
 function getTheLastMsg(conversationId) {
   return axios.get(`http://127.0.0.1:3000/messages/lastMsg/${conversationId}`)
     .then(function (response) {
+     
       const lastMessage = response.data.data;
       return lastMessage;
     });
@@ -801,7 +793,6 @@ export async function receiveMessage(data) {
 </div>
 </div>
 </div>
-
 `;
       });
     else if (myContent !== {} && data.messageData.type === "form") {
@@ -833,7 +824,6 @@ name="${field.field.field_name.replace(" ", "")}"
 placeholder="${field.field.field_name}"
 type="${type}"
 />
-
 `;
       });
       tableRows = `
@@ -891,12 +881,27 @@ ${inputForms.join('')}
 }
 
 async function markMessageAsSeen(conversationId) {
-  // if (conversationId) {
-  //   const message = getTheLastMsg(conversationId);
-  //   foued.markMessageAsRead(conversationId, message);
-  // } else {
-  //   console.log("ok seen");
-  // }
+  if (conversationId) {
+    
+   getTheLastMsg(conversationId).then((res)=>{
+      console.log(res)
+      const onMessageRead = {
+        app: "638dc76312488c6bf67e8fc0",
+        user: newData.user,
+        action: "message.read",
+        metaData: {
+        conversation: conversationId,
+        message: res._id,
+      
+        },
+        };
+      foued.markMessageAsRead(onMessageRead);
+    });
+   
+
+  } else {
+    console.log("ok seen");
+  }
 }
 
 
