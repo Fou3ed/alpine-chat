@@ -170,10 +170,7 @@ async function selectExpert() {
   });
 }
 
-
-
 export async function getMyConversations() {
-
   const leftConversationContainer = document.getElementById('left-conversation');
   leftConversationContainer.innerHTML = ''
   let latestConversationId = null;

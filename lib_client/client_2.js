@@ -170,7 +170,6 @@ export default class event {
     this.socket.on("onConversationUpdated", async (data, newData) => {
       console.log("conversation  updated ")
 
-      
       // call the getMyConversations function here
       // await getMyConversations(newData);
       // your code here
