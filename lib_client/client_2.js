@@ -1,14 +1,20 @@
 import io from "https://cdn.socket.io/4.5.4/socket.io.esm.min.js";
+
+
 import {
-  getExperts,
   receiveMessage,
   sentMessage,
+  getExperts,
+  onReadMsg,
+  reactDisplay,
+  messageDeleted,
+  updateMessage,
+  startTyping,
+  stopTyping,
+  pinMessage,
+  unpinMessage
 
 } from "../main.js";
-
-// import {
-//   getMyConversations
-// } from '../main.js'
 
 
 
@@ -53,6 +59,30 @@ export default class event {
       this.socket.emit("user-connected", onConnectData);
     });
   }
+  
+  onConnected = function () {
+    this.socket.on("onConnected", (info, newData, data, socketData) => {
+      if (newData) {
+        const concatenated = {
+          ...info,
+          ...newData,
+          ...data,
+          ...socketData
+        };
+        // Store the newData value in localStorage
+        localStorage.setItem('newData', JSON.stringify(concatenated));
+        window.location.href = "./index.html";
+      } else {
+        alert("error");
+      }
+    });
+  };
+
+
+
+
+
+
 
   //receive user connection (other user)
 
@@ -66,30 +96,12 @@ export default class event {
 
   onDisconnected = () => {
     this.socket.on("onDisconnected", (reason,socket_id) => {
-      console.log( "user-disconnected :  ",socket_id, "reason : ",reason)
+      console.log( "user-disconnected : ",socket_id, "reason : ",reason)
       getExperts()
 
     })
   }
 
-  onConnected = function () {
-    this.socket.on("onConnected", (info, newData, data, socketData) => {
-      if (newData) {
-        const concatenated = {
-          ...info,
-          ...newData,
-          ...data,
-          ...socketData
-        };
-        console.log(concatenated);
-        // Store the newData value in localStorage
-        localStorage.setItem('newData', JSON.stringify(concatenated));
-        window.location.href = "./index.html";
-      } else {
-        alert("error");
-      }
-    });
-  };
 
 
   /**
@@ -168,11 +180,7 @@ export default class event {
   }
   onConversationUpdated = (data) => {
     this.socket.on("onConversationUpdated", async (data, newData) => {
-      console.log("conversation  updated ")
 
-      // call the getMyConversations function here
-      // await getMyConversations(newData);
-      // your code here
     })
   }
   /**
@@ -226,7 +234,6 @@ export default class event {
   joinMembers = () => {
     //data=conversationId
     this.socket.on('joinConversationMember', (conversationId, error) => {
-      console.log("conversation join", conversationId)
       this.socket.emit("onConversationMemberJoined", conversationId)
 
     })
@@ -413,8 +420,16 @@ export default class event {
   }
 
   receiveMessage = async () => {
+    const leftConversationContainer = document.getElementById('left-conversation');
+
     await this.socket.on('onMessageReceived', async (data, error) => {
-      console.log("message received  aaa", data)
+      const msgDiv = document.getElementById(`left-conversation-${data.messageData.conversation}`);
+      console.log(`left-conversation-${data.messageData.conversation}`)
+      if (msgDiv) {
+      const msgText = msgDiv.querySelector("p#last-message")
+      msgText.textContent =  data.messageData.content
+      leftConversationContainer.insertBefore(msgDiv,leftConversationContainer.firstChild)
+      }
       // Check if the message was sent by the current user
       receiveMessage(data)
       // Update UI with messageData
@@ -450,6 +465,7 @@ export default class event {
   onMessageUpdated = (data) => {
     this.socket.on('onMessageUpdated', (data, error) => {
       console.log("message Updated ",data)
+      updateMessage(data)
     })
   }
   /**
@@ -470,11 +486,9 @@ export default class event {
 
   onMessageDeleted = () => {
     this.socket.on('onMessageDeleted', (data, error) => {
-      if (error) {
-        setError(error)
-        return
-      }
+
       console.log('Message deleted:', data)
+      messageDeleted(data)
     })
   }
 
@@ -491,9 +505,12 @@ export default class event {
       console.log('====================================');
     })
   }
-  onMessageRead = (data) => {
+  onMessageRead = () => {
     this.socket.on('onMessageRead', (data, error) => {
       console.log("message read",data)
+      onReadMsg()
+     
+
     })
   }
   /**
@@ -508,7 +525,7 @@ export default class event {
   onTypingStarted = (data) => {
     this.socket.on('onTypingStarted', (data, error) => {
       console.log("typing ")
-     startTyping()
+     startTyping(data)
     })
   }
   
@@ -527,6 +544,7 @@ export default class event {
   onTypingStopped = (data) => {
     this.socket.on('onTypingStopped', (data, error) => {
       console.log("onTypingStopped")
+      stopTyping(data)
 
     })
   }
@@ -545,7 +563,7 @@ export default class event {
   }
   onPinnedMsg = (data) => {
     this.socket.on('onMsgPinned', (data, error) => {
-      console.log("message pinned",data)
+      pinMessage(data)
     })
   }
 
@@ -561,7 +579,7 @@ export default class event {
   }
   onUnPinnedMsg = () => {
     this.socket.on('onMsgUnPinned', (data, error) => {
-      console.log("message unPinned",data)
+      unpinMessage(data)
     })
   }
 
@@ -579,7 +597,7 @@ export default class event {
 
   onReactMsg = () => {
     this.socket.on('onMsgReacted', (data, error) => {
-      console.log("reacted", data)
+       reactDisplay(data)
     })
   }
 
@@ -596,7 +614,7 @@ export default class event {
   }
   onUnReactMsg = () => {
     this.socket.on('onUnReactMsg', (data, error) => {
-      console.log("unReacted client",data)
+
     })
   }
 
@@ -612,7 +630,7 @@ export default class event {
   }
   onMentionRequest = (data) => {
     this.socket.on('requestMention', (data, error) => {
-      console.log(data)
+    
     })
   }
   /**
@@ -659,7 +677,6 @@ forwardMessage=(data)=>{
 }
 onMessageForwarded=()=>{
   this.socket.on('onMessageForwarded',(data,error)=>{
-    console.log("message been forwarded ",data)
 
   })
 }
@@ -830,44 +847,3 @@ onMessageForwarded=()=>{
     })
   }
 }
-
-// /**
-//  * update user event 
-//  */
-// updateUser = (data) => {
-//   this.socket.emit('onUserUpdated', data, error => {
-//     if (error) {
-//       setError(error)
-//     }
-//     console.log('====================================');
-//     console.log("user updated");
-//     console.log('====================================');
-//   })
-// }
-// onUpdateUser = (data) => {
-//   this.socket.on('onUserUpdated', data, error => {
-//     if (error) {
-//       setError(error)
-//     }
-//   })
-// }
-// /**
-//  * delete user event 
-//  */
-// deleteUser = (data) => {
-//   this.socket.emit('onUserDeleted', data, error => {
-//     if (error) {
-//       setError(error)
-//     }
-//     console.log('====================================');
-//     console.log("user deleted");
-//     console.log('====================================');
-//   })
-// }
-// onUserDeleted = (data) => {
-//   this.socket.on('onUserDeleted', data, error => {
-//     if (error) {
-//       setError(error)
-//     }
-//   })
-// }

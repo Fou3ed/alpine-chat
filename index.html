@@ -10,8 +10,7 @@
     content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
   <title>Chats - Dellastro</title>
   <link rel="icon" type="image/png" href="images/favicon.png" />
-<script src="main.js" type="module" >
-
+<script src="main.js" type="module"  >
 
 </script>
 
@@ -25,7 +24,7 @@
 
 <!-- Axios -->
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="moment/moment.js"></script>
+
   <!-- Javascript Assets -->
   <script src="js/app.js" defer></script>
 
@@ -42,7 +41,9 @@
   <div class="app-preloader fixed z-50 grid h-full w-full place-content-center bg-slate-50 dark:bg-navy-900">
     <div class="app-preloader-inner relative inline-block h-48 w-48"></div>
   </div>
-
+  <audio id="send-sound">
+    <source src="./audio/notification1.mp3" type="audio/mpeg" />
+    </audio>
   <!-- Page Wrapper -->
   <div id="root" class="min-h-100vh flex grow bg-slate-50 dark:bg-navy-900" x-cloak>
     <!-- Sidebar -->
@@ -1414,16 +1415,14 @@
 
     
     <!-- Main Content Wrapper -->
-   <main  id="chatId"
-  x-data="{ isShowChatInfo: !$store.breakpoints.mdAndDown, activeChat: { chatId: 'chat-1', name: '', avatar_url: 'images/avatar/avatar-19.jpg' } }"
-  x-effect="$store.breakpoints.mdAndDown === true && (isShowChatInfo = false)"
-  class="main-content h-100vh chat-app mt-0 flex w-full flex-col"
-  x-on:change-active-chat.window="activeChat=$event.detail"
-  x-init="function() { activeChat.name = '' }"
->
-
-
-
+    <main  id="chatId"
+    x-data="{ isShowChatInfo: !$store.breakpoints.mdAndDown, activeChat: { chatId: 'chat-1', name: '', avatar_url: 'images/avatar/avatar-19.jpg' } }"
+    x-effect="$store.breakpoints.mdAndDown === true && (isShowChatInfo = false)"
+    class="main-content h-100vh chat-app mt-0 flex w-full flex-col"
+    x-on:change-active-chat.window="activeChat=$event.detail"
+    x-init="function() { activeChat.name = '' }"
+  >
+  
       <!-- l bar lfou9ani  -->
       <div 
         class="chat-header relative z-10 flex h-[61px] w-full shrink-0 items-center justify-between border-b border-slate-150 bg-white px-[calc(var(--margin-x)-.5rem)] shadow-sm transition-[padding,width] duration-[.25s] dark:border-navy-700 dark:bg-navy-800">
