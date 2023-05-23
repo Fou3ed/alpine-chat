@@ -12,7 +12,11 @@ import {
   startTyping,
   stopTyping,
   pinMessage,
-  unpinMessage
+  unpinMessage,
+  userDisconnection,
+  userConnection,
+  reactHide,
+  updateUserBalance
 
 } from "../main.js";
 
@@ -22,7 +26,7 @@ export default class event {
 
   constructor() {
 
-    this.socket = io("ws://localhost:3000", {
+    this.socket = io("ws://foued.local.itwise.pro:3000", {
       transports: ['websocket']
     });
   }
@@ -59,7 +63,7 @@ export default class event {
       this.socket.emit("user-connected", onConnectData);
     });
   }
-  
+
   onConnected = function () {
     this.socket.on("onConnected", (info, newData, data, socketData) => {
       if (newData) {
@@ -89,15 +93,17 @@ export default class event {
   userConnection = () => {
     this.socket.on("user-connection", (userId) => {
       console.log("user-connection : ", userId)
-        getExperts()
+      getExperts()
+      userConnection(userId)
     })
   }
 
 
   onDisconnected = () => {
-    this.socket.on("onDisconnected", (reason,socket_id) => {
-      console.log( "user-disconnected : ",socket_id, "reason : ",reason)
+    this.socket.on("onDisconnected", (reason, socket_id) => {
+      console.log("user-disconnected : ", socket_id, "reason : ", reason)
       getExperts()
+      userDisconnection(socket_id)
 
     })
   }
@@ -121,7 +127,7 @@ export default class event {
    */
   reconnect = (data) => {
     this.socket.io.on("reconnect", () => {
-     console.log("socket reconnected",data)
+      console.log("socket reconnected", data)
     });
   }
   onReconnected = () => {
@@ -152,14 +158,14 @@ export default class event {
    */
   createConversation = (data) => {
     this.socket.emit('onConversationStart', data, error => {
-      console.log("onConversationStart",data)
+      console.log("onConversationStart", data)
     })
   }
 
   onConversationStart = () => {
     return new Promise((resolve, reject) => {
       this.socket.on("onConversationStarted", (data, newData) => {
-        console.log(data, newData)
+        console.log("onConversationStart",data,newData)
         resolve(newData)
       })
     })
@@ -236,6 +242,13 @@ export default class event {
     this.socket.on('joinConversationMember', (conversationId, error) => {
       this.socket.emit("onConversationMemberJoined", conversationId)
 
+    })
+  }
+
+  onBalanceStat = () => {
+    this.socket.on('updatedBalance', (data, error) => {
+      console.log("new balance : ", data)
+      updateUserBalance(data)
     })
   }
 
@@ -338,8 +351,8 @@ export default class event {
     })
   }
   onConversationMemberLeft = () => {
-    this.socket.on("onConversationMemberLeft",data => {
-      console.log("member left the conversation ",data)
+    this.socket.on("onConversationMemberLeft", data => {
+      console.log("member left the conversation ", data)
     })
   }
 
@@ -379,8 +392,7 @@ export default class event {
 
   /**
    * 
-   *                                    Message Events               
-   */
+   *                                    Message Events              
 
   /**
    *  send  message 
@@ -388,7 +400,6 @@ export default class event {
   onCreateMessage = (data) => {
 
     this.socket.emit('onMessageCreated', data, error => {
-      console.log("data data",data)
 
       if (error) {
         setError(error)
@@ -399,43 +410,84 @@ export default class event {
     })
 
   }
+  onCreateForm=(data)=>{
+    this.socket.emit('onMessageFormCreated', data, error => {
+
+      if (error) {
+        setError(error)
+      }
+      console.log('====================================');
+      console.log("message Form  created");
+      console.log('====================================');
+    })
+  }
 
 
   onMessageSent = async () => {
     await this.socket.on('onMessageSent', async (data, online, error) => {
       if (online === 0) {
         await sentMessage(data)
-      
-        await this.socket.emit('updateConversationLM', data.conversation,data.content,data.from)
+
+        await this.socket.emit('updateConversationLM', data.conversation, data.content, data.from)
       } else {
         await sentMessage(data)
         await this.socket.emit('receiveMessage', data.conversation)
-        
-        await this.socket.emit('updateConversationLM', data.conversation,data.content,data.from)
-
+        await this.socket.emit('updateConversationLM', data.conversation, data.content, data.from)
       }
-
-
     })
   }
 
   receiveMessage = async () => {
     const leftConversationContainer = document.getElementById('left-conversation');
-
     await this.socket.on('onMessageReceived', async (data, error) => {
       const msgDiv = document.getElementById(`left-conversation-${data.messageData.conversation}`);
       console.log(`left-conversation-${data.messageData.conversation}`)
       if (msgDiv) {
-      const msgText = msgDiv.querySelector("p#last-message")
-      msgText.textContent =  data.messageData.content
-      leftConversationContainer.insertBefore(msgDiv,leftConversationContainer.firstChild)
+        const msgText = msgDiv.querySelector("p#last-message")
+        if (data.messageData.type === "log") {
+          const log = JSON.parse(data.messageData.content)
+          let userLog = ""
+          switch (log.action) {
+            case "fill":
+              userLog = `${data.messageData.senderName} filled on the form.`;
+              break;
+            case "focus":
+              userLog = `${data.messageData.senderName}  focus on the form.`;
+              break;
+            case "purchase":
+              userLog = `${data.messageData.senderName}  purchased the <b> ${log.plan_name} </b>plan.`;
+              break;
+            case "start form":
+              userLog = `${data.messageData.senderName}  start submit the form.`;
+              break;
+            case "end form":
+              userLog = `${data.messageData.senderName}  end submit the form.`;
+              break;
+            case "start purchase":
+              userLog = `${data.messageData.senderName}  start purchase a plan.`;
+              break;
+            case "link click":
+              userLog = `${data.messageData.senderName} click to link.`;
+              break;
+            default:
+              userLog = `hello`;
+              console.log(log)
+              break;
+          }
+          msgText.textContent = userLog
+        } else
+          msgText.textContent = data.messageData.type === "plan" ? data.messageData.senderName + " sent a plan" : data.messageData.type === "form" ? data.messageData.senderName + " sent a form" : data.messageData.type === "link" ? data.messageData.senderName + " sent a link" : data.messageData.content
+        leftConversationContainer.insertBefore(msgDiv, leftConversationContainer.firstChild)
       }
       // Check if the message was sent by the current user
       receiveMessage(data)
       // Update UI with messageData
-      await this.socket.emit('updateConversationLM', data.conversation,data.content)
+      await this.socket.emit('updateConversationLM', data.conversation, data.content)
     })
   }
+
+
+
 
   onMessageDelivered = () => {
     this.socket.on('onMessageDelivered', (data, error) => {
@@ -459,12 +511,12 @@ export default class event {
 
   updateMessage = (data) => {
     this.socket.emit('updateMessage', data, error => {
-         })
+    })
   }
 
   onMessageUpdated = (data) => {
     this.socket.on('onMessageUpdated', (data, error) => {
-      console.log("message Updated ",data)
+      console.log("message Updated ", data)
       updateMessage(data)
     })
   }
@@ -472,7 +524,7 @@ export default class event {
    * 
    *  delete message 
    */
-  
+
   deleteMessage = (data) => {
     this.socket.emit('onMessageDeleted', data, error => {
       if (error) {
@@ -507,9 +559,9 @@ export default class event {
   }
   onMessageRead = () => {
     this.socket.on('onMessageRead', (data, error) => {
-      console.log("message read",data)
+      console.log("message read", data)
       onReadMsg()
-     
+
 
     })
   }
@@ -519,16 +571,16 @@ export default class event {
    */
   startTyping = (data) => {
     this.socket.emit('onTypingStart', data, error => {
-      
+
     })
   }
   onTypingStarted = (data) => {
     this.socket.on('onTypingStarted', (data, error) => {
       console.log("typing ")
-     startTyping(data)
+      startTyping(data)
     })
   }
-  
+
   /**
    * 
    * stop typing event  
@@ -597,7 +649,7 @@ export default class event {
 
   onReactMsg = () => {
     this.socket.on('onMsgReacted', (data, error) => {
-       reactDisplay(data)
+      reactDisplay(data)
     })
   }
 
@@ -614,7 +666,7 @@ export default class event {
   }
   onUnReactMsg = () => {
     this.socket.on('onUnReactMsg', (data, error) => {
-
+      reactHide(data)
     })
   }
 
@@ -630,7 +682,7 @@ export default class event {
   }
   onMentionRequest = (data) => {
     this.socket.on('requestMention', (data, error) => {
-    
+
     })
   }
   /**
@@ -667,19 +719,19 @@ export default class event {
 
 
 
-/**
- * forward a message
- */
-forwardMessage=(data)=>{
-  this.socket.emit('forwardMessage',data,error =>{
+  /**
+   * forward a message
+   */
+  forwardMessage = (data) => {
+    this.socket.emit('forwardMessage', data, error => {
 
-  })
-}
-onMessageForwarded=()=>{
-  this.socket.on('onMessageForwarded',(data,error)=>{
+    })
+  }
+  onMessageForwarded = () => {
+    this.socket.on('onMessageForwarded', (data, error) => {
 
-  })
-}
+    })
+  }
   /**
    * delete media event 
    */
@@ -750,20 +802,20 @@ onMessageForwarded=()=>{
    * accept transfer conversation 
    */
   conversationTransferAccept = (data) => {
-    this.socket.emit('transferConversation', data,error => {
-      
+    this.socket.emit('transferConversation', data, error => {
+
     })
   }
   onConversationTransferAccept = async () => {
-   await  this.socket.on('onConversationTransferAccept', (conversationId, error) => {
-      console.log("conversation Transfer",conversationId)
-      this.socket.emit('onConversationTransferAccepted',conversationId)
+    await this.socket.on('onConversationTransferAccept', (conversationId, error) => {
+      console.log("conversation Transfer", conversationId)
+      this.socket.emit('onConversationTransferAccepted', conversationId)
     })
   }
 
-  onConversationTransferAcceptedJoined=async()=>{
-    await this.socket.on('onConversationTransferAcceptedJoined',(user_id,socket_id,error)=>{
-      console.log(user_id ,"joined to the conversation",socket_id)
+  onConversationTransferAcceptedJoined = async () => {
+    await this.socket.on('onConversationTransferAcceptedJoined', (user_id, socket_id, error) => {
+      console.log(user_id, "joined to the conversation", socket_id)
     })
   }
 
