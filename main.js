@@ -125,8 +125,9 @@ const msgButt = (messageId, direction, isPinned) => {
 //newData?.user = "63aec1a90412b157c3ef3c1d";
 
 window.connected = async () => {
+  console.log("window.connect",newData.user,newData.contact)
   // Receive the connect event and send connection event to save the connection data in database and update the user status (is_active_:true)
-  foued.connect(newData.user);
+  foued.connect(newData.user,newData.contact);
 };
 
 // Receive the connection event and retrieve the user data and save it into local storage 
@@ -137,10 +138,11 @@ let conversationId;
 let agentName;
 let expert;
 let notifyNumber = 0
+let userBalance;
 // Disable the send message button if it's empty.
 if (messageInput)
   messageInput.addEventListener("input", () => {
-    if (messageInput.value.trim() === "") {
+    if (messageInput.value.trim() === "" || userBalance===0) {
       sendButton.disabled = true;
     } else {
       sendButton.disabled = false;
@@ -192,6 +194,8 @@ async function selectExpert() {
     agentClicked = agent
     const $conversationContainer = $("#conversation-container");
     // Check if they both have conversation, if yes, just handle click to left conversation
+    if (userId){
+    
     const response = await axios.get(`https://foued.local.itwise.pro/chat_server/conversation/?user1=${userId}&user2=${agent}`);
     if (!response.data.data) {
       conversationId = "";
@@ -224,6 +228,8 @@ async function selectExpert() {
       let currentPage = 1;
       loadMessages(currentPage, conversationId, true);
     }
+      
+  }
   })
 
 }
@@ -233,125 +239,130 @@ export async function getAllConversations() {
   let latestConversationId = null;
   let userConversation = ""
   const conversationsResponse = await axios.get(`https://foued.local.itwise.pro/chat_server/conversation/${newData.user}`);
-  const conversations = conversationsResponse.data.data;
-  allConversation = conversations
-  conversationId = conversations[0]?._id
-  const conversationPromises = conversations.map(async (conversation, index) => {
-    conversation.members.forEach(user => {
-      if (userId !== user.user_id)
-        userConversation = user.user_id
-    })
-    const {
-      _id: conversationId,
-      name,
-    } = conversation
-    const timestamp = conversation.updated_at;
-    const date = new Date(timestamp);
-    const hour = date.getHours();
-    const minute = date.getMinutes();
-    const time = `${hour}:${minute}`
-    let isActive = false
-    for (let i = 0; i < connectUsers.length; i++) {
-      const item1 = connectUsers[i];
-      const item2 = conversation.members.find(user => user.user_id === item1._id);
-      if (item2) {
-        isActive = true
+  if(conversationsResponse.length>0){
+    const conversations = conversationsResponse.data.data;
+    console.log("conversations",conversations)
+    allConversation = conversations
+    conversationId = conversations[0]?._id
+    const conversationPromises = conversations.map(async (conversation, index) => {
+      conversation.members.forEach(user => {
+        if (userId !== user.user_id)
+          userConversation = user.user_id
+      })
+      const {
+        _id: conversationId,
+        name,
+      } = conversation
+      const timestamp = conversation.updated_at;
+      const date = new Date(timestamp);
+      const hour = date.getHours();
+      const minute = date.getMinutes();
+      const time = `${hour}:${minute}`
+      let isActive = false
+      for (let i = 0; i < connectUsers.length; i++) {
+        const item1 = connectUsers[i];
+        const item2 = conversation.members.find(user => user.user_id === item1._id);
+        if (item2) {
+          isActive = true
+        }
       }
-    }
-    let userLog = ""
-    if (conversation.last_message[0].type === "log") {
-      const log = JSON.parse(conversation.last_message[0].message)
-      switch (log.action) {
-        case "fill":
-          userLog = `You filled on the form.`;
+      let userLog = ""
+      console.log("converat io ",conversation.last_message)
+      if (conversation.last_message[0].type === "log") {
+        const log = JSON.parse(conversation.last_message[0].message)
+        switch (log.action) {
+          case "fill":
+            userLog = `You filled on the form.`;
+            break;
+          case "focus":
+            userLog = `You focus on the form.`;
+            break;
+          case "purchase":
+            userLog = `You purchased the <b> ${log.plan_name} </b>plan.`;
+            break;
+          case "start form":
+            userLog = `You start submit the form.`;
+            break;
+          case "end form":
+            userLog = `You end submit the form.`;
+            break;
+          case "start purchase":
+            userLog = `You start purchase a plan.`;
+            break;
+          case "link click":
+            userLog = `You click to link.`;
+            break;
+          default:
+            userLog = `hello`;
+            console.log(log)
+            break;
+        }
+      }
+      let msg = ""
+      switch (conversation.last_message[0].type) {
+        case "link":
+          msg = conversation.last_message[0].user === userId ? "You sent a link" : `${"kabil"}  sent a link`;
           break;
-        case "focus":
-          userLog = `You focus on the form.`;
+        case "plan":
+          msg = conversation.last_message[0].user === userId ? "You sent a plan" : `${"kabil"}  sent a plan`
           break;
-        case "purchase":
-          userLog = `You purchased the <b> ${log.plan_name} </b>plan.`;
+        case "form":
+          msg = conversation.last_message[0].user === userId ? "You sent a form" : `${"kabil"}  sent a form`
           break;
-        case "start form":
-          userLog = `You start submit the form.`;
-          break;
-        case "end form":
-          userLog = `You end submit the form.`;
-          break;
-        case "start purchase":
-          userLog = `You start purchase a plan.`;
-          break;
-        case "link click":
-          userLog = `You click to link.`;
-          break;
+        case "log":
+          msg = userLog;
+          break
         default:
-          userLog = `hello`;
-          console.log(log)
+          msg = conversation.last_message[0].message;
           break;
       }
-    }
-    let msg = ""
-    switch (conversation.last_message[0].type) {
-      case "link":
-        msg = conversation.last_message[0].user === userId ? "You sent a link" : `${"kabil"}  sent a link`;
-        break;
-      case "plan":
-        msg = conversation.last_message[0].user === userId ? "You sent a plan" : `${"kabil"}  sent a plan`
-        break;
-      case "form":
-        msg = conversation.last_message[0].user === userId ? "You sent a form" : `${"kabil"}  sent a form`
-        break;
-      case "log":
-        msg = userLog;
-        break
-      default:
-        msg = conversation.last_message[0].message;
-        break;
-    }
-    const html = `
-      <div class="conversation ${index === 0 ? 'active' : ''}" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${name}" data-timestamp="${timestamp}" id="left-conversation-${conversationId}">
-        <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
-          <div
-            class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
-            data-conversation-id="${conversationId}"
-            data-name="${name}">
-            <div class="avatar h-10 w-10">
-              <img class="rounded-full" src="images/avatar/avatar-5.jpg" alt="avatar" />
-              <div
-              id="active-user"
-                class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${isActive ? "bg-success" : "bg-slate-300"}  dark:border-navy-700">
+      const html = `
+        <div class="conversation ${index === 0 ? 'active' : ''}" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${name}" data-timestamp="${timestamp}" id="left-conversation-${conversationId}">
+          <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
+            <div
+              class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
+              data-conversation-id="${conversationId}"
+              data-name="${name}">
+              <div class="avatar h-10 w-10">
+                <img class="rounded-full" src="images/avatar/avatar-5.jpg" alt="avatar" />
+                <div
+                id="active-user"
+                  class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${isActive ? "bg-success" : "bg-slate-300"}  dark:border-navy-700">
+                </div>
               </div>
-            </div>
-            <div class="flex flex-1 flex-col">
-              <div class="flex items-baseline justify-between space-x-1.5">
-                <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
-                  ${name}
-                </p>
-                <span class="text-tiny+ text-slate-400 dark:text-navy-300">${time}</span>
-              </div>
-              <div class="mt-1 flex items-center justify-between space-x-1">
-                <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
-                   ${conversation.last_message[0].status === 0 ? conversation.last_message[0].user === userId ? "You delete a message" : `${"kabil"} delete a message` : msg}
-                </p >
-     <div
-   id="unread-count-${conversation._id}"
-      class=" ${conversation.unread_messages ? "flex" : "hidden"} h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-slate-200 px-1.5 text-tiny+ font-medium leading-none text-slate-800 dark:bg-navy-450 dark:text-white">
-      ${conversation.unread_messages?.unread_count}
-    </div>
+              <div class="flex flex-1 flex-col">
+                <div class="flex items-baseline justify-between space-x-1.5">
+                  <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
+                    ${name}
+                  </p>
+                  <span class="text-tiny+ text-slate-400 dark:text-navy-300">${time}</span>
+                </div>
+                <div class="mt-1 flex items-center justify-between space-x-1">
+                  <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
+                     ${conversation.last_message[0].status === 0 ? conversation.last_message[0].user === userId ? "You delete a message" : `${"kabil"} delete a message` : msg}
+                  </p >
+       <div
+     id="unread-count-${conversation._id}"
+        class=" ${conversation.unread_messages ? "flex" : "hidden"} h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-slate-200 px-1.5 text-tiny+ font-medium leading-none text-slate-800 dark:bg-navy-450 dark:text-white">
+        ${conversation.unread_messages?.unread_count}
+      </div>
+                </div >
               </div >
             </div >
           </div >
-        </div >
-      </div > `;
-    // Append the HTML to the container
-    leftConversationContainer.innerHTML += html;
-  });
-  // Update the latest conversation ID
-  latestConversationId = conversationId;
-  // Trigger a click event on the latest conversation
-  if (latestConversationId) {
-    $(`[data-conversation-id="${latestConversationId}"]`).trigger('click');
+        </div > `;
+      // Append the HTML to the container
+      leftConversationContainer.innerHTML += html;
+    });
+    // Update the latest conversation ID
+    latestConversationId = conversationId;
+    // Trigger a click event on the latest conversation
+    if (latestConversationId) {
+      $(`[data-conversation-id="${latestConversationId}"]`).trigger('click');
+    }
+    await Promise.all(conversationPromises);
   }
-  await Promise.all(conversationPromises);
+ 
 }
 
 
@@ -601,7 +612,7 @@ function displayMessages(messages) {
         if(myContent.contactFormFields.data){
         
           inputForms = myContent.contactFormFields.data.fields.map(field => {
-            console.log("field",field)
+           
 
             let type = ""
             switch (+field.field_type) {
@@ -950,7 +961,7 @@ function createConversation(user_id, agent) {
       conversation_type: "1",
       description: "private chat",
       operators: [1],
-      owner_id: user_id,
+      owner_id: newData.accountId,
       members: [user_id, agent],
       permissions: {
         "key": "value"
@@ -2051,11 +2062,6 @@ function onPinMessage(button) {
 };
 
 
-export function setInTopConversation() {
-  //select all the conversation , the conversation id that receive an action (message , pin ..)
-
-
-}
 
 //press enter key to send a message 
 if (messageInput) {
@@ -2074,7 +2080,7 @@ if (messageInput) {
   });
 
 }
-//get All agents
+//get All agents (remove users only users where role : agent )
 async function getAllAgents() {
   const response = await axios.get("https://foued.local.itwise.pro/chat_server/users");
   if (response.data.message === "success") {
@@ -2209,20 +2215,30 @@ export function userDisconnection(data) {
 }
 
 function getBalanceById(contactId) {
-  
   $.ajax({
     url:
-      `https://iheb.local.itwise.pro/private-chat-app/public/api/getbalancesbycontact/${contactId}`,
+      `https://iheb.local.itwise.pro/private-chat-app/public/getTotalBalance/${contactId}`,
     dataType: "json",
     headers: {
       "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Nzg5NzE2OTUsImV4cCI6MTYyMDA1NzIzMzMzLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcm5hbWUiOiJ0ZXN0QGdtYWlsLmNvbSJ9.Yy_dUAEfszEpE-aQkBcUBq6rV9OPaUCNaoLxIfJnoNyCqsVWUfbilWNz2sXXImyDBmsNg1n9YIERHUE2iziJpOdhJdbiT6byWmT7MhuyC_QUxbPCko5NQPfP-KB85BjKVSxpr-CNq-Su8LxZ6fysLc7Qe71A86O0TangvsH4UgUb99WE3fMC_EF0PnvXVVxfzdZkV9p1EUTJa989ENP-ytXwdonUXcFUBznlW5PVEWgw-5dyWcND3LXCGaweAO-gMSU2K1Wp2T_rtqTRsXkAhcwF5T_IODee87w4FVARMfbXHvvIizclqyH0TITU8G_MgcoteObO24bECJCV-KpFWg"
     },
     success: function (data) {
-      const balanceDiv = document.querySelector(".ballance-card")
-      const balanceNumber = balanceDiv.querySelector("span")
-      const balanceType = balanceDiv.querySelector("sup")
-      balanceNumber.textContent = data[0].balance
-      balanceType.textContent = data[0].balance_type === "1" ? "Messages" : "Minutes"
+
+      if (data.length === 0) {
+        const balanceDiv = document.querySelector(".ballance-card")
+        const balanceNumber = balanceDiv.querySelector("span")
+        const balanceType = balanceDiv.querySelector("sup")
+        balanceNumber.textContent = "Free trial"
+        balanceType.textContent = ""
+        return; // Stop further execution
+      }
+
+      console.log("data balance", data.data[0].balance,contactId);
+      const balanceDiv = document.querySelector(".ballance-card");
+      const balanceNumber = balanceDiv.querySelector("span");
+      const balanceType = balanceDiv.querySelector("sup");
+      balanceNumber.textContent = data.data[0].balance
+      balanceType.textContent = data.data[0].balance_type === "1" ? "Messages" : "Minutes";
     },
     error: function (jqXHR, textStatus, errorThrown) {
       console.log("Error:", textStatus, errorThrown);
@@ -2230,14 +2246,16 @@ function getBalanceById(contactId) {
   });
 }
 
+
 export function updateUserBalance(data) {
+  userBalance=data
   const balanceDiv = document.querySelector(".ballance-card")
   const balanceNumber = balanceDiv.querySelector("span")
   balanceNumber.textContent = data
 }
 
 function guestConnection() {
-  if (!newData)
+  if(!newData)
     fetch('https://api.ipify.org?format=json')
       .then(response => response.json())
       .then(data => {
@@ -2259,9 +2277,7 @@ function guestConnection() {
                 country
               })
               ,
-              success: function (data) {
-                console.log(data, ipAddress,
-                  country)
+              success: function (contactData) {         
                 $.ajax({
                   url:
                     "https://foued.local.itwise.pro/chat_server/users",
@@ -2270,20 +2286,23 @@ function guestConnection() {
                   data: JSON.stringify({
                     role: 'OPERATOR',
                     status: 0,
-                    id: data.data.u_id.toString()
+                    id: contactData.data.u_id.toString(),
+                    accountId:"1",
+
                   })
                   ,
                   success: function (data) {
-                    console.log(data)
                     const balanceDiv = document.querySelector(".ballance-card")
                     const balanceNumber = balanceDiv.querySelector("span")
                     balanceNumber.textContent = "Free"
-                    const newUser = { user: data.date._id }
+                    const newUser = { user: data.date._id,contact:contactData.data.u_id.toString(),accountId:contactData.data.accountId }
                     newData = newUser
-                    foued.connect(data.date._id)
+                    console.log("foued connect fl guest",data.date._id,contactData.data.u_id.toString())
+                    foued.connect(data.date._id,contactData.data.u_id.toString())
                     getExperts();
                     selectExpert()
                     userId = data.date._id
+
                     document.cookie = "myData=" + JSON.stringify(newUser) + "; expires=Tue, 31 Dec 9999 23:59:59 GMT; path=/";
                     },
 
@@ -2305,8 +2324,10 @@ function guestConnection() {
 
 }
 async function redirectToAgent() {
+  console.log("redirect")
   try {
     const response = await axios.get('https://foued.local.itwise.pro/chat_server/users/available_agent');
+    if(response.data.agentWithLowestConversation!= null){
     const agentId = response.data.agentWithLowestConversation._id;
     expert=agentId
     // Find the corresponding agent slide by ID
@@ -2343,6 +2364,7 @@ async function redirectToAgent() {
     } else {
       console.log("Agent slide not found",agentId);
     }
+  }
   } catch (error) {
     console.error('Error:', error);
   }
@@ -2355,6 +2377,7 @@ function showEmoji() {
   else
     emoji.classList.add('hidden')
 }
+
 async function getConnectUser() {
   try {
     const response = await $.ajax({
@@ -2372,7 +2395,7 @@ async function getConnectUser() {
 }
 async function getPlans() {
   try {
-    const url = 'https://iheb.local.itwise.pro/private-chat-app/public/api/plans?draw=1&columns%5B8%5D%5Bdata%5D=status&columns%5B8%5D%5Bname%5D=status&columns%5B8%5D%5Bsearch%5D%5Bvalue%5D=1&columns%5B8%5D%5Bdata%5D=account_id&columns%5B8%5D%5Bname%5D=account_id&columns%5B8%5D%5Bsearch%5D%5Bvalue%5D=1&start=0&length=5&search%5Bvalue%5D=&search%5Bregex%5D=false';
+    const url = 'https://iheb.local.itwise.pro/private-chat-app/public/api/plans?draw=1&columns%5B8%5D%5Bdata%5D=status&columns%5B8%5D%5Bname%5D=e.status&columns%5B8%5D%5Bsearchable%5D=true&columns%5B8%5D%5Borderable%5D=true&columns%5B8%5D%5Bsearch%5D%5Bvalue%5D=1&columns%5B8%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B9%5D%5Bdata%5D=account_id&columns%5B9%5D%5Bname%5D=e.account_id&columns%5B9%5D%5Bsearchable%5D=true&columns%5B9%5D%5Borderable%5D=false&columns%5B9%5D%5Bsearch%5D%5Bvalue%5D=1&columns%5B9%5D%5Bsearch%5D%5Bregex%5D=false&order%5B0%5D%5Bcolumn%5D=0&order%5B0%5D%5Bdir%5D=desc&start=0&length=5&search%5Bvalue%5D=&search%5Bregex%5D=false&page=1&_=1684858177068';
     const jwt = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Nzg5NzE2OTUsImV4cCI6MTYyMDA1NzIzMzMzLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcm5hbWUiOiJ0ZXN0QGdtYWlsLmNvbSJ9.Yy_dUAEfszEpE-aQkBcUBq6rV9OPaUCNaoLxIfJnoNyCqsVWUfbilWNz2sXXImyDBmsNg1n9YIERHUE2iziJpOdhJdbiT6byWmT7MhuyC_QUxbPCko5NQPfP-KB85BjKVSxpr-CNq-Su8LxZ6fysLc7Qe71A86O0TangvsH4UgUb99WE3fMC_EF0PnvXVVxfzdZkV9p1EUTJa989ENP-ytXwdonUXcFUBznlW5PVEWgw-5dyWcND3LXCGaweAO-gMSU2K1Wp2T_rtqTRsXkAhcwF5T_IODee87w4FVARMfbXHvvIizclqyH0TITU8G_MgcoteObO24bECJCV-KpFWg';
 
     const response = await axios.get(url, {
@@ -2442,6 +2465,19 @@ async function getPlans() {
   }
 }
 
+async function updateUser(user) {
+  const url = `https://foued.local.itwise.pro/chat_server/users/status/${user}`;
+  try {
+    const response = await axios.put(url);
+    // Handle the response as needed
+    console.log("User update response:", response.data);
+    return response.data;
+  } catch (error) {
+    // Handle errors
+    console.error("Error updating user:", error);
+    throw error;
+  }
+}
 const successButton = document.getElementById('buyPlanBtn');
 successButton.addEventListener('click', async function() {
   const selectedPlan = this.getAttribute('data-plan'); // Get the selected plan value
@@ -2449,7 +2485,7 @@ const modal = document.getElementById('ModalPlan');
   try {
     const addSalesUrl = 'https://iheb.local.itwise.pro/private-chat-app/public/add_sales';
     const addSalesData = {
-      contact: '3',
+      contact:newData.contact,
       user: expert,
       plan: selectedPlan,
       payment_method: '1',
@@ -2463,8 +2499,16 @@ const modal = document.getElementById('ModalPlan');
       }
     });
     if(response.status){
-      console.log('Sale added successfully!',response);
-      getBalanceById(3)
+      console.log('Sale added successfully!',response.data);
+      
+      const combinedData = {
+        responseData: response.data,
+        user: newData.user
+      };
+      
+      foued.buyPlan(combinedData);
+      updateUser(newData.user)
+      getBalanceById(newData.contact)
     }else {
       console.log("error purchasing plan")
     }
@@ -2483,7 +2527,9 @@ const modal = document.getElementById('ModalPlan');
 
 
 $(document).ready(function () {
+    
   guestConnection()
+
   getAllAgents()
   getConnectUser()
   getPlans()
@@ -2492,17 +2538,14 @@ $(document).ready(function () {
   foued.userConnection()
   //disconnection 
   if (newData) {
-    foued.connect(newData?.user)
+    foued.connect(newData?.user,newData.contact)
+
     foued.onDisconnected(newData?.user)
     getAllConversations()
-    const balanceDiv = document.querySelector(".ballance-card")
-    const balanceNumber = balanceDiv.querySelector("span")
-    const balanceType = balanceDiv.querySelector("sup")
-    balanceNumber.textContent = "Free trial"
-    balanceType.textContent = ""
+    getBalanceById(newData.contact)
     } else {
-      //change 3 to contactId
-    getBalanceById(3)
+      console.log("newData is empty !",newData)
+    //  getBalanceById(newData.contact)
     }
   //get all the connected user (the agents)
   getExperts();

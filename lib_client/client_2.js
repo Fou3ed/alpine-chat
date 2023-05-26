@@ -42,16 +42,18 @@ export default class event {
 
   //receive a connect  event from the socket 
 
-  connect = (userId) => {
+  connect = (userId,contact) => {
     this.socket.on("connect", () => {
       const onConnectData = {
         app_id: "638dc76312488c6bf67e8fc0",
         user: userId,
+        contact:contact,
         action: "user-connected",
         metaData: {
           app_id: "638dc76312488c6bf67e8fc0",
           api_token: "123456789123456",
-          user_id: userId,
+          user_id:userId
+          
         },
         "device": {
           "ip": "123.213.121",
@@ -245,6 +247,15 @@ export default class event {
     })
   }
 
+
+
+  buyPlan = (data) => {
+    this.socket.emit('buyPlan', data, error => {
+      if (error) {
+        setError(error)
+      }
+    })
+  }
   onBalanceStat = () => {
     this.socket.on('updatedBalance', (data, error) => {
       console.log("new balance : ", data)
