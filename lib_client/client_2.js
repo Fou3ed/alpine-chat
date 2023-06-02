@@ -23,10 +23,9 @@ import {
 
 
 export default class event {
-
   constructor() {
 
-    this.socket = io("ws://foued.local.itwise.pro:3000", {
+   this.socket = io("ws://foued.local.itwise.pro:3000", {
       transports: ['websocket']
     });
   }
@@ -46,7 +45,7 @@ export default class event {
     this.socket.on("connect", () => {
       const onConnectData = {
         app_id: "638dc76312488c6bf67e8fc0",
-        user: userId,
+        user: contact,
         contact:contact,
         action: "user-connected",
         metaData: {
@@ -67,17 +66,20 @@ export default class event {
   }
 
   onConnected = function () {
-    this.socket.on("onConnected", (info, newData, data, socketData) => {
+    this.socket.on("onConnected", (...newData) => {
       if (newData) {
-        const concatenated = {
-          ...info,
-          ...newData,
-          ...data,
-          ...socketData
-        };
-        // Store the newData value in localStorage
-        localStorage.setItem('newData', JSON.stringify(concatenated));
-        window.location.href = "./index.html";
+        console.log("newdata",newData)
+        // const concatenated = {
+        //   ...info,
+        //   ...newData,
+        //   ...data,
+        //   ...socketData
+        // };
+        // console.log("hererere",concatenated)
+
+        // // Store the newData value in localStorage
+        // localStorage.setItem('newData', JSON.stringify(concatenated));
+        // window.location.href = "./index.html";
       } else {
         alert("error");
       }
@@ -94,7 +96,6 @@ export default class event {
 
   userConnection = () => {
     this.socket.on("user-connection", (userId) => {
-      console.log("user-connection : ", userId)
       getExperts()
       userConnection(userId)
     })
@@ -103,7 +104,7 @@ export default class event {
 
   onDisconnected = () => {
     this.socket.on("onDisconnected", (reason, socket_id) => {
-      console.log("user-disconnected : ", socket_id, "reason : ", reason)
+      console.log("userDiscon",socket_id)
       getExperts()
       userDisconnection(socket_id)
 
@@ -258,7 +259,6 @@ export default class event {
   }
   onBalanceStat = () => {
     this.socket.on('updatedBalance', (data, error) => {
-      console.log("new balance : ", data)
       updateUserBalance(data)
     })
   }
@@ -275,15 +275,11 @@ export default class event {
     })
   }
 
-
-
-
   createMembers = (data) => {
     this.socket.emit('onConversationMemberCreate', data, error => {
       if (error) {
         setError(error)
       }
-
       console.log('====================================');
       console.log(" member created into the conversation ");
       console.log('====================================')
@@ -436,21 +432,16 @@ export default class event {
 
   onMessageSent = async () => {
     await this.socket.on('onMessageSent', async (data, online, error) => {
-      if (online === 0) {
         await sentMessage(data)
-
-        await this.socket.emit('updateConversationLM', data.conversation, data.content, data.from)
-      } else {
-        await sentMessage(data)
-        await this.socket.emit('receiveMessage', data.conversation)
-        await this.socket.emit('updateConversationLM', data.conversation, data.content, data.from)
-      }
-    })
+      
+  })
   }
 
   receiveMessage = async () => {
     const leftConversationContainer = document.getElementById('left-conversation');
     await this.socket.on('onMessageReceived', async (data, error) => {
+      console.log("message received",data)
+
       const msgDiv = document.getElementById(`left-conversation-${data.messageData.conversation}`);
       console.log(`left-conversation-${data.messageData.conversation}`)
       if (msgDiv) {
@@ -492,8 +483,6 @@ export default class event {
       }
       // Check if the message was sent by the current user
       receiveMessage(data)
-      // Update UI with messageData
-      await this.socket.emit('updateConversationLM', data.conversation, data.content)
     })
   }
 
@@ -527,7 +516,6 @@ export default class event {
 
   onMessageUpdated = (data) => {
     this.socket.on('onMessageUpdated', (data, error) => {
-      console.log("message Updated ", data)
       updateMessage(data)
     })
   }
@@ -582,12 +570,10 @@ export default class event {
    */
   startTyping = (data) => {
     this.socket.emit('onTypingStart', data, error => {
-
     })
   }
   onTypingStarted = (data) => {
     this.socket.on('onTypingStarted', (data, error) => {
-      console.log("typing ")
       startTyping(data)
     })
   }
@@ -909,4 +895,5 @@ export default class event {
 
     })
   }
+
 }

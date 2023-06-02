@@ -22,7 +22,6 @@ function getCookie(name) {
       return decodeURIComponent(cookiePair[1]);
     }
   }
-
   // return null if cookie not found
   return null;
 }
@@ -121,15 +120,12 @@ const msgButt = (messageId, direction, isPinned) => {
           `;
 }
 
-// When a user connects the value changes
-//newData?.user = "63aec1a90412b157c3ef3c1d";
 
 window.connected = async () => {
   console.log("window.connect",newData.user,newData.contact)
   // Receive the connect event and send connection event to save the connection data in database and update the user status (is_active_:true)
   foued.connect(newData.user,newData.contact);
 };
-
 // Receive the connection event and retrieve the user data and save it into local storage 
 foued.onConnected();
 // Global variables 
@@ -148,12 +144,10 @@ if (messageInput)
       sendButton.disabled = false;
     }
   });
-
 /**
  * Display all connected agents 
  */
 const displayedUsers = new Set();
-
 export async function getExperts() {
   const response = await axios.get("https://foued.local.itwise.pro/chat_server/users/connected");
   if (response.data.message === "success") {
@@ -178,7 +172,9 @@ export async function getExperts() {
     });
   }
   if (!conversationId){
-    redirectToAgent()
+
+     redirectToAgent()
+    
   }
 }
 
@@ -194,8 +190,7 @@ async function selectExpert() {
     agentClicked = agent
     const $conversationContainer = $("#conversation-container");
     // Check if they both have conversation, if yes, just handle click to left conversation
-    if (userId){
-    
+    if (userId){                    
     const response = await axios.get(`https://foued.local.itwise.pro/chat_server/conversation/?user1=${userId}&user2=${agent}`);
     if (!response.data.data) {
       conversationId = "";
@@ -227,11 +222,9 @@ async function selectExpert() {
       // Load the first page of messages on page load
       let currentPage = 1;
       loadMessages(currentPage, conversationId, true);
-    }
-      
+    }    
   }
   })
-
 }
 
 export async function getAllConversations() {
@@ -239,9 +232,10 @@ export async function getAllConversations() {
   let latestConversationId = null;
   let userConversation = ""
   const conversationsResponse = await axios.get(`https://foued.local.itwise.pro/chat_server/conversation/${newData.user}`);
-  if(conversationsResponse.length>0){
+    console.log("conversations",conversationsResponse)
+  if(conversationsResponse.data.data.length>0){
     const conversations = conversationsResponse.data.data;
-    console.log("conversations",conversations)
+
     allConversation = conversations
     conversationId = conversations[0]?._id
     const conversationPromises = conversations.map(async (conversation, index) => {
@@ -267,7 +261,6 @@ export async function getAllConversations() {
         }
       }
       let userLog = ""
-      console.log("converat io ",conversation.last_message)
       if (conversation.last_message[0].type === "log") {
         const log = JSON.parse(conversation.last_message[0].message)
         switch (log.action) {
@@ -294,7 +287,6 @@ export async function getAllConversations() {
             break;
           default:
             userLog = `hello`;
-            console.log(log)
             break;
         }
       }
@@ -401,9 +393,7 @@ expert=agentClicked
   window.dispatchEvent(new CustomEvent('change-active-chat', {
     detail: activeChat
   }));
-
   markMessageAsSeen(conversationId)
-
 }
 
 async function getTheLastMsg(conversationId) {
@@ -416,7 +406,6 @@ async function getTheLastMsg(conversationId) {
 }
 
 async function markMessageAsSeen(conversationId) {
-
   if (conversationId) {
     getTheLastMsg(conversationId).then((res) => {
       const onMessageRead = {
@@ -549,7 +538,6 @@ function submitForm(element) {
 
 function displayMessages(messages) {
   document.getElementById('big-container-message').style.display = 'block';
-
   if (!messages || !messages.messages) {
     ('No messages to display');
     return;
@@ -606,14 +594,11 @@ function displayMessages(messages) {
 
 `;
         });
-      else if (myContent !== {} && message.type === "form") {
+      else if (message.type === "form") {
         let inputForms = ""
-
-        if(myContent.contactFormFields.data){
-        
-          inputForms = myContent.contactFormFields.data.fields.map(field => {
-           
-
+          console.log("mm",myContent)
+        if(myContent.fields){
+          inputForms = myContent.fields.map(field => {
             let type = ""
             switch (+field.field_type) {
               case 1:
@@ -645,41 +630,7 @@ function displayMessages(messages) {
     />
     `;
           });
-        }else {
-          inputForms = myContent.contactFormFields.map(field => {
-            let type = ""
-            switch (+field.field.field_type) {
-              case 1:
-                type = 'text';
-                break;
-              case 2:
-                type = 'number';
-                break;
-              case 3:
-                type = 'date';
-                break;
-              case 4:
-                type = 'datetime-local';
-                break
-              case 5:
-                type = 'number';
-                step = 'any';
-                break;
-                case 6:
-                  type='email';
-                  break;
-            }
-            return `
-    <input
-    id="field-${messageId}" data-field-id="${field.id}"
-    name="${field.field.field_name.replace(" ", "")}"
-    placeholder="${field.field.field_name}"
-    type="${type}"
-    />
-    `;
-          });
         }
-        
         tableRows = `
 <div
 class="contact-form-preview"
@@ -687,7 +638,8 @@ style="background-color: #fff"
 >
 <h3>Contact form</h3>
 <p>
-${myContent.introduction}
+${myContent.text_capture}
+
 </p>
 <form>
 <div id="text_capture" class="hidden"><p > ${myContent.text_capture}</p></div>
@@ -774,9 +726,7 @@ ${inputForms.join('')}
         );
       }
       conversationContainer.scrollTop = conversationContainer.scrollHeight;
-
     }
-
     if (message.reacts.length > 0) {
       let messageReactions = message.reacts.map(react => {
         return `
@@ -785,26 +735,20 @@ ${inputForms.join('')}
       const msgReacted = messagesContainer.querySelector(`#message-content-${messageId}`)
       msgReacted.innerHTML += `<div class="react-container bg-white  dark:bg-navy-700" id="react-content-${messageId}" >${messageReactions.join("")} </div>`
     }
-
     const submitButton = document.querySelector(`#submit-form-${messageId}`);
     if (submitButton) {
       submitButton.addEventListener("click", function () {
         submitForm(this);
       });
     }
-
     const allFormInput = document.querySelectorAll(`#field-${messageId}`);
-
     if (allFormInput.length > 0) {
       allFormInput.forEach(input => {
 
         input.oninput = () => sendTypingNotification(input);
-
       });
     }
-
     let userHasTyped = "";
-
     function sendTypingNotification(input) {
       if (userHasTyped !== input.dataset.fieldId) {
         addLogs({
@@ -814,13 +758,8 @@ ${inputForms.join('')}
         });
         userHasTyped = input.dataset.fieldId;
       }
-
-
     }
-
-
     let isFirstInputFocused = true;
-
     function sendFocusNotification(input) {
       addLogs({
         action: "focus",
@@ -884,7 +823,6 @@ ${inputForms.join('')}
 
 //whenever a user click on the message link fire this function 
 async function addLogs(log) {
-  console.log("lloooog",log)
   const logData = {
     "user_id": "3",
     "action": log.action,
@@ -911,7 +849,6 @@ async function addLogs(log) {
         conversation_id: conversationId, // Include the conversation ID
         user: newData.user,
         message: JSON.stringify(res.data),
-        data: "non other data",
         origin: "web",
       },
       to: expert,
@@ -928,6 +865,7 @@ async function addLogs(log) {
  */
 
 async function firstMessage(user_id, agent) {
+  console.log("user id ,agent ",user_id,agent)
   createConversation(user_id, agent)
   await foued.onConversationStart().then(async (res) => {
     const memberInfo = {
@@ -935,7 +873,7 @@ async function firstMessage(user_id, agent) {
       user_id: user_id,
       conversation_name: agentName,
     }
-    foued.createMembers(memberInfo); //just gonna add them in the data base 
+    foued.createMembers(memberInfo); 
     foued.createMembers({
       conversation_id: res._id,
       user_id: agent,
@@ -950,7 +888,6 @@ async function firstMessage(user_id, agent) {
 
 // create conversation function 
 function createConversation(user_id, agent) {
-
   const conversationInfo = {
     app: "638dc76312488c6bf67e8fc0",
     user: user_id,
@@ -980,13 +917,25 @@ if (sendButton)
     sendMessage()
   })
 
+let isSendingMessage = false;
+
 async function sendMessage() {
+  if (isSendingMessage) return; // If a message is already being sent, ignore the function call
+
   if (messageInput.value.trim() !== "") {
+    isSendingMessage = true; // Set the sending state to true
+
+    // Display a loader while sending the message
+    const loaderHTML = '<div class="loader"></div>'; // Replace with your own loader HTML
+    messagesContainer.insertAdjacentHTML("beforeend", loaderHTML);
+
+  
     if (!emoji.classList.contains('hidden'))
-      emoji.classList.add('hidden')
+      emoji.classList.add('hidden');
     if (conversationId == '') {
-      await firstMessage(newData.user, expert).then(async function (res) {
-        conversationContainer.dataset.conversationId = conversationId
+      try {
+        await firstMessage(newData.user, expert);
+        conversationContainer.dataset.conversationId = conversationId;
         const info = {
           app: "638dc76312488c6bf67e8fc0",
           user: newData.user,
@@ -1002,9 +951,13 @@ async function sendMessage() {
           },
           to: agentName,
         };
-        foued.onCreateMessage(info)
+        await foued.onCreateMessage(info);
         messageInput.value = "";
-      })
+        isSendingMessage = false; // Set the sending state to false
+      } catch (error) {
+        console.log(error);
+        isSendingMessage = false;
+      }
     } else {
       const info = {
         app: "638dc76312488c6bf67e8fc0",
@@ -1020,11 +973,22 @@ async function sendMessage() {
         },
         to: expert,
       };
-      foued.onCreateMessage(info)
-      messageInput.value = "";
+      try {
+        await foued.onCreateMessage(info);
+        messageInput.value = "";
+        isSendingMessage = false; // Set the sending state to false
+      } catch (error) {
+        console.log(error);
+        isSendingMessage = false;
+      }
     }
   }
 }
+
+
+
+
+
 export async function sentMessage(data) {
   let conv = conversationContainer.dataset.conversationId
   const isNotNewConversation = document.querySelector(`#left-conversation-${data.conversation}`)
@@ -1258,8 +1222,8 @@ export async function receiveMessage(data) {
     
     else if (myContent !== {} && data.messageData.type === "form") {
       let inputForms = ""
-      if(myContent.contactFormFields.data){
-        inputForms = myContent.contactFormFields.data.fields.map(field => {
+      if(myContent.fields){
+        inputForms = myContent.fields.map(field => {
           let type = ""
           switch (+field.field_type) {
             case 1:
@@ -1291,39 +1255,6 @@ export async function receiveMessage(data) {
   />
   `;
         });
-      }else {
-        inputForms = myContent.contactFormFields.map(field => {
-          let type = ""
-          switch (+field.field.field_type) {
-            case 1:
-              type = 'text';
-              break;
-            case 2:
-              type = 'number';
-              break;
-            case 3:
-              type = 'date';
-              break;
-            case 4:
-              type = 'datetime-local';
-              break
-            case 5:
-              type = 'number';
-              step = 'any';
-              break;
-              case 6:
-                type='email';
-                break;
-          }
-          return `
-  <input
-  id="field-${messageId}" data-field-id="${field.id}"
-  name="${field.field.field_name.replace(" ", "")}"
-  placeholder="${field.field.field_name}"
-  type="${type}"
-  />
-  `;
-        });
       }
 
       tableRows = `
@@ -1333,7 +1264,7 @@ style="background-color: #fff"
 >
 <h3>Contact form</h3>
 <p>
-${myContent.introduction}
+Welcome  2 
 </p>
 <form >
 <div id="text_capture" class="hidden"><p > ${myContent.text_capture}</p></div>
@@ -1608,7 +1539,6 @@ async function getReactButton() {
         onUnReactToMessage(this)
       }
     });
-
   }
 }
 
@@ -1620,7 +1550,7 @@ async function onUnReactToMessage(button) {
   const onMessageUnReact = {
     app: "ID",
     user: newData.user,
-    action: "message.react",
+    action: "message.Unreact",
     metaData: {
       conversation: conversationId,
       message_id: messageId,
@@ -1736,7 +1666,6 @@ async function editMessage(button) {
   const reactContent = document.querySelector(`#react-content-${messageId}`)
   if (reactContent)
     document.querySelector(`#react-content-${messageId}`).remove()
-  console.log(reactContent)
   const input = document.createElement("input");
   input.value = messageEdited.textContent.trim();
   input.style.width = "500px"
@@ -1830,24 +1759,22 @@ export async function updateMessage(data) {
 }
 
 
-let typingTimer; //timer identifier
-const doneTypingInterval = 1000;
+let isFirstKeyPress = true; // flag to track the first key press
 
 /* The above code is listening for the user to start typing and stop typing. */
 if (messageInput) {
-
-  messageInput.onkeyup = function () {
-    clearTimeout(typingTimer);
-    typingTimer = setTimeout(onStopTyping, doneTypingInterval);
-  }
-  messageInput.oninput = function () {
-    onStartTyping()
-  }
-
   messageInput.onkeydown = function () {
-    clearTimeout(typingTimer)
-  }
+    if (isFirstKeyPress) {
+      onStartTyping();
+      isFirstKeyPress = false;
+    }
+  };
+
+  messageInput.onblur = function () {
+    onStopTyping();
+  };
 }
+
 function onStartTyping() {
   const onTypingStart = {
     app: "ID",
@@ -1857,8 +1784,8 @@ function onStartTyping() {
       conversation: conversationId,
     },
   };
-  foued.startTyping(onTypingStart)
-};
+  foued.startTyping(onTypingStart);
+}
 
 function onStopTyping() {
   const onTypingStop = {
@@ -1869,15 +1796,16 @@ function onStopTyping() {
       conversation: conversationId,
     },
   };
-  foued.stopTyping(onTypingStop)
-};
+  foued.stopTyping(onTypingStop);
+  isFirstKeyPress = true; // Reset the flag for the next typing session
+}
+
 
 
 //start typing function 
 let typingBlock = document.getElementById("typing-block-message");
 export function startTyping(data) {
   typingBlock = document.getElementById("typing-block-message");
-
   if (data.metaData.conversation === conversationId) {
     // set the scroll position to the bottom of the conversation container
     conversationContainer.scrollTop = conversationContainer.scrollHeight;
@@ -1885,7 +1813,6 @@ export function startTyping(data) {
       typingBlock = document.createElement("div");
       typingBlock.className = "w-100 p-3 d-flex";
       typingBlock.id = "typing-block-message";
-
       typingBlock.innerHTML = `
                       <div>
                         <div class="flex" class="pe-3">
@@ -1964,9 +1891,6 @@ export function startTyping(data) {
   }
 }
 
-
-
-
 export function stopTyping(data) {
   if (data.metaData.conversation === conversationId) {
     if (typingBlock) {
@@ -1974,7 +1898,6 @@ export function stopTyping(data) {
     }
   }
 }
-
 
 async function getPinButtons() {
   const allPinButtons = document.querySelectorAll("#pin-message")
@@ -2164,6 +2087,8 @@ async function getAllAgents() {
 }
 
 export function userConnection(data) {
+console.log("data user connection",data)
+if (data.role==="AGENT"){
   allConversation.map(conv => {
     const conversationCard = document.getElementById(`left-conversation-${conv._id}`)
     const statusConv = conversationCard.querySelector("#active-user")
@@ -2188,7 +2113,7 @@ export function userConnection(data) {
     const conversationHeaderStatus = document.getElementById('conversation-name').parentNode.querySelector(".text-xs");
     conversationHeaderStatus.textContent = "En ligne"
   }
-
+}
 }
 
 export function userDisconnection(data) {
@@ -2217,28 +2142,34 @@ export function userDisconnection(data) {
 function getBalanceById(contactId) {
   $.ajax({
     url:
-      `https://iheb.local.itwise.pro/private-chat-app/public/getTotalBalance/${contactId}`,
+      `https://iheb.local.itwise.pro/private-chat-app/public/api/getTotalBalance/${contactId}`,
     dataType: "json",
     headers: {
       "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Nzg5NzE2OTUsImV4cCI6MTYyMDA1NzIzMzMzLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcm5hbWUiOiJ0ZXN0QGdtYWlsLmNvbSJ9.Yy_dUAEfszEpE-aQkBcUBq6rV9OPaUCNaoLxIfJnoNyCqsVWUfbilWNz2sXXImyDBmsNg1n9YIERHUE2iziJpOdhJdbiT6byWmT7MhuyC_QUxbPCko5NQPfP-KB85BjKVSxpr-CNq-Su8LxZ6fysLc7Qe71A86O0TangvsH4UgUb99WE3fMC_EF0PnvXVVxfzdZkV9p1EUTJa989ENP-ytXwdonUXcFUBznlW5PVEWgw-5dyWcND3LXCGaweAO-gMSU2K1Wp2T_rtqTRsXkAhcwF5T_IODee87w4FVARMfbXHvvIizclqyH0TITU8G_MgcoteObO24bECJCV-KpFWg"
     },
     success: function (data) {
+      if (data.data.length === 0) {
 
-      if (data.length === 0) {
         const balanceDiv = document.querySelector(".ballance-card")
         const balanceNumber = balanceDiv.querySelector("span")
         const balanceType = balanceDiv.querySelector("sup")
         balanceNumber.textContent = "Free trial"
         balanceType.textContent = ""
         return; // Stop further execution
+      }else {
+ 
+        const balanceDiv = document.querySelector(".ballance-card");
+        const balanceNumber = balanceDiv.querySelector("span");
+        const balanceType = balanceDiv.querySelector("sup");
+        
+        balanceNumber.textContent = data.data[0].balance
+        balanceType.textContent = data.data[0].balance_type === "1" ? "Messages" : "Minutes";
+        userBalance=data.data[0]
+        if (userBalance.balance==0){
+          messageInput.disabled=true;
+          sendButton.disabled=true;
+        }
       }
-
-      console.log("data balance", data.data[0].balance,contactId);
-      const balanceDiv = document.querySelector(".ballance-card");
-      const balanceNumber = balanceDiv.querySelector("span");
-      const balanceType = balanceDiv.querySelector("sup");
-      balanceNumber.textContent = data.data[0].balance
-      balanceType.textContent = data.data[0].balance_type === "1" ? "Messages" : "Minutes";
     },
     error: function (jqXHR, textStatus, errorThrown) {
       console.log("Error:", textStatus, errorThrown);
@@ -2252,6 +2183,11 @@ export function updateUserBalance(data) {
   const balanceDiv = document.querySelector(".ballance-card")
   const balanceNumber = balanceDiv.querySelector("span")
   balanceNumber.textContent = data
+  
+  if (userBalance.balance==0){
+          messageInput.disabled=true;
+          sendButton.disabled=true;
+        }
 }
 
 function guestConnection() {
@@ -2284,11 +2220,11 @@ function guestConnection() {
                   method: "POST",
                   contentType: "application/json",
                   data: JSON.stringify({
-                    role: 'OPERATOR',
+                    role: 'CLIENT',
                     status: 0,
                     id: contactData.data.u_id.toString(),
                     accountId:"1",
-
+                    is_active:true,
                   })
                   ,
                   success: function (data) {
@@ -2297,7 +2233,6 @@ function guestConnection() {
                     balanceNumber.textContent = "Free"
                     const newUser = { user: data.date._id,contact:contactData.data.u_id.toString(),accountId:contactData.data.accountId }
                     newData = newUser
-                    console.log("foued connect fl guest",data.date._id,contactData.data.u_id.toString())
                     foued.connect(data.date._id,contactData.data.u_id.toString())
                     getExperts();
                     selectExpert()
@@ -2324,21 +2259,22 @@ function guestConnection() {
 
 }
 async function redirectToAgent() {
-  console.log("redirect")
   try {
     const response = await axios.get('https://foued.local.itwise.pro/chat_server/users/available_agent');
     if(response.data.agentWithLowestConversation!= null){
+
     const agentId = response.data.agentWithLowestConversation._id;
     expert=agentId
+    const responseConversationId = await axios.get(`https://foued.local.itwise.pro/chat_server/conversation/?user1=${newData.user}&user2=${agentId}`);
     // Find the corresponding agent slide by ID
+    if(responseConversationId.data.data==null){
     const $agentSlide = $(`.swiper-slide[id="${agentId}"]`);
-    
     if ($agentSlide.length > 0) {
       // Trigger a click event on the agent slide
       $agentSlide.trigger("click");
       //get the form (before)
       const before= await axios.get('https://iheb.local.itwise.pro/private-chat-app/public/GetFormType')
-      const contactFormFields=before.data
+      const contactFormFields=before.data?.data
       // create conversation,create members and receive messages ,
        await firstMessage(newData.user,agentId).then(async function (res){
         conversationContainer.dataset.conversationId = conversationId
@@ -2351,7 +2287,7 @@ async function redirectToAgent() {
                   type: "form",
                   conversation_id: conversationId, // Include the conversation ID
                   user: agentId,
-                  message: JSON.stringify({contactFormFields}),
+                  message: JSON.stringify(contactFormFields),
                   data: "non other data",
                   origin: "web",
                   fieldId:contactFormFields.id
@@ -2359,12 +2295,100 @@ async function redirectToAgent() {
                 to: newData.user,
               };
                foued.onCreateForm(info)
+               const html = `
+               <<div class="conversation bg-slate-150" data-conversation-id="${conversationId}" data-name="New Conversation" data-timestamp="now" id="left-conversation-${conversationId}" data-user-id="${agentId}">
+                 <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
+                   <div
+                     class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
+                     data-conversation-id="${conversationId}"
+                     data-name="New Conversation">
+                     <div class="avatar h-10 w-10">
+                       <img class="rounded-full" src="images/avatar/avatar-5.jpg" alt="avatar" />
+                       <div
+                       id="active-user"
+                         class="absolute right-0 h-3 w-3 rounded-full border-2 border-white bg-slate-300 dark:border-navy-700">
+                       </div>
+                     </div>
+                     <div class="flex flex-1 flex-col">
+                       <div class="flex items-baseline justify-between space-x-1.5">
+                         <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
+                           New Conversation
+                         </p>
+                         <span class="text-tiny+ text-slate-400 dark:text-navy-300">"now"</span>
+                       </div>
+                       <div class="mt-1 flex items-center justify-between space-x-1">
+                         <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
+                           Contact form 
+                         </p>
+                         <div
+                           class="flex h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-slate-200 px-1.5 text-tiny+ font-medium leading-none text-slate-800 dark:bg-navy-450 dark:text-white">
+                           
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+                 </div>
+               </div>>`;
+               const newConvDiv = document.createElement("div")
+
+             // Append the HTML to the container
+             newConvDiv.innerHTML = html;
+             leftConversationContainer.insertBefore(newConvDiv, leftConversationContainer.firstChild)
          })
-        
+
     } else {
       console.log("Agent slide not found",agentId);
+
+    }}
+  }else {
+    console.log("redirected to an offline agent ")
+  const messageContainer = document.getElementById(`message-${messageId}`);
+    if (!messageContainer) {
+      let direction = data.direction == "in" ? 'justify-end' : 'justify-start';
+      const msgStyle = data.direction == "out" ? `rounded-2xl break-words rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 relative ` : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 relative shadow-sm break-words dark:bg-accent dark:text-white'
+      const messageContent = `
+     <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
+     <div class="flex flex-col items-end space-y-3.5">
+     <div class="flex flex-row">
+     ${data.direction == "in" ? msgButt(messageId, direction, data.messageData.pinned === 1) : ''}
+       <div class="ml-2 max-w-lg sm:ml-5">
+         <div class="${msgStyle}"  id="message-content-${messageId}">
+         
+           ${data.messageData.type == "link" ? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}"  href=" ${myContent.userLink?.url}">${myContent.userLink?.url}</a>` : data.messageData.type === "plan"
+          ? tableRows.join('') : data.messageData.type === "form" ? tableRows : data.messageData.content }
+           <div id="pin-div" class="  hidden ${direction == "justify-start" ? "pin-div-sender" : "pin-div"} justify-center  items-center me-2 "><i class="fas fa-thumbtack"></i></div>
+         </div>
+         <p  id="date_msg" data-direction="${direction}" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
+               ${timeString}      
+         </p>
+       </div>
+     ${data.direction == "out" ? msgButt(messageId, direction, data.messageData.pinned === 1) : ''}
+     </div>
+     <div class="flex flex-row">
+         </div>
+       </div>
+     </div>
+   </div>
+     </div>
+   `
+      let typingBlock = document.getElementById("typing-block-message");
+
+      if (typingBlock) {
+        const msgDiv = document.createElement("div");
+        msgDiv.innerHTML = messageContent
+
+        typingBlock.replaceWith(msgDiv)
+
+      } else
+        messagesContainer.insertAdjacentHTML("beforeend", messageContent)
+      if (conversationId === data.messageData.conversation) {
+        markMessageAsSeen(conversationId)
+      }
+      const conversationContainer = document.getElementById('conversation-container');
+      conversationContainer.scrollTop = conversationContainer.scrollHeight;
     }
-  }
+    }
+
   } catch (error) {
     console.error('Error:', error);
   }
@@ -2378,7 +2402,7 @@ function showEmoji() {
     emoji.classList.add('hidden')
 }
 
-async function getConnectUser() {
+async function getConnectedAgents() {
   try {
     const response = await $.ajax({
       url: `https://foued.local.itwise.pro/chat_server/users/connected`,
@@ -2393,6 +2417,7 @@ async function getConnectUser() {
     // Handle error
   }
 }
+
 async function getPlans() {
   try {
     const url = 'https://iheb.local.itwise.pro/private-chat-app/public/api/plans?draw=1&columns%5B8%5D%5Bdata%5D=status&columns%5B8%5D%5Bname%5D=e.status&columns%5B8%5D%5Bsearchable%5D=true&columns%5B8%5D%5Borderable%5D=true&columns%5B8%5D%5Bsearch%5D%5Bvalue%5D=1&columns%5B8%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B9%5D%5Bdata%5D=account_id&columns%5B9%5D%5Bname%5D=e.account_id&columns%5B9%5D%5Bsearchable%5D=true&columns%5B9%5D%5Borderable%5D=false&columns%5B9%5D%5Bsearch%5D%5Bvalue%5D=1&columns%5B9%5D%5Bsearch%5D%5Bregex%5D=false&order%5B0%5D%5Bcolumn%5D=0&order%5B0%5D%5Bdir%5D=desc&start=0&length=5&search%5Bvalue%5D=&search%5Bregex%5D=false&page=1&_=1684858177068';
@@ -2411,27 +2436,27 @@ async function getPlans() {
       const div = document.createElement('div');
       div.classList.add('mt-4');
       div.innerHTML = `
-        <div class="grid grid-cols-2 gap-3 px-3" id="balance-plan-${plan.id}" >
-          <div class="rounded-lg bg-slate-150 px-2.5 py-2 dark:bg-navy-600">
-            <div class="flex items-center justify-between space-x-1">
-              <p>
-                <span class="text-lg font-medium text-slate-700 dark:text-navy-100">${plan.tariff}</span>
-                <span class="text-xs">£</span>
-              </p>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5 text-secondary dark:text-secondary-light" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-              </svg>
-            </div>
-            <p class="mt-0.5 text-tiny+ uppercase">${plan.name} Messages</p>
-            <div class="flex items-center justify-between mt-3">
-            <button class="plan-btn rounded-full bg-primary text-white hover:bg-primary-light focus:bg-primary-light active:bg-primary-dark" data-plan="${plan.id}">
-            Buy
-          </button>
-            </div>
+      <div class="grid grid-cols-2 gap-3 px-3" id="balance-plan-${plan.id}">
+        <div class="rounded-lg bg-slate-150 px-2.5 py-2 dark:bg-navy-600">
+          <div class="flex items-center justify-between space-x-1">
+            <p>
+              <span class="text-lg font-medium text-slate-700 dark:text-navy-100">${plan.tariff}</span>
+              <span class="text-xs">£</span>
+            </p>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5 text-secondary dark:text-secondary-light" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          <p class="mt-0.5 text-tiny+ uppercase">${plan.name} Messages</p>
+          <div class="flex items-center justify-center mt-3">
+            <button class="plan-btn rounded-full bg-primary text-white hover:bg-primary-light px-3 py-1.5 text-sm font-medium" data-plan="${plan.id}">
+              Buy Plan
+            </button>
           </div>
         </div>
-      `;
-
+      </div>
+    `;
+    
       container.appendChild(div);
     });
 
@@ -2470,7 +2495,6 @@ async function updateUser(user) {
   try {
     const response = await axios.put(url);
     // Handle the response as needed
-    console.log("User update response:", response.data);
     return response.data;
   } catch (error) {
     // Handle errors
@@ -2500,10 +2524,9 @@ const modal = document.getElementById('ModalPlan');
     });
     if(response.status){
       console.log('Sale added successfully!',response.data);
-      
       const combinedData = {
         responseData: response.data,
-        user: newData.user
+        user: newData.contact
       };
       
       foued.buyPlan(combinedData);
@@ -2527,11 +2550,9 @@ const modal = document.getElementById('ModalPlan');
 
 
 $(document).ready(function () {
-    
   guestConnection()
-
   getAllAgents()
-  getConnectUser()
+  getConnectedAgents()
   getPlans()
   //connection 
   //inform the other users except the sender about the new connection 
@@ -2539,7 +2560,6 @@ $(document).ready(function () {
   //disconnection 
   if (newData) {
     foued.connect(newData?.user,newData.contact)
-
     foued.onDisconnected(newData?.user)
     getAllConversations()
     getBalanceById(newData.contact)
@@ -2587,5 +2607,4 @@ $(document).ready(function () {
   //click handler for the conversation 
   $(document).on('click', '.conversation-click', handleConversationClick)
   $(document).on('click', '#emoji-button', showEmoji)
-
 });
