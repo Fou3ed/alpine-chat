@@ -12,7 +12,9 @@ const timeString =
   hours.toString().padStart(2, "0") + ":" + minutes.toString().padStart(2, "0");
 // Save user information in local storage
 console.log("LOCAL STORAGE", getCookie("myData"));
+
 function getCookie(name) {
+
   var cookieArr = document.cookie.split(";");
 
   for (var i = 0; i < cookieArr.length; i++) {
@@ -126,6 +128,9 @@ window.connected = async () => {
   // Receive the connect event and send connection event to save the connection data in database and update the user status (is_active_:true)
   foued.connect(newData.user,newData.contact);
 };
+
+
+
 // Receive the connection event and retrieve the user data and save it into local storage 
 foued.onConnected();
 // Global variables 
@@ -135,6 +140,7 @@ let agentName;
 let expert;
 let notifyNumber = 0
 let userBalance;
+
 // Disable the send message button if it's empty.
 if (messageInput)
   messageInput.addEventListener("input", () => {
@@ -144,15 +150,84 @@ if (messageInput)
       sendButton.disabled = false;
     }
   });
+
+
+//if the connection user is a guest create a guest account : 
+  function guestConnection() {
+    if(!newData){
+      const payLoad={  
+        browser:navigator.userAgent,
+        platform:navigator.platform
+      }
+      foued.createGuestAccount(payLoad)
+    }
+        }  
+    
+   //when receiving guest data from server save it in cookies
+  export async function guestCreated(data){
+    const newUser = { user: data.user,contact:data.contact,accountId:data.accountId }
+    newData = newUser
+    document.cookie = "myData=" + JSON.stringify(newUser) + "; expires=Tue, 31 Dec 9999 23:59:59 GMT; path=/";
+
+    const balanceDiv = document.querySelector(".ballance-card")
+    const balanceNumber = balanceDiv.querySelector("span")
+    balanceNumber.textContent = "Free"
+    foued.connect(data.user,data.contact)
+    expert=data.availableAgent
+    getExperts();
+    userId = data.user
+    redirectToAgent(expert)
+    console.log("here data",data)
+    const html = `
+  <div class="conversation bg-slate-150" data-conversation-id="${data.conversationId}" data-name="New Conversation" data-timestamp="now" id="left-conversation-${data.conversationId}" data-user-id="${expert}">
+    <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
+      <div
+        class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
+        data-conversation-id="${data.conversationId}"
+        data-name="New Conversation">
+        <div class="avatar h-10 w-10">
+          <img class="rounded-full" src="images/avatar/avatar-5.jpg" alt="avatar" />
+          <div
+          id="active-user"
+            class="absolute right-0 h-3 w-3 rounded-full border-2 border-white bg-slate-300 dark:border-navy-700">
+          </div>
+        </div>
+        <div class="flex flex-1 flex-col">
+          <div class="flex items-baseline justify-between space-x-1.5">
+            <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
+              New Conversation
+            </p>
+            <span class="text-tiny+ text-slate-400 dark:text-navy-300">"now"</span>
+          </div>
+          <div class="mt-1 flex items-center justify-between space-x-1">
+            <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
+              Contact form 
+            </p>
+            <div
+              class="flex h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-slate-200 px-1.5 text-tiny+ font-medium leading-none text-slate-800 dark:bg-navy-450 dark:text-white">
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  const newConvDiv = document.createElement("div")
+// Append the HTML to the container
+newConvDiv.innerHTML = html;
+leftConversationContainer.insertBefore(newConvDiv, leftConversationContainer.firstChild)
+  }
+  
+  
 /**
  * Display all connected agents 
  */
 const displayedUsers = new Set();
 export async function getExperts() {
-  const response = await axios.get("https://foued.local.itwise.pro/chat_server/users/connected");
+  const response = await axios.get("http://192.168.1.16:3000/users/connected");
   if (response.data.message === "success") {
-    const users = response.data.data;
-    users.forEach((user) => {
+    connectUsers = response.data.data;
+    response.data.data.forEach((user) => {
       const {
         _id: agent,
         full_name: name
@@ -173,7 +248,6 @@ export async function getExperts() {
   }
   if (!conversationId){
 
-     redirectToAgent()
     
   }
 }
@@ -191,7 +265,7 @@ async function selectExpert() {
     const $conversationContainer = $("#conversation-container");
     // Check if they both have conversation, if yes, just handle click to left conversation
     if (userId){                    
-    const response = await axios.get(`https://foued.local.itwise.pro/chat_server/conversation/?user1=${userId}&user2=${agent}`);
+    const response = await axios.get(`http://192.168.1.16:3000/conversation/?user1=${userId}&user2=${agent}`);
     if (!response.data.data) {
       conversationId = "";
       messagesContainer.innerHTML = "";
@@ -231,11 +305,9 @@ export async function getAllConversations() {
   leftConversationContainer.innerHTML = '';
   let latestConversationId = null;
   let userConversation = ""
-  const conversationsResponse = await axios.get(`https://foued.local.itwise.pro/chat_server/conversation/${newData.user}`);
-    console.log("conversations",conversationsResponse)
+  const conversationsResponse = await axios.get(`http://192.168.1.16:3000/conversation/1/?user_id=${newData.user}`);
   if(conversationsResponse.data.data.length>0){
     const conversations = conversationsResponse.data.data;
-
     allConversation = conversations
     conversationId = conversations[0]?._id
     const conversationPromises = conversations.map(async (conversation, index) => {
@@ -261,8 +333,8 @@ export async function getAllConversations() {
         }
       }
       let userLog = ""
-      if (conversation.last_message[0].type === "log") {
-        const log = JSON.parse(conversation.last_message[0].message)
+      if (conversation.last_message.type === "log") {
+        const log = JSON.parse(conversation.last_message.message)
         switch (log.action) {
           case "fill":
             userLog = `You filled on the form.`;
@@ -291,21 +363,21 @@ export async function getAllConversations() {
         }
       }
       let msg = ""
-      switch (conversation.last_message[0].type) {
+      switch (conversation.last_message.type) {
         case "link":
-          msg = conversation.last_message[0].user === userId ? "You sent a link" : `${"kabil"}  sent a link`;
+          msg = conversation.last_message.user === userId ? "You sent a link" : `${"Agent"}  sent a link`;
           break;
         case "plan":
-          msg = conversation.last_message[0].user === userId ? "You sent a plan" : `${"kabil"}  sent a plan`
+          msg = conversation.last_message.user === userId ? "You sent a plan" : `${"Agent"}  sent a plan`
           break;
         case "form":
-          msg = conversation.last_message[0].user === userId ? "You sent a form" : `${"kabil"}  sent a form`
+          msg = conversation.last_message.user === userId ? "You sent a form" : `${"Agent"}  sent a form`
           break;
         case "log":
           msg = userLog;
           break
         default:
-          msg = conversation.last_message[0].message;
+          msg = conversation.last_message.message;
           break;
       }
       const html = `
@@ -331,7 +403,7 @@ export async function getAllConversations() {
                 </div>
                 <div class="mt-1 flex items-center justify-between space-x-1">
                   <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
-                     ${conversation.last_message[0].status === 0 ? conversation.last_message[0].user === userId ? "You delete a message" : `${"kabil"} delete a message` : msg}
+                     ${conversation.last_message.status === 0 ? conversation.last_message.user === userId ? "You delete a message" : `${"Agent"} delete a message` : msg}
                   </p >
        <div
      id="unread-count-${conversation._id}"
@@ -397,7 +469,7 @@ expert=agentClicked
 }
 
 async function getTheLastMsg(conversationId) {
-  return axios.get(`https://foued.local.itwise.pro/chat_server/messages/lastMsg/${conversationId}`)
+  return axios.get(`http://192.168.1.16:3000/messages/lastMsg/${conversationId}`)
     .then(function (response) {
 
       const lastMessage = response.data.data;
@@ -453,7 +525,7 @@ async function loadMessages(page, conversationId) {
     // Show the spinner
     spinner.classList.remove("hidden");
     // Load messages from the server
-    const response = await axios.get(`https://foued.local.itwise.pro/chat_server/messages/${conversationId}?page=${page}&limit=${limit}`);
+    const response = await axios.get(`http://192.168.1.16:3000/messages/${conversationId}?page=${page}&limit=${limit}`);
     if (response.data.message !== "success") {
       throw new Error("Failed to load messages");
     }
@@ -596,7 +668,6 @@ function displayMessages(messages) {
         });
       else if (message.type === "form") {
         let inputForms = ""
-          console.log("mm",myContent)
         if(myContent.fields){
           inputForms = myContent.fields.map(field => {
             let type = ""
@@ -644,7 +715,7 @@ ${myContent.text_capture}
 <form>
 <div id="text_capture" class="hidden"><p > ${myContent.text_capture}</p></div>
 ${inputForms.join('')}
-<button id="submit-form-${message._id}" data-content='${message.message}'  type="button" >Submit</button>
+<button id="submit-form-${message._id}" data-content='${message.message} '  type="button" >Submit</button>
 </form>
 </div>
 `
@@ -831,16 +902,7 @@ async function addLogs(log) {
     "log_date": currentDate,
     "source": "3"
   }
-  const
-    headers = {
-      "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Nzg5NzE2OTUsImV4cCI6MTYyMDA1NzIzMzMzLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcm5hbWUiOiJ0ZXN0QGdtYWlsLmNvbSJ9.Yy_dUAEfszEpE-aQkBcUBq6rV9OPaUCNaoLxIfJnoNyCqsVWUfbilWNz2sXXImyDBmsNg1n9YIERHUE2iziJpOdhJdbiT6byWmT7MhuyC_QUxbPCko5NQPfP-KB85BjKVSxpr-CNq-Su8LxZ6fysLc7Qe71A86O0TangvsH4UgUb99WE3fMC_EF0PnvXVVxfzdZkV9p1EUTJa989ENP-ytXwdonUXcFUBznlW5PVEWgw-5dyWcND3LXCGaweAO-gMSU2K1Wp2T_rtqTRsXkAhcwF5T_IODee87w4FVARMfbXHvvIizclqyH0TITU8G_MgcoteObO24bECJCV-KpFWg"
-    }
-  await axios.post(`https://iheb.local.itwise.pro/private-chat-app/public/api/user_logs`, logData, {
-    headers
-  }).then((res) => {
-
-    //send message to agent 
-    const info = {
+    foued.onCreateMessage( {
       app: "638dc76312488c6bf67e8fc0",
       user: newData.user,
       action: "message.create",
@@ -848,14 +910,14 @@ async function addLogs(log) {
         type: "log",
         conversation_id: conversationId, // Include the conversation ID
         user: newData.user,
-        message: JSON.stringify(res.data),
+        message: JSON.stringify(logData),
         origin: "web",
+        
       },
       to: expert,
-    };
-    foued.onCreateMessage(info)
-
-  });
+      logData:logData
+     
+    })
 
 
 }
@@ -865,25 +927,8 @@ async function addLogs(log) {
  */
 
 async function firstMessage(user_id, agent) {
-  console.log("user id ,agent ",user_id,agent)
-  createConversation(user_id, agent)
-  await foued.onConversationStart().then(async (res) => {
-    const memberInfo = {
-      conversation_id: res._id,
-      user_id: user_id,
-      conversation_name: agentName,
-    }
-    foued.createMembers(memberInfo); 
-    foued.createMembers({
-      conversation_id: res._id,
-      user_id: agent,
-      conversation_name: user_id
-    });
-    conversationId = res._id;
-    return {
-      conversationId: res._id
-    };
-  })
+  // createConversation(user_id, agent)
+  await foued.onConversationStart()
 }
 
 // create conversation function 
@@ -924,10 +969,6 @@ async function sendMessage() {
 
   if (messageInput.value.trim() !== "") {
     isSendingMessage = true; // Set the sending state to true
-
-    // Display a loader while sending the message
-    const loaderHTML = '<div class="loader"></div>'; // Replace with your own loader HTML
-    messagesContainer.insertAdjacentHTML("beforeend", loaderHTML);
 
   
     if (!emoji.classList.contains('hidden'))
@@ -1177,6 +1218,7 @@ export async function sentMessage(data) {
 }
 
 export async function receiveMessage(data) {
+  console.log("message received ",data)
   let tableRows = ""
   const messageId = data.messageData.id;
 
@@ -1185,7 +1227,6 @@ export async function receiveMessage(data) {
   data.messageData.type === "form" ||
   data.messageData.type === "link" ? JSON.parse(data.messageData.content)
     : {};  let conv = document.querySelector('#conversation-container').dataset['conversationId']
-
   if (data.messageData.conversation === conv) {
     if (myContent !== {} && data.messageData.type === "plan")
       tableRows = myContent.plans.map(plan => {
@@ -1264,7 +1305,7 @@ style="background-color: #fff"
 >
 <h3>Contact form</h3>
 <p>
-Welcome  2 
+Welcome  
 </p>
 <form >
 <div id="text_capture" class="hidden"><p > ${myContent.text_capture}</p></div>
@@ -2001,11 +2042,10 @@ if (messageInput) {
         sendMessage();
     }
   });
-
 }
-//get All agents (remove users only users where role : agent )
+//get All agents in the platform
 async function getAllAgents() {
-  const response = await axios.get("https://foued.local.itwise.pro/chat_server/users");
+  const response = await axios.get("http://192.168.1.16:3000/users");
   if (response.data.message === "success") {
     const agents = response.data.data
     agents.forEach((agent) => {
@@ -2085,9 +2125,8 @@ async function getAllAgents() {
 
 
 }
-
+//when an agent connect create an agent card and display it in the online agents block
 export function userConnection(data) {
-console.log("data user connection",data)
 if (data.role==="AGENT"){
   allConversation.map(conv => {
     const conversationCard = document.getElementById(`left-conversation-${conv._id}`)
@@ -2115,7 +2154,7 @@ if (data.role==="AGENT"){
   }
 }
 }
-
+//when an agent disconnect remove the card in the online agents block
 export function userDisconnection(data) {
   allConversation.map(conv => {
     const conversationCard = document.getElementById(`left-conversation-${conv._id}`)
@@ -2138,6 +2177,10 @@ export function userDisconnection(data) {
     conversationHeaderStatus.textContent = "Last seen recently"
   }
 }
+
+
+
+
 
 function getBalanceById(contactId) {
   $.ajax({
@@ -2173,227 +2216,89 @@ function getBalanceById(contactId) {
     },
     error: function (jqXHR, textStatus, errorThrown) {
       console.log("Error:", textStatus, errorThrown);
+      return;
     }
+  
   });
 }
 
 
 export function updateUserBalance(data) {
-  userBalance=data
+  userBalance=data.balance
   const balanceDiv = document.querySelector(".ballance-card")
   const balanceNumber = balanceDiv.querySelector("span")
-  balanceNumber.textContent = data
-  
+  balanceNumber.textContent = data.balance
   if (userBalance.balance==0){
           messageInput.disabled=true;
           sendButton.disabled=true;
         }
 }
 
-function guestConnection() {
-  if(!newData)
-    fetch('https://api.ipify.org?format=json')
-      .then(response => response.json())
-      .then(data => {
-        const ipAddress = data.ip;
-        fetch(`https://ipapi.co/${ipAddress}/json/`)
-          .then(response => response.json())
-          .then(data => {
-            const country = data.country_code;
-            $.ajax({
-              url:
-                "https://iheb.local.itwise.pro/private-chat-app/public/AddGuestContact/1",
-              method: "POST",
-              headers: {
-                "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Nzg5NzE2OTUsImV4cCI6MTYyMDA1NzIzMzMzLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcm5hbWUiOiJ0ZXN0QGdtYWlsLmNvbSJ9.Yy_dUAEfszEpE-aQkBcUBq6rV9OPaUCNaoLxIfJnoNyCqsVWUfbilWNz2sXXImyDBmsNg1n9YIERHUE2iziJpOdhJdbiT6byWmT7MhuyC_QUxbPCko5NQPfP-KB85BjKVSxpr-CNq-Su8LxZ6fysLc7Qe71A86O0TangvsH4UgUb99WE3fMC_EF0PnvXVVxfzdZkV9p1EUTJa989ENP-ytXwdonUXcFUBznlW5PVEWgw-5dyWcND3LXCGaweAO-gMSU2K1Wp2T_rtqTRsXkAhcwF5T_IODee87w4FVARMfbXHvvIizclqyH0TITU8G_MgcoteObO24bECJCV-KpFWg"
-              },
-              contentType: "application/json",
-              data: JSON.stringify({
-                ipAddress,
-                country
-              })
-              ,
-              success: function (contactData) {         
-                $.ajax({
-                  url:
-                    "https://foued.local.itwise.pro/chat_server/users",
-                  method: "POST",
-                  contentType: "application/json",
-                  data: JSON.stringify({
-                    role: 'CLIENT',
-                    status: 0,
-                    id: contactData.data.u_id.toString(),
-                    accountId:"1",
-                    is_active:true,
-                  })
-                  ,
-                  success: function (data) {
-                    const balanceDiv = document.querySelector(".ballance-card")
-                    const balanceNumber = balanceDiv.querySelector("span")
-                    balanceNumber.textContent = "Free"
-                    const newUser = { user: data.date._id,contact:contactData.data.u_id.toString(),accountId:contactData.data.accountId }
-                    newData = newUser
-                    foued.connect(data.date._id,contactData.data.u_id.toString())
-                    getExperts();
-                    selectExpert()
-                    userId = data.date._id
 
-                    document.cookie = "myData=" + JSON.stringify(newUser) + "; expires=Tue, 31 Dec 9999 23:59:59 GMT; path=/";
-                    },
-
-
-                  error: function (jqXHR, textStatus, errorThrown) {
-                    console.log("Error:", textStatus, errorThrown);
-
-                  }
-                });
-              },
-              error: function (jqXHR, textStatus, errorThrown) {
-                console.log("Error:", textStatus, errorThrown);
-
-              }
-            });
-          });
-      });
-
-
-}
-async function redirectToAgent() {
+async function redirectToAgent(agentId,conversationId) {
   try {
-    const response = await axios.get('https://foued.local.itwise.pro/chat_server/users/available_agent');
-    if(response.data.agentWithLowestConversation!= null){
-
-    const agentId = response.data.agentWithLowestConversation._id;
-    expert=agentId
-    const responseConversationId = await axios.get(`https://foued.local.itwise.pro/chat_server/conversation/?user1=${newData.user}&user2=${agentId}`);
+   
+    if(agentId!= null){
     // Find the corresponding agent slide by ID
-    if(responseConversationId.data.data==null){
     const $agentSlide = $(`.swiper-slide[id="${agentId}"]`);
     if ($agentSlide.length > 0) {
       // Trigger a click event on the agent slide
       $agentSlide.trigger("click");
-      //get the form (before)
-      const before= await axios.get('https://iheb.local.itwise.pro/private-chat-app/public/GetFormType')
-      const contactFormFields=before.data?.data
-      // create conversation,create members and receive messages ,
-       await firstMessage(newData.user,agentId).then(async function (res){
-        conversationContainer.dataset.conversationId = conversationId
-              const info = {
-                app: "638dc76312488c6bf67e8fc0",
-                user: agentId,
-                action: "message.create",
-                from: agentId,
-                metaData: {
-                  type: "form",
-                  conversation_id: conversationId, // Include the conversation ID
-                  user: agentId,
-                  message: JSON.stringify(contactFormFields),
-                  data: "non other data",
-                  origin: "web",
-                  fieldId:contactFormFields.id
-                },
-                to: newData.user,
-              };
-               foued.onCreateForm(info)
-               const html = `
-               <<div class="conversation bg-slate-150" data-conversation-id="${conversationId}" data-name="New Conversation" data-timestamp="now" id="left-conversation-${conversationId}" data-user-id="${agentId}">
-                 <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
-                   <div
-                     class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
-                     data-conversation-id="${conversationId}"
-                     data-name="New Conversation">
-                     <div class="avatar h-10 w-10">
-                       <img class="rounded-full" src="images/avatar/avatar-5.jpg" alt="avatar" />
-                       <div
-                       id="active-user"
-                         class="absolute right-0 h-3 w-3 rounded-full border-2 border-white bg-slate-300 dark:border-navy-700">
-                       </div>
-                     </div>
-                     <div class="flex flex-1 flex-col">
-                       <div class="flex items-baseline justify-between space-x-1.5">
-                         <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
-                           New Conversation
-                         </p>
-                         <span class="text-tiny+ text-slate-400 dark:text-navy-300">"now"</span>
-                       </div>
-                       <div class="mt-1 flex items-center justify-between space-x-1">
-                         <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
-                           Contact form 
-                         </p>
-                         <div
-                           class="flex h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-slate-200 px-1.5 text-tiny+ font-medium leading-none text-slate-800 dark:bg-navy-450 dark:text-white">
-                           
-                         </div>
-                       </div>
-                     </div>
-                   </div>
-                 </div>
-               </div>>`;
-               const newConvDiv = document.createElement("div")
-
-             // Append the HTML to the container
-             newConvDiv.innerHTML = html;
-             leftConversationContainer.insertBefore(newConvDiv, leftConversationContainer.firstChild)
-         })
-
-    } else {
-      console.log("Agent slide not found",agentId);
-
-    }}
+               
+    } 
   }else {
     console.log("redirected to an offline agent ")
-  const messageContainer = document.getElementById(`message-${messageId}`);
-    if (!messageContainer) {
-      let direction = data.direction == "in" ? 'justify-end' : 'justify-start';
-      const msgStyle = data.direction == "out" ? `rounded-2xl break-words rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 relative ` : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 relative shadow-sm break-words dark:bg-accent dark:text-white'
-      const messageContent = `
-     <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
-     <div class="flex flex-col items-end space-y-3.5">
-     <div class="flex flex-row">
-     ${data.direction == "in" ? msgButt(messageId, direction, data.messageData.pinned === 1) : ''}
-       <div class="ml-2 max-w-lg sm:ml-5">
-         <div class="${msgStyle}"  id="message-content-${messageId}">
+  // const messageContainer = document.getElementById(`message-${messageId}`);
+  //   if (!messageContainer) {
+  //     let direction = data.direction == "in" ? 'justify-end' : 'justify-start';
+  //     const msgStyle = data.direction == "out" ? `rounded-2xl break-words rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 relative ` : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 relative shadow-sm break-words dark:bg-accent dark:text-white'
+  //     const messageContent = `
+  //    <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
+  //    <div class="flex flex-col items-end space-y-3.5">
+  //    <div class="flex flex-row">
+  //    ${data.direction == "in" ? msgButt(messageId, direction, data.messageData.pinned === 1) : ''}
+  //      <div class="ml-2 max-w-lg sm:ml-5">
+  //        <div class="${msgStyle}"  id="message-content-${messageId}">
          
-           ${data.messageData.type == "link" ? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}"  href=" ${myContent.userLink?.url}">${myContent.userLink?.url}</a>` : data.messageData.type === "plan"
-          ? tableRows.join('') : data.messageData.type === "form" ? tableRows : data.messageData.content }
-           <div id="pin-div" class="  hidden ${direction == "justify-start" ? "pin-div-sender" : "pin-div"} justify-center  items-center me-2 "><i class="fas fa-thumbtack"></i></div>
-         </div>
-         <p  id="date_msg" data-direction="${direction}" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
-               ${timeString}      
-         </p>
-       </div>
-     ${data.direction == "out" ? msgButt(messageId, direction, data.messageData.pinned === 1) : ''}
-     </div>
-     <div class="flex flex-row">
-         </div>
-       </div>
-     </div>
-   </div>
-     </div>
-   `
-      let typingBlock = document.getElementById("typing-block-message");
+  //          ${data.messageData.type == "link" ? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}"  href=" ${myContent.userLink?.url}">${myContent.userLink?.url}</a>` : data.messageData.type === "plan"
+  //         ? tableRows.join('') : data.messageData.type === "form" ? tableRows : data.messageData.content }
+  //          <div id="pin-div" class="  hidden ${direction == "justify-start" ? "pin-div-sender" : "pin-div"} justify-center  items-center me-2 "><i class="fas fa-thumbtack"></i></div>
+  //        </div>
+  //        <p  id="date_msg" data-direction="${direction}" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
+  //              ${timeString}      
+  //        </p>
+  //      </div>
+  //    ${data.direction == "out" ? msgButt(messageId, direction, data.messageData.pinned === 1) : ''}
+  //    </div>
+  //    <div class="flex flex-row">
+  //        </div>
+  //      </div>
+  //    </div>
+  //  </div>
+  //    </div>
+  //  `
+  //     let typingBlock = document.getElementById("typing-block-message");
 
-      if (typingBlock) {
-        const msgDiv = document.createElement("div");
-        msgDiv.innerHTML = messageContent
+  //     if (typingBlock) {
+  //       const msgDiv = document.createElement("div");
+  //       msgDiv.innerHTML = messageContent
 
-        typingBlock.replaceWith(msgDiv)
+  //       typingBlock.replaceWith(msgDiv)
 
-      } else
-        messagesContainer.insertAdjacentHTML("beforeend", messageContent)
-      if (conversationId === data.messageData.conversation) {
-        markMessageAsSeen(conversationId)
-      }
-      const conversationContainer = document.getElementById('conversation-container');
-      conversationContainer.scrollTop = conversationContainer.scrollHeight;
-    }
-    }
+  //     } else
+  //       messagesContainer.insertAdjacentHTML("beforeend", messageContent)
+  //     if (conversationId === data.messageData.conversation) {
+  //       markMessageAsSeen(conversationId)
+  //     }
+  //     const conversationContainer = document.getElementById('conversation-container');
+  //     conversationContainer.scrollTop = conversationContainer.scrollHeight;
+  //   }
+   }
 
   } catch (error) {
     console.error('Error:', error);
   }
 }
-
 
 function showEmoji() {
   if (emoji.classList.contains('hidden'))
@@ -2402,25 +2307,25 @@ function showEmoji() {
     emoji.classList.add('hidden')
 }
 
-async function getConnectedAgents() {
-  try {
-    const response = await $.ajax({
-      url: `https://foued.local.itwise.pro/chat_server/users/connected`,
-      dataType: "json",
-      timeout: 5000,
-    });
-      connectUsers = response.data;
+// async function getConnectedAgents() {
+//   try {
+//     const response = await $.ajax({
+//       url: `http://192.168.1.16:3000/users/connected`,
+//       dataType: "json",
+//       timeout: 5000,
+//     });
+//       connectUsers = response.data;
 
-    // Process connectUsers
-  } catch (error) {
-    console.log("Error:", error);
-    // Handle error
-  }
-}
+//     // Process connectUsers
+//   } catch (error) {
+//     console.log("Error:", error);
+//     // Handle error
+//   }
+// }
 
 async function getPlans() {
   try {
-    const url = 'https://iheb.local.itwise.pro/private-chat-app/public/api/plans?draw=1&columns%5B8%5D%5Bdata%5D=status&columns%5B8%5D%5Bname%5D=e.status&columns%5B8%5D%5Bsearchable%5D=true&columns%5B8%5D%5Borderable%5D=true&columns%5B8%5D%5Bsearch%5D%5Bvalue%5D=1&columns%5B8%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B9%5D%5Bdata%5D=account_id&columns%5B9%5D%5Bname%5D=e.account_id&columns%5B9%5D%5Bsearchable%5D=true&columns%5B9%5D%5Borderable%5D=false&columns%5B9%5D%5Bsearch%5D%5Bvalue%5D=1&columns%5B9%5D%5Bsearch%5D%5Bregex%5D=false&order%5B0%5D%5Bcolumn%5D=0&order%5B0%5D%5Bdir%5D=desc&start=0&length=5&search%5Bvalue%5D=&search%5Bregex%5D=false&page=1&_=1684858177068';
+    const url = 'https://iheb.local.itwise.pro/private-chat-app/public/plan_client?account=1';
     const jwt = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Nzg5NzE2OTUsImV4cCI6MTYyMDA1NzIzMzMzLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcm5hbWUiOiJ0ZXN0QGdtYWlsLmNvbSJ9.Yy_dUAEfszEpE-aQkBcUBq6rV9OPaUCNaoLxIfJnoNyCqsVWUfbilWNz2sXXImyDBmsNg1n9YIERHUE2iziJpOdhJdbiT6byWmT7MhuyC_QUxbPCko5NQPfP-KB85BjKVSxpr-CNq-Su8LxZ6fysLc7Qe71A86O0TangvsH4UgUb99WE3fMC_EF0PnvXVVxfzdZkV9p1EUTJa989ENP-ytXwdonUXcFUBznlW5PVEWgw-5dyWcND3LXCGaweAO-gMSU2K1Wp2T_rtqTRsXkAhcwF5T_IODee87w4FVARMfbXHvvIizclqyH0TITU8G_MgcoteObO24bECJCV-KpFWg';
 
     const response = await axios.get(url, {
@@ -2428,114 +2333,87 @@ async function getPlans() {
         Authorization: `Bearer ${jwt}`
       }
     });
-    
-    const plans = response.data.data;
-    const container = document.getElementById('plans');
-
-    plans.forEach(plan => {
-      const div = document.createElement('div');
-      div.classList.add('mt-4');
-      div.innerHTML = `
-      <div class="grid grid-cols-2 gap-3 px-3" id="balance-plan-${plan.id}">
-        <div class="rounded-lg bg-slate-150 px-2.5 py-2 dark:bg-navy-600">
-          <div class="flex items-center justify-between space-x-1">
-            <p>
-              <span class="text-lg font-medium text-slate-700 dark:text-navy-100">${plan.tariff}</span>
-              <span class="text-xs">£</span>
-            </p>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5 text-secondary dark:text-secondary-light" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-            </svg>
-          </div>
-          <p class="mt-0.5 text-tiny+ uppercase">${plan.name} Messages</p>
-          <div class="flex items-center justify-center mt-3">
-            <button class="plan-btn rounded-full bg-primary text-white hover:bg-primary-light px-3 py-1.5 text-sm font-medium" data-plan="${plan.id}">
-              Buy Plan
-            </button>
+    if(response){
+      const plans = response.data.data;
+      const container = document.getElementById('plans');
+  
+      plans.forEach(plan => {
+        const div = document.createElement('div');
+        div.classList.add('mt-4');
+        div.innerHTML = `
+        <div class="grid grid-cols-2 gap-3 px-3" id="balance-plan-${plan.id}">
+          <div class="rounded-lg bg-slate-150 px-2.5 py-2 dark:bg-navy-600">
+            <div class="flex items-center justify-between space-x-1">
+              <p>
+                <span class="text-lg font-medium text-slate-700 dark:text-navy-100">${plan.tariff}</span>
+                <span class="text-xs">£</span>
+              </p>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5 text-secondary dark:text-secondary-light" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <p class="mt-0.5 text-tiny+ uppercase">${plan.name} Messages</p>
+            <div class="flex items-center justify-center mt-3">
+              <button class="plan-btn rounded-full bg-primary text-white hover:bg-primary-light px-3 py-1.5 text-sm font-medium" data-plan="${plan.id}">
+                Buy Plan
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    `;
-    
-      container.appendChild(div);
-    });
-
-    // Add event listeners to the buy buttons
-    const buyButtons = document.querySelectorAll('.plan-btn');
-    const modal = document.getElementById('ModalPlan');
-    const closeModalButtons = modal.querySelectorAll('.close, #closeModal, #buyPlanBtn');
-
-    buyButtons.forEach(buyButton => {
-      buyButton.addEventListener('click', function() {
-        const selectedPlan = this.getAttribute('data-plan'); // Get the selected plan value
-        modal.classList.remove('hidden');
-        successButton.setAttribute('data-plan', selectedPlan); // Set the selected plan value to the success button
+      `;
+      
+        container.appendChild(div);
       });
-    });
-    
-
-    closeModalButtons.forEach(closeButton => {
-      closeButton.addEventListener('click', function() {
-        modal.classList.add('hidden');
+  
+      // Add event listeners to the buy buttons
+      const buyButtons = document.querySelectorAll('.plan-btn');
+      const modal = document.getElementById('ModalPlan');
+      const closeModalButtons = modal.querySelectorAll('.close, #closeModal, #buyPlanBtn');
+  
+      buyButtons.forEach(buyButton => {
+        buyButton.addEventListener('click', function() {
+          const selectedPlan = this.getAttribute('data-plan'); // Get the selected plan value
+          modal.classList.remove('hidden');
+          successButton.setAttribute('data-plan', selectedPlan); // Set the selected plan value to the success button
+        });
       });
-    });
-
-    modal.addEventListener('click', function(event) {
-      if (event.target === modal) {
-        modal.classList.add('hidden');
-      }
-    });
+      
+  
+      closeModalButtons.forEach(closeButton => {
+        closeButton.addEventListener('click', function() {
+          modal.classList.add('hidden');
+        });
+      });
+  
+      modal.addEventListener('click', function(event) {
+        if (event.target === modal) {
+          modal.classList.add('hidden');
+        }
+      });
+    }
+  
   } catch (error) {
     console.error(error);
   }
 }
 
-async function updateUser(user) {
-  const url = `https://foued.local.itwise.pro/chat_server/users/status/${user}`;
-  try {
-    const response = await axios.put(url);
-    // Handle the response as needed
-    return response.data;
-  } catch (error) {
-    // Handle errors
-    console.error("Error updating user:", error);
-    throw error;
-  }
-}
+
 const successButton = document.getElementById('buyPlanBtn');
 successButton.addEventListener('click', async function() {
   const selectedPlan = this.getAttribute('data-plan'); // Get the selected plan value
 const modal = document.getElementById('ModalPlan');
   try {
-    const addSalesUrl = 'https://iheb.local.itwise.pro/private-chat-app/public/add_sales';
     const addSalesData = {
       contact:newData.contact,
-      user: expert,
+      user: newData.user,
       plan: selectedPlan,
       payment_method: '1',
       provider_id: '1'
     };
-    const addSalesToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Nzg5NzE2OTUsImV4cCI6MTYyMDA1NzIzMzMzLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcm5hbWUiOiJ0ZXN0QGdtYWlsLmNvbSJ9.Yy_dUAEfszEpE-aQkBcUBq6rV9OPaUCNaoLxIfJnoNyCqsVWUfbilWNz2sXXImyDBmsNg1n9YIERHUE2iziJpOdhJdbiT6byWmT7MhuyC_QUxbPCko5NQPfP-KB85BjKVSxpr-CNq-Su8LxZ6fysLc7Qe71A86O0TangvsH4UgUb99WE3fMC_EF0PnvXVVxfzdZkV9p1EUTJa989ENP-ytXwdonUXcFUBznlW5PVEWgw-5dyWcND3LXCGaweAO-gMSU2K1Wp2T_rtqTRsXkAhcwF5T_IODee87w4FVARMfbXHvvIizclqyH0TITU8G_MgcoteObO24bECJCV-KpFWg';
 
-    const response = await axios.post(addSalesUrl, addSalesData, {
-      headers: {
-        Authorization: `Bearer ${addSalesToken}`
-      }
-    });
-    if(response.status){
-      console.log('Sale added successfully!',response.data);
-      const combinedData = {
-        responseData: response.data,
-        user: newData.contact
-      };
-      
-      foued.buyPlan(combinedData);
-      updateUser(newData.user)
+      foued.buyPlan(addSalesData);
       getBalanceById(newData.contact)
-    }else {
-      console.log("error purchasing plan")
-    }
-
+  
     // Do any additional actions here after the successful sale addition
   } catch (error) {
     console.error('Error adding sale:', error);
@@ -2552,7 +2430,7 @@ const modal = document.getElementById('ModalPlan');
 $(document).ready(function () {
   guestConnection()
   getAllAgents()
-  getConnectedAgents()
+  // getConnectedAgents()
   getPlans()
   //connection 
   //inform the other users except the sender about the new connection 
@@ -2599,6 +2477,9 @@ $(document).ready(function () {
   foued.onTypingStarted()
   foued.onBalanceStat()
   foued.onTypingStopped()
+  foued.onGuestCreated()
+  foued.planBought()
+  foued.joinedDone()
   document
     .querySelector("emoji-picker")
     .addEventListener("emoji-click", (event) => {

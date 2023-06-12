@@ -16,7 +16,8 @@ import {
   userDisconnection,
   userConnection,
   reactHide,
-  updateUserBalance
+  updateUserBalance,
+  guestCreated,
 
 } from "../main.js";
 
@@ -25,7 +26,7 @@ import {
 export default class event {
   constructor() {
 
-   this.socket = io("ws://foued.local.itwise.pro:3000", {
+   this.socket = io("ws://192.168.1.16:3000", {
       transports: ['websocket']
     });
   }
@@ -167,9 +168,11 @@ export default class event {
 
   onConversationStart = () => {
     return new Promise((resolve, reject) => {
-      this.socket.on("onConversationStarted", (data, newData) => {
-        console.log("onConversationStart",data,newData)
-        resolve(newData)
+      this.socket.on("onConversationStarted", (conversationId) => {
+        console.log("onConversationStart",conversationId)
+
+       
+        resolve(conversationId)
       })
     })
   }
@@ -259,6 +262,7 @@ export default class event {
   }
   onBalanceStat = () => {
     this.socket.on('updatedBalance', (data, error) => {
+      console.log("updated balance",data)
       updateUserBalance(data)
     })
   }
@@ -269,9 +273,15 @@ export default class event {
   //     this.socket.emit("onConversationMemberJoined", socket_id, info, conversationId)
   //   })
   // }
+  planBought = () => {
+    this.socket.on('planBought',(data,error)=>{
+      console.log('plan bought ',data);
+    })
+  }
+  
   joinedDone = () => {
     this.socket.on('memberJoinedDone', (data) => {
-      console.log("aa", data)
+      console.log("last station", data)
     })
   }
 
@@ -432,6 +442,7 @@ export default class event {
 
   onMessageSent = async () => {
     await this.socket.on('onMessageSent', async (data, online, error) => {
+      console.log("message sent ")
         await sentMessage(data)
       
   })
@@ -440,10 +451,9 @@ export default class event {
   receiveMessage = async () => {
     const leftConversationContainer = document.getElementById('left-conversation');
     await this.socket.on('onMessageReceived', async (data, error) => {
-      console.log("message received",data)
+      console.log("message received")
 
       const msgDiv = document.getElementById(`left-conversation-${data.messageData.conversation}`);
-      console.log(`left-conversation-${data.messageData.conversation}`)
       if (msgDiv) {
         const msgText = msgDiv.querySelector("p#last-message")
         if (data.messageData.type === "log") {
@@ -878,7 +888,7 @@ export default class event {
 
   /**
    * log out user
-   *    */
+   **/
 
   logoutUser = (data) => {
     this.socket.emit('onUserLogOut', data, error => {
@@ -895,5 +905,20 @@ export default class event {
 
     })
   }
+
+
+  createGuestAccount=(data)=>{
+this.socket.emit('createGuest',data,error=>{
+
+})
+  }
+
+onGuestCreated=(data)=>{
+  this.socket.on('guestCreated',(data)=>{
+
+    guestCreated(data)  
+
+  })
+}
 
 }
