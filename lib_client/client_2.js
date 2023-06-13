@@ -18,6 +18,7 @@ import {
   reactHide,
   updateUserBalance,
   guestCreated,
+  getTotalBalance
 
 } from "../main.js";
 
@@ -44,6 +45,7 @@ export default class event {
 
   connect = (userId,contact) => {
     this.socket.on("connect", () => {
+
       const onConnectData = {
         app_id: "638dc76312488c6bf67e8fc0",
         user: contact,
@@ -65,22 +67,12 @@ export default class event {
       this.socket.emit("user-connected", onConnectData);
     });
   }
-
   onConnected = function () {
     this.socket.on("onConnected", (...newData) => {
+        console.log("new data connection ",newData)
       if (newData) {
         console.log("newdata",newData)
-        // const concatenated = {
-        //   ...info,
-        //   ...newData,
-        //   ...data,
-        //   ...socketData
-        // };
-        // console.log("hererere",concatenated)
-
-        // // Store the newData value in localStorage
-        // localStorage.setItem('newData', JSON.stringify(concatenated));
-        // window.location.href = "./index.html";
+        getTotalBalance(newData[1])
       } else {
         alert("error");
       }
@@ -673,6 +665,7 @@ export default class event {
   }
   onUnReactMsg = () => {
     this.socket.on('onUnReactMsg', (data, error) => {
+      console.log("unreact",data)
       reactHide(data)
     })
   }

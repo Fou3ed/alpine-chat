@@ -1,5 +1,4 @@
 import Event from "./lib_client/client_2.js";
-
 const foued = new Event();
 
 const currentDate = new Date();
@@ -128,8 +127,6 @@ window.connected = async () => {
   // Receive the connect event and send connection event to save the connection data in database and update the user status (is_active_:true)
   foued.connect(newData.user,newData.contact);
 };
-
-
 
 // Receive the connection event and retrieve the user data and save it into local storage 
 foued.onConnected();
@@ -611,14 +608,13 @@ function submitForm(element) {
 function displayMessages(messages) {
   document.getElementById('big-container-message').style.display = 'block';
   if (!messages || !messages.messages) {
-    ('No messages to display');
+    console.log('No messages to display');
     return;
   }
 
   // Loop through the messages
-  const convMessages = messages.messages.slice()
+  const convMessages = messages.messages.slice();
   for (let i = 0; i < convMessages.length; i++) {
-
     let message = convMessages[i];
     const messageId = convMessages[i]._id;
     const messageContainer = document.getElementById(`message-${messageId}`);
@@ -631,46 +627,52 @@ function displayMessages(messages) {
     const hour = date.getHours();
     const minute = date.getMinutes();
     const time = `${day}:${hour}:${minute}`;
+
+    // Check if messageContainer exists
     if (!messageContainer) {
-      let tableRows = ""
-      const myContent = message.type === "plan" || message.type === "form" || message.type === "link" ? JSON.parse(message.message) : {}
-      if (myContent !== {} && message.type === "plan")
+      let tableRows = "";
+      const myContent = message.type === "plan" || message.type === "form" || message.type === "link" ? JSON.parse(message.message) : {};
+      if (myContent !== {} && message.type === "plan") {
         tableRows = myContent.plans.map(plan => {
           return `
-<div class="pricing-table" id="plan-${messageId}" data-plan-id="${plan.id}">
-<div class="ptable-item">
-<div class="ptable-single">
-<div class="ptable-header">
-<div class="ptable-title">
-<h3>${plan.title}</h3>
-</div>
-<div class="ptable-price">
-<h3><small>$</small>${plan.price.replace("$", "")}</h3>
-</div>
-</div>
-<div class="ptable-body">
-<div class="ptable-description">
-<ul>
-<li>${plan.time}</li>
-</ul>
-</div>
-</div>
-<div class="ptable-footer">
-<div class="ptable-action">
-<button >Buy Now</button>
-</div>
-</div>
-</div>
-</div>
-</div>
-
-`;
+            <div class="pricing-table" id="plan-${messageId}" data-plan-id="${plan.id}">
+              <div class="ptable-item">
+                <div class="ptable-single">
+                  <div class="ptable-header">
+                    <div class="ptable-title">
+                      <h3>${plan.name}</h3>
+                    </div>
+                    <div class="ptable-price">
+                      <h3>
+                        <small>
+                          ${plan.currency === "EUR" ? "€" : "$"}
+                        </small>
+                        ${plan.tariff}
+                      </h3>
+                    </div>
+                  </div>
+                  <div class="ptable-body">
+                    <div class="ptable-description">
+                      <ul>
+                        <li>${plan.date_start}</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="ptable-footer">
+                    <div class="ptable-action">
+                      <button>Buy Now</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
         });
-      else if (message.type === "form") {
-        let inputForms = ""
-        if(myContent.fields){
+      } else if (message.type === "form") {
+        let inputForms = "";
+        if (myContent.fields) {
           inputForms = myContent.fields.map(field => {
-            let type = ""
+            let type = "";
             switch (+field.field_type) {
               case 1:
                 type = 'text';
@@ -683,46 +685,43 @@ function displayMessages(messages) {
                 break;
               case 4:
                 type = 'datetime-local';
-                break
+                break;
               case 5:
                 type = 'number';
                 step = 'any';
                 break;
-                case 6:
-                  type='email';
-                  break;
+              case 6:
+                type = 'email';
+                break;
             }
             return `
-    <input
-    id="field-${messageId}" data-field-id="${field.id}"
-    name="${field.field_name.replace(" ", "")}"
-    placeholder="${field.field_name}"
-    type="${type}"
-    />
-    `;
+              <input
+                id="field-${messageId}"
+                data-field-id="${field.id}"
+                name="${field.field_name.replace(" ", "")}"
+                placeholder="${field.field_name}"
+                type="${type}"
+              />
+            `;
           });
         }
         tableRows = `
-<div
-class="contact-form-preview"
-style="background-color: #fff"
->
-<h3>Contact form</h3>
-<p>
-${myContent.text_capture}
-
-</p>
-<form>
-<div id="text_capture" class="hidden"><p > ${myContent.text_capture}</p></div>
-${inputForms.join('')}
-<button id="submit-form-${message._id}" data-content='${message.message} '  type="button" >Submit</button>
-</form>
-</div>
-`
+          <div class="contact-form-preview" style="background-color: #fff">
+            <h3>Contact form</h3>
+            <p>${myContent.text_capture}</p>
+            <form>
+              <div id="text_capture" class="hidden">
+                <p>${myContent.text_capture}</p>
+              </div>
+              ${inputForms.join('')}
+              <button id="submit-form-${message._id}" data-content='${message.message}' type="button">Submit</button>
+            </form>
+          </div>
+        `;
       }
       if (message.type === "log") {
-        const log = JSON.parse(message.message)
-        let userLog = ""
+        const log = JSON.parse(message.message);
+        let userLog = "";
         switch (log.action) {
           case "fill":
             userLog = `You filled on the form.`;
@@ -731,7 +730,7 @@ ${inputForms.join('')}
             userLog = `You focus on the form.`;
             break;
           case "purchase":
-            userLog = `You purchased the <b> ${log.plan_name} </b>plan.`;
+            userLog = `You purchased the <b>${log.plan_name}</b> plan.`;
             break;
           case "start form":
             userLog = `You start submit the form.`;
@@ -747,48 +746,40 @@ ${inputForms.join('')}
             break;
           default:
             userLog = `hello`;
-            console.log(log)
+            console.log(log);
             break;
         }
 
         messagesContainer.insertAdjacentHTML(
-          "afterbegin", ` <div
-          class="flex justify-center items-center w-100 m-2"
-          id="msg-${message.id}"
-          >
-          <span class="logs-notification">
-          ${userLog}
-          </span>
-          </div>`
+          "afterbegin",
+          ` <div class="flex justify-center items-center w-100 m-2" id="msg-${message.id}">
+              <span class="logs-notification">${userLog}</span>
+            </div>`
         );
       } else {
-
         let direction =
           message.user === newData.user ? "justify-end" : "justify-start";
         const msgStyle =
-          direction === "justify-start" ?
-            `rounded-2xl rounded-tl-none break-words  p-3 text-slate-700 shadow-sm  dark:text-navy-100 relative ${message.status === 0 ? "bg-transparent border-2 border-info/10 dark:border-navy-700" : message.status === 2 ? "bg-navy-100 dark:bg-navy-500 " : "bg-white dark:bg-navy-700 "} ` :
-            `rounded-2xl rounded-tr-none break-words p-3 shadow-sm dark:text-white relative  ${message.status === 0 ? "bg-transparent border-2 border-info/10 dark:border-navy-700" : message.status === 2 ? "bg-info text-white dark:bg-accent-focus" : "bg-info/10 dark:bg-accent text-slate-700 "}  `;
+          direction === "justify-start"
+            ? `rounded-2xl rounded-tl-none break-words p-3 text-slate-700 shadow-sm dark:text-navy-100 relative ${message.status === 0 ? "bg-transparent border-2 border-info/10 dark:border-navy-700" : message.status === 2 ? "bg-navy-100 dark:bg-navy-500" : "bg-white dark:bg-navy-700"}`
+            : `rounded-2xl rounded-tr-none break-words p-3 shadow-sm dark:text-white relative ${message.status === 0 ? "bg-transparent border-2 border-info/10 dark:border-navy-700" : message.status === 2 ? "bg-info text-white dark:bg-accent-focus" : "bg-info/10 dark:bg-accent text-slate-700"}`;
         messagesContainer.insertAdjacentHTML(
           "afterbegin",
           `
             <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
               <div class="flex flex-col items-end space-y-3.5">
                 <div class="flex flex-row">
-                  ${direction == "justify-end" ? msgButt(messageId, direction, message.pinned === 1) : ""}
+                  ${message.type === "MSG" && direction === "justify-end" ? msgButt(messageId, direction, message.pinned === 1) : ""}
                   <div class="ml-2 max-w-lg sm:ml-5">
                     <div class="${msgStyle}" id="message-content-${messageId}">
-  
-                   ${message.status === 0 ? `${direction === "justify-start" ? message.user_data.full_name : "You"} unsent a message ` : message.type == "link" ? `<a class="link-msg"  id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}" href=" ${myContent.userLink?.url}">${myContent.userLink?.url}</a>` : message.type === "plan"
-            ? tableRows.join('') : message.type === "form" ? tableRows : message.message}
-                  <div id="pin-div" class=" ${message.pinned === 0 || message.status === 0 ? "hidden" : "flex"} ${direction == "justify-start" ? "pin-div-sender" : "pin-div"} justify-center  items-center me-2 "><i class="fas fa-thumbtack"></i></div>
+                      ${message.status === 0 ? `${direction === "justify-start" ? message.user_data.full_name : "You"} unsent a message` : message.type == "link" ? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}" href="${myContent.userLink?.url}">${myContent.userLink?.url}</a>` : message.type === "plan" ? tableRows.join('') : message.type === "form" ? tableRows : message.message}
+                      <div id="pin-div" class="${message.pinned === 0 || message.status === 0 ? "hidden" : "flex"} ${direction == "justify-start" ? "pin-div-sender" : "pin-div"} justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
                     </div>
-                    <p id="date_msg" data-direction="${direction}" class="mt-1 ml-auto text-left  text-xs text-slate-400 dark:text-navy-300">
-                    ${message.status === 2 ? "(updated) " + time : direction == "justify-start" ? time : message.read ? time + `<i class="fas fa-check ps-2" style="font-size:10px;"></i>` : time}
+                    <p id="date_msg" data-direction="${direction}" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
+                      ${message.status === 2 ? "(updated) " + time : direction == "justify-start" ? time : message.read ? time + `<i class="fas fa-check ps-2" style="font-size:10px;"></i>` : time}
                     </p>
                   </div>
-                  ${direction == "justify-start" ? msgButt(messageId, direction, message.pinned === 1) : ""}
-  
+                  ${message.type === "MSG" && direction === "justify-start" ? msgButt(messageId, direction, message.pinned === 1) : ""}
                 </div>
                 <div class="flex flex-row"></div>
               </div>
@@ -801,10 +792,11 @@ ${inputForms.join('')}
     if (message.reacts.length > 0) {
       let messageReactions = message.reacts.map(react => {
         return `
-      <a id="react-${react._id}" disabled="${newData.user !== react.user_id}"> ${react.path}</a>
-        `})
-      const msgReacted = messagesContainer.querySelector(`#message-content-${messageId}`)
-      msgReacted.innerHTML += `<div class="react-container bg-white  dark:bg-navy-700" id="react-content-${messageId}" >${messageReactions.join("")} </div>`
+          <a id="react-${react._id}" disabled="${newData.user !== react.user_id}">${react.path}</a>
+        `;
+      });
+      const msgReacted = messagesContainer.querySelector(`#message-content-${messageId}`);
+      msgReacted.innerHTML += `<div class="react-container bg-white dark:bg-navy-700" id="react-content-${messageId}">${messageReactions.join("")}</div>`;
     }
     const submitButton = document.querySelector(`#submit-form-${messageId}`);
     if (submitButton) {
@@ -1213,176 +1205,196 @@ export async function sentMessage(data) {
     getDeleteButtons()
     getEditButtons()
     getPinButtons()
+    reactions()
   }
 
 }
 
 export async function receiveMessage(data) {
-  console.log("message received ",data)
-  let tableRows = ""
+  let tableRows = "";
   const messageId = data.messageData.id;
 
   const myContent =
-  data.messageData.type === "plan" ||
-  data.messageData.type === "form" ||
-  data.messageData.type === "link" ? JSON.parse(data.messageData.content)
-    : {};  let conv = document.querySelector('#conversation-container').dataset['conversationId']
+    data.messageData.type === "plan" ||
+    data.messageData.type === "form" ||
+    data.messageData.type === "link"
+      ? JSON.parse(data.messageData.content)
+      : {};
+  let conv = document.querySelector("#conversation-container").dataset[
+    "conversationId"
+  ];
   if (data.messageData.conversation === conv) {
     if (myContent !== {} && data.messageData.type === "plan")
-      tableRows = myContent.plans.map(plan => {
+      tableRows = myContent.plans.map((plan) => {
         return `
-<div class="pricing-table" id="plan-${messageId}" data-plan-id="${plan.id}">
-<div class="ptable-item">
-<div class="ptable-single">
-<div class="ptable-header">
-<div class="ptable-title">
-<h3>${plan.title}</h3>
-</div>
-<div class="ptable-price">
-<h3><small>$</small>${plan.price.replace("$", "")}</h3>
-</div>
-</div>
-<div class="ptable-body">
-<div class="ptable-description">
-<ul>
-<li>${plan.time}</li>
-</ul>
-</div>
-</div>
-<div class="ptable-footer">
-<div class="ptable-action">
-<button>Buy Now</button>
-</div>
-</div>
-</div>
-</div>
-</div>
-`;
-
+          <div class="pricing-table" id="plan-${messageId}" data-plan-id="${plan.id}">
+            <div class="ptable-item">
+              <div class="ptable-single">
+                <div class="ptable-header">
+                  <div class="ptable-title">
+                    <h3>${plan.name}</h3>
+                  </div>
+                  <div class="ptable-price">
+                    <h3><small>${plan.currency === "EUR" ? "€" : "$"}</small>  ${plan.tariff}</h3>
+                  </div>
+                </div>
+                <div class="ptable-body">
+                  <div class="ptable-description">
+                    <ul>
+                      <li>${plan.date_start}</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="ptable-footer">
+                  <div class="ptable-action">
+                    <button>Buy Now</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
       });
-    
     else if (myContent !== {} && data.messageData.type === "form") {
-      let inputForms = ""
-      if(myContent.fields){
-        inputForms = myContent.fields.map(field => {
-          let type = ""
+      let inputForms = "";
+      if (myContent.fields) {
+        inputForms = myContent.fields.map((field) => {
+          let type = "";
           switch (+field.field_type) {
             case 1:
-              type = 'text';
+              type = "text";
               break;
             case 2:
-              type = 'number';
+              type = "number";
               break;
             case 3:
-              type = 'date';
+              type = "date";
               break;
             case 4:
-              type = 'datetime-local';
-              break
-            case 5:
-              type = 'number';
-              step = 'any';
+              type = "datetime-local";
               break;
-              case 6:
-                type='email';
-                break;
+            case 5:
+              type = "number";
+              step = "any";
+              break;
+            case 6:
+              type = "email";
+              break;
           }
           return `
-  <input
-  id="field-${messageId}" data-field-id="${field.id}"
-  name="${field.field_name.replace(" ", "")}"
-  placeholder="${field.field_name}"
-  type="${type}"
-  />
-  `;
+            <input
+              id="field-${messageId}"
+              data-field-id="${field.id}"
+              name="${field.field_name.replace(" ", "")}"
+              placeholder="${field.field_name}"
+              type="${type}"
+            />
+          `;
         });
       }
 
       tableRows = `
-<div
-class="contact-form-preview"
-style="background-color: #fff"
->
-<h3>Contact form</h3>
-<p>
-Welcome  
-</p>
-<form >
-<div id="text_capture" class="hidden"><p > ${myContent.text_capture}</p></div>
-${inputForms.join('')}
-<button id="submit-form-${data.messageData.id}" data-content='${data.messageData.content}' type="button" >Submit</button>
-</form>
-</div>
-`
+        <div class="contact-form-preview" style="background-color: #fff">
+          <h3>Contact form</h3>
+          <p>Welcome</p>
+          <form>
+            <div id="text_capture" class="hidden">
+              <p>${myContent.text_capture}</p>
+            </div>
+            ${inputForms.join("")}
+            <button id="submit-form-${data.messageData.id}" data-content='${data.messageData.content}' type="button">Submit</button>
+          </form>
+        </div>
+      `;
     }
 
     const messageContainer = document.getElementById(`message-${messageId}`);
     if (!messageContainer) {
-      let direction = data.direction == "in" ? 'justify-end' : 'justify-start';
-      const msgStyle = data.direction == "out" ? `rounded-2xl break-words rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 relative ` : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 relative shadow-sm break-words dark:bg-accent dark:text-white'
+      let direction = data.direction == "in" ? "justify-end" : "justify-start";
+      const msgStyle =
+        data.direction == "out"
+          ? `rounded-2xl break-words rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 relative `
+          : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 relative shadow-sm break-words dark:bg-accent dark:text-white';
       const messageContent = `
-     <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
-     <div class="flex flex-col items-end space-y-3.5">
-     <div class="flex flex-row">
-     ${data.direction == "in" ? msgButt(messageId, direction, data.messageData.pinned === 1) : ''}
-       <div class="ml-2 max-w-lg sm:ml-5">
-         <div class="${msgStyle}"  id="message-content-${messageId}">
-         
-           ${data.messageData.type == "link" ? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}"  href=" ${myContent.userLink?.url}">${myContent.userLink?.url}</a>` : data.messageData.type === "plan"
-          ? tableRows.join('') : data.messageData.type === "form" ? tableRows : data.messageData.content }
-           <div id="pin-div" class="  hidden ${direction == "justify-start" ? "pin-div-sender" : "pin-div"} justify-center  items-center me-2 "><i class="fas fa-thumbtack"></i></div>
-         </div>
-         <p  id="date_msg" data-direction="${direction}" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
-               ${timeString}      
-         </p>
-       </div>
-     ${data.direction == "out" ? msgButt(messageId, direction, data.messageData.pinned === 1) : ''}
-     </div>
-     <div class="flex flex-row">
-         </div>
-       </div>
-     </div>
-   </div>
-     </div>
-   `
+        <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
+          <div class="flex flex-col items-end space-y-3.5">
+            <div class="flex flex-row">
+              ${
+                data.direction == "in" && data.messageData.type === "MSG"
+                  ? msgButt(messageId, direction, data.messageData.pinned === 1)
+                  : ""
+              }
+              <div class="ml-2 max-w-lg sm:ml-5">
+                <div class="${msgStyle}" id="message-content-${messageId}">
+                  ${
+                    data.messageData.type == "link"
+                      ? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}" href="${myContent.userLink?.url}">${myContent.userLink?.url}</a>`
+                      : data.messageData.type === "plan"
+                      ? tableRows.join("")
+                      : data.messageData.type === "form"
+                      ? tableRows
+                      : data.messageData.content
+                  }
+                  <div id="pin-div" class="hidden ${
+                    direction == "justify-start" ? "pin-div-sender" : "pin-div"
+                  } justify-center items-center me-2">
+                    <i class="fas fa-thumbtack"></i>
+                  </div>
+                </div>
+                <p id="date_msg" data-direction="${direction}" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
+                  ${timeString}
+                </p>
+              </div>
+              ${
+                data.direction == "out" && data.messageData.type === "MSG"
+                  ? msgButt(messageId, direction, data.messageData.pinned === 1)
+                  : ""
+              }
+            </div>
+            <div class="flex flex-row"></div>
+          </div>
+        </div>
+      `;
+
       let typingBlock = document.getElementById("typing-block-message");
 
       if (typingBlock) {
         const msgDiv = document.createElement("div");
-        msgDiv.innerHTML = messageContent
+        msgDiv.innerHTML = messageContent;
 
-        typingBlock.replaceWith(msgDiv)
+        typingBlock.replaceWith(msgDiv);
+      } else messagesContainer.insertAdjacentHTML("beforeend", messageContent);
 
-      } else
-        messagesContainer.insertAdjacentHTML("beforeend", messageContent)
       if (conversationId === data.messageData.conversation) {
-        markMessageAsSeen(conversationId)
+        markMessageAsSeen(conversationId);
       }
-      const conversationContainer = document.getElementById('conversation-container');
+
+      const conversationContainer = document.getElementById(
+        "conversation-container"
+      );
       conversationContainer.scrollTop = conversationContainer.scrollHeight;
     }
 
-    reactions()
-    getReactButton()
-    getDeleteButtons()
-    getEditButtons()
-    getPinButtons()
-    playNotificationSound()
+    reactions();
+    getReactButton();
+    getDeleteButtons();
+    getEditButtons();
+    getPinButtons();
+    playNotificationSound();
 
-    notifyNumber += 1
-    changeTitle(notifyNumber)
-
-
-  }
-  else {
-    const unreadCount = document.getElementById(`unread-count-${data.messageData.conversation}`)
+    notifyNumber += 1;
+    changeTitle(notifyNumber);
+  } else {
+    const unreadCount = document.getElementById(
+      `unread-count-${data.messageData.conversation}`
+    );
     if (unreadCount.classList.contains("hidden")) {
-      unreadCount.classList.remove("hidden")
-      unreadCount.classList.add("flex")
-      unreadCount.textContent = 1
+      unreadCount.classList.remove("hidden");
+      unreadCount.classList.add("flex");
+      unreadCount.textContent = 1;
     } else {
-      const count = unreadCount.textContent
-      unreadCount.textContent = +count + 1
+      const count = unreadCount.textContent;
+      unreadCount.textContent = +count + 1;
     }
   }
 
@@ -1396,9 +1408,8 @@ ${inputForms.join('')}
   const allFormInput = document.querySelectorAll(`#field-${messageId}`);
 
   if (allFormInput.length > 0) {
-    allFormInput.forEach(input => {
+    allFormInput.forEach((input) => {
       input.oninput = () => sendTypingNotification(input);
-
     });
   }
 
@@ -1409,14 +1420,11 @@ ${inputForms.join('')}
       addLogs({
         action: "fill",
         element: "22",
-        element_id: +input.dataset.fieldId
+        element_id: +input.dataset.fieldId,
       });
       userHasTyped = input.dataset.fieldId;
     }
-
-
   }
-
 
   let isFirstInputFocused = true;
 
@@ -1424,7 +1432,7 @@ ${inputForms.join('')}
     addLogs({
       action: "focus",
       element: "22",
-      element_id: +input.dataset.fieldId
+      element_id: +input.dataset.fieldId,
     });
     isFirstInputFocused = false;
   }
@@ -1433,7 +1441,7 @@ ${inputForms.join('')}
     addLogs({
       action: "link click",
       element: "7",
-      element_id: +data.dataset.linkId
+      element_id: +data.dataset.linkId,
     });
   }
 
@@ -1441,37 +1449,39 @@ ${inputForms.join('')}
     addLogs({
       action: "start purchase",
       element: "3",
-      element_id: +data.dataset.planId
+      element_id: +data.dataset.planId,
     });
   }
 
-
-  document.querySelectorAll(`#field-${messageId}`).forEach(input => {
-    input.addEventListener('focus', () => {
+  document.querySelectorAll(`#field-${messageId}`).forEach((input) => {
+    input.addEventListener("focus", () => {
       if (isFirstInputFocused) {
         sendFocusNotification(input);
       }
     });
   });
 
-
-
-
-  const linkedMessage = document.querySelector(`#linked-msg-${messageId}`)
+  const linkedMessage = document.querySelector(`#linked-msg-${messageId}`);
   if (linkedMessage) {
     linkedMessage.addEventListener("click", function () {
-      sendClickingNotification(this)
-    })
+      sendClickingNotification(this);
+    });
   }
 
-
-  const planMessage = document.querySelectorAll(`#plan-${messageId}`)
+  const planMessage = document.querySelectorAll(`#plan-${messageId}`);
   if (planMessage.length > 0) {
-    planMessage.forEach(plan => {
-      plan.querySelector("button").onclick = () => sendPlanClickNotification(plan)
-    })
+    planMessage.forEach((plan) => {
+      plan.querySelector("button").onclick = () =>
+        sendPlanClickNotification(plan);
+    });
   }
 }
+
+
+
+
+
+
 
 
 
@@ -1607,15 +1617,19 @@ async function onUnReactToMessage(button) {
 }
 
 export async function reactHide(data) {
+  console.log("hide react")
   const reactElement = document.getElementById(`react-${data._id}`);
   if (reactElement)
     reactElement.remove()
 }
+
+
 export async function reactDisplay(data) {
   const reactData = data.metaData ? data.metaData : data
   const msgReacted = messagesContainer.querySelector(`#message-content-${reactData.message_id}`)
   let react = document.getElementById(`react-${reactData._id}`)
   let reactContent = document.getElementById(`react-content-${reactData.message_id}`)
+
   if (reactContent) {
     if (react) {
       react.innerHTML = reactData.path
@@ -1846,6 +1860,8 @@ function onStopTyping() {
 //start typing function 
 let typingBlock = document.getElementById("typing-block-message");
 export function startTyping(data) {
+  conversationContainer.scrollTop = conversationContainer.scrollHeight;
+
   typingBlock = document.getElementById("typing-block-message");
   if (data.metaData.conversation === conversationId) {
     // set the scroll position to the bottom of the conversation container
@@ -2127,6 +2143,7 @@ async function getAllAgents() {
 }
 //when an agent connect create an agent card and display it in the online agents block
 export function userConnection(data) {
+
 if (data.role==="AGENT"){
   allConversation.map(conv => {
     const conversationCard = document.getElementById(`left-conversation-${conv._id}`)
@@ -2180,19 +2197,12 @@ export function userDisconnection(data) {
 
 
 
+let totalBalance;
 
 
-function getBalanceById(contactId) {
-  $.ajax({
-    url:
-      `https://iheb.local.itwise.pro/private-chat-app/public/api/getTotalBalance/${contactId}`,
-    dataType: "json",
-    headers: {
-      "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Nzg5NzE2OTUsImV4cCI6MTYyMDA1NzIzMzMzLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcm5hbWUiOiJ0ZXN0QGdtYWlsLmNvbSJ9.Yy_dUAEfszEpE-aQkBcUBq6rV9OPaUCNaoLxIfJnoNyCqsVWUfbilWNz2sXXImyDBmsNg1n9YIERHUE2iziJpOdhJdbiT6byWmT7MhuyC_QUxbPCko5NQPfP-KB85BjKVSxpr-CNq-Su8LxZ6fysLc7Qe71A86O0TangvsH4UgUb99WE3fMC_EF0PnvXVVxfzdZkV9p1EUTJa989ENP-ytXwdonUXcFUBznlW5PVEWgw-5dyWcND3LXCGaweAO-gMSU2K1Wp2T_rtqTRsXkAhcwF5T_IODee87w4FVARMfbXHvvIizclqyH0TITU8G_MgcoteObO24bECJCV-KpFWg"
-    },
-    success: function (data) {
-      if (data.data.length === 0) {
-
+export function getTotalBalance(data) {
+  totalBalance=data
+      if (totalBalance.balance === 0) {
         const balanceDiv = document.querySelector(".ballance-card")
         const balanceNumber = balanceDiv.querySelector("span")
         const balanceType = balanceDiv.querySelector("sup")
@@ -2205,21 +2215,13 @@ function getBalanceById(contactId) {
         const balanceNumber = balanceDiv.querySelector("span");
         const balanceType = balanceDiv.querySelector("sup");
         
-        balanceNumber.textContent = data.data[0].balance
-        balanceType.textContent = data.data[0].balance_type === "1" ? "Messages" : "Minutes";
-        userBalance=data.data[0]
-        if (userBalance.balance==0){
+        balanceNumber.textContent = totalBalance.balance
+        balanceType.textContent = totalBalance.balance_type === "1" ? "Messages" : "Minutes";
+        if (totalBalance.balance==0){
           messageInput.disabled=true;
           sendButton.disabled=true;
         }
       }
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      console.log("Error:", textStatus, errorThrown);
-      return;
-    }
-  
-  });
 }
 
 
@@ -2245,55 +2247,8 @@ async function redirectToAgent(agentId,conversationId) {
       // Trigger a click event on the agent slide
       $agentSlide.trigger("click");
                
-    } 
-  }else {
-    console.log("redirected to an offline agent ")
-  // const messageContainer = document.getElementById(`message-${messageId}`);
-  //   if (!messageContainer) {
-  //     let direction = data.direction == "in" ? 'justify-end' : 'justify-start';
-  //     const msgStyle = data.direction == "out" ? `rounded-2xl break-words rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 relative ` : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 relative shadow-sm break-words dark:bg-accent dark:text-white'
-  //     const messageContent = `
-  //    <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
-  //    <div class="flex flex-col items-end space-y-3.5">
-  //    <div class="flex flex-row">
-  //    ${data.direction == "in" ? msgButt(messageId, direction, data.messageData.pinned === 1) : ''}
-  //      <div class="ml-2 max-w-lg sm:ml-5">
-  //        <div class="${msgStyle}"  id="message-content-${messageId}">
-         
-  //          ${data.messageData.type == "link" ? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}"  href=" ${myContent.userLink?.url}">${myContent.userLink?.url}</a>` : data.messageData.type === "plan"
-  //         ? tableRows.join('') : data.messageData.type === "form" ? tableRows : data.messageData.content }
-  //          <div id="pin-div" class="  hidden ${direction == "justify-start" ? "pin-div-sender" : "pin-div"} justify-center  items-center me-2 "><i class="fas fa-thumbtack"></i></div>
-  //        </div>
-  //        <p  id="date_msg" data-direction="${direction}" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
-  //              ${timeString}      
-  //        </p>
-  //      </div>
-  //    ${data.direction == "out" ? msgButt(messageId, direction, data.messageData.pinned === 1) : ''}
-  //    </div>
-  //    <div class="flex flex-row">
-  //        </div>
-  //      </div>
-  //    </div>
-  //  </div>
-  //    </div>
-  //  `
-  //     let typingBlock = document.getElementById("typing-block-message");
-
-  //     if (typingBlock) {
-  //       const msgDiv = document.createElement("div");
-  //       msgDiv.innerHTML = messageContent
-
-  //       typingBlock.replaceWith(msgDiv)
-
-  //     } else
-  //       messagesContainer.insertAdjacentHTML("beforeend", messageContent)
-  //     if (conversationId === data.messageData.conversation) {
-  //       markMessageAsSeen(conversationId)
-  //     }
-  //     const conversationContainer = document.getElementById('conversation-container');
-  //     conversationContainer.scrollTop = conversationContainer.scrollHeight;
-  //   }
-   }
+    }
+  }
 
   } catch (error) {
     console.error('Error:', error);
@@ -2412,7 +2367,9 @@ const modal = document.getElementById('ModalPlan');
     };
 
       foued.buyPlan(addSalesData);
-      getBalanceById(newData.contact)
+      console.log("add sales",addSalesData)
+      //TODO:change it Iheb's new data
+      // getTotalBalance(newData.contact)
   
     // Do any additional actions here after the successful sale addition
   } catch (error) {
@@ -2440,10 +2397,10 @@ $(document).ready(function () {
     foued.connect(newData?.user,newData.contact)
     foued.onDisconnected(newData?.user)
     getAllConversations()
-    getBalanceById(newData.contact)
+    getTotalBalance(newData.contact)
     } else {
       console.log("newData is empty !",newData)
-    //  getBalanceById(newData.contact)
+    //  getTotalBalance(newData.contact)
     }
   //get all the connected user (the agents)
   getExperts();
