@@ -114,8 +114,6 @@ const msgButt = (messageId, direction, isPinned) => {
               </div>
             </div>
 
-     
-
           </div>
                           
           `;
@@ -152,11 +150,11 @@ if (messageInput)
 //if the connection user is a guest create a guest account : 
   function guestConnection() {
     if(!newData){
-      const payLoad={  
+      foued.createGuestAccount({  
         browser:navigator.userAgent,
-        platform:navigator.platform
-      }
-      foued.createGuestAccount(payLoad)
+        platform:navigator.platform,
+        accountId:"1"
+      })
     }
         }  
     
@@ -174,14 +172,13 @@ if (messageInput)
     getExperts();
     userId = data.user
     redirectToAgent(expert)
-    console.log("here data",data)
     const html = `
-  <div class="conversation bg-slate-150" data-conversation-id="${data.conversationId}" data-name="New Conversation" data-timestamp="now" id="left-conversation-${data.conversationId}" data-user-id="${expert}">
+  <div class="conversation bg-slate-150" data-conversation-id="${data.conversationId}" data-name=${agentName} data-timestamp="now" id="left-conversation-${data.conversationId}" data-user-id="${expert}">
     <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
       <div
         class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
         data-conversation-id="${data.conversationId}"
-        data-name="New Conversation">
+        data-name=${agentName}>
         <div class="avatar h-10 w-10">
           <img class="rounded-full" src="images/avatar/avatar-5.jpg" alt="avatar" />
           <div
@@ -192,7 +189,7 @@ if (messageInput)
         <div class="flex flex-1 flex-col">
           <div class="flex items-baseline justify-between space-x-1.5">
             <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
-              New Conversation
+              ${agentName}
             </p>
             <span class="text-tiny+ text-slate-400 dark:text-navy-300">"now"</span>
           </div>
@@ -278,7 +275,6 @@ async function selectExpert() {
       console.log(" 'there is no conversation between the both of them yet',start a conversation by sending a message")
     } else {
       conversationId = !response.data.data.conversation ? response.data.data[0]._id : response.data.data.conversation[0]._id
-
       // Update the active chat with the conversation data
       const activeChat = {
         chatId: conversationId,
@@ -302,10 +298,12 @@ export async function getAllConversations() {
   leftConversationContainer.innerHTML = '';
   let latestConversationId = null;
   let userConversation = ""
-  const conversationsResponse = await axios.get(`http://192.168.1.16:3000/conversation/1/?user_id=${newData.user}`);
+  const conversationsResponse = await axios.get(`http://192.168.1.16:3000/conversation/1/?user_id=${newData.contact}`);
+  
   if(conversationsResponse.data.data.length>0){
     const conversations = conversationsResponse.data.data;
     allConversation = conversations
+    console.log("all conversation",allConversation)
     conversationId = conversations[0]?._id
     const conversationPromises = conversations.map(async (conversation, index) => {
       conversation.members.forEach(user => {
@@ -468,9 +466,11 @@ expert=agentClicked
 async function getTheLastMsg(conversationId) {
   return axios.get(`http://192.168.1.16:3000/messages/lastMsg/${conversationId}`)
     .then(function (response) {
-
-      const lastMessage = response.data.data;
-      return lastMessage;
+      if(response){
+        const lastMessage = response.data.data;
+        return lastMessage;
+      }
+    
     });
 }
 
@@ -516,7 +516,7 @@ async function loadMessages(page, conversationId) {
   if (isLoading) {
     return;
   }
-
+if(conversationId){
   try {
     isLoading = true;
     // Show the spinner
@@ -542,6 +542,7 @@ async function loadMessages(page, conversationId) {
     spinner.classList.add("hidden");
     isLoading = false;
   }
+}
 }
 // Listen for the scroll event on the container element
 const container = document.getElementById('conversation-container');
@@ -877,6 +878,7 @@ function displayMessages(messages) {
   }
 
   reactions()
+  
   getReactButton()
   getDeleteButtons()
   getEditButtons()
@@ -919,13 +921,7 @@ async function addLogs(log) {
  */
 
 async function firstMessage(user_id, agent) {
-  // createConversation(user_id, agent)
-  await foued.onConversationStart()
-}
-
-// create conversation function 
-function createConversation(user_id, agent) {
-  const conversationInfo = {
+  foued.createConversation({
     app: "638dc76312488c6bf67e8fc0",
     user: user_id,
     action: "conversation.create",
@@ -938,16 +934,33 @@ function createConversation(user_id, agent) {
       owner_id: newData.accountId,
       members: [user_id, agent],
       permissions: {
-        "key": "value"
       },
       members_count: 2,
       max_length_message: "256",
     },
-  }
-  foued.createConversation(conversationInfo);
+  });
 }
 
-
+export async function sendFirstMessage(conversation){
+  conversationContainer.dataset.conversationId = conversation._id;
+ foued.onCreateMessage( {
+  app: "638dc76312488c6bf67e8fc0",
+  user: newData.user,
+  action: "message.create",
+  from: newData.socket_id,
+  metaData: {
+    type: "MSG",
+    conversation_id: conversation._id, // Include the conversation ID
+    user: newData.user,
+    message: messageInput.value,
+    data: "non other data",
+    origin: "web",
+  },
+  to: agentName,
+});
+  messageInput.value = "";
+  isSendingMessage = false; // Set the sending state to false
+}
 
 if (sendButton)
   sendButton.addEventListener("click", async () => {
@@ -957,42 +970,25 @@ if (sendButton)
 let isSendingMessage = false;
 
 async function sendMessage() {
+
   if (isSendingMessage) return; // If a message is already being sent, ignore the function call
 
   if (messageInput.value.trim() !== "") {
     isSendingMessage = true; // Set the sending state to true
-
   
     if (!emoji.classList.contains('hidden'))
       emoji.classList.add('hidden');
     if (conversationId == '') {
       try {
         await firstMessage(newData.user, expert);
-        conversationContainer.dataset.conversationId = conversationId;
-        const info = {
-          app: "638dc76312488c6bf67e8fc0",
-          user: newData.user,
-          action: "message.create",
-          from: newData.socket_id,
-          metaData: {
-            type: "MSG",
-            conversation_id: conversationId, // Include the conversation ID
-            user: newData.user,
-            message: messageInput.value,
-            data: "non other data",
-            origin: "web",
-          },
-          to: agentName,
-        };
-        await foued.onCreateMessage(info);
-        messageInput.value = "";
-        isSendingMessage = false; // Set the sending state to false
+       
       } catch (error) {
         console.log(error);
         isSendingMessage = false;
       }
     } else {
-      const info = {
+      try {
+       foued.onCreateMessage({
         app: "638dc76312488c6bf67e8fc0",
         user: newData.user,
         action: "message.create",
@@ -1005,9 +1001,7 @@ async function sendMessage() {
           origin: "web",
         },
         to: expert,
-      };
-      try {
-        await foued.onCreateMessage(info);
+      });
         messageInput.value = "";
         isSendingMessage = false; // Set the sending state to false
       } catch (error) {
@@ -1017,6 +1011,14 @@ async function sendMessage() {
     }
   }
 }
+
+
+
+
+
+
+
+
 
 
 
@@ -1039,12 +1041,12 @@ export async function sentMessage(data) {
         element.classList.remove("bg-slate-150")
     });
     const html = `
-      <div class="conversation bg-slate-150" data-conversation-id="${data.conversation}" data-name="New Conversation" data-timestamp="${timestamp}" id="left-conversation-${data.conversation}" data-user-id="${agentClicked}">
+      <div class="conversation bg-slate-150" data-conversation-id="${data.conversation}" data-name=${agentName} data-timestamp="${timestamp}" id="left-conversation-${data.conversation}" data-user-id="${agentClicked}">
         <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
           <div
             class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
             data-conversation-id="${data.conversation}"
-            data-name="New Conversation">
+            data-name=${agentName}>
             <div class="avatar h-10 w-10">
               <img class="rounded-full" src="images/avatar/avatar-5.jpg" alt="avatar" />
               <div
@@ -1055,7 +1057,7 @@ export async function sentMessage(data) {
             <div class="flex flex-1 flex-col">
               <div class="flex items-baseline justify-between space-x-1.5">
                 <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
-                  New Conversation
+                  ${agentName}
                 </p>
                 <span class="text-tiny+ text-slate-400 dark:text-navy-300">${time}</span>
               </div>
@@ -1106,7 +1108,6 @@ export async function sentMessage(data) {
           break;
         default:
           userLog = `hello`;
-          console.log(log)
           break;
       }
       convMessage.textContent = userLog
@@ -1145,7 +1146,6 @@ export async function sentMessage(data) {
             break;
           default:
             userLog = `hello`;
-            console.log(log)
             break;
         }
         const newDivMsg = document.createElement("div");
@@ -1211,6 +1211,7 @@ export async function sentMessage(data) {
 }
 
 export async function receiveMessage(data) {
+  console.log(data)
   let tableRows = "";
   const messageId = data.messageData.id;
 
@@ -1224,6 +1225,8 @@ export async function receiveMessage(data) {
     "conversationId"
   ];
   if (data.messageData.conversation === conv) {
+    console.log("my contents 2",myContent.fields)
+
     if (myContent !== {} && data.messageData.type === "plan")
       tableRows = myContent.plans.map((plan) => {
         return `
@@ -1255,7 +1258,9 @@ export async function receiveMessage(data) {
           </div>
         `;
       });
+
     else if (myContent !== {} && data.messageData.type === "form") {
+      console.log("my contents",myContent.fields)
       let inputForms = "";
       if (myContent.fields) {
         inputForms = myContent.fields.map((field) => {
@@ -1479,17 +1484,12 @@ export async function receiveMessage(data) {
 
 
 
-
-
-
-
-
-
 function playNotificationSound() {
   var sendSound = document.getElementById("send-sound");
   sendSound.play();
 
 }
+
 const notifyMe = () => {
   if (!window.Notification) {
     console.log('Browser does not support notifications.')
@@ -1714,7 +1714,7 @@ async function getEditButtons() {
   });
 
 }
-
+// click to update message 
 async function editMessage(button) {
   let messageId = button.dataset.messageId
   const messageEdited = document.getElementById(`message-content-${messageId}`)
@@ -1750,7 +1750,7 @@ async function editMessage(button) {
   // messageEdited.innerHTML=`<input class="bg-transparent border-none "  value="${messageEdited.textContent.trim()} "    >`
 
 }
-
+//updated message
 export async function updateMessage(data) {
   const date = new Date(data.updated_at);
   const today = new Date();
@@ -2050,6 +2050,7 @@ if (messageInput) {
     this.style.maxHeight = "250px";
     this.style.height = this.scrollHeight + "px";
   });
+
   messageInput.addEventListener("keydown", function (event) {
     if (event.keyCode === 13) {
       event.preventDefault();
@@ -2059,6 +2060,9 @@ if (messageInput) {
     }
   });
 }
+
+
+
 //get All agents in the platform
 async function getAllAgents() {
   const response = await axios.get("http://192.168.1.16:3000/users");
@@ -2143,7 +2147,6 @@ async function getAllAgents() {
 }
 //when an agent connect create an agent card and display it in the online agents block
 export function userConnection(data) {
-
 if (data.role==="AGENT"){
   allConversation.map(conv => {
     const conversationCard = document.getElementById(`left-conversation-${conv._id}`)
@@ -2171,6 +2174,7 @@ if (data.role==="AGENT"){
   }
 }
 }
+
 //when an agent disconnect remove the card in the online agents block
 export function userDisconnection(data) {
   allConversation.map(conv => {
@@ -2199,10 +2203,9 @@ export function userDisconnection(data) {
 
 let totalBalance;
 
-
 export function getTotalBalance(data) {
   totalBalance=data
-      if (totalBalance.balance === 0) {
+      if (!totalBalance.balance) {
         const balanceDiv = document.querySelector(".ballance-card")
         const balanceNumber = balanceDiv.querySelector("span")
         const balanceType = balanceDiv.querySelector("sup")
@@ -2210,11 +2213,9 @@ export function getTotalBalance(data) {
         balanceType.textContent = ""
         return; // Stop further execution
       }else {
- 
         const balanceDiv = document.querySelector(".ballance-card");
         const balanceNumber = balanceDiv.querySelector("span");
-        const balanceType = balanceDiv.querySelector("sup");
-        
+        const balanceType = balanceDiv.querySelector("sup");  
         balanceNumber.textContent = totalBalance.balance
         balanceType.textContent = totalBalance.balance_type === "1" ? "Messages" : "Minutes";
         if (totalBalance.balance==0){
@@ -2224,18 +2225,25 @@ export function getTotalBalance(data) {
       }
 }
 
-
-export function updateUserBalance(data) {
-  userBalance=data.balance
-  const balanceDiv = document.querySelector(".ballance-card")
-  const balanceNumber = balanceDiv.querySelector("span")
-  balanceNumber.textContent = data.balance
-  if (userBalance.balance==0){
-          messageInput.disabled=true;
-          sendButton.disabled=true;
-        }
+export function updateUserBalance() {
+  if(totalBalance.balance){
+    totalBalance.balance = Number(totalBalance.balance) - 1; 
+    const balanceDiv = document.querySelector(".ballance-card");
+    const balanceNumber = balanceDiv.querySelector("span");
+    
+    balanceNumber.textContent = totalBalance.balance;
+    if (totalBalance.balance === 0) {
+      messageInput.disabled = true;
+      sendButton.disabled = true;
+    } 
+  }
+ 
 }
 
+export function ableInputArea(){
+  messageInput.disabled = false;
+    sendButton.disabled = false;
+}
 
 async function redirectToAgent(agentId,conversationId) {
   try {
@@ -2262,37 +2270,17 @@ function showEmoji() {
     emoji.classList.add('hidden')
 }
 
-// async function getConnectedAgents() {
-//   try {
-//     const response = await $.ajax({
-//       url: `http://192.168.1.16:3000/users/connected`,
-//       dataType: "json",
-//       timeout: 5000,
-//     });
-//       connectUsers = response.data;
 
-//     // Process connectUsers
-//   } catch (error) {
-//     console.log("Error:", error);
-//     // Handle error
-//   }
-// }
 
 async function getPlans() {
   try {
-    const url = 'https://iheb.local.itwise.pro/private-chat-app/public/plan_client?account=1';
-    const jwt = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Nzg5NzE2OTUsImV4cCI6MTYyMDA1NzIzMzMzLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcm5hbWUiOiJ0ZXN0QGdtYWlsLmNvbSJ9.Yy_dUAEfszEpE-aQkBcUBq6rV9OPaUCNaoLxIfJnoNyCqsVWUfbilWNz2sXXImyDBmsNg1n9YIERHUE2iziJpOdhJdbiT6byWmT7MhuyC_QUxbPCko5NQPfP-KB85BjKVSxpr-CNq-Su8LxZ6fysLc7Qe71A86O0TangvsH4UgUb99WE3fMC_EF0PnvXVVxfzdZkV9p1EUTJa989ENP-ytXwdonUXcFUBznlW5PVEWgw-5dyWcND3LXCGaweAO-gMSU2K1Wp2T_rtqTRsXkAhcwF5T_IODee87w4FVARMfbXHvvIizclqyH0TITU8G_MgcoteObO24bECJCV-KpFWg';
-
-    const response = await axios.get(url, {
+    const response = await axios.get('https://iheb.local.itwise.pro/private-chat-app/public/plan_client?account=1', {
       headers: {
-        Authorization: `Bearer ${jwt}`
+        Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Nzg5NzE2OTUsImV4cCI6MTYyMDA1NzIzMzMzLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcm5hbWUiOiJ0ZXN0QGdtYWlsLmNvbSJ9.Yy_dUAEfszEpE-aQkBcUBq6rV9OPaUCNaoLxIfJnoNyCqsVWUfbilWNz2sXXImyDBmsNg1n9YIERHUE2iziJpOdhJdbiT6byWmT7MhuyC_QUxbPCko5NQPfP-KB85BjKVSxpr-CNq-Su8LxZ6fysLc7Qe71A86O0TangvsH4UgUb99WE3fMC_EF0PnvXVVxfzdZkV9p1EUTJa989ENP-ytXwdonUXcFUBznlW5PVEWgw-5dyWcND3LXCGaweAO-gMSU2K1Wp2T_rtqTRsXkAhcwF5T_IODee87w4FVARMfbXHvvIizclqyH0TITU8G_MgcoteObO24bECJCV-KpFWg`
       }
     });
     if(response){
-      const plans = response.data.data;
-      const container = document.getElementById('plans');
-  
-      plans.forEach(plan => {
+      response.data.data.forEach(plan => {
         const div = document.createElement('div');
         div.classList.add('mt-4');
         div.innerHTML = `
@@ -2317,7 +2305,7 @@ async function getPlans() {
         </div>
       `;
       
-        container.appendChild(div);
+      document.getElementById('plans').appendChild(div);
       });
   
       // Add event listeners to the buy buttons
@@ -2358,30 +2346,23 @@ successButton.addEventListener('click', async function() {
   const selectedPlan = this.getAttribute('data-plan'); // Get the selected plan value
 const modal = document.getElementById('ModalPlan');
   try {
-    const addSalesData = {
-      contact:newData.contact,
-      user: newData.user,
-      plan: selectedPlan,
-      payment_method: '1',
-      provider_id: '1'
-    };
 
-      foued.buyPlan(addSalesData);
-      console.log("add sales",addSalesData)
-      //TODO:change it Iheb's new data
-      // getTotalBalance(newData.contact)
+      foued.buyPlan({
+        contact:newData.contact,
+        user: newData.user,
+        plan: selectedPlan,
+        payment_method: '1',
+        provider_id: '1'
+      });
   
-    // Do any additional actions here after the successful sale addition
   } catch (error) {
     console.error('Error adding sale:', error);
-    // Handle the error if needed
   } finally {
     // Hide the modal after the request is triggered, regardless of success or failure
     modal.classList.add('hidden');
   }
 });
 
-// ...
 
 
 $(document).ready(function () {
@@ -2437,6 +2418,7 @@ $(document).ready(function () {
   foued.onGuestCreated()
   foued.planBought()
   foued.joinedDone()
+  foued.onConversationStart()
   document
     .querySelector("emoji-picker")
     .addEventListener("emoji-click", (event) => {

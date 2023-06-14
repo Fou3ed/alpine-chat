@@ -18,7 +18,9 @@ import {
   reactHide,
   updateUserBalance,
   guestCreated,
-  getTotalBalance
+  getTotalBalance,
+  ableInputArea,
+  sendFirstMessage
 
 } from "../main.js";
 
@@ -71,7 +73,6 @@ export default class event {
     this.socket.on("onConnected", (...newData) => {
         console.log("new data connection ",newData)
       if (newData) {
-        console.log("newdata",newData)
         getTotalBalance(newData[1])
       } else {
         alert("error");
@@ -161,10 +162,10 @@ export default class event {
   onConversationStart = () => {
     return new Promise((resolve, reject) => {
       this.socket.on("onConversationStarted", (conversationId) => {
-        console.log("onConversationStart",conversationId)
-
-       
+        console.log("onConversationStarted houni ",conversationId)
         resolve(conversationId)
+        sendFirstMessage(conversationId)
+
       })
     })
   }
@@ -255,7 +256,7 @@ export default class event {
   onBalanceStat = () => {
     this.socket.on('updatedBalance', (data, error) => {
       console.log("updated balance",data)
-      updateUserBalance(data)
+      // updateUserBalance(data)
     })
   }
 
@@ -268,6 +269,11 @@ export default class event {
   planBought = () => {
     this.socket.on('planBought',(data,error)=>{
       console.log('plan bought ',data);
+      console.log("get total balance ",data.Total_balance[0])
+
+      getTotalBalance(data.Total_balance[0])
+      ableInputArea()
+    
     })
   }
   
@@ -436,7 +442,7 @@ export default class event {
     await this.socket.on('onMessageSent', async (data, online, error) => {
       console.log("message sent ")
         await sentMessage(data)
-      
+        updateUserBalance()
   })
   }
 
