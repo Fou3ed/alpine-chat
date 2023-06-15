@@ -299,11 +299,9 @@ export async function getAllConversations() {
   let latestConversationId = null;
   let userConversation = ""
   const conversationsResponse = await axios.get(`http://192.168.1.16:3000/conversation/1/?user_id=${newData.contact}`);
-  
   if(conversationsResponse.data.data.length>0){
     const conversations = conversationsResponse.data.data;
     allConversation = conversations
-    console.log("all conversation",allConversation)
     conversationId = conversations[0]?._id
     const conversationPromises = conversations.map(async (conversation, index) => {
       conversation.members.forEach(user => {
@@ -381,7 +379,7 @@ export async function getAllConversations() {
             <div
               class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
               data-conversation-id="${conversationId}"
-              data-name="${name}">
+              data-name="${conversation.name}">
               <div class="avatar h-10 w-10">
                 <img class="rounded-full" src="images/avatar/avatar-5.jpg" alt="avatar" />
                 <div
@@ -398,7 +396,7 @@ export async function getAllConversations() {
                 </div>
                 <div class="mt-1 flex items-center justify-between space-x-1">
                   <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
-                     ${conversation.last_message.status === 0 ? conversation.last_message.user === userId ? "You delete a message" : `${"Agent"} delete a message` : msg}
+                     ${conversation.last_message.status === 0 ? conversation.last_message.user === userId ? "You delete a message" : `${conversation.members[0].full_name} delete a message` : msg}
                   </p >
        <div
      id="unread-count-${conversation._id}"
@@ -421,14 +419,13 @@ export async function getAllConversations() {
     }
     await Promise.all(conversationPromises);
   }
- 
 }
 
 
 // this function is a handle click , so whenever the client click on a conversation it call the load messages function where messages should be displayed in the messagesContainer
 function handleConversationClick() {
   agentClicked = $(this).parent().parent().data('user-id')
-expert=agentClicked
+    expert=agentClicked
   const conversationActive = document.querySelectorAll("div.conversation-click")
   conversationActive.forEach(element => {
     if (element.classList.contains("bg-slate-150"))
@@ -689,7 +686,6 @@ function displayMessages(messages) {
                 break;
               case 5:
                 type = 'number';
-                step = 'any';
                 break;
               case 6:
                 type = 'email';
@@ -793,7 +789,7 @@ function displayMessages(messages) {
     if (message.reacts.length > 0) {
       let messageReactions = message.reacts.map(react => {
         return `
-          <a id="react-${react._id}" disabled="${newData.user !== react.user_id}">${react.path}</a>
+          <a id="react-${react._id}" ${newData.user !== react.user_id ? 'style="pointer-events: none"' : ''}>${react.path}</a>
         `;
       });
       const msgReacted = messagesContainer.querySelector(`#message-content-${messageId}`);
@@ -920,26 +916,6 @@ async function addLogs(log) {
  * open a new blank conversation 
  */
 
-async function firstMessage(user_id, agent) {
-  foued.createConversation({
-    app: "638dc76312488c6bf67e8fc0",
-    user: user_id,
-    action: "conversation.create",
-    metaData: {
-      name: agentName,
-      channel_url: "foued/test",
-      conversation_type: "1",
-      description: "private chat",
-      operators: [1],
-      owner_id: newData.accountId,
-      members: [user_id, agent],
-      permissions: {
-      },
-      members_count: 2,
-      max_length_message: "256",
-    },
-  });
-}
 
 export async function sendFirstMessage(conversation){
   conversationContainer.dataset.conversationId = conversation._id;
@@ -962,6 +938,10 @@ export async function sendFirstMessage(conversation){
   isSendingMessage = false; // Set the sending state to false
 }
 
+
+
+
+
 if (sendButton)
   sendButton.addEventListener("click", async () => {
     sendMessage()
@@ -980,7 +960,24 @@ async function sendMessage() {
       emoji.classList.add('hidden');
     if (conversationId == '') {
       try {
-        await firstMessage(newData.user, expert);
+        foued.createConversation({
+          app: "638dc76312488c6bf67e8fc0",
+          user: newData.user,
+          action: "conversation.create",
+          metaData: {
+            name: agentName,
+            channel_url: "foued/test",
+            conversation_type: "1",
+            description: "private chat",
+            operators: [1],
+            owner_id: newData.accountId,
+            members: [newData.user, expert],
+            permissions: {
+            },
+            members_count: 2,
+            max_length_message: "256",
+          },
+        })
        
       } catch (error) {
         console.log(error);
@@ -1211,7 +1208,6 @@ export async function sentMessage(data) {
 }
 
 export async function receiveMessage(data) {
-  console.log(data)
   let tableRows = "";
   const messageId = data.messageData.id;
 
@@ -1225,7 +1221,6 @@ export async function receiveMessage(data) {
     "conversationId"
   ];
   if (data.messageData.conversation === conv) {
-    console.log("my contents 2",myContent.fields)
 
     if (myContent !== {} && data.messageData.type === "plan")
       tableRows = myContent.plans.map((plan) => {
@@ -1260,7 +1255,6 @@ export async function receiveMessage(data) {
       });
 
     else if (myContent !== {} && data.messageData.type === "form") {
-      console.log("my contents",myContent.fields)
       let inputForms = "";
       if (myContent.fields) {
         inputForms = myContent.fields.map((field) => {
@@ -1280,7 +1274,6 @@ export async function receiveMessage(data) {
               break;
             case 5:
               type = "number";
-              step = "any";
               break;
             case 6:
               type = "email";
@@ -1587,6 +1580,7 @@ async function getReactButton() {
     const allReacts = reactContainer.querySelectorAll('a');
     allReacts.forEach(react => {
       react.onclick = function () {
+
         onUnReactToMessage(this)
       }
     });
@@ -1594,11 +1588,11 @@ async function getReactButton() {
 }
 
 async function onUnReactToMessage(button) {
-  let reaction = button.parentNode;
-  let messageId = reaction.querySelector("a").id.replace("react-", "")
+  let messageId = button.id.replace("react-", "")
   let react = button.textContent;
   // Construct metadata for removing the reaction
-  const onMessageUnReact = {
+  // Call the UnReact function with the metadata object
+  foued.unReactMsg( {
     app: "ID",
     user: newData.user,
     action: "message.Unreact",
@@ -1609,18 +1603,16 @@ async function onUnReactToMessage(button) {
       user_id: newData.user,
       path: react,
     },
-  };
-  // Call the UnReact function with the metadata object
-  foued.unReactMsg(onMessageUnReact);
+  });
   // Remove the reaction element from the DOM
-  reaction.remove();
 }
 
 export async function reactHide(data) {
-  console.log("hide react")
+  if(data.user_id===newData.user){
   const reactElement = document.getElementById(`react-${data._id}`);
   if (reactElement)
     reactElement.remove()
+}  
 }
 
 
@@ -1634,10 +1626,10 @@ export async function reactDisplay(data) {
     if (react) {
       react.innerHTML = reactData.path
     } else {
-      reactContent.innerHTML += `<a id="react-${reactData._id}" disabled="${newData.user !== reactData.user_id}"> ${reactData.path}</a>`
+      reactContent.innerHTML += `<a id="react-${reactData._id}" ${newData.user !== reactData.user_id ? 'style="pointer-events: none"' : ''}> ${reactData.path}</a>`
     }
   } else {
-    msgReacted.innerHTML += `<div id="react-content-${reactData.message_id}" class="react-container bg-white  dark:bg-navy-700" > <a   id="react-${reactData._id}" disabled="${newData.user !== reactData.user_id}"> ${reactData.path}</a> </div>`
+    msgReacted.innerHTML += `<div id="react-content-${reactData.message_id}" class="react-container bg-white  dark:bg-navy-700" > <a   id="react-${reactData._id}" ${newData.user !== reactData.user_id ? 'style="pointer-events: none"' : ''}> ${reactData.path}</a> </div>`
     let react = document.getElementById(`react-${reactData._id}`)
     react.innerHTML = reactData.path
   }
@@ -1790,7 +1782,7 @@ export async function updateMessage(data) {
     if (data.reacts.length > 0) {
       let messageReactions = data.reacts.map(react => {
         return `
-      <a id="react-${react._id}" disabled="${newData.user !== react.user_id}"> ${react.path}</a>
+      <a id="react-${react._id}" ${newData.user !== react.user_id ? 'style="pointer-events: none"' : ''}> ${react.path}</a>
         `})
 
       newMessage.innerHTML += `<div class="react-container bg-white  dark:bg-navy-700" id="react-content-${data._id}" >${messageReactions.join("")} </div>`
@@ -1805,7 +1797,7 @@ export async function updateMessage(data) {
     if (data.reacts.length > 0) {
       let messageReactions = data.reacts.map(react => {
         return `
-      <a id="react-${react._id}" disabled="${newData.user !== react.user_id}"> ${react.path}</a>
+      <a id="react-${react._id}" ${newData.user !== react.user_id ? 'style="pointer-events: none"' : ''}> ${react.path}</a>
         `})
 
       messageEdited.innerHTML += `<div class="react-container bg-white  dark:bg-navy-700" id="react-content-${data._id}" >${messageReactions.join("")} </div>`
@@ -2174,7 +2166,6 @@ if (data.role==="AGENT"){
   }
 }
 }
-
 //when an agent disconnect remove the card in the online agents block
 export function userDisconnection(data) {
   allConversation.map(conv => {
@@ -2217,7 +2208,7 @@ export function getTotalBalance(data) {
         const balanceNumber = balanceDiv.querySelector("span");
         const balanceType = balanceDiv.querySelector("sup");  
         balanceNumber.textContent = totalBalance.balance
-        balanceType.textContent = totalBalance.balance_type === "1" ? "Messages" : "Minutes";
+        balanceType.textContent = totalBalance.balance_type == "1" ? "Messages" : "Minutes";
         if (totalBalance.balance==0){
           messageInput.disabled=true;
           sendButton.disabled=true;
@@ -2378,10 +2369,8 @@ $(document).ready(function () {
     foued.connect(newData?.user,newData.contact)
     foued.onDisconnected(newData?.user)
     getAllConversations()
-    getTotalBalance(newData.contact)
     } else {
       console.log("newData is empty !",newData)
-    //  getTotalBalance(newData.contact)
     }
   //get all the connected user (the agents)
   getExperts();

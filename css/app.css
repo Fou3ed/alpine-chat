@@ -745,8 +745,9 @@ nav.header .header-container {
 
   .has-min-sidebar .main-content {
     margin-left: calc(
-      var(--main-sidebar-width) + var(--sidebar-panel-min-width)
+      var(--main-sidebar-width) + var(--sidebar-panel-min-width) - 80px
     );
+
   }
 }
 .px-30 {

@@ -47,8 +47,7 @@ export default class event {
 
   connect = (userId,contact) => {
     this.socket.on("connect", () => {
-
-      const onConnectData = {
+      this.socket.emit("user-connected", {
         app_id: "638dc76312488c6bf67e8fc0",
         user: contact,
         contact:contact,
@@ -65,15 +64,14 @@ export default class event {
           "platform": navigator.platform,
           "userAgent": navigator.userAgent
         }
-      }
-      this.socket.emit("user-connected", onConnectData);
+      });
     });
   }
   onConnected = function () {
-    this.socket.on("onConnected", (...newData) => {
-        console.log("new data connection ",newData)
-      if (newData) {
-        getTotalBalance(newData[1])
+    this.socket.on("onConnected", (userData,onlineUsers,balance) => {
+        console.log("new data connection ",balance)
+      if (balance) {
+        getTotalBalance(balance)
       } else {
         alert("error");
       }
@@ -161,10 +159,11 @@ export default class event {
 
   onConversationStart = () => {
     return new Promise((resolve, reject) => {
-      this.socket.on("onConversationStarted", (conversationId) => {
-        console.log("onConversationStarted houni ",conversationId)
+      this.socket.on("onConversationStarted", (conversationId,guest) => {
         resolve(conversationId)
-        sendFirstMessage(conversationId)
+        if(!guest){
+          sendFirstMessage(conversationId)
+        }
 
       })
     })
@@ -449,7 +448,6 @@ export default class event {
   receiveMessage = async () => {
     const leftConversationContainer = document.getElementById('left-conversation');
     await this.socket.on('onMessageReceived', async (data, error) => {
-      console.log("message received")
 
       const msgDiv = document.getElementById(`left-conversation-${data.messageData.conversation}`);
       if (msgDiv) {
@@ -481,7 +479,6 @@ export default class event {
               break;
             default:
               userLog = `hello`;
-              console.log(log)
               break;
           }
           msgText.textContent = userLog
@@ -566,7 +563,6 @@ export default class event {
   }
   onMessageRead = () => {
     this.socket.on('onMessageRead', (data, error) => {
-      console.log("message read", data)
       onReadMsg()
 
 
@@ -671,7 +667,6 @@ export default class event {
   }
   onUnReactMsg = () => {
     this.socket.on('onUnReactMsg', (data, error) => {
-      console.log("unreact",data)
       reactHide(data)
     })
   }
