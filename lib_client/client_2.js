@@ -23,6 +23,7 @@ import {
   sendFirstMessage
 
 } from "../main.js";
+let messagesContainer = document.getElementById("big-container-message");
 
 
 
@@ -265,11 +266,20 @@ export default class event {
   //     this.socket.emit("onConversationMemberJoined", socket_id, info, conversationId)
   //   })
   // }
+
   planBought = () => {
     this.socket.on('planBought',(data,error)=>{
-      console.log('plan bought ',data);
-      console.log("get total balance ",data.Total_balance[0])
-
+      const newDivMsg = document.createElement("div");
+      newDivMsg.innerHTML = ` <div
+      class="flex justify-center items-center w-100 m-2"
+      id="msg-${data._id}"
+      >
+      <span class="logs-notification">
+      You bought a plan
+      </span>
+      </div>`
+      let typingBlock = document.getElementById("typing-block-message");
+      messagesContainer.insertBefore(newDivMsg, typingBlock);
       getTotalBalance(data.Total_balance[0])
       ableInputArea()
     

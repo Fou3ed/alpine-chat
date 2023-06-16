@@ -2354,8 +2354,16 @@ const modal = document.getElementById('ModalPlan');
   }
 });
 
+$(document).ready(function() {
 
+});
 
+   // Function to hide the loader and remove the blur effect
+   function hideLoader() {
+    $('#loader').fadeOut(500, function() {
+      $('.content').removeClass('blur');
+    });
+  }
 $(document).ready(function () {
   guestConnection()
   getAllAgents()
@@ -2416,4 +2424,7 @@ $(document).ready(function () {
   //click handler for the conversation 
   $(document).on('click', '.conversation-click', handleConversationClick)
   $(document).on('click', '#emoji-button', showEmoji)
+ 
+    
+    hideLoader();
 });
