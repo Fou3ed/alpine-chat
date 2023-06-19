@@ -180,7 +180,7 @@ if (messageInput)
         data-conversation-id="${data.conversationId}"
         data-name=${agentName}>
         <div class="avatar h-10 w-10">
-          <img class="rounded-full" src="images/avatar/avatar-5.jpg" alt="avatar" />
+          <img class="rounded-full" src="images/avatar/unkown.jpg" alt="avatar" />
           <div
           id="active-user"
             class="absolute right-0 h-3 w-3 rounded-full border-2 border-white bg-slate-300 dark:border-navy-700">
@@ -232,7 +232,7 @@ export async function getExperts() {
         const html = `
           <div id="${agent}" data-name="${name}" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center">
             <div class="h-13 w-13 p-0.5">
-              <img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/avatar-20.jpg" alt="avatar"/>
+              <img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/unkown.jpg" alt="avatar"/>
             </div>
             <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">${name}</p>
           </div>`;
@@ -266,7 +266,7 @@ async function selectExpert() {
       let activeChat = {
         chatId: conversationId,
         name: name,
-        avatar_url: "images/avatar/avatar-18.jpg"
+        avatar_url: "images/avatar/unkown.jpg"
       };
       window.dispatchEvent(new CustomEvent('change-active-chat', {
         detail: activeChat
@@ -279,7 +279,7 @@ async function selectExpert() {
       const activeChat = {
         chatId: conversationId,
         name: name,
-        avatar_url: 'images/avatar/avatar-18.jpg'
+        avatar_url: 'images/avatar/unkown.jpg'
       };
       window.dispatchEvent(new CustomEvent('change-active-chat', {
         detail: activeChat
@@ -381,7 +381,7 @@ export async function getAllConversations() {
               data-conversation-id="${conversationId}"
               data-name="${conversation.name}">
               <div class="avatar h-10 w-10">
-                <img class="rounded-full" src="images/avatar/avatar-5.jpg" alt="avatar" />
+                <img class="rounded-full" src="images/avatar/unkown.jpg" alt="avatar" />
                 <div
                 id="active-user"
                   class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${isActive ? "bg-success" : "bg-slate-300"}  dark:border-navy-700">
@@ -452,7 +452,7 @@ function handleConversationClick() {
   let activeChat = {
     chatId: conversationId,
     name: name,
-    avatar_url: 'images/avatar/avatar-19.jpg'
+    avatar_url: 'images/avatar/unkown.jpg'
   };
   window.dispatchEvent(new CustomEvent('change-active-chat', {
     detail: activeChat
@@ -947,10 +947,33 @@ if (sendButton)
     sendMessage()
   })
 
+
+  export async function sendBuyMessage(data){
+
+    try {
+      foued.onCreateMessage({
+       app: "638dc76312488c6bf67e8fc0",
+       user: newData.user,
+       action: "message.create",
+       metaData: {
+         type: "log",
+         conversation_id: conversationId, // Include the conversation ID
+         user: newData.user,
+         message:JSON.stringify(data),
+         data: "non other data",
+         origin: "web",
+       },
+       to: expert,
+     });
+     } catch (error) {
+       console.log(error);
+     }
+  }
+
+
 let isSendingMessage = false;
 
-async function sendMessage() {
-
+ async function sendMessage() {
   if (isSendingMessage) return; // If a message is already being sent, ignore the function call
 
   if (messageInput.value.trim() !== "") {
@@ -1009,18 +1032,6 @@ async function sendMessage() {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 export async function sentMessage(data) {
   let conv = conversationContainer.dataset.conversationId
   const isNotNewConversation = document.querySelector(`#left-conversation-${data.conversation}`)
@@ -1045,7 +1056,7 @@ export async function sentMessage(data) {
             data-conversation-id="${data.conversation}"
             data-name=${agentName}>
             <div class="avatar h-10 w-10">
-              <img class="rounded-full" src="images/avatar/avatar-5.jpg" alt="avatar" />
+              <img class="rounded-full" src="images/avatar/unkown.jpg" alt="avatar" />
               <div
               id="active-user"
                 class="absolute right-0 h-3 w-3 rounded-full border-2 border-white bg-slate-300 dark:border-navy-700">
@@ -1076,11 +1087,13 @@ export async function sentMessage(data) {
     leftConversationContainer.insertBefore(newConvDiv, leftConversationContainer.firstChild)
 
   } else {
+    let userLog = ""
 
     const convMessage = isNotNewConversation.querySelector("p#last-message")
     if (data.type === "log") {
+      console.log("data.content",data.content)
       const log = JSON.parse(data.content)
-      let userLog = ""
+    {
       switch (log.action) {
         case "fill":
           userLog = `You filled on the form.`;
@@ -1108,6 +1121,8 @@ export async function sentMessage(data) {
           break;
       }
       convMessage.textContent = userLog
+     }
+  
     } else
       convMessage.textContent = data.content
   }
@@ -2066,7 +2081,7 @@ async function getAllAgents() {
       <div class="flex items-center justify-between space-x-2">
         <div class="flex items-center space-x-3">
           <div class="avatar">
-            <img class="mask is-squircle" src="images/avatar/avatar-5.jpg" alt="image">
+            <img class="mask is-squircle" src="images/avatar/unkown.jpg" alt="image">
           </div>
           <div>
             <p class="font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
@@ -2154,7 +2169,7 @@ if (data.role==="AGENT"){
     const html = `
           <div id="${data._id}" data-name="${data.full_name}" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center">
             <div class="h-13 w-13 p-0.5">
-              <img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/avatar-20.jpg" alt="avatar" />
+              <img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/unkown.jpg" alt="avatar" />
             </div>
             <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">${data.full_name}</p>
           </div>`;
@@ -2195,41 +2210,74 @@ export function userDisconnection(data) {
 let totalBalance;
 
 export function getTotalBalance(data) {
-  totalBalance=data
-      if (!totalBalance.balance) {
-        const balanceDiv = document.querySelector(".ballance-card")
-        const balanceNumber = balanceDiv.querySelector("span")
-        const balanceType = balanceDiv.querySelector("sup")
-        balanceNumber.textContent = "Free trial"
-        balanceType.textContent = ""
-        return; // Stop further execution
-      }else {
-        const balanceDiv = document.querySelector(".ballance-card");
-        const balanceNumber = balanceDiv.querySelector("span");
-        const balanceType = balanceDiv.querySelector("sup");  
-        balanceNumber.textContent = totalBalance.balance
-        balanceType.textContent = totalBalance.balance_type == "1" ? "Messages" : "Minutes";
-        if (totalBalance.balance==0){
-          messageInput.disabled=true;
-          sendButton.disabled=true;
-        }
-      }
-}
+  totalBalance = data;
 
-export function updateUserBalance() {
-  if(totalBalance.balance){
-    totalBalance.balance = Number(totalBalance.balance) - 1; 
+  if (!totalBalance.balance) {
     const balanceDiv = document.querySelector(".ballance-card");
     const balanceNumber = balanceDiv.querySelector("span");
-    
+    const balanceType = balanceDiv.querySelector("sup");
+    balanceNumber.textContent = "Free trial";
+    balanceType.textContent = "";
+    return; // Stop further execution
+  } else {
+    const balanceDiv = document.querySelector(".ballance-card");
+    const balanceNumber = balanceDiv.querySelector("span");
+    const balanceType = balanceDiv.querySelector("sup");
     balanceNumber.textContent = totalBalance.balance;
+    balanceType.textContent =
+      totalBalance.balance_type === "1" ? "Messages" : "Minutes";
+
+    // Add color change logic
+    if (totalBalance.balance > 5) {
+      balanceDiv.classList.remove("from-purple-500", "to-indigo-600");
+      balanceDiv.classList.add("from-red-500", "to-green-400");
+    } else if (totalBalance.balance < 3 && totalBalance.balance > 1  ) {
+      balanceDiv.classList.remove("from-purple-500", "to-indigo-600");
+      balanceDiv.classList.add("from-green-400", "to-orange-600");
+    } else {
+      console.log("here")
+      // Reset to default colors
+      balanceDiv.classList.remove("from-green-400", "to-orang-600");
+      balanceDiv.classList.add("from-green-400", "to-fuchsia-600");
+    }
+
+    if (totalBalance.balance == 0) {
+      messageInput.disabled = true;
+      sendButton.disabled = true;
+    }
+  }
+}
+
+
+export function updateUserBalance() {
+  if (totalBalance.balance) {
+    totalBalance.balance = Number(totalBalance.balance) - 1;
+    const balanceDiv = document.querySelector(".ballance-card");
+    const balanceNumber = balanceDiv.querySelector("span");
+    const balanceType = balanceDiv.querySelector("sup");
+
+    balanceNumber.textContent = totalBalance.balance;
+    balanceType.textContent =
+      totalBalance.balance_type === "1" ? "Messages" : "Minutes";
+
+    if (totalBalance.balance > 5) {
+      balanceDiv.classList.remove("from-purple-500", "to-indigo-600");
+      balanceDiv.classList.add("from-red-500", "to-green-400");
+    } else if (totalBalance.balance < 3 && totalBalance.balance > 1) {
+      balanceDiv.classList.remove("from-purple-500", "to-indigo-600");
+      balanceDiv.classList.add("from-green-400", "to-orange-600");
+    } else {
+      balanceDiv.classList.remove("from-green-400", "to-orange-600");
+      balanceDiv.classList.add("from-green-400", "to-fuchsia-600");
+    }
+
     if (totalBalance.balance === 0) {
       messageInput.disabled = true;
       sendButton.disabled = true;
-    } 
+    }
   }
- 
 }
+
 
 export function ableInputArea(){
   messageInput.disabled = false;
@@ -2282,9 +2330,7 @@ async function getPlans() {
                 <span class="text-lg font-medium text-slate-700 dark:text-navy-100">${plan.tariff}</span>
                 <span class="text-xs">£</span>
               </p>
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5 text-secondary dark:text-secondary-light" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
-              </svg>
+             
             </div>
             <p class="mt-0.5 text-tiny+ uppercase">${plan.name} Messages</p>
             <div class="flex items-center justify-center mt-3">
@@ -2354,9 +2400,6 @@ const modal = document.getElementById('ModalPlan');
   }
 });
 
-$(document).ready(function() {
-
-});
 
    // Function to hide the loader and remove the blur effect
    function hideLoader() {
@@ -2416,11 +2459,13 @@ $(document).ready(function () {
   foued.planBought()
   foued.joinedDone()
   foued.onConversationStart()
+
   document
     .querySelector("emoji-picker")
     .addEventListener("emoji-click", (event) => {
       messageInput.value = messageInput.value + event.detail.unicode;
     });
+
   //click handler for the conversation 
   $(document).on('click', '.conversation-click', handleConversationClick)
   $(document).on('click', '#emoji-button', showEmoji)
@@ -2428,3 +2473,24 @@ $(document).ready(function () {
     
     hideLoader();
 });
+
+
+// $(window).on('beforeunload', function(e) {
+// //update balance in Iheb's data base 
+//   console.log("userBalance",totalBalance)
+//   //send emit to update balance
+//   const confirmationMessage = 'Are you sure you want to leave this page?';
+//   e.preventDefault();
+//   e.returnValue = confirmationMessage;
+  
+//   return confirmationMessage;
+// });
+
+// $(window).on('unload', function() {
+//   const confirmation = confirm('Do you want to leave this page?');
+//   if (confirmation) {
+    
+//   } else {
+//     return false;
+//   }
+// });

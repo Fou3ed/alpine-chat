@@ -9963,12 +9963,22 @@ button.gridjs-sort-desc {
   --tw-gradient-to: rgba(74, 222, 128, 0);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
-
+.to-green-400 {
+  --tw-gradient-from: #4ade80;
+  --tw-gradient-to: rgba(74, 222, 128, 0);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
 .from-fuchsia-600 {
   --tw-gradient-from: #c026d3;
   --tw-gradient-to: rgba(192, 38, 211, 0);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
+.to-fuchsia-600 {
+  --tw-gradient-from: #B31312;
+  --tw-gradient-to: rgba(192, 38, 211, 0);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
 
 .from-green-300 {
   --tw-gradient-from: #86efac;

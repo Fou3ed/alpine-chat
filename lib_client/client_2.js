@@ -20,7 +20,8 @@ import {
   guestCreated,
   getTotalBalance,
   ableInputArea,
-  sendFirstMessage
+  sendFirstMessage,
+  sendBuyMessage
 
 } from "../main.js";
 let messagesContainer = document.getElementById("big-container-message");
@@ -68,18 +69,21 @@ export default class event {
       });
     });
   }
-  onConnected = function () {
-    this.socket.on("onConnected", (userData,onlineUsers,balance) => {
-        console.log("new data connection ",balance)
+  onConnected = function() {
+    this.socket.on("onConnected", (userData, onlineUsers, balance) => {
+      console.log("new data connection ", userData);
+      const usernameLink = document.getElementById("usernameLink");
+      if (usernameLink) {
+        usernameLink.textContent = userData.full_name;
+      }
       if (balance) {
-        getTotalBalance(balance)
+        getTotalBalance(balance);
       } else {
         alert("error");
       }
     });
   };
-
-
+  
 
 
 
@@ -282,7 +286,8 @@ export default class event {
       messagesContainer.insertBefore(newDivMsg, typingBlock);
       getTotalBalance(data.Total_balance[0])
       ableInputArea()
-    
+ 
+      // sendBuyMessage(data)
     })
   }
   
