@@ -22419,3 +22419,20 @@ emoji-picker {
 .content {
   transition: filter 0.5s;
 }
+
+.balanceloader {
+  font-size: 1.2em;
+  animation: loading-dots 1.8s infinite;
+}
+
+@keyframes loading-dots {
+  0%, 20% {
+    content: ".";
+  }
+  40%, 60% {
+    content: "..";
+  }
+  80%, 100% {
+    content: "...";
+  }
+}

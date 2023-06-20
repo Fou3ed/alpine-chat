@@ -70,7 +70,7 @@ export default class event {
     });
   }
   onConnected = function() {
-    this.socket.on("onConnected", (userData, onlineUsers, balance) => {
+    this.socket.on("onConnected", (userData,balance) => {
       console.log("new data connection ", userData);
       const usernameLink = document.getElementById("usernameLink");
       if (usernameLink) {
@@ -93,6 +93,7 @@ export default class event {
 
   userConnection = () => {
     this.socket.on("user-connection", (userId) => {
+
       getExperts()
       userConnection(userId)
     })
@@ -287,7 +288,7 @@ export default class event {
       getTotalBalance(data.Total_balance[0])
       ableInputArea()
  
-      // sendBuyMessage(data)
+       sendBuyMessage(data)
     })
   }
   
