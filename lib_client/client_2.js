@@ -71,7 +71,7 @@ export default class event {
   }
   onConnected = function() {
     this.socket.on("onConnected", (userData,balance) => {
-      console.log("new data connection ", userData);
+      console.log("new data connection ", userData,balance);
       const usernameLink = document.getElementById("usernameLink");
       if (usernameLink) {
         usernameLink.textContent = userData.full_name;
@@ -193,6 +193,13 @@ export default class event {
 
     })
   }
+
+  conversationStatusUpdated = (data) => {
+    this.socket.on("conversationStatusUpdated", async (data, newData) => {
+        this.socket.emit("joinConversationRoom",data._id)
+    })
+  }
+
   /**
    *  delete Conversation  
    */
@@ -242,6 +249,13 @@ export default class event {
    * add member to a conversation 
    */
   joinMembers = () => {
+    //data=conversationId
+    this.socket.on('joinConversationMember', (conversationId, error) => {
+      this.socket.emit("onConversationMemberJoined", conversationId)
+
+    })
+  }
+  updateConversation = () => {
     //data=conversationId
     this.socket.on('joinConversationMember', (conversationId, error) => {
       this.socket.emit("onConversationMemberJoined", conversationId)
@@ -464,7 +478,7 @@ export default class event {
   receiveMessage = async () => {
     const leftConversationContainer = document.getElementById('left-conversation');
     await this.socket.on('onMessageReceived', async (data, error) => {
-
+      console.log("message received",data)
       const msgDiv = document.getElementById(`left-conversation-${data.messageData.conversation}`);
       if (msgDiv) {
         const msgText = msgDiv.querySelector("p#last-message")
@@ -473,25 +487,25 @@ export default class event {
           let userLog = ""
           switch (log.action) {
             case "fill":
-              userLog = `${data.messageData.senderName} filled on the form.`;
+              userLog = `${data.senderName} filled on the form.`;
               break;
             case "focus":
-              userLog = `${data.messageData.senderName}  focus on the form.`;
+              userLog = `${data.senderName}  focus on the form.`;
               break;
             case "purchase":
-              userLog = `${data.messageData.senderName}  purchased the <b> ${log.plan_name} </b>plan.`;
+              userLog = `${data.senderName}  purchased the <b> ${log.plan_name} </b>plan.`;
               break;
             case "start form":
-              userLog = `${data.messageData.senderName}  start submit the form.`;
+              userLog = `${data.senderName}  start submit the form.`;
               break;
             case "end form":
-              userLog = `${data.messageData.senderName}  end submit the form.`;
+              userLog = `${data.senderName}  end submit the form.`;
               break;
             case "start purchase":
-              userLog = `${data.messageData.senderName}  start purchase a plan.`;
+              userLog = `${data.senderName}  start purchase a plan.`;
               break;
             case "link click":
-              userLog = `${data.messageData.senderName} click to link.`;
+              userLog = `${data.senderName} click to link.`;
               break;
             default:
               userLog = `hello`;
@@ -499,8 +513,9 @@ export default class event {
           }
           msgText.textContent = userLog
         } else
-          msgText.textContent = data.messageData.type === "plan" ? data.messageData.senderName + " sent a plan" : data.messageData.type === "form" ? data.messageData.senderName + " sent a form" : data.messageData.type === "link" ? data.messageData.senderName + " sent a link" : data.messageData.content
-        leftConversationContainer.insertBefore(msgDiv, leftConversationContainer.firstChild)
+
+          msgText.textContent = data.messageData.type === "plan" ? data.senderName + " sent a plan" : data.messageData.type === "form" ? data.senderName + " sent a form" : data.messageData.type === "link" ? data.senderName + " sent a link" : data.messageData.content
+          leftConversationContainer.insertBefore(msgDiv, leftConversationContainer.firstChild)
       }
       // Check if the message was sent by the current user
       receiveMessage(data)

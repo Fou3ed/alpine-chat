@@ -161,6 +161,7 @@ if (messageInput)
     
    //when receiving guest data from server save it in cookies
   export async function guestCreated(data){
+    console.log("data",data.senderName)
     const newUser = { user: data.user,contact:data.contact,accountId:data.accountId }
     newData = newUser
     document.cookie = "myData=" + JSON.stringify(newUser) + "; expires=Tue, 31 Dec 9999 23:59:59 GMT; path=/";
@@ -169,29 +170,30 @@ if (messageInput)
     balanceNumber.textContent = "Free"
     foued.connect(data.user,data.contact)
     expert=data.availableAgent
-    getExperts();
     userId = data.user
-    redirectToAgent(expert)
+    if(expert){
+      redirectToAgent(expert)
+    }
     const html = `
-  <div class="conversation bg-slate-150" data-conversation-id="${data.conversationId}" data-name=${agentName} data-timestamp="now" id="left-conversation-${data.conversationId}" data-user-id="${expert}">
+  <div class="conversation bg-slate-150" data-conversation-id="${data.conversationId}" data-name=${data.senderName} data-timestamp=${timeString} id="left-conversation-${data.conversationId}" data-user-id="${data.availableAgent}">
     <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
       <div
         class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
         data-conversation-id="${data.conversationId}"
-        data-name=${agentName}>
+        data-name=${data.senderNamer}>
         <div class="avatar h-10 w-10">
           <img class="rounded-full" src="images/avatar/unkown.jpg" alt="avatar" />
           <div
           id="active-user"
-            class="absolute right-0 h-3 w-3 rounded-full border-2 border-white bg-slate-300 dark:border-navy-700">
+            class="absolute right-0 h-3 w-3 rounded-full border-2 border-white bg-success dark:border-navy-700">
           </div>
         </div>
         <div class="flex flex-1 flex-col">
           <div class="flex items-baseline justify-between space-x-1.5">
             <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
-              ${agentName}
+            ${data.senderNamer}
             </p>
-            <span class="text-tiny+ text-slate-400 dark:text-navy-300">"now"</span>
+            <span class="text-tiny+ text-slate-400 dark:text-navy-300">${timeString}</span>
           </div>
           <div class="mt-1 flex items-center justify-between space-x-1">
             <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
@@ -217,18 +219,27 @@ leftConversationContainer.insertBefore(newConvDiv, leftConversationContainer.fir
  * Display all connected agents 
  */
 const displayedUsers = new Set();
+let expertMsgAppended = false; 
+
 export async function getExperts() {
+  
   const response = await axios.get("http://192.168.1.16:3000/users/connected");
+  
   if (response.data.message === "success") {
     connectUsers = response.data.data;
+
+    if (response.data.data.length > 0 && !expertMsgAppended) {
+      const html = `<span class="text-xs font-medium uppercase">Meet our new experts</span>`;
+      $("#expert-msg").append(html);
+      expertMsgAppended = true; 
+    }
+
     response.data.data.forEach((user) => {
-      const {
-        _id: agent,
-        full_name: name
-      } = user;
-   
+      const { _id: agent, full_name: name } = user;
+
       if (!displayedUsers.has(agent)) {
         displayedUsers.add(agent);
+
         const html = `
           <div id="${agent}" data-name="${name}" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center">
             <div class="h-13 w-13 p-0.5">
@@ -238,9 +249,10 @@ export async function getExperts() {
           </div>`;
         $(".swiper-wrapper").append(html);
       }
-    });  
+    });
   }
 }
+
 
 //select the agent from the list connected agents and open the conversation they share if they already have one , if not open an empty conversation-container
 async function selectExpert() {
@@ -352,9 +364,7 @@ export async function getAllConversations() {
           case "link click":
             userLog = `You click to link.`;
             break;
-          default:
-            userLog = `hello`;
-            break;
+         
         }
       }
       let msg = ""
@@ -375,7 +385,6 @@ export async function getAllConversations() {
           msg = conversation.last_message.message;
           break;
       }
-      console.log("user convesations",userConversation)
       const html = `
         <div class="conversation ${index === 0 ? 'active' : ''}" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${name}" data-timestamp="${timestamp}" id="left-conversation-${conversationId}">
           <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
@@ -430,18 +439,10 @@ function handleConversationClick() {
   agentClicked = $(this).parent().parent().data('user-id')
     expert=agentClicked
   const conversationActive = document.querySelectorAll("div.conversation-click")
-    console.log("conversation active",conversationActive)
-
-
+  console.log(allConversation)
   conversationActive.forEach(element => {
    if (element.classList.contains("bg-slate-150"))
       element.classList.remove("bg-slate-150")
-
-    console.log("element.querySelector('.bg-success')",element)
-      if (element.querySelector('.bg-success')) {
-        console.log("erhere")
-        conversationHeaderStatus.textContent = "En ligne"
-      }
 
   }); 
 
@@ -452,8 +453,14 @@ function handleConversationClick() {
   const conversation_id = $(this).data('conversation-id');
   const name = $(this).data('name');
   conversationId = conversation_id;
-  
+  const exist=allConversation.find(conversation=>conversation._id===conversationId)
+  console.log(exist.status==1)
+if(exist.status==1){
+  conversationHeaderStatus.textContent = "En ligne"
+}else {
+  conversationHeaderStatus.textContent = "Last seen recently"
 
+}
   // Set the conversation ID as an attribute of the conversation container element
   const conversationName = document.getElementById('conversation-name');
   conversationName.textContent = name;
@@ -471,9 +478,7 @@ function handleConversationClick() {
   window.dispatchEvent(new CustomEvent('change-active-chat', {
     detail: activeChat
   }));
-  console.log(agentClicked)
-  console.log("connected user",connectUsers.find(user => user._id === expert))
-  conversationHeaderStatus.textContent = connectUsers.find(user => user._id === expert)? "En ligne" : "last seen recently"
+  // conversationHeaderStatus.textContent = connectUsers.find(user => user._id === expert)? "En ligne" : "last seen recently"
 
   markMessageAsSeen(conversationId)
 }
@@ -763,10 +768,7 @@ function displayMessages(messages) {
           case "link click":
             userLog = `You click to link.`;
             break;
-          default:
-            userLog = `hello`;
-            console.log(log);
-            break;
+      
         }
 
         messagesContainer.insertAdjacentHTML(
@@ -795,7 +797,7 @@ function displayMessages(messages) {
                       <div id="pin-div" class="${message.pinned === 0 || message.status === 0 ? "hidden" : "flex"} ${direction == "justify-start" ? "pin-div-sender" : "pin-div"} justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
                     </div>
                     <p id="date_msg" data-direction="${direction}" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
-                      ${message.status === 2 ? "(updated) " + time : direction == "justify-start" ? time : message.read ? time + `<i class="fas fa-check ps-2" style="font-size:10px;"></i>` : time}
+                      ${message.status === 2 ? "(updated) " + time : direction == "justify-start" ? time : message.read ? time + `<i class="fas fa-check-double ps-2" style="font-size:10px;"></i>` : time}
                     </p>
                   </div>
                   ${message.type === "MSG" && direction === "justify-start" ? msgButt(messageId, direction, message.pinned === 1) : ""}
@@ -971,7 +973,6 @@ if (sendButton)
 
 
   export async function sendBuyMessage(data){
-    console.log("data message",data)
     try {
       foued.onCreateMessage({
        app: "638dc76312488c6bf67e8fc0",
@@ -1056,6 +1057,7 @@ let isSendingMessage = false;
 }
 
 export async function sentMessage(data) {
+  console.log("message",data)
   let conv = conversationContainer.dataset.conversationId
   const isNotNewConversation = document.querySelector(`#left-conversation-${data.conversation}`)
 
@@ -1138,9 +1140,7 @@ export async function sentMessage(data) {
         case "link click":
           userLog = `You click to link.`;
           break;
-        default:
-          userLog = `hello`;
-          break;
+      
       }
       convMessage.textContent = userLog
      }
@@ -1178,9 +1178,8 @@ export async function sentMessage(data) {
           case "link click":
             userLog = `You click to link.`;
             break;
-          default:
-            userLog = `hello`;
-            break;
+        
+            
         }
         const newDivMsg = document.createElement("div");
         newDivMsg.innerHTML = ` <div
@@ -1207,10 +1206,9 @@ export async function sentMessage(data) {
             <div class="${msgStyle}"  id="message-content-${messageId}">
               ${data.content} 
               <div id="pin-div" class="  hidden ${direction == "justify-start" ? "pin-div-sender" : "pin-div"} justify-center  items-center me-2 "><i class="fas fa-thumbtack"></i></div>
-
             </div>
             <p  id="date_msg" data-direction="${direction}" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
-                  ${timeString}      
+                  ${timeString + `<i class="fas fa-check ps-2" style="font-size:10px;"></i>` }       
             </p>
           </div>
         ${data.direction == "out" ? msgButt(messageId, direction, data.pinned === 1) : ''}
@@ -1245,7 +1243,6 @@ export async function sentMessage(data) {
 }
 
 export async function receiveMessage(data) {
-  console.log("data",data)
   let tableRows = "";
   const messageId = data.messageData.id;
 
@@ -1974,6 +1971,11 @@ export function startTyping(data) {
                         </div>
                       </div>`
       messagesContainer.appendChild(typingBlock)
+      const msgDiv = document.getElementById(`left-conversation-${data.messageData.conversation}`);
+
+      const msgText = msgDiv.querySelector("p#last-message")
+      msgText.textContent.appendChild(typingBlock)
+
     }
   }
 }
@@ -2177,7 +2179,6 @@ async function getAllAgents() {
 }
 //when an agent connect create an agent card and display it in the online agents block
 export function userConnection(data) {
-  console.log("data",data)
 if (data.role==="AGENT"){
   allConversation.map(conv => {
     const conversationCard = document.getElementById(`left-conversation-${conv._id}`)
@@ -2189,7 +2190,6 @@ if (data.role==="AGENT"){
     }
   })
   const agentCard = document.getElementById(`${data?._id}`)
-  console.log("agent card",agentCard)
   if (!agentCard) {
     const html = `
           <div id="${data._id}" data-name="${data.full_name}" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center">
@@ -2200,11 +2200,7 @@ if (data.role==="AGENT"){
           </div>`;
     $(".swiper-wrapper").append(html);
   }
-  if (agentClicked == data._id) {
-    
-    const conversationHeaderStatus = document.getElementById('conversation-name').parentNode.querySelector(".text-xs");
-    conversationHeaderStatus.textContent = "En ligne"
-  }
+
 }
 }
 //when an agent disconnect remove the card in the online agents block
@@ -2226,7 +2222,6 @@ export function userDisconnection(data) {
     agentCard.remove()
   }
   if (agentClicked == data._id) {
-    const conversationHeaderStatus = document.getElementById('conversation-name').parentNode.querySelector(".text-xs");
     conversationHeaderStatus.textContent = "Last seen recently"
   }
 }
