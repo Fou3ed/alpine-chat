@@ -26,7 +26,7 @@ import {
 } from "../main.js";
 let messagesContainer = document.getElementById("big-container-message");
 
-
+export let role=""
 
 export default class event {
   constructor() {
@@ -72,6 +72,7 @@ export default class event {
   onConnected = function() {
     this.socket.on("onConnected", (userData,balance) => {
       console.log("new data connection ", userData,balance);
+      role=userData.role
       const usernameLink = document.getElementById("usernameLink");
       if (usernameLink) {
         usernameLink.textContent = userData.full_name;
@@ -301,7 +302,7 @@ export default class event {
       messagesContainer.insertBefore(newDivMsg, typingBlock);
       getTotalBalance(data.Total_balance[0])
       ableInputArea()
- 
+      role="CLIENT"
        sendBuyMessage(data)
     })
   }
@@ -478,7 +479,6 @@ export default class event {
   receiveMessage = async () => {
     const leftConversationContainer = document.getElementById('left-conversation');
     await this.socket.on('onMessageReceived', async (data, error) => {
-      console.log("message received",data)
       const msgDiv = document.getElementById(`left-conversation-${data.messageData.conversation}`);
       if (msgDiv) {
         const msgText = msgDiv.querySelector("p#last-message")

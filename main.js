@@ -1,6 +1,6 @@
 import Event from "./lib_client/client_2.js";
 const foued = new Event();
-
+import { role } from "./lib_client/client_2.js";
 const currentDate = new Date();
 let allConversation = []
 let connectUsers = []
@@ -26,9 +26,9 @@ function getCookie(name) {
   // return null if cookie not found
   return null;
 }
+
 let newData = getCookie("myData") !== undefined ? JSON.parse(getCookie("myData")) : null;;
 // Components
-
 // The message input is where the user types their message 
 const messageInput = document.querySelector("#message-input");
 // The send message button 
@@ -161,7 +161,6 @@ if (messageInput)
     
    //when receiving guest data from server save it in cookies
   export async function guestCreated(data){
-    console.log("data",data.senderName)
     const newUser = { user: data.user,contact:data.contact,accountId:data.accountId }
     newData = newUser
     document.cookie = "myData=" + JSON.stringify(newUser) + "; expires=Tue, 31 Dec 9999 23:59:59 GMT; path=/";
@@ -174,13 +173,14 @@ if (messageInput)
     if(expert){
       redirectToAgent(expert)
     }
+    console.log(data)
     const html = `
   <div class="conversation bg-slate-150" data-conversation-id="${data.conversationId}" data-name=${data.senderName} data-timestamp=${timeString} id="left-conversation-${data.conversationId}" data-user-id="${data.availableAgent}">
     <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
       <div
         class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
         data-conversation-id="${data.conversationId}"
-        data-name=${data.senderNamer}>
+        data-name=${data.agentName}>
         <div class="avatar h-10 w-10">
           <img class="rounded-full" src="images/avatar/unkown.jpg" alt="avatar" />
           <div
@@ -191,7 +191,7 @@ if (messageInput)
         <div class="flex flex-1 flex-col">
           <div class="flex items-baseline justify-between space-x-1.5">
             <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
-            ${data.senderNamer}
+            ${data.agentName}
             </p>
             <span class="text-tiny+ text-slate-400 dark:text-navy-300">${timeString}</span>
           </div>
@@ -340,7 +340,8 @@ export async function getAllConversations() {
       }
       
       let userLog = ""
-      if (conversation.last_message.type === "log") {
+      console.log(conversation)
+      if (conversation?.last_message.type === "log") {
         const log = JSON.parse(conversation.last_message.message)
         switch (log.action) {
           case "fill":
@@ -439,8 +440,8 @@ function handleConversationClick() {
   agentClicked = $(this).parent().parent().data('user-id')
     expert=agentClicked
   const conversationActive = document.querySelectorAll("div.conversation-click")
-  console.log(allConversation)
   conversationActive.forEach(element => {
+
    if (element.classList.contains("bg-slate-150"))
       element.classList.remove("bg-slate-150")
 
@@ -453,8 +454,9 @@ function handleConversationClick() {
   const conversation_id = $(this).data('conversation-id');
   const name = $(this).data('name');
   conversationId = conversation_id;
+  
   const exist=allConversation.find(conversation=>conversation._id===conversationId)
-  console.log(exist.status==1)
+ console.log(exist)
 if(exist.status==1){
   conversationHeaderStatus.textContent = "En ligne"
 }else {
@@ -479,6 +481,19 @@ if(exist.status==1){
     detail: activeChat
   }));
   // conversationHeaderStatus.textContent = connectUsers.find(user => user._id === expert)? "En ligne" : "last seen recently"
+  
+  messageInput.setAttribute('maxlength', exist.max_length_message);
+
+
+
+
+  document.getElementById('max-length-value').textContent = exist.max_length_message;
+
+  messageInput.addEventListener('input', function() {
+    document.getElementById('message-counter').textContent = `Max Length: ${exist.max_length_message} | Remaining Characters: ${exist.max_length_message - this.value.length}`;
+
+  });
+
 
   markMessageAsSeen(conversationId)
 }
@@ -568,6 +583,8 @@ if(conversationId){
   }
 }
 }
+
+
 // Listen for the scroll event on the container element
 const container = document.getElementById('conversation-container');
 if (container)
@@ -580,19 +597,22 @@ if (container)
     }
   });
 
+
+
+// The submitForm function definition
 function submitForm(element) {
-  const form = JSON.parse(element.dataset.content)
-  let forms = []
-  const formContact = element.parentNode
-  const formContent = formContact.parentNode
+  const form = JSON.parse(element.dataset.content);
+  let forms = [];
+  const formContact = element.parentNode;
+  const formContent = formContact.parentNode;
   const formInputs = formContact.querySelectorAll("input");
-  const successMessage = formContact.querySelector('#text_capture')
-  element.innerHTML = `<div class="d-flex"><span class="loader2"></span></div>`
+  const successMessage = formContact.querySelector('#text_capture');
+  element.innerHTML = `<div class="d-flex"><span class="loader2"></span></div>`;
   for (let i = 0; i < formInputs.length; i++) {
     forms = [...forms, {
       fieldId: formInputs[i].dataset.fieldId,
       value: formInputs[i].value,
-    }]
+    }];
   }
   $.ajax({
     url: "https://iheb.local.itwise.pro/private-chat-app/public/addcontactforms",
@@ -608,27 +628,27 @@ function submitForm(element) {
     success: function () {
       formInputs.forEach(input => {
         input.value = "";
-        input.disabled = true
+        input.disabled = true;
       });
-      element.innerHTML = "Sended"
+      element.innerHTML = "Sended";
       successMessage.classList.remove('hidden');
-      element.disabled = true
-      formContent.style.opacity = 0.7
+      element.disabled = true;
+      formContent.style.opacity = 0.7;
       addLogs({
         action: "end form",
         element: "21",
         element_id: +form.id
-      })
+      });
     },
-
     error: function (jqXHR, textStatus, errorThrown) {
       console.log("Error:", textStatus, errorThrown);
     }
   });
   setTimeout(() => {
     successMessage.classList.add('hidden');
-  }, 3000)
+  }, 3000);
 }
+
 
 function displayMessages(messages) {
   document.getElementById('big-container-message').style.display = 'block';
@@ -660,42 +680,24 @@ function displayMessages(messages) {
       if (myContent !== {} && message.type === "plan") {
         tableRows = myContent.plans.map(plan => {
           return `
-            <div class="pricing-table" id="plan-${messageId}" data-plan-id="${plan.id}">
-              <div class="ptable-item">
-                <div class="ptable-single">
-                  <div class="ptable-header">
-                    <div class="ptable-title">
-                      <h3>${plan.name}</h3>
-                    </div>
-                    <div class="ptable-price">
-                      <h3>
-                        <small>
-                          ${plan.currency === "EUR" ? "€" : "$"}
-                        </small>
-                        ${plan.tariff}
-                      </h3>
-                    </div>
-                  </div>
-                  <div class="ptable-body">
-                    <div class="ptable-description">
-                      <ul>
-                        <li>${plan.date_start}</li>
-                      </ul>
-                    </div>
-                  </div>
-                  <div class="ptable-footer">
-                    <div class="ptable-action">
-                      <button>Buy Now</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div class="pricing-item" id="plan-${messageId}" data-plan-id="${plan.id}">
+          <ul>
+            <li class="icon"><i class="fas fa-comments"></i></li>
+            <li class="pricing-header">
+              <h4>${plan.billing_volume}<span>${plan.billing_type === "1" ? "Messages" : "Minutes"}</span></h4>
+              <h2><sup>${plan.tariff}</sup>${plan.currency === "EUR" ? "€" : "$"}</h2>
+            </li>
+            <li>${plan.name}</li>
+            <li class="footer"><a class="btn btn-dark border btn-sm" href="#">Buy</a></li>
+          </ul>
+        </div>
+          
           `;
         });
       } else if (message.type === "form") {
         let inputForms = "";
         if (myContent.fields) {
+
           inputForms = myContent.fields.map(field => {
             let type = "";
             switch (+field.field_type) {
@@ -719,28 +721,27 @@ function displayMessages(messages) {
                 break;
             }
             return `
-              <input
-                id="field-${messageId}"
-                data-field-id="${field.id}"
-                name="${field.field_name.replace(" ", "")}"
-                placeholder="${field.field_name}"
-                type="${type}"
-              />
-            `;
+            <div class="relative">
+            <input type="text" class="form-input field-${messageId} block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer " placeholder=" "
+              data-field-id="${field.id}"
+              name="${field.field_name.replace(" ", "")}"
+              type="${type}"
+            />
+            <label class="form-label absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-6 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4">${field.field_name}</label>
+          </div>`;
           });
         }
         tableRows = `
-          <div class="contact-form-preview" style="background-color: #fff">
-            <h3>Contact form</h3>
-            <p>${myContent.text_capture}</p>
-            <form>
-              <div id="text_capture" class="hidden">
-                <p>${myContent.text_capture}</p>
-              </div>
-              ${inputForms.join('')}
-              <button id="submit-form-${message._id}" data-content='${message.message}' type="button">Submit</button>
-            </form>
-          </div>
+        <div class="form-container f-error f-success">
+        <span class="error" id="msg"></span>
+        <form name="form1" class="box" onsubmit="">
+        <h4>${myContent.text_capture}</h4>
+        <h5>Please fill in all fields</h5>
+        ${inputForms.join('')}
+        
+        <button  type="button"  class="btn1" id="submit-form-${message._id}" data-content='${message.message}'  >Valider</button>
+        </form>
+        </div>
         `;
       }
       if (message.type === "log") {
@@ -780,10 +781,11 @@ function displayMessages(messages) {
       } else {
         let direction =
           message.user === newData.user ? "justify-end" : "justify-start";
-        const msgStyle =
-          direction === "justify-start"
-            ? `rounded-2xl rounded-tl-none break-words p-3 text-slate-700 shadow-sm dark:text-navy-100 relative ${message.status === 0 ? "bg-transparent border-2 border-info/10 dark:border-navy-700" : message.status === 2 ? "bg-navy-100 dark:bg-navy-500" : "bg-white dark:bg-navy-700"}`
-            : `rounded-2xl rounded-tr-none break-words p-3 shadow-sm dark:text-white relative ${message.status === 0 ? "bg-transparent border-2 border-info/10 dark:border-navy-700" : message.status === 2 ? "bg-info text-white dark:bg-accent-focus" : "bg-info/10 dark:bg-accent text-slate-700"}`;
+             const msgStyle =  role === "GUEST"
+  ? `rounded-2xl break-words rounded-tl-none bg-gray-light p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
+  : `rounded-2xl break-words relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
+;
+     ;
         messagesContainer.insertAdjacentHTML(
           "afterbegin",
           `
@@ -819,19 +821,30 @@ function displayMessages(messages) {
       const msgReacted = messagesContainer.querySelector(`#message-content-${messageId}`);
       msgReacted.innerHTML += `<div class="react-container bg-white dark:bg-navy-700" id="react-content-${messageId}">${messageReactions.join("")}</div>`;
     }
-    const submitButton = document.querySelector(`#submit-form-${messageId}`);
-    if (submitButton) {
-      submitButton.addEventListener("click", function () {
-        submitForm(this);
-      });
-    }
-    const allFormInput = document.querySelectorAll(`#field-${messageId}`);
+// Add an event listener to the submit button
+document.addEventListener('DOMContentLoaded', function() {
+  const submitButton = document.querySelector(`#submit-form-${messageId}`);
+  if (submitButton) {
+    submitButton.addEventListener("click", function () {
+      submitForm(this);
+    });
+  }
+});
+    // const submitButton = document.querySelector(`#submit-form-${messageId}`);
+    // if (submitButton) {
+    //   submitButton.addEventListener("click", function () {
+    //     submitForm(this);
+    //   });
+    // }
+    
+    const allFormInput = document.querySelectorAll(`.field-${messageId}`);
     if (allFormInput.length > 0) {
       allFormInput.forEach(input => {
-
-        input.oninput = () => sendTypingNotification(input);
+        input.addEventListener('input', () => sendTypingNotification(input));
+        input.addEventListener('focus', () => sendFocusNotification(input));
       });
     }
+    
     let userHasTyped = "";
     function sendTypingNotification(input) {
       if (userHasTyped !== input.dataset.fieldId) {
@@ -843,15 +856,15 @@ function displayMessages(messages) {
         userHasTyped = input.dataset.fieldId;
       }
     }
-    let isFirstInputFocused = true;
+    
     function sendFocusNotification(input) {
       addLogs({
         action: "focus",
         element: "22",
         element_id: +input.dataset.fieldId
       });
-      isFirstInputFocused = false;
     }
+    
 
     function sendClickingNotification(data) {
       addLogs({
@@ -868,7 +881,6 @@ function displayMessages(messages) {
         element_id: +data.dataset.planId
       });
     }
-
 
     document.querySelectorAll(`#field-${messageId}`).forEach(input => {
       input.addEventListener('focus', () => {
@@ -889,11 +901,16 @@ function displayMessages(messages) {
     }
 
 
-    const planMessage = document.querySelectorAll(`#plan-${messageId}`)
+    const planMessage = document.querySelectorAll(`#plan-${messageId}`);
     if (planMessage.length > 0) {
-      planMessage.forEach(plan => {
-        plan.querySelector("button").onclick = () => sendPlanClickNotification(plan)
-      })
+      planMessage.forEach((plan) => {
+        const buyButton = plan.querySelector("a.btn");
+        if (buyButton) {
+          buyButton.addEventListener("click", (event) => {
+            sendPlanClickNotification(plan);
+          });
+        }
+      });
     }
   }
 
@@ -973,6 +990,7 @@ if (sendButton)
 
 
   export async function sendBuyMessage(data){
+
     try {
       foued.onCreateMessage({
        app: "638dc76312488c6bf67e8fc0",
@@ -1057,7 +1075,7 @@ let isSendingMessage = false;
 }
 
 export async function sentMessage(data) {
-  console.log("message",data)
+  console.log("role",role)
   let conv = conversationContainer.dataset.conversationId
   const isNotNewConversation = document.querySelector(`#left-conversation-${data.conversation}`)
 
@@ -1194,7 +1212,11 @@ export async function sentMessage(data) {
         messagesContainer.insertBefore(newDivMsg, typingBlock);
       } else {
         let direction = data.direction == "in" ? 'justify-end' : '';
-        const msgStyle = data.direction == "out" ? `rounded-2xl  break-words rounded-tl-none bg-white p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100` : 'rounded-2xl break-words  relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white'
+       const msgStyle =  role === "GUEST"
+  ? `rounded-2xl break-words rounded-tl-none bg-gray-light p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
+  : `rounded-2xl break-words relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
+;
+      
         messagesContainer.style.display = "block"
         messagesContainer.insertAdjacentHTML("beforeend", `
         <div id="message-${messageId}"  class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
@@ -1260,32 +1282,17 @@ export async function receiveMessage(data) {
     if (myContent !== {} && data.messageData.type === "plan")
       tableRows = myContent.plans.map((plan) => {
         return `
-          <div class="pricing-table" id="plan-${messageId}" data-plan-id="${plan.id}">
-            <div class="ptable-item">
-              <div class="ptable-single">
-                <div class="ptable-header">
-                  <div class="ptable-title">
-                    <h3>${plan.name}</h3>
-                  </div>
-                  <div class="ptable-price">
-                    <h3><small>${plan.currency === "EUR" ? "€" : "$"}</small>  ${plan.tariff}</h3>
-                  </div>
-                </div>
-                <div class="ptable-body">
-                  <div class="ptable-description">
-                    <ul>
-                      <li>${plan.date_start}</li>
-                    </ul>
-                  </div>
-                </div>
-                <div class="ptable-footer">
-                  <div class="ptable-action">
-                    <button>Buy Now</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="pricing-item" id="plan-${messageId}" data-plan-id="${plan.id}">
+        <ul>
+          <li class="icon"><i class="fas fa-comments"></i></li>
+          <li class="pricing-header">
+            <h4>${plan.billing_volume}<span>${plan.billing_type === "1" ? "Messages" : "Minutes"}</span></h4>
+            <h2><sup>${plan.tariff}</sup>${plan.currency === "EUR" ? "€" : "$"}</h2>
+          </li>
+          <li>${plan.name}</li>
+          <li class="footer"><a class="btn btn-dark border btn-sm" href="#">Buy</a></li>
+        </ul>
+      </div>
         `;
       });
 
@@ -1314,31 +1321,30 @@ export async function receiveMessage(data) {
               type = "email";
               break;
           }
-          return `
-            <input
-              id="field-${messageId}"
-              data-field-id="${field.id}"
-              name="${field.field_name.replace(" ", "")}"
-              placeholder="${field.field_name}"
-              type="${type}"
-            />
-          `;
+          return  `
+          <div class="relative">
+          <input type="text" class="form-input field-${messageId} block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer " placeholder=" "
+            data-field-id="${field.id}"
+            name="${field.field_name.replace(" ", "")}"
+            type="${type}"
+          />
+          <label class="form-label absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-6 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4">${field.field_name}</label>
+        </div>`;
         });
       }
-
       tableRows = `
-        <div class="contact-form-preview" style="background-color: #fff">
-          <h3>Contact form</h3>
-          <p>Welcome</p>
-          <form>
-            <div id="text_capture" class="hidden">
-              <p>${myContent.text_capture}</p>
-            </div>
-            ${inputForms.join("")}
-            <button id="submit-form-${data.messageData.id}" data-content='${data.messageData.content}' type="button">Submit</button>
-          </form>
-        </div>
-      `;
+      <div class="form-container f-error f-success">
+      <span class="error" id="msg"></span>
+      <form name="form1" class="box" onsubmit="">
+      <h4>${myContent.text_capture}</h4>
+      <h5>Please fill in all fields</h5>
+      ${inputForms.join('')}
+      <button  type="button"  class="btn1" id="submit-form-${data.messageData.id}" data-content='${data.messageData.content}'  >Valider</button>
+
+      </form>
+      </div>
+      `
+    ;
     }
 
     const messageContainer = document.getElementById(`message-${messageId}`);
@@ -1430,13 +1436,14 @@ export async function receiveMessage(data) {
       unreadCount.textContent = +count + 1;
     }
   }
-
-  const submitButton = document.querySelector(`#submit-form-${messageId}`);
-  if (submitButton) {
-    submitButton.addEventListener("click", function () {
-      submitForm(this);
-    });
-  }
+  document.addEventListener('DOMContentLoaded', function() {
+    const submitButton = document.querySelector(`#submit-form-${messageId}`);
+    if (submitButton) {
+      submitButton.addEventListener("click", function () {
+        submitForm(this);
+      });
+    }
+  })
 
   const allFormInput = document.querySelectorAll(`#field-${messageId}`);
 
@@ -1487,6 +1494,7 @@ export async function receiveMessage(data) {
   }
 
   document.querySelectorAll(`#field-${messageId}`).forEach((input) => {
+
     input.addEventListener("focus", () => {
       if (isFirstInputFocused) {
         sendFocusNotification(input);
@@ -1504,8 +1512,13 @@ export async function receiveMessage(data) {
   const planMessage = document.querySelectorAll(`#plan-${messageId}`);
   if (planMessage.length > 0) {
     planMessage.forEach((plan) => {
-      plan.querySelector("button").onclick = () =>
-        sendPlanClickNotification(plan);
+      const buyButton = plan.querySelector("a.btn");
+      if (buyButton) {
+        buyButton.addEventListener("click", (event) => {
+          event.preventDefault(); // Prevent the default behavior of the link
+          sendPlanClickNotification(plan);
+        });
+      }
     });
   }
 }
@@ -1980,6 +1993,8 @@ export function startTyping(data) {
   }
 }
 
+
+
 export function stopTyping(data) {
   if (data.metaData.conversation === conversationId) {
     if (typingBlock) {
@@ -2246,7 +2261,6 @@ export function getTotalBalance(data) {
   // Simulate an asynchronous operation
   setTimeout(() => {
     totalBalance = data;
-
     if (!totalBalance.balance) {
       balanceNumber.textContent = "Free trial";
       balanceType.textContent = "";
@@ -2281,7 +2295,7 @@ export function getTotalBalance(data) {
 
 
 export function updateUserBalance() {
-  if (totalBalance.balance) {
+  if (totalBalance?.balance) {
     totalBalance.balance = Number(totalBalance.balance) - 1;
     const balanceDiv = document.querySelector(".ballance-card");
     const balanceNumber = balanceDiv.querySelector("span");
@@ -2362,7 +2376,6 @@ async function getPlans() {
                 <span class="text-lg font-medium text-slate-700 dark:text-navy-100">${plan.tariff}</span>
                 <span class="text-xs">£</span>
               </p>
-             
             </div>
             <p class="mt-0.5 text-tiny+ uppercase">${plan.name} Messages</p>
             <div class="flex items-center justify-center mt-3">
@@ -2386,7 +2399,7 @@ async function getPlans() {
         buyButton.addEventListener('click', function() {
           const selectedPlan = this.getAttribute('data-plan'); // Get the selected plan value
           modal.classList.remove('hidden');
-          successButton.setAttribute('data-plan', selectedPlan); // Set the selected plan value to the success button
+          successButton.setAttribute('data-plan', selectedPlan);
         });
       });
       
@@ -2410,12 +2423,21 @@ async function getPlans() {
 }
 
 
+// function showLoader() {
+//   const loader = document.getElementById('buyLoader');
+//   console.log(loader); 
+//   if (loader) {
+//     loader.style.display = 'block';
+//   }
+// }
+
 const successButton = document.getElementById('buyPlanBtn');
 successButton.addEventListener('click', async function() {
+
   const selectedPlan = this.getAttribute('data-plan'); // Get the selected plan value
 const modal = document.getElementById('ModalPlan');
   try {
-
+      // showLoader()
       foued.buyPlan({
         contact:newData.contact,
         user: newData.user,

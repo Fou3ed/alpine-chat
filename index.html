@@ -43,7 +43,10 @@
     <div
       class="app-preloader fixed z-50 grid h-full w-full place-content-center bg-slate-50 dark:bg-navy-900"
     >
-    
+  <div id="buyLoader">
+  <!-- Loader content goes here -->
+</div>
+
 
     <div id="loader">
       <h1>Loading...</h1>
@@ -2596,16 +2599,15 @@
               class="form-input h-9 w-full bg-transparent placeholder:text-slate-400/70"
               placeholder="Write the message"
               id="message-input"
-              maxlength="256"
+             
             />
           </div>
           <emoji-picker class="light hidden"></emoji-picker>
           <div class="-mr-1.5 flex">
-            <button
-              class="btn h-9 w-9 shrink-0 rounded-full p-0 text-slate-500 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:text-navy-200 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-            >
-              <i class="fa fa-microphone text-primary"></i>
-            </button>
+              <div  class="text-xs text-gray-900 dark:text-white" id="message-counter">
+                Max Length: <span   id="max-length-value"> </span>
+
+              </div>
             <button
               id="emoji-button"
               class="btn h-9 w-9 shrink-0 rounded-full p-0 text-slate-500 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:text-navy-200 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
