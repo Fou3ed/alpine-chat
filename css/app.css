@@ -415,8 +415,8 @@ body.is-monochrome:before {
   z-index: 999999;
 }
 
-.app-preloader .app-preloader-inner:after,
-.app-preloader .app-preloader-inner:before {
+.app-preloader1 .app-preloader-inner:after,
+.app-preloader1 .app-preloader-inner:before {
   --tw-content: "";
   background-color: rgba(203, 213, 225, 0.25);
   border-radius: 9999px;
@@ -426,17 +426,17 @@ body.is-monochrome:before {
   width: 100%;
 }
 
-.dark .app-preloader .app-preloader-inner:after,
-.dark .app-preloader .app-preloader-inner:before {
+.dark .app-preloader1 .app-preloader-inner:after,
+.dark .app-preloader1 .app-preloader-inner:before {
   background-color: rgba(105, 122, 155, 0.5);
 }
 
-.app-preloader .app-preloader-inner:after,
-.app-preloader .app-preloader-inner:before {
+.app-preloader1 .app-preloader-inner:after,
+.app-preloader1 .app-preloader-inner:before {
   animation: spinner-grow 3s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
 }
 
-.app-preloader .app-preloader-inner:after {
+.app-preloader1 .app-preloader-inner:after {
   animation-delay: -1.5s;
 }
 
@@ -22640,6 +22640,7 @@ a.btn {
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin: 0 auto;
+  ;
 }
 
 @keyframes spin {

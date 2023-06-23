@@ -21,13 +21,13 @@ import {
   getTotalBalance,
   ableInputArea,
   sendFirstMessage,
-  sendBuyMessage
+  sendBuyMessage,
 
 } from "../main.js";
 let messagesContainer = document.getElementById("big-container-message");
+const loader = document.querySelector(".app-preloader1");
 
 export let role=""
-
 export default class event {
   constructor() {
 
@@ -70,9 +70,10 @@ export default class event {
     });
   }
   onConnected = function() {
-    this.socket.on("onConnected", (userData,balance) => {
-      console.log("new data connection ", userData,balance);
-      role=userData.role
+  console.log(loader)
+    this.socket.on("onConnected", (userData, balance) => {
+      console.log("new data connection ", userData, balance);
+      role = userData.status == 0 ? "GUEST" : "CLIENT";
       const usernameLink = document.getElementById("usernameLink");
       if (usernameLink) {
         usernameLink.textContent = userData.full_name;
@@ -82,6 +83,8 @@ export default class event {
       } else {
         alert("error");
       }
+  
+       loader.style.display = "none"; 
     });
   };
   
@@ -89,14 +92,25 @@ export default class event {
 
 
 
-
   //receive user connection (other user)
 
   userConnection = () => {
-    this.socket.on("user-connection", (userId) => {
+    this.socket.on("user-connection", (user) => {
+      if(user?.role==="AGENT"){
+        const html = `
+        <div id="${user._id}" data-name="${user.full_name}" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center">
+          <div class="h-13 w-13 p-0.5">
+            <img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/unkown.jpg" alt="avatar"/>
+          </div>
+          <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">${user.full_name}</p>
+        </div>`;
+      $(".swiper-wrapper").append(html);
+      
 
-      getExperts()
-      userConnection(userId)
+
+      }
+ 
+      userConnection(user)
     })
   }
 
@@ -106,10 +120,9 @@ export default class event {
       console.log("userDiscon",socket_id)
       getExperts()
       userDisconnection(socket_id)
-
     })
   }
-
+d
 
 
   /**
@@ -513,10 +526,12 @@ export default class event {
           }
           msgText.textContent = userLog
         } else
-
           msgText.textContent = data.messageData.type === "plan" ? data.senderName + " sent a plan" : data.messageData.type === "form" ? data.senderName + " sent a form" : data.messageData.type === "link" ? data.senderName + " sent a link" : data.messageData.content
           leftConversationContainer.insertBefore(msgDiv, leftConversationContainer.firstChild)
-      }
+        
+        }
+
+
       // Check if the message was sent by the current user
       receiveMessage(data)
     })
@@ -942,8 +957,20 @@ onGuestCreated=(data)=>{
   this.socket.on('guestCreated',(data)=>{
 
     guestCreated(data)  
+    loader.style.display = "none"; 
 
   })
 }
+saveFormData=(data)=>{
+  this.socket.emit('saveForm',data,error=>{
+  
+  })
+    }
 
+    updateBalance = (data) => {
+      console.log("data",data)
+      this.socket.emit('updateTotalBalance', data, (error) => {
+       
+      });
+    };
 }

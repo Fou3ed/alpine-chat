@@ -132,7 +132,7 @@ foued.onConnected();
 // Global variables 
 let userId = newData?.user;
 let conversationId;
-let agentName;
+let senderName;
 let expert;
 let notifyNumber = 0
 let userBalance;
@@ -147,7 +147,7 @@ if (messageInput)
     }
   });
 
-
+  
 //if the connection user is a guest create a guest account : 
   function guestConnection() {
     if(!newData){
@@ -158,7 +158,7 @@ if (messageInput)
       })
     }
         }  
-    
+        let firstConv=""
    //when receiving guest data from server save it in cookies
   export async function guestCreated(data){
     const newUser = { user: data.user,contact:data.contact,accountId:data.accountId }
@@ -168,19 +168,20 @@ if (messageInput)
     const balanceNumber = balanceDiv.querySelector("span")
     balanceNumber.textContent = "Free"
     foued.connect(data.user,data.contact)
-    expert=data.availableAgent
-    userId = data.user
+       expert=data.availableAgent
+       userId = data.user
+       firstConv=data.conversationId
     if(expert){
+
       redirectToAgent(expert)
     }
-    console.log(data)
     const html = `
   <div class="conversation bg-slate-150" data-conversation-id="${data.conversationId}" data-name=${data.senderName} data-timestamp=${timeString} id="left-conversation-${data.conversationId}" data-user-id="${data.availableAgent}">
     <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
       <div
         class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
         data-conversation-id="${data.conversationId}"
-        data-name=${data.agentName}>
+        data-name=${data.senderName}>
         <div class="avatar h-10 w-10">
           <img class="rounded-full" src="images/avatar/unkown.jpg" alt="avatar" />
           <div
@@ -191,7 +192,7 @@ if (messageInput)
         <div class="flex flex-1 flex-col">
           <div class="flex items-baseline justify-between space-x-1.5">
             <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
-            ${data.agentName}
+            ${data.senderName}
             </p>
             <span class="text-tiny+ text-slate-400 dark:text-navy-300">${timeString}</span>
           </div>
@@ -212,6 +213,7 @@ if (messageInput)
 // Append the HTML to the container
 newConvDiv.innerHTML = html;
 leftConversationContainer.insertBefore(newConvDiv, leftConversationContainer.firstChild)
+
   }
   
   
@@ -261,7 +263,7 @@ async function selectExpert() {
     // Get the unique ID of the agent clicked
     const agent = $(this).attr("id");
     const name = $(this).data("name");
-    agentName = name;
+    senderName = name;
     expert = agent;
     agentClicked = agent
     const $conversationContainer = $("#conversation-container");
@@ -340,7 +342,6 @@ export async function getAllConversations() {
       }
       
       let userLog = ""
-      console.log(conversation)
       if (conversation?.last_message.type === "log") {
         const log = JSON.parse(conversation.last_message.message)
         switch (log.action) {
@@ -455,18 +456,16 @@ function handleConversationClick() {
   const name = $(this).data('name');
   conversationId = conversation_id;
   
-  const exist=allConversation.find(conversation=>conversation._id===conversationId)
- console.log(exist)
-if(exist.status==1){
+const exist=allConversation.find(conversation=>conversation._id===conversationId)
+
+if(exist?.status==1){
   conversationHeaderStatus.textContent = "En ligne"
 }else {
   conversationHeaderStatus.textContent = "Last seen recently"
-
 }
   // Set the conversation ID as an attribute of the conversation container element
   const conversationName = document.getElementById('conversation-name');
   conversationName.textContent = name;
-
   // Load the first page of messages on page load
   let currentPage = 1;
   loadMessages(currentPage, conversationId, true);
@@ -481,25 +480,22 @@ if(exist.status==1){
     detail: activeChat
   }));
   // conversationHeaderStatus.textContent = connectUsers.find(user => user._id === expert)? "En ligne" : "last seen recently"
-  
-  messageInput.setAttribute('maxlength', exist.max_length_message);
-
-
-
-
-  document.getElementById('max-length-value').textContent = exist.max_length_message;
-
-  messageInput.addEventListener('input', function() {
-    document.getElementById('message-counter').textContent = `Max Length: ${exist.max_length_message} | Remaining Characters: ${exist.max_length_message - this.value.length}`;
-
-  });
+  inputLEngth(exist?.max_length_message)
 
 
   markMessageAsSeen(conversationId)
 }
 
 
+function inputLEngth(conversationMaxMsg){
+    messageInput.setAttribute('maxlength', conversationMaxMsg);
+    document.getElementById('max-length-value').textContent = conversationMaxMsg;
+    messageInput.addEventListener('input', function() {
+    document.getElementById('message-counter').textContent = `Max Length: ${conversationMaxMsg} | Remaining Characters: ${conversationMaxMsg - this?.value.length}`;
 
+  });
+
+}
 
 
 async function getTheLastMsg(conversationId) {
@@ -548,6 +544,7 @@ const spinner = document.getElementById('conversation-spinner')
 
 const limit = 10;
 async function loadMessages(page, conversationId) {
+
   // Show the big container message
   document.getElementById('big-container-message').style.display = 'block';
 
@@ -601,6 +598,8 @@ if (container)
 
 // The submitForm function definition
 function submitForm(element) {
+  let messageContent = element.closest('[id^="message-content-"]');
+  let messageId = messageContent?.id?.replace('message-content-', '');
   const form = JSON.parse(element.dataset.content);
   let forms = [];
   const formContact = element.parentNode;
@@ -614,38 +613,41 @@ function submitForm(element) {
       value: formInputs[i].value,
     }];
   }
-  $.ajax({
-    url: "https://iheb.local.itwise.pro/private-chat-app/public/addcontactforms",
-    method: "POST",
-    contentType: "application/json",
-    data: JSON.stringify({
-      contact: "1",
-      forms
-    }),
-    headers: {
-      "Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Nzg5NzE2OTUsImV4cCI6MTYyMDA1NzIzMzMzLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcm5hbWUiOiJ0ZXN0QGdtYWlsLmNvbSJ9.Yy_dUAEfszEpE-aQkBcUBq6rV9OPaUCNaoLxIfJnoNyCqsVWUfbilWNz2sXXImyDBmsNg1n9YIERHUE2iziJpOdhJdbiT6byWmT7MhuyC_QUxbPCko5NQPfP-KB85BjKVSxpr-CNq-Su8LxZ6fysLc7Qe71A86O0TangvsH4UgUb99WE3fMC_EF0PnvXVVxfzdZkV9p1EUTJa989ENP-ytXwdonUXcFUBznlW5PVEWgw-5dyWcND3LXCGaweAO-gMSU2K1Wp2T_rtqTRsXkAhcwF5T_IODee87w4FVARMfbXHvvIizclqyH0TITU8G_MgcoteObO24bECJCV-KpFWg"
-    },
-    success: function () {
+
+  form.fields = form.fields.map(field => {
+    let fieldValue = forms.find(fild => fild.fieldId == field.field_id);
+    if(fieldValue){
+      field.field_value = fieldValue.value
+    }
+    return field;
+      })
+  form.result = 1;
+
+  const data=JSON.stringify({
+    contact: newData.contact,
+    forms,
+    messageId,
+    form
+  })
+     
+
+    foued.saveFormData(data)
+
       formInputs.forEach(input => {
-        input.value = "";
         input.disabled = true;
       });
-      element.innerHTML = "Sended";
-      successMessage.classList.remove('hidden');
+      element.innerHTML = "Sent";
+      successMessage?.classList.remove('hidden');
       element.disabled = true;
       formContent.style.opacity = 0.7;
       addLogs({
         action: "end form",
         element: "21",
-        element_id: +form.id
+        element_id: +form.form_id
       });
-    },
-    error: function (jqXHR, textStatus, errorThrown) {
-      console.log("Error:", textStatus, errorThrown);
-    }
-  });
+    
   setTimeout(() => {
-    successMessage.classList.add('hidden');
+    successMessage?.classList.add('hidden');
   }, 3000);
 }
 
@@ -697,7 +699,7 @@ function displayMessages(messages) {
       } else if (message.type === "form") {
         let inputForms = "";
         if (myContent.fields) {
-
+          console.log("myContent : ",myContent)
           inputForms = myContent.fields.map(field => {
             let type = "";
             switch (+field.field_type) {
@@ -723,23 +725,25 @@ function displayMessages(messages) {
             return `
             <div class="relative">
             <input type="text" class="form-input field-${messageId} block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer " placeholder=" "
-              data-field-id="${field.id}"
+              data-field-id="${field.field_id}"
               name="${field.field_name.replace(" ", "")}"
               type="${type}"
+              value="${field?.field_value ?? ""}" 
+              ${field?.field_value ? "style='pointer-events:none'": ""}
             />
             <label class="form-label absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-6 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4">${field.field_name}</label>
           </div>`;
           });
         }
         tableRows = `
-        <div class="form-container f-error f-success">
+        <div class="form-container ${myContent?.result==1 ?"f-success" :""}  ">
         <span class="error" id="msg"></span>
         <form name="form1" class="box" onsubmit="">
         <h4>${myContent.text_capture}</h4>
         <h5>Please fill in all fields</h5>
         ${inputForms.join('')}
         
-        <button  type="button"  class="btn1" id="submit-form-${message._id}" data-content='${message.message}'  >Valider</button>
+        <button  type="button"  class="btn1  ${myContent?.result==1 ?"disabled" :""} " id="submit-form-${message._id}" data-content='${message.message}'  >Valider</button>
         </form>
         </div>
         `;
@@ -822,20 +826,24 @@ function displayMessages(messages) {
       msgReacted.innerHTML += `<div class="react-container bg-white dark:bg-navy-700" id="react-content-${messageId}">${messageReactions.join("")}</div>`;
     }
 // Add an event listener to the submit button
-document.addEventListener('DOMContentLoaded', function() {
-  const submitButton = document.querySelector(`#submit-form-${messageId}`);
-  if (submitButton) {
-    submitButton.addEventListener("click", function () {
-      submitForm(this);
-    });
-  }
-});
-    // const submitButton = document.querySelector(`#submit-form-${messageId}`);
-    // if (submitButton) {
-    //   submitButton.addEventListener("click", function () {
-    //     submitForm(this);
-    //   });
-    // }
+// document.addEventListener('DOMContentLoaded', function() {
+
+//   const submitButton = document.querySelector(`#submit-form-${messageId}`);
+//   if (submitButton) {
+//     submitButton.addEventListener("click", function () {
+//       submitForm(this);
+//     });
+//   }
+// });
+
+
+
+    const submitButton = document.querySelector(`#submit-form-${messageId}`);
+    if (submitButton) {
+      submitButton.addEventListener("click", function () {
+        submitForm(this);
+      });
+    }
     
     const allFormInput = document.querySelectorAll(`.field-${messageId}`);
     if (allFormInput.length > 0) {
@@ -858,6 +866,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function sendFocusNotification(input) {
+      
       addLogs({
         action: "focus",
         element: "22",
@@ -925,6 +934,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 //whenever a user click on the message link fire this function 
 async function addLogs(log) {
+  console.log("log",log)
   const logData = {
     "user_id": "3",
     "action": log.action,
@@ -933,6 +943,7 @@ async function addLogs(log) {
     "log_date": currentDate,
     "source": "3"
   }
+
     foued.onCreateMessage( {
       app: "638dc76312488c6bf67e8fc0",
       user: newData.user,
@@ -943,11 +954,10 @@ async function addLogs(log) {
         user: newData.user,
         message: JSON.stringify(logData),
         origin: "web",
-        
+      
       },
       to: expert,
       logData:logData
-     
     })
 
 
@@ -973,7 +983,7 @@ export async function sendFirstMessage(conversation){
     data: "non other data",
     origin: "web",
   },
-  to: agentName,
+  to: senderName,
 });
   messageInput.value = "";
   isSendingMessage = false; // Set the sending state to false
@@ -1029,7 +1039,7 @@ let isSendingMessage = false;
           user: newData.user,
           action: "conversation.create",
           metaData: {
-            name: agentName,
+            name: senderName,
             channel_url: "foued/test",
             conversation_type: "1",
             description: "private chat",
@@ -1075,7 +1085,6 @@ let isSendingMessage = false;
 }
 
 export async function sentMessage(data) {
-  console.log("role",role)
   let conv = conversationContainer.dataset.conversationId
   const isNotNewConversation = document.querySelector(`#left-conversation-${data.conversation}`)
 
@@ -1092,12 +1101,12 @@ export async function sentMessage(data) {
         element.classList.remove("bg-slate-150")
     });
     const html = `
-      <div class="conversation bg-slate-150" data-conversation-id="${data.conversation}" data-name=${agentName} data-timestamp="${timestamp}" id="left-conversation-${data.conversation}" data-user-id="${agentClicked}">
+      <div class="conversation bg-slate-150" data-conversation-id="${data.conversation}" data-name=${senderName} data-timestamp="${timestamp}" id="left-conversation-${data.conversation}" data-user-id="${agentClicked}">
         <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
           <div
             class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
             data-conversation-id="${data.conversation}"
-            data-name=${agentName}>
+            data-name=${senderName}>
             <div class="avatar h-10 w-10">
               <img class="rounded-full" src="images/avatar/unkown.jpg" alt="avatar" />
               <div
@@ -1108,7 +1117,7 @@ export async function sentMessage(data) {
             <div class="flex flex-1 flex-col">
               <div class="flex items-baseline justify-between space-x-1.5">
                 <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
-                  ${agentName}
+                  ${senderName}
                 </p>
                 <span class="text-tiny+ text-slate-400 dark:text-navy-300">${time}</span>
               </div>
@@ -1265,6 +1274,14 @@ export async function sentMessage(data) {
 }
 
 export async function receiveMessage(data) {
+  console.log(firstConv)
+  console.log(data.messageData.conversation)
+
+  if(firstConv && firstConv===data.messageData.conversation){
+console.log({element :$(`.conversation-click[data-conversation-id="${firstConv}"]`)})
+    $(`.conversation-click[data-conversation-id="${firstConv}"]`).trigger("click")
+      firstConv=""
+  }
   let tableRows = "";
   const messageId = data.messageData.id;
 
@@ -1324,7 +1341,7 @@ export async function receiveMessage(data) {
           return  `
           <div class="relative">
           <input type="text" class="form-input field-${messageId} block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer " placeholder=" "
-            data-field-id="${field.id}"
+            data-field-id="${field.field_id}"
             name="${field.field_name.replace(" ", "")}"
             type="${type}"
           />
@@ -1427,13 +1444,12 @@ export async function receiveMessage(data) {
     const unreadCount = document.getElementById(
       `unread-count-${data.messageData.conversation}`
     );
-    if (unreadCount.classList.contains("hidden")) {
-      unreadCount.classList.remove("hidden");
-      unreadCount.classList.add("flex");
+    if (unreadCount?.classList.contains("hidden")) {
+      unreadCount?.classList.remove("hidden");
+      unreadCount?.classList.add("flex");
       unreadCount.textContent = 1;
     } else {
-      const count = unreadCount.textContent;
-      unreadCount.textContent = +count + 1;
+      unreadCount.textContent = +unreadCount?.textContent + 1;
     }
   }
   document.addEventListener('DOMContentLoaded', function() {
@@ -2536,26 +2552,22 @@ $(document).ready(function () {
   $(document).on('click', '#emoji-button', showEmoji)
  
     
-    hideLoader();
 });
 
 
-// $(window).on('beforeunload', function(e) {
-// //update balance in Iheb's data base 
-//   console.log("userBalance",totalBalance)
-//   //send emit to update balance
-//   const confirmationMessage = 'Are you sure you want to leave this page?';
-//   e.preventDefault();
-//   e.returnValue = confirmationMessage;
-  
-//   return confirmationMessage;
-// });
+$(window).on('beforeunload', function(e) {
+  foued.updateBalance({
+    "contact_id": newData.contact,
+    "type" : totalBalance.balance_type,
+    "total":totalBalance.balance
+    })
+    console.log({
+      "contact_id": newData.contact,
+      "type" : totalBalance.balance_type,
+      "total":totalBalance.balance
+      })
 
-// $(window).on('unload', function() {
-//   const confirmation = confirm('Do you want to leave this page?');
-//   if (confirmation) {
-    
-//   } else {
-//     return false;
-//   }
-// });
+  e.preventDefault();
+  
+});
+
