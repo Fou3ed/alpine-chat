@@ -70,7 +70,6 @@ export default class event {
     });
   }
   onConnected = function() {
-  console.log(loader)
     this.socket.on("onConnected", (userData, balance) => {
       console.log("new data connection ", userData, balance);
       role = userData.status == 0 ? "GUEST" : "CLIENT";
@@ -78,11 +77,9 @@ export default class event {
       if (usernameLink) {
         usernameLink.textContent = userData.full_name;
       }
-      if (balance) {
+     
         getTotalBalance(balance);
-      } else {
-        alert("error");
-      }
+   
   
        loader.style.display = "none"; 
     });
@@ -301,7 +298,8 @@ d
   // }
 
   planBought = () => {
-    this.socket.on('planBought',(data,error)=>{
+    this.socket.on('planBought',(data,messageId)=>{
+      console.log("data",data,messageId)
       const newDivMsg = document.createElement("div");
       newDivMsg.innerHTML = ` <div
       class="flex justify-center items-center w-100 m-2"
@@ -313,16 +311,15 @@ d
       </div>`
       let typingBlock = document.getElementById("typing-block-message");
       messagesContainer.insertBefore(newDivMsg, typingBlock);
-      getTotalBalance(data.Total_balance[0])
+       getTotalBalance(data.balance)
       ableInputArea()
       role="CLIENT"
-       sendBuyMessage(data)
+   
     })
   }
   
   joinedDone = () => {
     this.socket.on('memberJoinedDone', (data) => {
-      console.log("last station", data)
     })
   }
 

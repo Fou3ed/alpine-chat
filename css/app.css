@@ -9559,7 +9559,8 @@ button.gridjs-sort-desc {
 .bg-primary {
   background-color: #4f46e5;
 }
-
+.bg-violet-300	{
+	background-color: rgb(196 181 253)}
 .bg-white {
   background-color: #fff;
 }
@@ -22441,7 +22442,6 @@ emoji-picker {
   -webkit-box-shadow: 0 0 10px #cccccc;
   -o-box-shadow: 0 0 10px #cccccc;
   box-shadow: 0 0 10px #cccccc;
-  margin-bottom: 80px;
   position: relative;
   z-index: 9;
   border-radius: 5px;

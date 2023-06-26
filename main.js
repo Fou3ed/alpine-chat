@@ -43,6 +43,7 @@ const $conversationContainer = $('#conversation-container');
 const conversationContainer = document.getElementById('conversation-container');
 const emoji = document.querySelector("emoji-picker")
 const conversationHeaderStatus = document.getElementById('conversation-name').parentNode.querySelector(".text-xs");
+const modal = document.getElementById('ModalPlan');
 
 const msgButt = (messageId, direction, isPinned) => {
   return `
@@ -621,7 +622,7 @@ function submitForm(element) {
     }
     return field;
       })
-  form.result = 1;
+  form.status = 1;
 
   const data=JSON.stringify({
     contact: newData.contact,
@@ -682,10 +683,10 @@ function displayMessages(messages) {
       if (myContent !== {} && message.type === "plan") {
         tableRows = myContent.plans.map(plan => {
           return `
-          <div class="pricing-item" id="plan-${messageId}" data-plan-id="${plan.id}">
+          <div class="pricing-item" id="plan-${messageId}" data-plan-id="${plan.id}" >
           <ul>
-            <li class="icon"><i class="fas fa-comments"></i></li>
-            <li class="pricing-header">
+          <li class="icon" style="background-color: ${plan.status === 2 ? 'rgba(255, 105, 105, 0.8)' : (plan.status === 0 ? 'rgba(210, 233, 233, 0.8)' : 'rgba(159, 230, 160, 0.8)')}"><i class="fas fa-comments"></i></li>
+          <li class="pricing-header">
               <h4>${plan.billing_volume}<span>${plan.billing_type === "1" ? "Messages" : "Minutes"}</span></h4>
               <h2><sup>${plan.tariff}</sup>${plan.currency === "EUR" ? "€" : "$"}</h2>
             </li>
@@ -693,13 +694,13 @@ function displayMessages(messages) {
             <li class="footer"><a class="btn btn-dark border btn-sm" href="#">Buy</a></li>
           </ul>
         </div>
+        
           
           `;
         });
       } else if (message.type === "form") {
         let inputForms = "";
         if (myContent.fields) {
-          console.log("myContent : ",myContent)
           inputForms = myContent.fields.map(field => {
             let type = "";
             switch (+field.field_type) {
@@ -736,14 +737,14 @@ function displayMessages(messages) {
           });
         }
         tableRows = `
-        <div class="form-container ${myContent?.result==1 ?"f-success" :""}  ">
+        <div class="form-container ${myContent?.status==1 ?"f-success" :""}  ">
         <span class="error" id="msg"></span>
         <form name="form1" class="box" onsubmit="">
         <h4>${myContent.text_capture}</h4>
         <h5>Please fill in all fields</h5>
         ${inputForms.join('')}
         
-        <button  type="button"  class="btn1  ${myContent?.result==1 ?"disabled" :""} " id="submit-form-${message._id}" data-content='${message.message}'  >Valider</button>
+        <button  type="button"  class="btn1  ${myContent?.status==1 ?"disabled" :""} " id="submit-form-${message._id}" data-content='${message.message}'  >Valider</button>
         </form>
         </div>
         `;
@@ -787,8 +788,9 @@ function displayMessages(messages) {
           message.user === newData.user ? "justify-end" : "justify-start";
              const msgStyle =  role === "GUEST"
   ? `rounded-2xl break-words rounded-tl-none bg-gray-light p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
-  : `rounded-2xl break-words relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
-;
+  : `rounded-2xl break-words relative rounded-tr-none   bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
+; 
+
      ;
         messagesContainer.insertAdjacentHTML(
           "afterbegin",
@@ -798,7 +800,7 @@ function displayMessages(messages) {
                 <div class="flex flex-row">
                   ${message.type === "MSG" && direction === "justify-end" ? msgButt(messageId, direction, message.pinned === 1) : ""}
                   <div class="ml-2 max-w-lg sm:ml-5">
-                    <div class="${msgStyle}" id="message-content-${messageId}">
+                    <div class="${message.type==="link" ? "rounded-2xl break-words relative rounded-tr-none   bg-violet-300 p-3 text-slate-700 shadow-sm dark:bg-violet-500 dark:text-white ": msgStyle}" id="message-content-${messageId}">
                       ${message.status === 0 ? `${direction === "justify-start" ? message.user_data.full_name : "You"} unsent a message` : message.type == "link" ? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}" href="${myContent.userLink?.url}">${myContent.userLink?.url}</a>` : message.type === "plan" ? tableRows.join('') : message.type === "form" ? tableRows : message.message}
                       <div id="pin-div" class="${message.pinned === 0 || message.status === 0 ? "hidden" : "flex"} ${direction == "justify-start" ? "pin-div-sender" : "pin-div"} justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
                     </div>
@@ -825,17 +827,6 @@ function displayMessages(messages) {
       const msgReacted = messagesContainer.querySelector(`#message-content-${messageId}`);
       msgReacted.innerHTML += `<div class="react-container bg-white dark:bg-navy-700" id="react-content-${messageId}">${messageReactions.join("")}</div>`;
     }
-// Add an event listener to the submit button
-// document.addEventListener('DOMContentLoaded', function() {
-
-//   const submitButton = document.querySelector(`#submit-form-${messageId}`);
-//   if (submitButton) {
-//     submitButton.addEventListener("click", function () {
-//       submitForm(this);
-//     });
-//   }
-// });
-
 
 
     const submitButton = document.querySelector(`#submit-form-${messageId}`);
@@ -883,12 +874,18 @@ function displayMessages(messages) {
       });
     }
 
-    function sendPlanClickNotification(data) {
+    function sendPlanClickNotification(data,messageId) {
+       modal.classList.remove('hidden');
+      successButton.setAttribute('data-plan', data.dataset.planId);
+      successButton.setAttribute('message-id', messageId);
+
+        //update message to status not paid  : 2      
       addLogs({
         action: "start purchase",
         element: "3",
         element_id: +data.dataset.planId
       });
+
     }
 
     document.querySelectorAll(`#field-${messageId}`).forEach(input => {
@@ -916,7 +913,7 @@ function displayMessages(messages) {
         const buyButton = plan.querySelector("a.btn");
         if (buyButton) {
           buyButton.addEventListener("click", (event) => {
-            sendPlanClickNotification(plan);
+            sendPlanClickNotification(plan,messageId);
           });
         }
       });
@@ -934,9 +931,8 @@ function displayMessages(messages) {
 
 //whenever a user click on the message link fire this function 
 async function addLogs(log) {
-  console.log("log",log)
   const logData = {
-    "user_id": "3",
+    "user_id": newData.contact.toString(),
     "action": log.action,
     "element": log.element,
     "element_id": log.element_id,
@@ -1072,7 +1068,7 @@ let isSendingMessage = false;
           origin: "web",
         },
         to: expert,
-      
+        balance:totalBalance?.balance
       });
         messageInput.value = "";
         isSendingMessage = false; // Set the sending state to false
@@ -1085,6 +1081,7 @@ let isSendingMessage = false;
 }
 
 export async function sentMessage(data) {
+  console.log(data)
   let conv = conversationContainer.dataset.conversationId
   const isNotNewConversation = document.querySelector(`#left-conversation-${data.conversation}`)
 
@@ -1263,7 +1260,9 @@ export async function sentMessage(data) {
       }
 
     }
-    conversationContainer.scrollTop = conversationContainer.scrollHeight;
+    if(data.type==="MSG"){
+      conversationContainer.scrollTop = conversationContainer.scrollHeight;
+    }
 
     getDeleteButtons()
     getEditButtons()
@@ -1274,8 +1273,6 @@ export async function sentMessage(data) {
 }
 
 export async function receiveMessage(data) {
-  console.log(firstConv)
-  console.log(data.messageData.conversation)
 
   if(firstConv && firstConv===data.messageData.conversation){
 console.log({element :$(`.conversation-click[data-conversation-id="${firstConv}"]`)})
@@ -1301,7 +1298,7 @@ console.log({element :$(`.conversation-click[data-conversation-id="${firstConv}"
         return `
         <div class="pricing-item" id="plan-${messageId}" data-plan-id="${plan.id}">
         <ul>
-          <li class="icon"><i class="fas fa-comments"></i></li>
+          <li class="icon"  style="background-color: ${plan.status === 2 ? 'rgba(255, 105, 105, 0.8)' : (plan.status === 0 ? 'rgba(210, 233, 233, 0.8)' : 'rgba(159, 230, 160, 0.8)')}" ><i class="fas fa-comments"></i></li>
           <li class="pricing-header">
             <h4>${plan.billing_volume}<span>${plan.billing_type === "1" ? "Messages" : "Minutes"}</span></h4>
             <h2><sup>${plan.tariff}</sup>${plan.currency === "EUR" ? "€" : "$"}</h2>
@@ -2261,7 +2258,7 @@ export function userDisconnection(data) {
 
 let totalBalance;
 
-export function getTotalBalance(data) {
+export function getTotalBalance(balance) {
   const balanceDiv = document.querySelector(".ballance-card");
   const balanceNumber = document.querySelector("#balanceNumber");
   const balanceType = document.querySelector("#balanceType");
@@ -2276,19 +2273,18 @@ export function getTotalBalance(data) {
 
   // Simulate an asynchronous operation
   setTimeout(() => {
-    totalBalance = data;
-    if (!totalBalance.balance) {
+    totalBalance = balance;
+    if (!balance) {
       balanceNumber.textContent = "Free trial";
       balanceType.textContent = "";
     } else {
-      balanceNumber.textContent = totalBalance.balance;
-      balanceType.textContent = totalBalance.balance_type === "1" ? "Messages" : "Minutes";
+      balanceNumber.textContent = balance;
+      balanceType.textContent = "Messages" ;
 
-      // Add color change logic
-      if (totalBalance.balance > 5) {
+      if (balance > 5) {
         balanceDiv.classList.remove("from-purple-500", "to-indigo-600");
         balanceDiv.classList.add("from-purple-500", "to-green-400");
-      } else if (totalBalance.balance < 3 && totalBalance.balance > 1) {
+      } else if (balance < 3 && balance > 1) {
         balanceDiv.classList.remove("from-purple-500", "to-indigo-600");
         balanceDiv.classList.add("from-green-400", "to-orange-600");
       } else {
@@ -2297,7 +2293,7 @@ export function getTotalBalance(data) {
         balanceDiv.classList.add("from-green-400", "to-fuchsia-600");
       }
 
-      if (totalBalance.balance == 0) {
+      if (balance == 0) {
         // Disable input and button if balance is 0
         messageInput.disabled = true;
         sendButton.disabled = true;
@@ -2311,20 +2307,19 @@ export function getTotalBalance(data) {
 
 
 export function updateUserBalance() {
-  if (totalBalance?.balance) {
-    totalBalance.balance = Number(totalBalance.balance) - 1;
+  console.log("houni",totalBalance)
+  if (totalBalance) {
+    totalBalance = Number(totalBalance) - 1;
     const balanceDiv = document.querySelector(".ballance-card");
     const balanceNumber = balanceDiv.querySelector("span");
     const balanceType = balanceDiv.querySelector("sup");
 
-    balanceNumber.textContent = totalBalance.balance;
-    balanceType.textContent =
-      totalBalance.balance_type === "1" ? "Messages" : "Minutes";
-
-    if (totalBalance.balance > 5) {
+    balanceNumber.textContent = totalBalance;
+    balanceType.textContent = "Messages";
+    if (totalBalance> 5) {
       balanceDiv.classList.remove("from-purple-500", "to-indigo-600");
       balanceDiv.classList.add("from-purple-500", "to-green-400");
-    } else if (totalBalance.balance <= 4 && totalBalance.balance >= 2) {
+    } else if (totalBalance <= 4 && totalBalance >= 2) {
       balanceDiv.classList.remove("from-purple-500", "to-indigo-600");
       balanceDiv.classList.add("from-green-400", "to-orange-600");
     } else {
@@ -2332,7 +2327,7 @@ export function updateUserBalance() {
       balanceDiv.classList.add("from-green-400", "to-fuchsia-600");
     }
 
-    if (totalBalance.balance === 0) {
+    if (totalBalance === 0) {
       alert('you need to buy more balance to keep chatting')
       messageInput.disabled = true;
       sendButton.disabled = true;
@@ -2450,7 +2445,8 @@ async function getPlans() {
 const successButton = document.getElementById('buyPlanBtn');
 successButton.addEventListener('click', async function() {
 
-  const selectedPlan = this.getAttribute('data-plan'); // Get the selected plan value
+  const selectedPlan = this.getAttribute('data-plan'); 
+  const msgId =this.getAttribute('message-id')
 const modal = document.getElementById('ModalPlan');
   try {
       // showLoader()
@@ -2459,7 +2455,10 @@ const modal = document.getElementById('ModalPlan');
         user: newData.user,
         plan: selectedPlan,
         payment_method: '1',
-        provider_id: '1'
+        provider_id: '1',
+        messageId:msgId,
+        conversationId:conversationId,
+        senderName:senderName
       });
   
   } catch (error) {
@@ -2555,19 +2554,19 @@ $(document).ready(function () {
 });
 
 
-$(window).on('beforeunload', function(e) {
-  foued.updateBalance({
-    "contact_id": newData.contact,
-    "type" : totalBalance.balance_type,
-    "total":totalBalance.balance
-    })
-    console.log({
-      "contact_id": newData.contact,
-      "type" : totalBalance.balance_type,
-      "total":totalBalance.balance
-      })
+// $(window).on('beforeunload', function(e) {
+//   foued.updateBalance({
+//     "contact_id": newData.contact,
+//     "type" : totalBalance.balance_type,
+//     "total":totalBalance.balance
+//     })
+//     console.log({
+//       "contact_id": newData.contact,
+//       "type" : totalBalance.balance_type,
+//       "total":totalBalance.balance
+//       })
 
-  e.preventDefault();
+//   e.preventDefault();
   
-});
+// });
 
