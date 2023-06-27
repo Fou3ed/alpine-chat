@@ -683,19 +683,17 @@ function displayMessages(messages) {
       if (myContent !== {} && message.type === "plan") {
         tableRows = myContent.plans.map(plan => {
           return `
-          <div class="pricing-item" id="plan-${messageId}" data-plan-id="${plan.id}" >
+          <div class="pricing-item" id="plan-${messageId}" data-plan-id="${plan.id}" name="${plan.name}">
           <ul>
-          <li class="icon" style="background-color: ${plan.status === 2 ? 'rgba(255, 105, 105, 0.8)' : (plan.status === 0 ? 'rgba(210, 233, 233, 0.8)' : 'rgba(159, 230, 160, 0.8)')}"><i class="fas fa-comments"></i></li>
-          <li class="pricing-header">
+            <li class="icon"  style="background-color: ${plan.status === 2 ? 'rgba(255, 105, 105, 0.8)' : (plan.status === 0 ? 'rgba(210, 233, 233, 0.8)' : 'rgba(159, 230, 160, 0.8)')}" ><i class="fas fa-comments"></i></li>
+            <li class="pricing-header">
               <h4>${plan.billing_volume}<span>${plan.billing_type === "1" ? "Messages" : "Minutes"}</span></h4>
               <h2><sup>${plan.tariff}</sup>${plan.currency === "EUR" ? "€" : "$"}</h2>
             </li>
             <li>${plan.name}</li>
             <li class="footer"><a class="btn btn-dark border btn-sm" href="#">Buy</a></li>
           </ul>
-        </div>
-        
-          
+        </div>    
           `;
         });
       } else if (message.type === "form") {
@@ -874,19 +872,23 @@ function displayMessages(messages) {
       });
     }
 
-    function sendPlanClickNotification(data,messageId) {
-       modal.classList.remove('hidden');
+    function sendPlanClickNotification(data, messageId) {
+      modal.classList.remove('hidden');
       successButton.setAttribute('data-plan', data.dataset.planId);
       successButton.setAttribute('message-id', messageId);
-
-        //update message to status not paid  : 2      
+    
+      const name = data.getAttribute('name');
+      successButton.setAttribute('name', name);
+      console.log("name:", name);
+    
+      // Update message to status not paid: 2
       addLogs({
         action: "start purchase",
         element: "3",
         element_id: +data.dataset.planId
       });
-
     }
+    
 
     document.querySelectorAll(`#field-${messageId}`).forEach(input => {
       input.addEventListener('focus', () => {
@@ -1048,7 +1050,6 @@ let isSendingMessage = false;
             max_length_message: "256",
           },
         })
-       
       } catch (error) {
         console.log(error);
         isSendingMessage = false;
@@ -1061,7 +1062,7 @@ let isSendingMessage = false;
         action: "message.create",
         metaData: {
           type: "MSG",
-          conversation_id: conversationId, // Include the conversation ID
+          conversation_id: conversationId,
           user: newData.user,
           message: messageInput.value,
           data: "non other data",
@@ -1071,7 +1072,7 @@ let isSendingMessage = false;
         balance:totalBalance?.balance
       });
         messageInput.value = "";
-        isSendingMessage = false; // Set the sending state to false
+        isSendingMessage = false; 
       } catch (error) {
         console.log(error);
         isSendingMessage = false;
@@ -1081,7 +1082,6 @@ let isSendingMessage = false;
 }
 
 export async function sentMessage(data) {
-  console.log(data)
   let conv = conversationContainer.dataset.conversationId
   const isNotNewConversation = document.querySelector(`#left-conversation-${data.conversation}`)
 
@@ -1761,12 +1761,10 @@ async function getEditButtons() {
   allEditButtons.forEach(editButton => {
     editButton.onclick = function () {
       editMessage(this)
-
     }
-
   });
-
 }
+
 // click to update message 
 async function editMessage(button) {
   let messageId = button.dataset.messageId
@@ -1796,7 +1794,6 @@ async function editMessage(button) {
           },
         },
       };
-
       foued.updateMessage(onMessageUpdate)
     }
   });
@@ -1830,7 +1827,6 @@ export async function updateMessage(data) {
     timeMsg = formattedString
   }
 
-
   if (data.user === newData.user) {
     const input = document.getElementById(`edit-input-${data._id}`)
     const newMessage = document.createElement("div");
@@ -1860,7 +1856,6 @@ export async function updateMessage(data) {
         return `
       <a id="react-${react._id}" ${newData.user !== react.user_id ? 'style="pointer-events: none"' : ''}> ${react.path}</a>
         `})
-
       messageEdited.innerHTML += `<div class="react-container bg-white  dark:bg-navy-700" id="react-content-${data._id}" >${messageReactions.join("")} </div>`
     }
   }
@@ -2259,6 +2254,8 @@ export function userDisconnection(data) {
 let totalBalance;
 
 export function getTotalBalance(balance) {
+  console.log("balance : ",balance)
+  totalBalance=balance
   const balanceDiv = document.querySelector(".ballance-card");
   const balanceNumber = document.querySelector("#balanceNumber");
   const balanceType = document.querySelector("#balanceType");
@@ -2273,7 +2270,6 @@ export function getTotalBalance(balance) {
 
   // Simulate an asynchronous operation
   setTimeout(() => {
-    totalBalance = balance;
     if (!balance) {
       balanceNumber.textContent = "Free trial";
       balanceType.textContent = "";
@@ -2380,7 +2376,7 @@ async function getPlans() {
         const div = document.createElement('div');
         div.classList.add('mt-4');
         div.innerHTML = `
-        <div class="grid grid-cols-2 gap-2 px-3" id="balance-plan-${plan.id}">
+        <div class="grid grid-cols-2 gap-2 px-3" id="balance-plan-${plan.id}" >
           <div class="rounded-lg bg-slate-150 px-2.5 py-2 dark:bg-navy-600">
             <div class="flex items-center justify-between space-x-1">
               <p>
@@ -2390,7 +2386,7 @@ async function getPlans() {
             </div>
             <p class="mt-0.5 text-tiny+ uppercase">${plan.name} Messages</p>
             <div class="flex items-center justify-center mt-3">
-              <button class="plan-btn rounded-full bg-primary text-white hover:bg-primary-light px-3 py-1.5 text-sm font-medium" data-plan="${plan.id}">
+              <button class="plan-btn rounded-full bg-primary text-white hover:bg-primary-light px-3 py-1.5 text-sm font-medium" data-plan="${plan.id}" name="${plan.name}">
                 Buy Plan
               </button>
             </div>
@@ -2408,13 +2404,14 @@ async function getPlans() {
   
       buyButtons.forEach(buyButton => {
         buyButton.addEventListener('click', function() {
-          const selectedPlan = this.getAttribute('data-plan'); // Get the selected plan value
+          const selectedPlan = this.getAttribute('data-plan');
+          const planName = this.getAttribute('name');
           modal.classList.remove('hidden');
           successButton.setAttribute('data-plan', selectedPlan);
+          successButton.setAttribute('name', planName);
         });
       });
-      
-  
+
       closeModalButtons.forEach(closeButton => {
         closeButton.addEventListener('click', function() {
           modal.classList.add('hidden');
@@ -2444,33 +2441,32 @@ async function getPlans() {
 
 const successButton = document.getElementById('buyPlanBtn');
 successButton.addEventListener('click', async function() {
+  console.log("here")
+  const selectedPlan = this.getAttribute('data-plan');
+  const planName=this.getAttribute('name')
+  const msgId = this.getAttribute('message-id');
 
-  const selectedPlan = this.getAttribute('data-plan'); 
-  const msgId =this.getAttribute('message-id')
-const modal = document.getElementById('ModalPlan');
   try {
-      // showLoader()
-      foued.buyPlan({
-        contact:newData.contact,
-        user: newData.user,
-        plan: selectedPlan,
-        payment_method: '1',
-        provider_id: '1',
-        messageId:msgId,
-        conversationId:conversationId,
-        senderName:senderName
-      });
-  
+    console.log("planName:",planName)
+    foued.buyPlan({
+      contact: newData.contact,
+      user: newData.user,
+      plan: selectedPlan,
+      payment_method: '1',
+      provider_id: '1',
+      messageId: msgId,
+      conversationId: conversationId,
+      senderName: senderName,
+      planName:planName
+    });
   } catch (error) {
     console.error('Error adding sale:', error);
   } finally {
-    // Hide the modal after the request is triggered, regardless of success or failure
-    modal.classList.add('hidden');
+
   }
 });
 
 
-   // Function to hide the loader and remove the blur effect
    function hideLoader() {
     $('#loader').fadeOut(500, function() {
       $('.content').removeClass('blur');
@@ -2478,15 +2474,11 @@ const modal = document.getElementById('ModalPlan');
   }
 
   $(document).ready(function() {
-
-    // Add a click event listener to the "Buy more" button
     $("#buyMoreButton").on("click", function() {
-      // Trigger the click event on the other button
     $("#modalButton").trigger("click");
     });
   });
   
-
 $(document).ready(function () {
   guestConnection()
   getAllAgents()
@@ -2550,7 +2542,6 @@ $(document).ready(function () {
   $(document).on('click', '.conversation-click', handleConversationClick)
   $(document).on('click', '#emoji-button', showEmoji)
  
-    
 });
 
 
@@ -2565,7 +2556,6 @@ $(document).ready(function () {
 //       "type" : totalBalance.balance_type,
 //       "total":totalBalance.balance
 //       })
-
 //   e.preventDefault();
   
 // });

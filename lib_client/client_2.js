@@ -27,11 +27,11 @@ import {
 let messagesContainer = document.getElementById("big-container-message");
 const loader = document.querySelector(".app-preloader1");
 
-export let role=""
+export let role = ""
 export default class event {
   constructor() {
 
-   this.socket = io("ws://192.168.1.16:3000", {
+    this.socket = io("ws://192.168.1.16:3000", {
       transports: ['websocket']
     });
   }
@@ -47,18 +47,18 @@ export default class event {
 
   //receive a connect  event from the socket 
 
-  connect = (userId,contact) => {
+  connect = (userId, contact) => {
     this.socket.on("connect", () => {
       this.socket.emit("user-connected", {
         app_id: "638dc76312488c6bf67e8fc0",
         user: contact,
-        contact:contact,
+        contact: contact,
         action: "user-connected",
         metaData: {
           app_id: "638dc76312488c6bf67e8fc0",
           api_token: "123456789123456",
-          user_id:userId
-          
+          user_id: userId
+
         },
         "device": {
           "ip": "123.213.121",
@@ -69,7 +69,7 @@ export default class event {
       });
     });
   }
-  onConnected = function() {
+  onConnected = function () {
     this.socket.on("onConnected", (userData, balance) => {
       console.log("new data connection ", userData, balance);
       role = userData.status == 0 ? "GUEST" : "CLIENT";
@@ -77,14 +77,14 @@ export default class event {
       if (usernameLink) {
         usernameLink.textContent = userData.full_name;
       }
-     
-        getTotalBalance(balance);
-   
-  
-       loader.style.display = "none"; 
+
+      getTotalBalance(balance);
+
+
+      loader.style.display = "none";
     });
   };
-  
+
 
 
 
@@ -93,7 +93,7 @@ export default class event {
 
   userConnection = () => {
     this.socket.on("user-connection", (user) => {
-      if(user?.role==="AGENT"){
+      if (user ?.role === "AGENT") {
         const html = `
         <div id="${user._id}" data-name="${user.full_name}" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center">
           <div class="h-13 w-13 p-0.5">
@@ -101,25 +101,19 @@ export default class event {
           </div>
           <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">${user.full_name}</p>
         </div>`;
-      $(".swiper-wrapper").append(html);
-      
-
-
+        $(".swiper-wrapper").append(html);
       }
- 
       userConnection(user)
     })
   }
 
-
   onDisconnected = () => {
     this.socket.on("onDisconnected", (reason, socket_id) => {
-      console.log("userDiscon",socket_id)
       getExperts()
       userDisconnection(socket_id)
     })
   }
-d
+  
 
 
   /**
@@ -176,9 +170,9 @@ d
 
   onConversationStart = () => {
     return new Promise((resolve, reject) => {
-      this.socket.on("onConversationStarted", (conversationId,guest) => {
+      this.socket.on("onConversationStarted", (conversationId, guest) => {
         resolve(conversationId)
-        if(!guest){
+        if (!guest) {
           sendFirstMessage(conversationId)
         }
 
@@ -207,7 +201,7 @@ d
 
   conversationStatusUpdated = (data) => {
     this.socket.on("conversationStatusUpdated", async (data, newData) => {
-        this.socket.emit("joinConversationRoom",data._id)
+      this.socket.emit("joinConversationRoom", data._id)
     })
   }
 
@@ -285,7 +279,7 @@ d
   }
   onBalanceStat = () => {
     this.socket.on('updatedBalance', (data, error) => {
-      console.log("updated balance",data)
+      console.log("updated balance", data)
       // updateUserBalance(data)
     })
   }
@@ -296,31 +290,31 @@ d
   //     this.socket.emit("onConversationMemberJoined", socket_id, info, conversationId)
   //   })
   // }
-
   planBought = () => {
-    this.socket.on('planBought',(data,messageId)=>{
-      console.log("data",data,messageId)
+    this.socket.on('planBought', (data, newBalance) => {
       const newDivMsg = document.createElement("div");
-      newDivMsg.innerHTML = ` <div
-      class="flex justify-center items-center w-100 m-2"
-      id="msg-${data._id}"
-      >
-      <span class="logs-notification">
-      You bought a plan
-      </span>
-      </div>`
+      newDivMsg.innerHTML = `
+        <div class="flex justify-center items-center w-100 m-2" id="msg-${data._id}">
+          <span class="logs-notification">You bought a plan</span>
+        </div>
+      `;
+      const loader = document.getElementById('loaderBalance');
+  
+      if (loader.style.display === 'block') {
+        loader.style.display = 'none';
+      }
+        
       let typingBlock = document.getElementById("typing-block-message");
       messagesContainer.insertBefore(newDivMsg, typingBlock);
-       getTotalBalance(data.balance)
-      ableInputArea()
-      role="CLIENT"
-   
-    })
-  }
+      getTotalBalance(newBalance);
+      ableInputArea();
+      role = "CLIENT";
+    });
+  };
+  
   
   joinedDone = () => {
-    this.socket.on('memberJoinedDone', (data) => {
-    })
+    this.socket.on('memberJoinedDone', (data) => {})
   }
 
   createMembers = (data) => {
@@ -465,7 +459,7 @@ d
     })
 
   }
-  onCreateForm=(data)=>{
+  onCreateForm = (data) => {
     this.socket.emit('onMessageFormCreated', data, error => {
 
       if (error) {
@@ -481,9 +475,9 @@ d
   onMessageSent = async () => {
     await this.socket.on('onMessageSent', async (data, online, error) => {
       console.log("message sent ")
-        await sentMessage(data)
-        updateUserBalance()
-  })
+      await sentMessage(data)
+      updateUserBalance()
+    })
   }
 
   receiveMessage = async () => {
@@ -524,9 +518,9 @@ d
           msgText.textContent = userLog
         } else
           msgText.textContent = data.messageData.type === "plan" ? data.senderName + " sent a plan" : data.messageData.type === "form" ? data.senderName + " sent a form" : data.messageData.type === "link" ? data.senderName + " sent a link" : data.messageData.content
-          leftConversationContainer.insertBefore(msgDiv, leftConversationContainer.firstChild)
-        
-        }
+        leftConversationContainer.insertBefore(msgDiv, leftConversationContainer.firstChild)
+
+      }
 
 
       // Check if the message was sent by the current user
@@ -558,8 +552,7 @@ d
    */
 
   updateMessage = (data) => {
-    this.socket.emit('updateMessage', data, error => {
-    })
+    this.socket.emit('updateMessage', data, error => {})
   }
 
   onMessageUpdated = (data) => {
@@ -616,8 +609,7 @@ d
    * Start typing event  
    */
   startTyping = (data) => {
-    this.socket.emit('onTypingStart', data, error => {
-    })
+    this.socket.emit('onTypingStart', data, error => {})
   }
   onTypingStarted = (data) => {
     this.socket.on('onTypingStarted', (data, error) => {
@@ -944,30 +936,30 @@ d
   }
 
 
-  createGuestAccount=(data)=>{
-this.socket.emit('createGuest',data,error=>{
+  createGuestAccount = (data) => {
+    this.socket.emit('createGuest', data, error => {
 
-})
+    })
   }
 
-onGuestCreated=(data)=>{
-  this.socket.on('guestCreated',(data)=>{
+  onGuestCreated = (data) => {
+    this.socket.on('guestCreated', (data) => {
 
-    guestCreated(data)  
-    loader.style.display = "none"; 
+      guestCreated(data)
+      loader.style.display = "none";
 
-  })
-}
-saveFormData=(data)=>{
-  this.socket.emit('saveForm',data,error=>{
-  
-  })
-    }
+    })
+  }
+  saveFormData = (data) => {
+    this.socket.emit('saveForm', data, error => {
 
-    updateBalance = (data) => {
-      console.log("data",data)
-      this.socket.emit('updateTotalBalance', data, (error) => {
-       
-      });
-    };
+    })
+  }
+
+  updateBalance = (data) => {
+    console.log("data", data)
+    this.socket.emit('updateTotalBalance', data, (error) => {
+
+    });
+  };
 }
