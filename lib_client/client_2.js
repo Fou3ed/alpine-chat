@@ -292,25 +292,36 @@ export default class event {
   // }
   planBought = () => {
     this.socket.on('planBought', (data, newBalance) => {
-      const newDivMsg = document.createElement("div");
-      newDivMsg.innerHTML = `
-        <div class="flex justify-center items-center w-100 m-2" id="msg-${data._id}">
-          <span class="logs-notification">You bought a plan</span>
-        </div>
+      console.log("data : ",data , newBalance)
+      const modalDiv = document.createElement("div");
+      modalDiv.innerHTML = `
+      <div class="modal-bought" id="modal-bought">
+      <div class="modal-overlay"></div>
+      <div class="modal-content">
+        <h2 class="modal-title">Congratulations</h2>
+        <p class="modal-text">you Bought ${data.balance} Message <br> your new Balance : <i>${newBalance}</i></p>
+        <button class="modal-button" id="confirmButton">Confirm</button>
+      </div>
+    </div>
+    
       `;
-      const loader = document.getElementById('loaderBalance');
   
-      if (loader.style.display === 'block') {
-        loader.style.display = 'none';
-      }
-        
-      let typingBlock = document.getElementById("typing-block-message");
-      messagesContainer.insertBefore(newDivMsg, typingBlock);
+      // Hide the modal when the Confirm button is pressed
+      const confirmButton = modalDiv.querySelector("#confirmButton");
+      confirmButton.addEventListener("click", () => {
+        modalDiv.style.display = "none";
+      });
+  
+      document.body.appendChild(modalDiv);
       getTotalBalance(newBalance);
       ableInputArea();
       role = "CLIENT";
+      console.log("data balance ", data, newBalance);
     });
   };
+  
+  
+  
   
   
   joinedDone = () => {
@@ -474,7 +485,7 @@ export default class event {
 
   onMessageSent = async () => {
     await this.socket.on('onMessageSent', async (data, online, error) => {
-      console.log("message sent ")
+      console.log("message sent ",data)
       await sentMessage(data)
       updateUserBalance()
     })
@@ -483,6 +494,7 @@ export default class event {
   receiveMessage = async () => {
     const leftConversationContainer = document.getElementById('left-conversation');
     await this.socket.on('onMessageReceived', async (data, error) => {
+      console.log("message received",data)
       const msgDiv = document.getElementById(`left-conversation-${data.messageData.conversation}`);
       if (msgDiv) {
         const msgText = msgDiv.querySelector("p#last-message")

@@ -2026,6 +2026,7 @@
               </div>
             </div>
           </div>
+
           <div class="-mr-1 flex items-center">
             
             <div class="ballance-card flex flex-row items-center bg-gradient-to-br from-purple-500 to-indigo-600 px-4 mr-4">
@@ -2037,8 +2038,9 @@
                 </div>
                 <div class="text-xl font-semibold text-white">
                   <span id="balanceNumber"></span>
-                  <sup id="balanceType" class="text-tiny font-normal text-slate-200">Loading . . .</sup>
-                  <div id="loadingDots" class="balanceLoader"></div>
+                  <sup id="balanceType" class="text-tiny font-normal text-slate-200">
+                    <span class="balance-spinner"></span>
+                  </sup>
                 </div>
               </div>
               <button id="buyMoreButton" class="btn h-6 px-3 text-tiny border border-white/10 bg-white/20 text-white hover:bg-white/30 focus:bg-white/30">
@@ -2046,9 +2048,7 @@
               </button>
             </div>
             
-            
-            
-           
+          
             <button
               class="btn h-9 w-9 rounded-full p-0 text-slate-500 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:text-navy-200 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
             >
@@ -2538,7 +2538,7 @@
                   class="modal-footer flex pb-5 justify-end border-slate-150 dark:border-navy-500"
                 >
                   <button
-                    id="closeModal"
+                    id="closeModalPlan"
                     class="btn mt-5 mr-3 bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                   >
                     fail
@@ -2555,6 +2555,7 @@
 
             
           </div>
+
         </div>
 
 

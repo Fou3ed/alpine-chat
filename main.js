@@ -492,7 +492,7 @@ function inputLEngth(conversationMaxMsg){
     messageInput.setAttribute('maxlength', conversationMaxMsg);
     document.getElementById('max-length-value').textContent = conversationMaxMsg;
     messageInput.addEventListener('input', function() {
-    document.getElementById('message-counter').textContent = `Max Length: ${conversationMaxMsg} | Remaining Characters: ${conversationMaxMsg - this?.value.length}`;
+    document.getElementById('message-counter').textContent = `Max Length: ${conversationMaxMsg} | ${conversationMaxMsg - this?.value.length}`;
 
   });
 
@@ -654,6 +654,7 @@ function submitForm(element) {
 
 
 function displayMessages(messages) {
+  console.log("messages",messages)
   document.getElementById('big-container-message').style.display = 'block';
   if (!messages || !messages.messages) {
     console.log('No messages to display');
@@ -748,7 +749,9 @@ function displayMessages(messages) {
         `;
       }
       if (message.type === "log") {
+        console.log("message log",message.message)
         const log = JSON.parse(message.message);
+        console.log("log sss",log.action)
         let userLog = "";
         switch (log.action) {
           case "fill":
@@ -772,6 +775,13 @@ function displayMessages(messages) {
           case "link click":
             userLog = `You click to link.`;
             break;
+            case  "purchase completed":
+            userLog=`Purchase completed successfully.`
+            break;
+            case  "purchase went wrong":
+              userLog=`Purchase went  wrong.`
+              break;
+        
       
         }
 
@@ -790,31 +800,43 @@ function displayMessages(messages) {
 ; 
 
      ;
-        messagesContainer.insertAdjacentHTML(
-          "afterbegin",
-          `
-            <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
-              <div class="flex flex-col items-end space-y-3.5">
-                <div class="flex flex-row">
-                  ${message.type === "MSG" && direction === "justify-end" ? msgButt(messageId, direction, message.pinned === 1) : ""}
-                  <div class="ml-2 max-w-lg sm:ml-5">
-                    <div class="${message.type==="link" ? "rounded-2xl break-words relative rounded-tr-none   bg-violet-300 p-3 text-slate-700 shadow-sm dark:bg-violet-500 dark:text-white ": msgStyle}" id="message-content-${messageId}">
-                      ${message.status === 0 ? `${direction === "justify-start" ? message.user_data.full_name : "You"} unsent a message` : message.type == "link" ? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}" href="${myContent.userLink?.url}">${myContent.userLink?.url}</a>` : message.type === "plan" ? tableRows.join('') : message.type === "form" ? tableRows : message.message}
-                      <div id="pin-div" class="${message.pinned === 0 || message.status === 0 ? "hidden" : "flex"} ${direction == "justify-start" ? "pin-div-sender" : "pin-div"} justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
+     messagesContainer.insertAdjacentHTML(
+      "afterbegin",
+      `
+        <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
+          <div class="flex flex-col items-end space-y-3.5">
+            <div class="flex flex-row">
+              ${message.type === "MSG" && direction === "justify-end" ? msgButt(messageId, direction, message.pinned === 1) : ""}
+              <div class="ml-2 max-w-lg sm:ml-5">
+                ${
+                  message.type === "MSG" || message.type === "link"
+                    ? `
+                    <div class="${message.type === "link" ? "rounded-2xl break-words relative rounded-tr-none bg-violet-300 p-3 text-slate-700 shadow-sm dark:bg-violet-500 dark:text-white" : msgStyle}" id="message-content-${messageId}">
+                      ${message.status === 0 ? `${direction === "justify-start" ? message.user_data.full_name : "You"} unsent a message` : message.type === "link" ? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}" href="${myContent.userLink?.url}">${myContent.userLink?.url}</a>` : message.type === "plan" ? tableRows.join('') : message.type === "form" ? tableRows : message.message}
+                      <div id="pin-div" class="${message.pinned === 0 || message.status === 0 ? "hidden" : "flex"} ${direction === "justify-start" ? "pin-div-sender" : "pin-div"} justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
                     </div>
-                    <p id="date_msg" data-direction="${direction}" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
-                      ${message.status === 2 ? "(updated) " + time : direction == "justify-start" ? time : message.read ? time + `<i class="fas fa-check-double ps-2" style="font-size:10px;"></i>` : time}
-                    </p>
-                  </div>
-                  ${message.type === "MSG" && direction === "justify-start" ? msgButt(messageId, direction, message.pinned === 1) : ""}
-                </div>
-                <div class="flex flex-row"></div>
+                    `
+                    : `
+                    <div id="message-content-${messageId}">
+                      ${message.status === 0 ? `${direction === "justify-start" ? message.user_data.full_name : "You"} unsent a message` : message.type === "plan" ? tableRows.join('') : message.type === "form" ? tableRows : message.message}
+                      <div id="pin-div" class="${message.pinned === 0 || message.status === 0 ? "hidden" : "flex"} ${direction === "justify-start" ? "pin-div-sender" : "pin-div"} justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
+                    </div>
+                    `
+                }
+                <p id="date_msg" data-direction="${direction}" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
+                  ${message.status === 2 ? "(updated) " + time : direction === "justify-start" ? time : message.read ? time + `<i class="fas fa-check-double ps-2" style="font-size:10px;"></i>` : time}
+                </p>
               </div>
+              ${message.type === "MSG" && direction === "justify-start" ? msgButt(messageId, direction, message.pinned === 1) : ""}
             </div>
-          `
-        );
+            <div class="flex flex-row"></div>
+          </div>
+        </div>
+      `
+    );
+    conversationContainer.scrollTop = conversationContainer.scrollHeight;
+
       }
-      conversationContainer.scrollTop = conversationContainer.scrollHeight;
     }
     if (message.reacts.length > 0) {
       let messageReactions = message.reacts.map(react => {
@@ -881,6 +903,8 @@ function displayMessages(messages) {
       successButton.setAttribute('name', name);
       console.log("name:", name);
     
+
+
       // Update message to status not paid: 2
       addLogs({
         action: "start purchase",
@@ -1082,6 +1106,7 @@ let isSendingMessage = false;
 }
 
 export async function sentMessage(data) {
+  console.log("message sennttt",data.type)
   let conv = conversationContainer.dataset.conversationId
   const isNotNewConversation = document.querySelector(`#left-conversation-${data.conversation}`)
 
@@ -1137,11 +1162,14 @@ export async function sentMessage(data) {
 
   } else {
     let userLog = ""
-
+    console.log("here 1 ")
     const convMessage = isNotNewConversation.querySelector("p#last-message")
     if (data.type === "log") {
+      console.log("here 2 ")
+
       const log = JSON.parse(data.content)
     {
+      console.log("houni",log.action)
       switch (log.action) {
         case "fill":
           userLog = `You filled on the form.`;
@@ -1164,6 +1192,13 @@ export async function sentMessage(data) {
         case "link click":
           userLog = `You click to link.`;
           break;
+          case  "purchase completed":
+            userLog=`Purchase completed successfully.`
+            break;
+            case  "purchase went wrong":
+              userLog=`Purchase went  wrong.`
+              break;
+        
       
       }
       convMessage.textContent = userLog
@@ -1202,7 +1237,12 @@ export async function sentMessage(data) {
           case "link click":
             userLog = `You click to link.`;
             break;
-        
+            case  "purchase completed":
+              userLog=`Purchase completed successfully.`
+              break;
+              case  "purchase went wrong":
+                userLog=`Purchase went wrong.`
+                break;
             
         }
         const newDivMsg = document.createElement("div");
@@ -1368,46 +1408,64 @@ console.log({element :$(`.conversation-click[data-conversation-id="${firstConv}"
         data.direction == "out"
           ? `rounded-2xl break-words rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 relative `
           : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 relative shadow-sm break-words dark:bg-accent dark:text-white';
-      const messageContent = `
-        <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
-          <div class="flex flex-col items-end space-y-3.5">
-            <div class="flex flex-row">
-              ${
-                data.direction == "in" && data.messageData.type === "MSG"
-                  ? msgButt(messageId, direction, data.messageData.pinned === 1)
-                  : ""
-              }
-              <div class="ml-2 max-w-lg sm:ml-5">
-                <div class="${msgStyle}" id="message-content-${messageId}">
+          const messageContent = `
+          <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
+            <div class="flex flex-col items-end space-y-3.5">
+              <div class="flex flex-row">
+                ${
+                  data.direction == "in" && data.messageData.type === "MSG"
+                    ? msgButt(messageId, direction, data.messageData.pinned === 1)
+                    : ""
+                }
+                <div class="ml-2 max-w-lg sm:ml-5">
                   ${
-                    data.messageData.type == "link"
-                      ? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}" href="${myContent.userLink?.url}">${myContent.userLink?.url}</a>`
-                      : data.messageData.type === "plan"
-                      ? tableRows.join("")
-                      : data.messageData.type === "form"
-                      ? tableRows
-                      : data.messageData.content
+                    data.messageData.type === "MSG" || data.messageData.type === "link"
+                      ? `
+                      <div class="${msgStyle}" id="message-content-${messageId}">
+                        ${
+                          data.messageData.type === "link"
+                            ? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}" href="${myContent.userLink?.url}">${myContent.userLink?.url}</a>`
+                            : data.messageData.type === "plan"
+                            ? tableRows.join("")
+                            : data.messageData.type === "form"
+                            ? tableRows
+                            : data.messageData.content
+                        }
+                        <div id="pin-div" class="hidden ${direction == "justify-start" ? "pin-div-sender" : "pin-div"} justify-center items-center me-2">
+                          <i class="fas fa-thumbtack"></i>
+                        </div>
+                      </div>
+                      `
+                      : `
+                      <div id="message-content-${messageId}">
+                        ${
+                          data.messageData.type === "plan"
+                            ? tableRows.join("")
+                            : data.messageData.type === "form"
+                            ? tableRows
+                            : data.messageData.content
+                        }
+                        <div id="pin-div" class="hidden ${direction == "justify-start" ? "pin-div-sender" : "pin-div"} justify-center items-center me-2">
+                          <i class="fas fa-thumbtack"></i>
+                        </div>
+                      </div>
+                      `
                   }
-                  <div id="pin-div" class="hidden ${
-                    direction == "justify-start" ? "pin-div-sender" : "pin-div"
-                  } justify-center items-center me-2">
-                    <i class="fas fa-thumbtack"></i>
-                  </div>
+                  <p id="date_msg" data-direction="${direction}" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
+                    ${timeString}
+                  </p>
                 </div>
-                <p id="date_msg" data-direction="${direction}" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
-                  ${timeString}
-                </p>
+                ${
+                  data.direction == "out" && data.messageData.type === "MSG"
+                    ? msgButt(messageId, direction, data.messageData.pinned === 1)
+                    : ""
+                }
               </div>
-              ${
-                data.direction == "out" && data.messageData.type === "MSG"
-                  ? msgButt(messageId, direction, data.messageData.pinned === 1)
-                  : ""
-              }
+              <div class="flex flex-row"></div>
             </div>
-            <div class="flex flex-row"></div>
           </div>
-        </div>
-      `;
+        `;
+        
 
       let typingBlock = document.getElementById("typing-block-message");
 
@@ -2254,21 +2312,14 @@ export function userDisconnection(data) {
 let totalBalance;
 
 export function getTotalBalance(balance) {
-  console.log("balance : ",balance)
   totalBalance=balance
   const balanceDiv = document.querySelector(".ballance-card");
   const balanceNumber = document.querySelector("#balanceNumber");
   const balanceType = document.querySelector("#balanceType");
   const buyMoreButton = document.querySelector("#buyMoreButton");
 
-  // Disable the "Buy more" button
   buyMoreButton.disabled = true;
-
-  // Show loader while the function is executing
-  // balanceNumber.textContent = "Loading...";
-  // balanceType.textContent = "";
-
-  // Simulate an asynchronous operation
+ 
   setTimeout(() => {
     if (!balance) {
       balanceNumber.textContent = "Free trial";
@@ -2288,22 +2339,20 @@ export function getTotalBalance(balance) {
         balanceDiv.classList.remove("from-green-400", "to-orang-600");
         balanceDiv.classList.add("from-green-400", "to-fuchsia-600");
       }
-
       if (balance == 0) {
         // Disable input and button if balance is 0
         messageInput.disabled = true;
         sendButton.disabled = true;
       }
     }
-
     // Enable the "Buy more" button
     buyMoreButton.disabled = false;
   }, 2000); // Simulated 2-second delay, replace with actual async logic
 }
 
 
+
 export function updateUserBalance() {
-  console.log("houni",totalBalance)
   if (totalBalance) {
     totalBalance = Number(totalBalance) - 1;
     const balanceDiv = document.querySelector(".ballance-card");
@@ -2371,29 +2420,29 @@ async function getPlans() {
         Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Nzg5NzE2OTUsImV4cCI6MTYyMDA1NzIzMzMzLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcm5hbWUiOiJ0ZXN0QGdtYWlsLmNvbSJ9.Yy_dUAEfszEpE-aQkBcUBq6rV9OPaUCNaoLxIfJnoNyCqsVWUfbilWNz2sXXImyDBmsNg1n9YIERHUE2iziJpOdhJdbiT6byWmT7MhuyC_QUxbPCko5NQPfP-KB85BjKVSxpr-CNq-Su8LxZ6fysLc7Qe71A86O0TangvsH4UgUb99WE3fMC_EF0PnvXVVxfzdZkV9p1EUTJa989ENP-ytXwdonUXcFUBznlW5PVEWgw-5dyWcND3LXCGaweAO-gMSU2K1Wp2T_rtqTRsXkAhcwF5T_IODee87w4FVARMfbXHvvIizclqyH0TITU8G_MgcoteObO24bECJCV-KpFWg`
       }
     });
+
     if(response){
       response.data.data.forEach(plan => {
         const div = document.createElement('div');
         div.classList.add('mt-4');
         div.innerHTML = `
-        <div class="grid grid-cols-2 gap-2 px-3" id="balance-plan-${plan.id}" >
-          <div class="rounded-lg bg-slate-150 px-2.5 py-2 dark:bg-navy-600">
-            <div class="flex items-center justify-between space-x-1">
-              <p>
-                <span class="text-lg font-medium text-slate-700 dark:text-navy-100">${plan.tariff}</span>
-                <span class="text-xs">£</span>
-              </p>
-            </div>
-            <p class="mt-0.5 text-tiny+ uppercase">${plan.name} Messages</p>
-            <div class="flex items-center justify-center mt-3">
-              <button class="plan-btn rounded-full bg-primary text-white hover:bg-primary-light px-3 py-1.5 text-sm font-medium" data-plan="${plan.id}" name="${plan.name}">
-                Buy Plan
-              </button>
-            </div>
+        <div class="grid grid-cols-2 gap-2 px-3" id="balance-plan-${plan.id}">
+        <div class="rounded-lg bg-slate-150 px-2.5 py-2 dark:bg-navy-600">
+          <div class="flex items-center justify-between space-x-1">
+            <p>
+              <span class="text-lg font-medium text-slate-700 dark:text-navy-100">${plan.tariff}</span>
+              <span class="text-xs">£</span>
+            </p>
+          </div>
+          <p class="mt-0.5 text-tiny+ uppercase">${plan.name} Messages</p>
+          <div class="flex items-center justify-center mt-3">
+            <button class="plan-btn rounded-full bg-primary text-white hover:bg-primary-light px-3 py-1.5 text-sm font-medium" data-plan="${plan.id}" name="${plan.name}">
+              Buy Plan
+            </button>
           </div>
         </div>
+      </div>
       `;
-      
       document.getElementById('plans').appendChild(div);
       });
   
@@ -2411,6 +2460,7 @@ async function getPlans() {
           successButton.setAttribute('name', planName);
         });
       });
+
 
       closeModalButtons.forEach(closeButton => {
         closeButton.addEventListener('click', function() {
@@ -2438,16 +2488,40 @@ async function getPlans() {
 //     loader.style.display = 'block';
 //   }
 // }
+const balanceNumber = document.getElementById('balanceNumber');
+const balanceSpinner = document.querySelector('.balance-spinner');
+
+
+const failButton = document.getElementById("closeModalPlan");
+
+console.log(failButton)
+failButton.addEventListener('click', function() {
+  console.log("clicked ", failButton);
+
+  try {
+    
+
+  foued.buyPlan({
+   contact: newData.contact,
+   conversationId: conversationId,
+
+    
+  })
+  } catch (error) {
+    console.error('Error adding sale:', error);
+  } 
+});
+
 
 const successButton = document.getElementById('buyPlanBtn');
 successButton.addEventListener('click', async function() {
-  console.log("here")
   const selectedPlan = this.getAttribute('data-plan');
-  const planName=this.getAttribute('name')
+  const planName = this.getAttribute('name');
   const msgId = this.getAttribute('message-id');
-
   try {
-    console.log("planName:",planName)
+    balanceNumber.innerHTML = '';
+    balanceNumber.appendChild(balanceSpinner);
+    // Your existing code
     foued.buyPlan({
       contact: newData.contact,
       user: newData.user,
@@ -2457,21 +2531,12 @@ successButton.addEventListener('click', async function() {
       messageId: msgId,
       conversationId: conversationId,
       senderName: senderName,
-      planName:planName
+      planName: planName
     });
   } catch (error) {
     console.error('Error adding sale:', error);
-  } finally {
-
-  }
+  } 
 });
-
-
-   function hideLoader() {
-    $('#loader').fadeOut(500, function() {
-      $('.content').removeClass('blur');
-    });
-  }
 
   $(document).ready(function() {
     $("#buyMoreButton").on("click", function() {
