@@ -22725,7 +22725,6 @@ a.btn {
   }
 }
 
-
 .modal-bought {
   position: fixed;
   top: 0;
@@ -22770,4 +22769,63 @@ a.btn {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+
+
+
+
+.peer:placeholder-shown~.peer-placeholder-shown\:scale-100 {
+    --tw-scale-x: 1;
+    --tw-scale-y: 1;
+    transform: translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.peer:placeholder-shown~.peer-placeholder-shown\:translate-y-0 {
+    --tw-translate-y: 0px;
+    transform: translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+:is(.dark .dark\:text-gray-400) {
+    --tw-text-opacity: 1;
+    color: rgb(156 163 175/var(--tw-text-opacity));
+}
+.duration-300 {
+    transition-duration: .3s;
+}
+.text-gray-500 {
+    --tw-text-opacity: 1;
+    color: rgb(107 114 128/var(--tw-text-opacity));
+}
+.text-sm {
+    font-size: .875rem;
+    line-height: 1.25rem;
+}
+.transform {
+    transform: translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.scale-75 {
+    --tw-scale-x: .75;
+    --tw-scale-y: .75;
+}
+.rotate-90, .scale-75 {
+    transform: translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.-translate-y-4, .-translate-y-6 {
+    transform: translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+.-translate-y-4 {
+    --tw-translate-y: -1rem;
+}
+.origin-\[0\] {
+    transform-origin: 0;
+}
+.z-10 {
+    z-index: 10;
+}
+.top-4 {
+    top: 1rem;
+}
+.left-2\.5 {
+    left: .625rem;
+}
+.absolute {
+    position: absolute;
 }

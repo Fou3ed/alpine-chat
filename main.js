@@ -148,7 +148,6 @@ if (messageInput)
     }
   });
 
-  
 //if the connection user is a guest create a guest account : 
   function guestConnection() {
     if(!newData){
@@ -226,7 +225,7 @@ let expertMsgAppended = false;
 
 export async function getExperts() {
   
-  const response = await axios.get("http://192.168.1.16:3000/users/connected");
+  const response = await axios.get("http://192.168.1.20:3000/users/connected");
   
   if (response.data.message === "success") {
     connectUsers = response.data.data;
@@ -270,7 +269,7 @@ async function selectExpert() {
     const $conversationContainer = $("#conversation-container");
     // Check if they both have conversation, if yes, just handle click to left conversation
     if (userId){                    
-    const response = await axios.get(`http://192.168.1.16:3000/conversation/?user1=${userId}&user2=${agent}`);
+    const response = await axios.get(`http://192.168.1.20:3000/conversation/?user1=${userId}&user2=${agent}`);
 
     if (!response.data.data) {
       conversationId = "";
@@ -316,7 +315,7 @@ export async function getAllConversations() {
   leftConversationContainer.innerHTML = '';
   let latestConversationId = null;
   let userConversation = ""
-  const conversationsResponse = await axios.get(`http://192.168.1.16:3000/conversation/1/?user_id=${newData.contact}`);
+  const conversationsResponse = await axios.get(`http://192.168.1.20:3000/conversation/1/?user_id=${newData.contact}`);
   if(conversationsResponse.data.data.length>0){
     const conversations = conversationsResponse.data.data;
     allConversation = conversations
@@ -367,7 +366,6 @@ export async function getAllConversations() {
           case "link click":
             userLog = `You click to link.`;
             break;
-         
         }
       }
       let msg = ""
@@ -440,6 +438,7 @@ export async function getAllConversations() {
 // this function is a handle click , so whenever the client click on a conversation it call the load messages function where messages should be displayed in the messagesContainer
 function handleConversationClick() {
   agentClicked = $(this).parent().parent().data('user-id')
+  
     expert=agentClicked
   const conversationActive = document.querySelectorAll("div.conversation-click")
   conversationActive.forEach(element => {
@@ -458,7 +457,6 @@ function handleConversationClick() {
   conversationId = conversation_id;
   
 const exist=allConversation.find(conversation=>conversation._id===conversationId)
-
 if(exist?.status==1){
   conversationHeaderStatus.textContent = "En ligne"
 }else {
@@ -500,7 +498,7 @@ function inputLEngth(conversationMaxMsg){
 
 
 async function getTheLastMsg(conversationId) {
-  return axios.get(`http://192.168.1.16:3000/messages/lastMsg/${conversationId}`)
+  return axios.get(`http://192.168.1.20:3000/messages/lastMsg/${conversationId}`)
     .then(function (response) {
       if(response){
         const lastMessage = response.data.data;
@@ -545,10 +543,12 @@ const spinner = document.getElementById('conversation-spinner')
 
 const limit = 10;
 async function loadMessages(page, conversationId) {
+  if (page===2){
+    conversationContainer.scrollTop = conversationContainer.scrollHeight;
 
+  }
   // Show the big container message
   document.getElementById('big-container-message').style.display = 'block';
-
   // Don't make multiple requests if a request is already in progress
   if (isLoading) {
     return;
@@ -559,13 +559,12 @@ if(conversationId){
     // Show the spinner
     spinner.classList.remove("hidden");
     // Load messages from the server
-    const response = await axios.get(`http://192.168.1.16:3000/messages/${conversationId}?page=${page}&limit=${limit}`);
+    const response = await axios.get(`http://192.168.1.20:3000/messages/conv/${conversationId}?page=${page}&limit=${limit}`);
     if (response.data.message !== "success") {
       throw new Error("Failed to load messages");
     }
-    const messages = response.data.data;
     // Do something with the messages
-    displayMessages(messages);
+    displayMessages(response.data.data);
     // Check if the scrollbar has reached the top
     const container = document.getElementById('conversation-container');
     if (container.scrollTop === 0) {
@@ -588,10 +587,10 @@ const container = document.getElementById('conversation-container');
 if (container)
   container.addEventListener('scroll', () => {
     if (container.scrollTop === 0) {
+      container.scrollTop = container.scrollHeight * 0.1;
       // Call loadMessages() with the current page
-      const conversationId = container.dataset.conversationId;
       const currentPage = Math.ceil(container.scrollHeight / container.clientHeight);
-      loadMessages(currentPage, conversationId);
+      loadMessages(currentPage,  container.dataset.conversationId);
     }
   });
 
@@ -599,6 +598,7 @@ if (container)
 
 // The submitForm function definition
 function submitForm(element) {
+  console.log("element",element)
   let messageContent = element.closest('[id^="message-content-"]');
   let messageId = messageContent?.id?.replace('message-content-', '');
   const form = JSON.parse(element.dataset.content);
@@ -654,7 +654,6 @@ function submitForm(element) {
 
 
 function displayMessages(messages) {
-  console.log("messages",messages)
   document.getElementById('big-container-message').style.display = 'block';
   if (!messages || !messages.messages) {
     console.log('No messages to display');
@@ -724,15 +723,20 @@ function displayMessages(messages) {
             }
             return `
             <div class="relative">
-            <input type="text" class="form-input field-${messageId} block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer " placeholder=" "
+            <input
+              id="floating_filled_${messageId}"
+              class="form-input field-${messageId} block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+              placeholder=""
               data-field-id="${field.field_id}"
-              name="${field.field_name.replace(" ", "")}"
+              name="${field.field_name.replace(" ", "")}" 
               type="${type}"
-              value="${field?.field_value ?? ""}" 
-              ${field?.field_value ? "style='pointer-events:none'": ""}
+              value="${field?.field_value ?? ""}"
+              required 
+              ${field?.field_value ? "style='pointer-events:none'" : ""}
             />
-            <label class="form-label absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-6 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4">${field.field_name}</label>
-          </div>`;
+            <label for="floating_filled_${messageId}" class="form-label absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-6 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4">${field.field_name}</label>
+          </div>
+          `;
           });
         }
         tableRows = `
@@ -743,15 +747,13 @@ function displayMessages(messages) {
         <h5>Please fill in all fields</h5>
         ${inputForms.join('')}
         
-        <button  type="button"  class="btn1  ${myContent?.status==1 ?"disabled" :""} " id="submit-form-${message._id}" data-content='${message.message}'  >Valider</button>
+        <button  type="button"  class="btn1  ${myContent?.status==1 ?"disabled" :""} " id="submit-form-${message._id}" data-content='${message.message}'  >Submit</button>
         </form>
         </div>
         `;
       }
       if (message.type === "log") {
-        console.log("message log",message.message)
         const log = JSON.parse(message.message);
-        console.log("log sss",log.action)
         let userLog = "";
         switch (log.action) {
           case "fill":
@@ -784,6 +786,7 @@ function displayMessages(messages) {
         
       
         }
+    
 
         messagesContainer.insertAdjacentHTML(
           "afterbegin",
@@ -797,12 +800,9 @@ function displayMessages(messages) {
              const msgStyle =  role === "GUEST"
   ? `rounded-2xl break-words rounded-tl-none bg-gray-light p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
   : `rounded-2xl break-words relative rounded-tr-none   bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
-; 
-
-     ;
-     messagesContainer.insertAdjacentHTML(
-      "afterbegin",
-      `
+      messagesContainer.insertAdjacentHTML(
+        "afterbegin",
+        `
         <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
           <div class="flex flex-col items-end space-y-3.5">
             <div class="flex flex-row">
@@ -814,6 +814,7 @@ function displayMessages(messages) {
                     <div class="${message.type === "link" ? "rounded-2xl break-words relative rounded-tr-none bg-violet-300 p-3 text-slate-700 shadow-sm dark:bg-violet-500 dark:text-white" : msgStyle}" id="message-content-${messageId}">
                       ${message.status === 0 ? `${direction === "justify-start" ? message.user_data.full_name : "You"} unsent a message` : message.type === "link" ? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}" href="${myContent.userLink?.url}">${myContent.userLink?.url}</a>` : message.type === "plan" ? tableRows.join('') : message.type === "form" ? tableRows : message.message}
                       <div id="pin-div" class="${message.pinned === 0 || message.status === 0 ? "hidden" : "flex"} ${direction === "justify-start" ? "pin-div-sender" : "pin-div"} justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
+                      ${direction === "justify-start" && myContent.userLink?.status === "1" ? '<i class="fas fa-eye text-blue-500 ml-1"></i>' : ''}
                     </div>
                     `
                     : `
@@ -832,12 +833,17 @@ function displayMessages(messages) {
             <div class="flex flex-row"></div>
           </div>
         </div>
-      `
-    );
-    conversationContainer.scrollTop = conversationContainer.scrollHeight;
+        `
+      );
+    
+    
 
       }
     }
+
+
+
+
     if (message.reacts.length > 0) {
       let messageReactions = message.reacts.map(react => {
         return `
@@ -852,9 +858,29 @@ function displayMessages(messages) {
     const submitButton = document.querySelector(`#submit-form-${messageId}`);
     if (submitButton) {
       submitButton.addEventListener("click", function () {
-        submitForm(this);
+        const form = document.forms.form1;
+        const inputs = form.elements;
+    
+        let isValid = true;
+        for (let i = 0; i < inputs.length; i++) {
+          const input = inputs[i];
+          if (input.required && !input.value) {
+            isValid = false;
+            break;
+          }
+          if (input.type === "number" && isNaN(Number(input.value))) {
+            isValid = false;
+            break;
+          }
+        }  
+        if (isValid) {
+          submitForm(this);
+        } else {
+          console.log("Please fill in all fields correctly.");
+        }
       });
     }
+    
     
     const allFormInput = document.querySelectorAll(`.field-${messageId}`);
     if (allFormInput.length > 0) {
@@ -887,6 +913,8 @@ function displayMessages(messages) {
     
 
     function sendClickingNotification(data) {
+
+       foued.linkClick(data.id.replace("linked-msg-",""))
       addLogs({
         action: "link click",
         element: "7",
@@ -1080,6 +1108,9 @@ let isSendingMessage = false;
       }
     } else {
       try {
+        if(totalBalance>0){
+
+    
        foued.onCreateMessage({
         app: "638dc76312488c6bf67e8fc0",
         user: newData.user,
@@ -1095,18 +1126,20 @@ let isSendingMessage = false;
         to: expert,
         balance:totalBalance?.balance
       });
+    }
         messageInput.value = "";
         isSendingMessage = false; 
       } catch (error) {
         console.log(error);
         isSendingMessage = false;
       }
+      
     }
+    
   }
 }
 
 export async function sentMessage(data) {
-  console.log("message sennttt",data.type)
   let conv = conversationContainer.dataset.conversationId
   const isNotNewConversation = document.querySelector(`#left-conversation-${data.conversation}`)
 
@@ -1162,14 +1195,10 @@ export async function sentMessage(data) {
 
   } else {
     let userLog = ""
-    console.log("here 1 ")
     const convMessage = isNotNewConversation.querySelector("p#last-message")
     if (data.type === "log") {
-      console.log("here 2 ")
-
       const log = JSON.parse(data.content)
     {
-      console.log("houni",log.action)
       switch (log.action) {
         case "fill":
           userLog = `You filled on the form.`;
@@ -1289,7 +1318,6 @@ export async function sentMessage(data) {
         </div>
       `);
         changeTitle(0)
-        // set the scroll position to the bottom of the conversation container
         const msgDiv = document.getElementById(`left-conversation-${conversationId}`);
 
         if (msgDiv) {
@@ -1315,7 +1343,6 @@ export async function sentMessage(data) {
 export async function receiveMessage(data) {
 
   if(firstConv && firstConv===data.messageData.conversation){
-console.log({element :$(`.conversation-click[data-conversation-id="${firstConv}"]`)})
     $(`.conversation-click[data-conversation-id="${firstConv}"]`).trigger("click")
       firstConv=""
   }
@@ -1424,7 +1451,7 @@ console.log({element :$(`.conversation-click[data-conversation-id="${firstConv}"
                       <div class="${msgStyle}" id="message-content-${messageId}">
                         ${
                           data.messageData.type === "link"
-                            ? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}" href="${myContent.userLink?.url}">${myContent.userLink?.url}</a>`
+                            ? `<a class="link-msg  " id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}" href="${myContent.userLink?.url}">${myContent.userLink?.url}</a>`
                             : data.messageData.type === "plan"
                             ? tableRows.join("")
                             : data.messageData.type === "form"
@@ -1504,16 +1531,41 @@ console.log({element :$(`.conversation-click[data-conversation-id="${firstConv}"
       unreadCount?.classList.add("flex");
       unreadCount.textContent = 1;
     } else {
-      unreadCount.textContent = +unreadCount?.textContent + 1;
+      if(unreadCount?.textContent){
+        unreadCount.textContent = +unreadCount?.textContent + 1;
+      }
     }
   }
   document.addEventListener('DOMContentLoaded', function() {
     const submitButton = document.querySelector(`#submit-form-${messageId}`);
     if (submitButton) {
       submitButton.addEventListener("click", function () {
-        submitForm(this);
+        const form = document.forms.form1;
+        const inputs = form.elements;
+    
+        // Iterate over the input fields and validate them
+        let isValid = true;
+        for (let i = 0; i < inputs.length; i++) {
+          const input = inputs[i];
+          if (input.required && !input.value) {
+            isValid = false;
+            break;
+          }
+          if (input.type === "number" && isNaN(Number(input.value))) {
+            isValid = false;
+            break;
+          }
+          // Add more validation logic for other input types if needed
+        }
+    
+        if (isValid) {
+          submitForm(this);
+        } else {
+          console.log("Please fill in all fields correctly.");
+        }
       });
     }
+    
   })
 
   const allFormInput = document.querySelectorAll(`#field-${messageId}`);
@@ -1672,7 +1724,6 @@ async function reactions() {
 }
 
 function onReactToMessage(button) {
-
   let reaction = button.parentNode;
   let messageId = reaction.parentNode.parentNode.dataset.messageId;
   let react = button.textContent
@@ -1693,7 +1744,7 @@ function onReactToMessage(button) {
   playNotificationSound()
 };
 
-async function getReactButton() {
+async function  getReactButton() {
   const toUnReact = document.querySelectorAll('.react-container');
   for (const reactContainer of toUnReact) {
     const allReacts = reactContainer.querySelectorAll('a');
@@ -1966,13 +2017,15 @@ function onStopTyping() {
 //start typing function 
 let typingBlock = document.getElementById("typing-block-message");
 export function startTyping(data) {
-  conversationContainer.scrollTop = conversationContainer.scrollHeight;
-
+  console.log("start typing ",data)
   typingBlock = document.getElementById("typing-block-message");
+  console.log("typingBlock")
   if (data.metaData.conversation === conversationId) {
+    console.log("da5let")
     // set the scroll position to the bottom of the conversation container
     conversationContainer.scrollTop = conversationContainer.scrollHeight;
     if (!typingBlock) {
+      console.log("hererereerre")
       typingBlock = document.createElement("div");
       typingBlock.className = "w-100 p-3 d-flex";
       typingBlock.id = "typing-block-message";
@@ -2050,9 +2103,9 @@ export function startTyping(data) {
                         </div>
                       </div>`
       messagesContainer.appendChild(typingBlock)
-      const msgDiv = document.getElementById(`left-conversation-${data.messageData.conversation}`);
+      // const msgDiv = document.getElementById(`left-conversation-${data.messageData.conversation}`);
 
-      const msgText = msgDiv.querySelector("p#last-message")
+      const msgText = msgDiv?.querySelector("p#last-message")
       msgText.textContent.appendChild(typingBlock)
 
     }
@@ -2178,7 +2231,7 @@ if (messageInput) {
 
 //get All agents in the platform
 async function getAllAgents() {
-  const response = await axios.get("http://192.168.1.16:3000/users");
+  const response = await axios.get("http://192.168.1.20:3000/users");
   if (response.data.message === "success") {
     const agents = response.data.data
     agents.forEach((agent) => {
@@ -2312,6 +2365,7 @@ export function userDisconnection(data) {
 let totalBalance;
 
 export function getTotalBalance(balance) {
+  console.log("balance",balance)
   totalBalance=balance
   const balanceDiv = document.querySelector(".ballance-card");
   const balanceNumber = document.querySelector("#balanceNumber");
@@ -2345,9 +2399,8 @@ export function getTotalBalance(balance) {
         sendButton.disabled = true;
       }
     }
-    // Enable the "Buy more" button
     buyMoreButton.disabled = false;
-  }, 2000); // Simulated 2-second delay, replace with actual async logic
+  }, 2000); 
 }
 
 
@@ -2480,21 +2533,12 @@ async function getPlans() {
   }
 }
 
-
-// function showLoader() {
-//   const loader = document.getElementById('buyLoader');
-//   console.log(loader); 
-//   if (loader) {
-//     loader.style.display = 'block';
-//   }
-// }
 const balanceNumber = document.getElementById('balanceNumber');
 const balanceSpinner = document.querySelector('.balance-spinner');
 
 
 const failButton = document.getElementById("closeModalPlan");
 
-console.log(failButton)
 failButton.addEventListener('click', function() {
   console.log("clicked ", failButton);
 
@@ -2596,7 +2640,7 @@ $(document).ready(function () {
   foued.planBought()
   foued.joinedDone()
   foued.onConversationStart()
-
+  foued.linkClicked()
   document
     .querySelector("emoji-picker")
     .addEventListener("emoji-click", (event) => {

@@ -31,7 +31,7 @@ export let role = ""
 export default class event {
   constructor() {
 
-    this.socket = io("ws://192.168.1.16:3000", {
+    this.socket = io("ws://192.168.1.20:3000", {
       transports: ['websocket']
     });
   }
@@ -79,7 +79,6 @@ export default class event {
       }
 
       getTotalBalance(balance);
-
 
       loader.style.display = "none";
     });
@@ -485,9 +484,11 @@ export default class event {
 
   onMessageSent = async () => {
     await this.socket.on('onMessageSent', async (data, online, error) => {
-      console.log("message sent ",data)
       await sentMessage(data)
-      updateUserBalance()
+      if(data?.type==="MSG" ){
+        updateUserBalance()
+
+      }
     })
   }
 
@@ -974,4 +975,22 @@ export default class event {
 
     });
   };
+
+  linkClick=(data)=>{
+    this.socket.emit('linkClick',data,(error)=>{
+
+    })
+  }
+  linkClicked = () => {
+    this.socket.on('linkClicked', (data, error) => {
+      const msg = messagesContainer.querySelector(`#message-content-${data._id}`);
+      if (msg) {
+        const eyeIcon = document.createElement('i');
+        eyeIcon.className = 'fas fa-eye text-blue-500 ml-1';
+        msg.appendChild(eyeIcon);
+      }
+    });
+  };
+  
+ 
 }
