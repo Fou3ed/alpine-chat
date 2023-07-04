@@ -77,9 +77,8 @@ export default class event {
       if (usernameLink) {
         usernameLink.textContent = userData.full_name;
       }
-
-      getTotalBalance(balance);
-
+        getTotalBalance(balance);
+      
       loader.style.display = "none";
     });
   };
@@ -289,36 +288,35 @@ export default class event {
   //     this.socket.emit("onConversationMemberJoined", socket_id, info, conversationId)
   //   })
   // }
-  planBought = () => {
-    this.socket.on('planBought', (data, newBalance) => {
-      console.log("data : ",data , newBalance)
-      const modalDiv = document.createElement("div");
-      modalDiv.innerHTML = `
+planBought = () => {
+  this.socket.on('planBought', (data, newBalance) => {
+    console.log("data: ", data, newBalance);
+    const modalDiv = document.createElement("div");
+    modalDiv.innerHTML = `
       <div class="modal-bought" id="modal-bought">
-      <div class="modal-overlay"></div>
-      <div class="modal-content">
-        <h2 class="modal-title">Congratulations</h2>
-        <p class="modal-text">you Bought ${data.balance} Message <br> your new Balance : <i>${newBalance}</i></p>
-        <button class="modal-button" id="confirmButton">Confirm</button>
+        <div class="modal-overlay"></div>
+        <div class="modal-content bg-light-gray">
+          <h2 class="modal-title">Congratulations</h2>
+          <p class="modal-text">You bought ${data.balance} messages.<br>Your new balance: <i>${newBalance}</i></p>
+          <button class="modal-button bg-soft-color" id="confirmButton">Confirm</button>
+        </div>
       </div>
-    </div>
-    
-      `;
-  
-      // Hide the modal when the Confirm button is pressed
-      const confirmButton = modalDiv.querySelector("#confirmButton");
-      confirmButton.addEventListener("click", () => {
-        modalDiv.style.display = "none";
-      });
-  
-      document.body.appendChild(modalDiv);
-      getTotalBalance(newBalance);
-      ableInputArea();
-      role = "CLIENT";
-      console.log("data balance ", data, newBalance);
+    `;
+
+    // Hide the modal when the Confirm button is pressed
+    const confirmButton = modalDiv.querySelector("#confirmButton");
+    confirmButton.addEventListener("click", () => {
+      modalDiv.style.display = "none";
     });
-  };
-  
+
+    document.body.appendChild(modalDiv);
+    getTotalBalance(newBalance);
+    ableInputArea();
+    role = "CLIENT";
+    console.log("Data balance: ", data, newBalance);
+  });
+};
+
   
   
   
@@ -960,7 +958,7 @@ export default class event {
 
       guestCreated(data)
       loader.style.display = "none";
-
+       getTotalBalance()
     })
   }
   saveFormData = (data) => {

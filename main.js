@@ -1,6 +1,9 @@
 import Event from "./lib_client/client_2.js";
+
 const foued = new Event();
-import { role } from "./lib_client/client_2.js";
+import {
+  role
+} from "./lib_client/client_2.js";
 const currentDate = new Date();
 let allConversation = []
 let connectUsers = []
@@ -123,9 +126,9 @@ const msgButt = (messageId, direction, isPinned) => {
 
 
 window.connected = async () => {
-  console.log("window.connect",newData.user,newData.contact)
+  console.log("window.connect", newData.user, newData.contact)
   // Receive the connect event and send connection event to save the connection data in database and update the user status (is_active_:true)
-  foued.connect(newData.user,newData.contact);
+  foued.connect(newData.user, newData.contact);
 };
 
 // Receive the connection event and retrieve the user data and save it into local storage 
@@ -141,7 +144,7 @@ let userBalance;
 // Disable the send message button if it's empty.
 if (messageInput)
   messageInput.addEventListener("input", () => {
-    if (messageInput.value.trim() === "" || userBalance===0) {
+    if (messageInput.value.trim() === "" || userBalance === 0) {
       sendButton.disabled = true;
     } else {
       sendButton.disabled = false;
@@ -149,33 +152,39 @@ if (messageInput)
   });
 
 //if the connection user is a guest create a guest account : 
-  function guestConnection() {
-    if(!newData){
-      foued.createGuestAccount({  
-        browser:navigator.userAgent,
-        platform:navigator.platform,
-        accountId:"1"
-      })
-    }
-        }  
-        let firstConv=""
-   //when receiving guest data from server save it in cookies
-  export async function guestCreated(data){
-    const newUser = { user: data.user,contact:data.contact,accountId:data.accountId }
-    newData = newUser
-    document.cookie = "myData=" + JSON.stringify(newUser) + "; expires=Tue, 31 Dec 9999 23:59:59 GMT; path=/";
-    const balanceDiv = document.querySelector(".ballance-card")
-    const balanceNumber = balanceDiv.querySelector("span")
-    balanceNumber.textContent = "Free"
-    foued.connect(data.user,data.contact)
-       expert=data.availableAgent
-       userId = data.user
-       firstConv=data.conversationId
-    if(expert){
+function guestConnection() {
+  if (!newData) {
+    foued.createGuestAccount({
+      browser: navigator.userAgent,
+      platform: navigator.platform,
+      accountId: "1"
+    })
+  }
+}
+let firstConv = ""
+//when receiving guest data from server save it in cookies
+export async function guestCreated(data) {
+  console.log("guest data",data)
+  const newUser = {
+    user: data.user,
+    contact: data.contact,
+    accountId: data.accountId
+  }
+  newData = newUser
+  document.cookie = "myData=" + JSON.stringify(newUser) + "; expires=Tue, 31 Dec 9999 23:59:59 GMT; path=/";
+  foued.connect(data.user, data.contact)
+  const usernameLink = document.getElementById("usernameLink");
+  if (usernameLink) {
+    usernameLink.textContent = `Guest #${data.contact}`;
+  }
+  expert = data.availableAgent
+  userId = data.user
+  firstConv = data.conversationId
+  if (expert) {
 
-      redirectToAgent(expert)
-    }
-    const html = `
+    redirectToAgent(expert)
+  }
+  const html = `
   <div class="conversation bg-slate-150" data-conversation-id="${data.conversationId}" data-name=${data.senderName} data-timestamp=${timeString} id="left-conversation-${data.conversationId}" data-user-id="${data.availableAgent}">
     <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
       <div
@@ -200,44 +209,45 @@ if (messageInput)
             <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
               Contact form 
             </p>
-            <div
-              class="flex h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-slate-200 px-1.5 text-tiny+ font-medium leading-none text-slate-800 dark:bg-navy-450 dark:text-white">
-
-            </div>
+       
           </div>
         </div>
       </div>
     </div>
   </div>`;
   const newConvDiv = document.createElement("div")
-// Append the HTML to the container
-newConvDiv.innerHTML = html;
-leftConversationContainer.insertBefore(newConvDiv, leftConversationContainer.firstChild)
+  inputLEngth(256)
+  // Append the HTML to the container
+  newConvDiv.innerHTML = html;
+  leftConversationContainer.insertBefore(newConvDiv, leftConversationContainer.firstChild)
 
-  }
-  
-  
+}
+
+
 /**
  * Display all connected agents 
  */
 const displayedUsers = new Set();
-let expertMsgAppended = false; 
+let expertMsgAppended = false;
 
 export async function getExperts() {
-  
+
   const response = await axios.get("http://192.168.1.20:3000/users/connected");
-  
+
   if (response.data.message === "success") {
     connectUsers = response.data.data;
 
     if (response.data.data.length > 0 && !expertMsgAppended) {
       const html = `<span class="text-xs font-medium uppercase">Meet our new experts</span>`;
       $("#expert-msg").append(html);
-      expertMsgAppended = true; 
+      expertMsgAppended = true;
     }
 
     response.data.data.forEach((user) => {
-      const { _id: agent, full_name: name } = user;
+      const {
+        _id: agent,
+        full_name: name
+      } = user;
 
       if (!displayedUsers.has(agent)) {
         displayedUsers.add(agent);
@@ -268,46 +278,46 @@ async function selectExpert() {
     agentClicked = agent
     const $conversationContainer = $("#conversation-container");
     // Check if they both have conversation, if yes, just handle click to left conversation
-    if (userId){                    
-    const response = await axios.get(`http://192.168.1.20:3000/conversation/?user1=${userId}&user2=${agent}`);
+    if (userId) {
+      const response = await axios.get(`http://192.168.1.20:3000/conversation/?user1=${userId}&user2=${agent}`);
 
-    if (!response.data.data) {
-      conversationId = "";
-      messagesContainer.innerHTML = "";
-      let activeChat = {
-        chatId: conversationId,
-        name: name,
-        avatar_url: "images/avatar/unkown.jpg"
-      };
-      window.dispatchEvent(new CustomEvent('change-active-chat', {
-        detail: activeChat
-      }));
-      $conversationContainer.attr("data-conversation-id", null);
-      console.log(" 'there is no conversation between the both of them yet',start a conversation by sending a message")
-    } else {
-      conversationId = !response.data.data.conversation ? response.data.data[0]._id : response.data.data.conversation[0]._id
-      // Update the active chat with the conversation data
-      window.dispatchEvent(new CustomEvent('change-active-chat', {
-        detail: {
+      if (!response.data.data) {
+        conversationId = "";
+        messagesContainer.innerHTML = "";
+        let activeChat = {
           chatId: conversationId,
           name: name,
-          avatar_url: 'images/avatar/unkown.jpg'
-        }
-        
-      }));
+          avatar_url: "images/avatar/unkown.jpg"
+        };
+        window.dispatchEvent(new CustomEvent('change-active-chat', {
+          detail: activeChat
+        }));
+        $conversationContainer.attr("data-conversation-id", null);
+        console.log(" 'there is no conversation between the both of them yet',start a conversation by sending a message")
+      } else {
+        conversationId = !response.data.data.conversation ? response.data.data[0]._id : response.data.data.conversation[0]._id
+        // Update the active chat with the conversation data
+        window.dispatchEvent(new CustomEvent('change-active-chat', {
+          detail: {
+            chatId: conversationId,
+            name: name,
+            avatar_url: 'images/avatar/unkown.jpg'
+          }
 
-           
-    conversationHeaderStatus.textContent = connectUsers.find(user => user._id === agent)? "En ligne" : "last seen recently"
-      
-    
-      expert = agent;
-      $conversationContainer.attr("data-conversation-id", conversationId);
-      // Load the first page of messages on page load
-      let currentPage = 1;
-      loadMessages(currentPage, conversationId, true);
-    }    
+        }));
 
-  }
+
+        conversationHeaderStatus.textContent = connectUsers.find(user => user._id === agent) ? "En ligne" : "last seen recently"
+
+
+        expert = agent;
+        $conversationContainer.attr("data-conversation-id", conversationId);
+        // Load the first page of messages on page load
+        let currentPage = 1;
+        loadMessages(currentPage, conversationId, true);
+      }
+
+    }
   })
 }
 
@@ -316,10 +326,10 @@ export async function getAllConversations() {
   let latestConversationId = null;
   let userConversation = ""
   const conversationsResponse = await axios.get(`http://192.168.1.20:3000/conversation/1/?user_id=${newData.contact}`);
-  if(conversationsResponse.data.data.length>0){
+  if (conversationsResponse.data.data.length > 0) {
     const conversations = conversationsResponse.data.data;
     allConversation = conversations
-    conversationId = conversations[0]?._id
+    conversationId = conversations[0] ?._id
     const conversationPromises = conversations.map(async (conversation, index) => {
       conversation.members.forEach(user => {
         if (userId !== user.user_id)
@@ -340,7 +350,7 @@ export async function getAllConversations() {
           isActive = true;
         }
       }
-      
+
       let userLog = ""
       if (conversation?.last_message.type === "log") {
         const log = JSON.parse(conversation.last_message.message)
@@ -438,15 +448,15 @@ export async function getAllConversations() {
 // this function is a handle click , so whenever the client click on a conversation it call the load messages function where messages should be displayed in the messagesContainer
 function handleConversationClick() {
   agentClicked = $(this).parent().parent().data('user-id')
-  
-    expert=agentClicked
+
+  expert = agentClicked
   const conversationActive = document.querySelectorAll("div.conversation-click")
   conversationActive.forEach(element => {
 
-   if (element.classList.contains("bg-slate-150"))
+    if (element.classList.contains("bg-slate-150"))
       element.classList.remove("bg-slate-150")
 
-  }); 
+  });
 
   $(this).addClass('bg-slate-150')
   messagesContainer.innerHTML = '';
@@ -455,13 +465,13 @@ function handleConversationClick() {
   const conversation_id = $(this).data('conversation-id');
   const name = $(this).data('name');
   conversationId = conversation_id;
-  
-const exist=allConversation.find(conversation=>conversation._id===conversationId)
-if(exist?.status==1){
-  conversationHeaderStatus.textContent = "En ligne"
-}else {
-  conversationHeaderStatus.textContent = "Last seen recently"
-}
+
+  const exist = allConversation.find(conversation => conversation._id === conversationId)
+  if (exist?.status == 1) {
+    conversationHeaderStatus.textContent = "En ligne"
+  } else {
+    conversationHeaderStatus.textContent = "Last seen recently"
+  }
   // Set the conversation ID as an attribute of the conversation container element
   const conversationName = document.getElementById('conversation-name');
   conversationName.textContent = name;
@@ -486,25 +496,26 @@ if(exist?.status==1){
 }
 
 
-function inputLEngth(conversationMaxMsg){
-    messageInput.setAttribute('maxlength', conversationMaxMsg);
-    document.getElementById('max-length-value').textContent = conversationMaxMsg;
-    messageInput.addEventListener('input', function() {
-    document.getElementById('message-counter').textContent = `Max Length: ${conversationMaxMsg} | ${conversationMaxMsg - this?.value.length}`;
-
+function inputLEngth(conversationMaxMsg) {
+  if(conversationMaxMsg){
+  messageInput.setAttribute('maxlength', conversationMaxMsg);
+  console.log("messageInput",messageInput)
+  document.getElementById('max-length-value').textContent = conversationMaxMsg;
+  messageInput.addEventListener('input', function () {
+  document.getElementById('message-counter').textContent = `Max Length: ${conversationMaxMsg} | ${conversationMaxMsg - this?.value.length}`;
   });
-
+}
 }
 
 
 async function getTheLastMsg(conversationId) {
   return axios.get(`http://192.168.1.20:3000/messages/lastMsg/${conversationId}`)
     .then(function (response) {
-      if(response){
+      if (response) {
         const lastMessage = response.data.data;
         return lastMessage;
       }
-    
+
     });
 }
 
@@ -543,7 +554,7 @@ const spinner = document.getElementById('conversation-spinner')
 
 const limit = 10;
 async function loadMessages(page, conversationId) {
-  if (page===2){
+  if (page === 2) {
     conversationContainer.scrollTop = conversationContainer.scrollHeight;
 
   }
@@ -553,32 +564,32 @@ async function loadMessages(page, conversationId) {
   if (isLoading) {
     return;
   }
-if(conversationId){
-  try {
-    isLoading = true;
-    // Show the spinner
-    spinner.classList.remove("hidden");
-    // Load messages from the server
-    const response = await axios.get(`http://192.168.1.20:3000/messages/conv/${conversationId}?page=${page}&limit=${limit}`);
-    if (response.data.message !== "success") {
-      throw new Error("Failed to load messages");
+  if (conversationId) {
+    try {
+      isLoading = true;
+      // Show the spinner
+      spinner.classList.remove("hidden");
+      // Load messages from the server
+      const response = await axios.get(`http://192.168.1.20:3000/messages/conv/${conversationId}?page=${page}&limit=${limit}`);
+      if (response.data.message !== "success") {
+        throw new Error("Failed to load messages");
+      }
+      // Do something with the messages
+      displayMessages(response.data.data);
+      // Check if the scrollbar has reached the top
+      const container = document.getElementById('conversation-container');
+      if (container.scrollTop === 0) {
+        // Call loadMessages() again with the next page
+        loadMessages(page + 1, conversationId);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      // Hide the spinner
+      spinner.classList.add("hidden");
+      isLoading = false;
     }
-    // Do something with the messages
-    displayMessages(response.data.data);
-    // Check if the scrollbar has reached the top
-    const container = document.getElementById('conversation-container');
-    if (container.scrollTop === 0) {
-      // Call loadMessages() again with the next page
-      loadMessages(page + 1, conversationId);
-    }
-  } catch (error) {
-    console.error(error);
-  } finally {
-    // Hide the spinner
-    spinner.classList.add("hidden");
-    isLoading = false;
   }
-}
 }
 
 
@@ -590,7 +601,7 @@ if (container)
       container.scrollTop = container.scrollHeight * 0.1;
       // Call loadMessages() with the current page
       const currentPage = Math.ceil(container.scrollHeight / container.clientHeight);
-      loadMessages(currentPage,  container.dataset.conversationId);
+      loadMessages(currentPage, container.dataset.conversationId);
     }
   });
 
@@ -598,9 +609,9 @@ if (container)
 
 // The submitForm function definition
 function submitForm(element) {
-  console.log("element",element)
+  console.log("element", element)
   let messageContent = element.closest('[id^="message-content-"]');
-  let messageId = messageContent?.id?.replace('message-content-', '');
+  let messageId = messageContent ?.id ?.replace('message-content-', '');
   const form = JSON.parse(element.dataset.content);
   let forms = [];
   const formContact = element.parentNode;
@@ -617,36 +628,36 @@ function submitForm(element) {
 
   form.fields = form.fields.map(field => {
     let fieldValue = forms.find(fild => fild.fieldId == field.field_id);
-    if(fieldValue){
+    if (fieldValue) {
       field.field_value = fieldValue.value
     }
     return field;
-      })
+  })
   form.status = 1;
 
-  const data=JSON.stringify({
+  const data = JSON.stringify({
     contact: newData.contact,
     forms,
     messageId,
     form
   })
-     
 
-    foued.saveFormData(data)
 
-      formInputs.forEach(input => {
-        input.disabled = true;
-      });
-      element.innerHTML = "Sent";
-      successMessage?.classList.remove('hidden');
-      element.disabled = true;
-      formContent.style.opacity = 0.7;
-      addLogs({
-        action: "end form",
-        element: "21",
-        element_id: +form.form_id
-      });
-    
+  foued.saveFormData(data)
+
+  formInputs.forEach(input => {
+    input.disabled = true;
+  });
+  element.innerHTML = "Sent";
+  successMessage?.classList.remove('hidden');
+  element.disabled = true;
+  formContent.style.opacity = 0.7;
+  addLogs({
+    action: "end form",
+    element: "21",
+    element_id: +form.form_id
+  });
+
   setTimeout(() => {
     successMessage?.classList.add('hidden');
   }, 3000);
@@ -687,11 +698,11 @@ function displayMessages(messages) {
           <ul>
             <li class="icon"  style="background-color: ${plan.status === 2 ? 'rgba(255, 105, 105, 0.8)' : (plan.status === 0 ? 'rgba(210, 233, 233, 0.8)' : 'rgba(159, 230, 160, 0.8)')}" ><i class="fas fa-comments"></i></li>
             <li class="pricing-header">
-              <h4>${plan.billing_volume}<span>${plan.billing_type === "1" ? "Messages" : "Minutes"}</span></h4>
-              <h2><sup>${plan.tariff}</sup>${plan.currency === "EUR" ? "€" : "$"}</h2>
+              <h4>${plan.billing_volume} <span> Message </span></h4>
+              <h2><sup>${plan.tariff}</sup>  ${plan.currency === "EUR" ? "€" : "$"} </h2>
             </li>
             <li>${plan.name}</li>
-            <li class="footer"><a class="btn btn-dark border btn-sm" href="#">Buy</a></li>
+            <button class="footer"><a class="btn btn-dark border btn-sm" href="#">Buy</a></button>
           </ul>
         </div>    
           `;
@@ -777,17 +788,13 @@ function displayMessages(messages) {
           case "link click":
             userLog = `You click to link.`;
             break;
-            case  "purchase completed":
-            userLog=`Purchase completed successfully.`
+          case "purchase completed":
+            userLog = `Purchase completed successfully.`
             break;
-            case  "purchase went wrong":
-              userLog=`Purchase went  wrong.`
-              break;
-        
-      
+          case "purchase went wrong":
+            userLog = `Purchase went  wrong.`
+            break;
         }
-    
-
         messagesContainer.insertAdjacentHTML(
           "afterbegin",
           ` <div class="flex justify-center items-center w-100 m-2" id="msg-${message.id}">
@@ -797,12 +804,12 @@ function displayMessages(messages) {
       } else {
         let direction =
           message.user === newData.user ? "justify-end" : "justify-start";
-             const msgStyle =  role === "GUEST"
-  ? `rounded-2xl break-words rounded-tl-none bg-gray-light p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
-  : `rounded-2xl break-words relative rounded-tr-none   bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
-      messagesContainer.insertAdjacentHTML(
-        "afterbegin",
-        `
+        const msgStyle = role === "GUEST" ?
+          `rounded-2xl break-words rounded-tl-none bg-gray-light p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100` :
+          `rounded-2xl break-words relative rounded-tr-none   bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
+        messagesContainer.insertAdjacentHTML(
+          "afterbegin",
+          `
         <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
           <div class="flex flex-col items-end space-y-3.5">
             <div class="flex flex-row">
@@ -834,15 +841,9 @@ function displayMessages(messages) {
           </div>
         </div>
         `
-      );
-    
-    
-
+        );
       }
     }
-
-
-
 
     if (message.reacts.length > 0) {
       let messageReactions = message.reacts.map(react => {
@@ -860,7 +861,7 @@ function displayMessages(messages) {
       submitButton.addEventListener("click", function () {
         const form = document.forms.form1;
         const inputs = form.elements;
-    
+
         let isValid = true;
         for (let i = 0; i < inputs.length; i++) {
           const input = inputs[i];
@@ -872,7 +873,7 @@ function displayMessages(messages) {
             isValid = false;
             break;
           }
-        }  
+        }
         if (isValid) {
           submitForm(this);
         } else {
@@ -880,8 +881,6 @@ function displayMessages(messages) {
         }
       });
     }
-    
-    
     const allFormInput = document.querySelectorAll(`.field-${messageId}`);
     if (allFormInput.length > 0) {
       allFormInput.forEach(input => {
@@ -889,8 +888,8 @@ function displayMessages(messages) {
         input.addEventListener('focus', () => sendFocusNotification(input));
       });
     }
-    
     let userHasTyped = "";
+
     function sendTypingNotification(input) {
       if (userHasTyped !== input.dataset.fieldId) {
         addLogs({
@@ -901,20 +900,19 @@ function displayMessages(messages) {
         userHasTyped = input.dataset.fieldId;
       }
     }
-    
+
     function sendFocusNotification(input) {
-      
       addLogs({
         action: "focus",
         element: "22",
         element_id: +input.dataset.fieldId
       });
     }
-    
+
 
     function sendClickingNotification(data) {
 
-       foued.linkClick(data.id.replace("linked-msg-",""))
+      foued.linkClick(data.id.replace("linked-msg-", ""))
       addLogs({
         action: "link click",
         element: "7",
@@ -926,11 +924,11 @@ function displayMessages(messages) {
       modal.classList.remove('hidden');
       successButton.setAttribute('data-plan', data.dataset.planId);
       successButton.setAttribute('message-id', messageId);
-    
+
       const name = data.getAttribute('name');
       successButton.setAttribute('name', name);
       console.log("name:", name);
-    
+
 
 
       // Update message to status not paid: 2
@@ -940,7 +938,7 @@ function displayMessages(messages) {
         element_id: +data.dataset.planId
       });
     }
-    
+
 
     document.querySelectorAll(`#field-${messageId}`).forEach(input => {
       input.addEventListener('focus', () => {
@@ -967,7 +965,7 @@ function displayMessages(messages) {
         const buyButton = plan.querySelector("a.btn");
         if (buyButton) {
           buyButton.addEventListener("click", (event) => {
-            sendPlanClickNotification(plan,messageId);
+            sendPlanClickNotification(plan, messageId);
           });
         }
       });
@@ -975,7 +973,7 @@ function displayMessages(messages) {
   }
 
   reactions()
-  
+
   getReactButton()
   getDeleteButtons()
   getEditButtons()
@@ -994,21 +992,21 @@ async function addLogs(log) {
     "source": "3"
   }
 
-    foued.onCreateMessage( {
-      app: "638dc76312488c6bf67e8fc0",
+  foued.onCreateMessage({
+    app: "638dc76312488c6bf67e8fc0",
+    user: newData.user,
+    action: "message.create",
+    metaData: {
+      type: "log",
+      conversation_id: conversationId, // Include the conversation ID
       user: newData.user,
-      action: "message.create",
-      metaData: {
-        type: "log",
-        conversation_id: conversationId, // Include the conversation ID
-        user: newData.user,
-        message: JSON.stringify(logData),
-        origin: "web",
-      
-      },
-      to: expert,
-      logData:logData
-    })
+      message: JSON.stringify(logData),
+      origin: "web",
+
+    },
+    to: expert,
+    logData: logData
+  })
 
 
 }
@@ -1018,23 +1016,23 @@ async function addLogs(log) {
  */
 
 
-export async function sendFirstMessage(conversation){
+export async function sendFirstMessage(conversation) {
   conversationContainer.dataset.conversationId = conversation._id;
- foued.onCreateMessage( {
-  app: "638dc76312488c6bf67e8fc0",
-  user: newData.user,
-  action: "message.create",
-  from: newData.socket_id,
-  metaData: {
-    type: "MSG",
-    conversation_id: conversation._id, // Include the conversation ID
+  foued.onCreateMessage({
+    app: "638dc76312488c6bf67e8fc0",
     user: newData.user,
-    message: messageInput.value,
-    data: "non other data",
-    origin: "web",
-  },
-  to: senderName,
-});
+    action: "message.create",
+    from: newData.socket_id,
+    metaData: {
+      type: "MSG",
+      conversation_id: conversation._id, // Include the conversation ID
+      user: newData.user,
+      message: messageInput.value,
+      data: "non other data",
+      origin: "web",
+    },
+    to: senderName,
+  });
   messageInput.value = "";
   isSendingMessage = false; // Set the sending state to false
 }
@@ -1049,37 +1047,37 @@ if (sendButton)
   })
 
 
-  export async function sendBuyMessage(data){
+export async function sendBuyMessage(data) {
 
-    try {
-      foued.onCreateMessage({
-       app: "638dc76312488c6bf67e8fc0",
-       user: newData.user,
-       action: "message.create",
-       metaData: {
-         type: "log",
-         conversation_id: conversationId, // Include the conversation ID
-         user: newData.user,
-         message:JSON.stringify(data),
-         data: "non other data",
-         origin: "web",
-       },
-       to: expert,
-     });
-     } catch (error) {
-       console.log(error);
-     }
+  try {
+    foued.onCreateMessage({
+      app: "638dc76312488c6bf67e8fc0",
+      user: newData.user,
+      action: "message.create",
+      metaData: {
+        type: "log",
+        conversation_id: conversationId, // Include the conversation ID
+        user: newData.user,
+        message: JSON.stringify(data),
+        data: "non other data",
+        origin: "web",
+      },
+      to: expert,
+    });
+  } catch (error) {
+    console.log(error);
   }
+}
 
 
 let isSendingMessage = false;
 
- async function sendMessage() {
+async function sendMessage() {
   if (isSendingMessage) return; // If a message is already being sent, ignore the function call
 
   if (messageInput.value.trim() !== "") {
     isSendingMessage = true; // Set the sending state to true
-  
+
     if (!emoji.classList.contains('hidden'))
       emoji.classList.add('hidden');
     if (conversationId == '') {
@@ -1096,8 +1094,7 @@ let isSendingMessage = false;
             operators: [1],
             owner_id: newData.accountId,
             members: [newData.user, expert],
-            permissions: {
-            },
+            permissions: {},
             members_count: 2,
             max_length_message: "256",
           },
@@ -1108,38 +1105,38 @@ let isSendingMessage = false;
       }
     } else {
       try {
-        if(totalBalance>0){
-
-    
-       foued.onCreateMessage({
-        app: "638dc76312488c6bf67e8fc0",
-        user: newData.user,
-        action: "message.create",
-        metaData: {
-          type: "MSG",
-          conversation_id: conversationId,
-          user: newData.user,
-          message: messageInput.value,
-          data: "non other data",
-          origin: "web",
-        },
-        to: expert,
-        balance:totalBalance?.balance
-      });
-    }
+        if (role==="GUEST" || totalBalance > 0) {
+          foued.onCreateMessage({
+            app: "638dc76312488c6bf67e8fc0",
+            user: newData.user,
+            action: "message.create",
+            metaData: {
+              type: "MSG",
+              conversation_id: conversationId,
+              user: newData.user,
+              message: messageInput.value,
+              data: "non other data",
+              origin: "web",
+            },
+            to: expert,
+            balance: totalBalance?.balance
+          });
+        }
         messageInput.value = "";
-        isSendingMessage = false; 
+        isSendingMessage = false;
       } catch (error) {
         console.log(error);
         isSendingMessage = false;
       }
-      
+
     }
-    
+
   }
 }
 
 export async function sentMessage(data) {
+  console.log("sending")
+
   let conv = conversationContainer.dataset.conversationId
   const isNotNewConversation = document.querySelector(`#left-conversation-${data.conversation}`)
 
@@ -1195,44 +1192,41 @@ export async function sentMessage(data) {
 
   } else {
     let userLog = ""
-    const convMessage = isNotNewConversation.querySelector("p#last-message")
+    const convMessage =isNotNewConversation.querySelector("p#last-message")
     if (data.type === "log") {
-      const log = JSON.parse(data.content)
-    {
-      switch (log.action) {
-        case "fill":
-          userLog = `You filled on the form.`;
-          break;
-        case "focus":
-          userLog = `You  focus on the form.`;
-          break;
-        case "purchase":
-          userLog = `You  purchased the <b> ${log.plan_name} </b>plan.`;
-          break;
-        case "start form":
-          userLog = `You  start submit the form.`;
-          break;
-        case "end form":
-          userLog = `You  end submit the form.`;
-          break;
-        case "start purchase":
-          userLog = `You  start purchase a plan.`;
-          break;
-        case "link click":
-          userLog = `You click to link.`;
-          break;
-          case  "purchase completed":
-            userLog=`Purchase completed successfully.`
+      const log = JSON.parse(data.content) 
+        switch(log.action){
+          case "fill":
+            userLog = `You filled on the form.`;
             break;
-            case  "purchase went wrong":
-              userLog=`Purchase went  wrong.`
-              break;
-        
+          case "focus":
+            userLog = `You  focus on the form.`;
+            break;
+          case "purchase":
+            userLog = `You  purchased the <b> ${log.plan_name} </b>plan.`;
+            break;
+          case "start form":
+            userLog = `You  start submit the form.`;
+            break;
+          case "end form":
+            userLog = `You  end submit the form.`;
+            break;
+          case "start purchase":
+            userLog = `You  start purchase a plan.`;
+            break;
+          case "link click":
+            userLog = `You click to link.`;
+            break;
+          case "purchase completed":
+            userLog = `Purchase completed successfully.`
+            break;
+          case "purchase went wrong":
+            userLog = `Purchase went  wrong.`
+            break;
+        }
+        convMessage.textContent = userLog
       
-      }
-      convMessage.textContent = userLog
-     }
-  
+
     } else
       convMessage.textContent = data.content
   }
@@ -1266,13 +1260,13 @@ export async function sentMessage(data) {
           case "link click":
             userLog = `You click to link.`;
             break;
-            case  "purchase completed":
-              userLog=`Purchase completed successfully.`
-              break;
-              case  "purchase went wrong":
-                userLog=`Purchase went wrong.`
-                break;
-            
+          case "purchase completed":
+            userLog = `Purchase completed successfully.`
+            break;
+          case "purchase went wrong":
+            userLog = `Purchase went wrong.`
+            break;
+
         }
         const newDivMsg = document.createElement("div");
         newDivMsg.innerHTML = ` <div
@@ -1287,11 +1281,10 @@ export async function sentMessage(data) {
         messagesContainer.insertBefore(newDivMsg, typingBlock);
       } else {
         let direction = data.direction == "in" ? 'justify-end' : '';
-       const msgStyle =  role === "GUEST"
-  ? `rounded-2xl break-words rounded-tl-none bg-gray-light p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
-  : `rounded-2xl break-words relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
-;
-      
+        const msgStyle = role === "GUEST" ?
+          `rounded-2xl break-words rounded-tl-none bg-gray-light p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100` :
+          `rounded-2xl break-words relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;;
+
         messagesContainer.style.display = "block"
         messagesContainer.insertAdjacentHTML("beforeend", `
         <div id="message-${messageId}"  class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
@@ -1328,7 +1321,7 @@ export async function sentMessage(data) {
       }
 
     }
-    if(data.type==="MSG"){
+    if (data.type === "MSG") {
       conversationContainer.scrollTop = conversationContainer.scrollHeight;
     }
 
@@ -1342,9 +1335,9 @@ export async function sentMessage(data) {
 
 export async function receiveMessage(data) {
 
-  if(firstConv && firstConv===data.messageData.conversation){
+  if (firstConv && firstConv === data.messageData.conversation) {
     $(`.conversation-click[data-conversation-id="${firstConv}"]`).trigger("click")
-      firstConv=""
+    firstConv = ""
   }
   let tableRows = "";
   const messageId = data.messageData.id;
@@ -1352,9 +1345,9 @@ export async function receiveMessage(data) {
   const myContent =
     data.messageData.type === "plan" ||
     data.messageData.type === "form" ||
-    data.messageData.type === "link"
-      ? JSON.parse(data.messageData.content)
-      : {};
+    data.messageData.type === "link" ?
+    JSON.parse(data.messageData.content) :
+    {};
   let conv = document.querySelector("#conversation-container").dataset[
     "conversationId"
   ];
@@ -1402,7 +1395,7 @@ export async function receiveMessage(data) {
               type = "email";
               break;
           }
-          return  `
+          return `
           <div class="relative">
           <input type="text" class="form-input field-${messageId} block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer " placeholder=" "
             data-field-id="${field.field_id}"
@@ -1424,18 +1417,17 @@ export async function receiveMessage(data) {
 
       </form>
       </div>
-      `
-    ;
+      `;
     }
 
     const messageContainer = document.getElementById(`message-${messageId}`);
     if (!messageContainer) {
       let direction = data.direction == "in" ? "justify-end" : "justify-start";
       const msgStyle =
-        data.direction == "out"
-          ? `rounded-2xl break-words rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 relative `
-          : 'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 relative shadow-sm break-words dark:bg-accent dark:text-white';
-          const messageContent = `
+        data.direction == "out" ?
+        `rounded-2xl break-words rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 relative ` :
+        'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 relative shadow-sm break-words dark:bg-accent dark:text-white';
+      const messageContent = `
           <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
             <div class="flex flex-col items-end space-y-3.5">
               <div class="flex flex-row">
@@ -1448,7 +1440,7 @@ export async function receiveMessage(data) {
                   ${
                     data.messageData.type === "MSG" || data.messageData.type === "link"
                       ? `
-                      <div class="${msgStyle}" id="message-content-${messageId}">
+                      <div class="rounded-2xl break-words relative rounded-tr-none bg-violet-300 p-3 text-slate-700 shadow-sm dark:bg-violet-500 dark:text-white" id="message-content-${messageId}">
                         ${
                           data.messageData.type === "link"
                             ? `<a class="link-msg  " id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}" href="${myContent.userLink?.url}">${myContent.userLink?.url}</a>`
@@ -1492,7 +1484,7 @@ export async function receiveMessage(data) {
             </div>
           </div>
         `;
-        
+
 
       let typingBlock = document.getElementById("typing-block-message");
 
@@ -1531,18 +1523,18 @@ export async function receiveMessage(data) {
       unreadCount?.classList.add("flex");
       unreadCount.textContent = 1;
     } else {
-      if(unreadCount?.textContent){
+      if (unreadCount?.textContent) {
         unreadCount.textContent = +unreadCount?.textContent + 1;
       }
     }
   }
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     const submitButton = document.querySelector(`#submit-form-${messageId}`);
     if (submitButton) {
       submitButton.addEventListener("click", function () {
         const form = document.forms.form1;
         const inputs = form.elements;
-    
+
         // Iterate over the input fields and validate them
         let isValid = true;
         for (let i = 0; i < inputs.length; i++) {
@@ -1557,7 +1549,7 @@ export async function receiveMessage(data) {
           }
           // Add more validation logic for other input types if needed
         }
-    
+
         if (isValid) {
           submitForm(this);
         } else {
@@ -1565,7 +1557,7 @@ export async function receiveMessage(data) {
         }
       });
     }
-    
+
   })
 
   const allFormInput = document.querySelectorAll(`#field-${messageId}`);
@@ -1744,7 +1736,7 @@ function onReactToMessage(button) {
   playNotificationSound()
 };
 
-async function  getReactButton() {
+async function getReactButton() {
   const toUnReact = document.querySelectorAll('.react-container');
   for (const reactContainer of toUnReact) {
     const allReacts = reactContainer.querySelectorAll('a');
@@ -1762,7 +1754,7 @@ async function onUnReactToMessage(button) {
   let react = button.textContent;
   // Construct metadata for removing the reaction
   // Call the UnReact function with the metadata object
-  foued.unReactMsg( {
+  foued.unReactMsg({
     app: "ID",
     user: newData.user,
     action: "message.Unreact",
@@ -1778,11 +1770,11 @@ async function onUnReactToMessage(button) {
 }
 
 export async function reactHide(data) {
-  if(data.user_id===newData.user){
-  const reactElement = document.getElementById(`react-${data._id}`);
-  if (reactElement)
-    reactElement.remove()
-}  
+  if (data.user_id === newData.user) {
+    const reactElement = document.getElementById(`react-${data._id}`);
+    if (reactElement)
+      reactElement.remove()
+  }
 }
 
 
@@ -1949,7 +1941,8 @@ export async function updateMessage(data) {
       let messageReactions = data.reacts.map(react => {
         return `
       <a id="react-${react._id}" ${newData.user !== react.user_id ? 'style="pointer-events: none"' : ''}> ${react.path}</a>
-        `})
+        `
+      })
 
       newMessage.innerHTML += `<div class="react-container bg-white  dark:bg-navy-700" id="react-content-${data._id}" >${messageReactions.join("")} </div>`
     }
@@ -1964,7 +1957,8 @@ export async function updateMessage(data) {
       let messageReactions = data.reacts.map(react => {
         return `
       <a id="react-${react._id}" ${newData.user !== react.user_id ? 'style="pointer-events: none"' : ''}> ${react.path}</a>
-        `})
+        `
+      })
       messageEdited.innerHTML += `<div class="react-container bg-white  dark:bg-navy-700" id="react-content-${data._id}" >${messageReactions.join("")} </div>`
     }
   }
@@ -2017,7 +2011,6 @@ function onStopTyping() {
 //start typing function 
 let typingBlock = document.getElementById("typing-block-message");
 export function startTyping(data) {
-  console.log("start typing ",data)
   typingBlock = document.getElementById("typing-block-message");
   console.log("typingBlock")
   if (data.metaData.conversation === conversationId) {
@@ -2025,7 +2018,6 @@ export function startTyping(data) {
     // set the scroll position to the bottom of the conversation container
     conversationContainer.scrollTop = conversationContainer.scrollHeight;
     if (!typingBlock) {
-      console.log("hererereerre")
       typingBlock = document.createElement("div");
       typingBlock.className = "w-100 p-3 d-flex";
       typingBlock.id = "typing-block-message";
@@ -2103,10 +2095,11 @@ export function startTyping(data) {
                         </div>
                       </div>`
       messagesContainer.appendChild(typingBlock)
-      // const msgDiv = document.getElementById(`left-conversation-${data.messageData.conversation}`);
 
-      const msgText = msgDiv?.querySelector("p#last-message")
-      msgText.textContent.appendChild(typingBlock)
+
+      // const msgDiv = document.getElementById(`left-conversation-${data.messageData.conversation}`)
+      // const msgText = msgDiv?.querySelector("p#last-message")
+      // msgText.textContent.appendChild(typingBlock)
 
     }
   }
@@ -2219,6 +2212,8 @@ if (messageInput) {
 
   messageInput.addEventListener("keydown", function (event) {
     if (event.keyCode === 13) {
+      console.log("houninni")
+
       event.preventDefault();
       if (messageInput.value !== "")
         // Check if enter key is pressed
@@ -2313,29 +2308,29 @@ async function getAllAgents() {
 }
 //when an agent connect create an agent card and display it in the online agents block
 export function userConnection(data) {
-if (data.role==="AGENT"){
-  allConversation.map(conv => {
-    const conversationCard = document.getElementById(`left-conversation-${conv._id}`)
-    const statusConv = conversationCard.querySelector("#active-user")
-    const isConnected = conv.members.find(user => user.user_id === data._id);
-    if (isConnected) {
-      statusConv.classList.remove("bg-slate-300")
-      statusConv.classList.add("bg-success")
-    }
-  })
-  const agentCard = document.getElementById(`${data?._id}`)
-  if (!agentCard) {
-    const html = `
+  if (data.role === "AGENT") {
+    allConversation.map(conv => {
+      const conversationCard = document.getElementById(`left-conversation-${conv._id}`)
+      const statusConv = conversationCard.querySelector("#active-user")
+      const isConnected = conv.members.find(user => user.user_id === data._id);
+      if (isConnected) {
+        statusConv.classList.remove("bg-slate-300")
+        statusConv.classList.add("bg-success")
+      }
+    })
+    const agentCard = document.getElementById(`${data?._id}`)
+    if (!agentCard) {
+      const html = `
           <div id="${data._id}" data-name="${data.full_name}" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center">
             <div class="h-13 w-13 p-0.5">
               <img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/unkown.jpg" alt="avatar" />
             </div>
             <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">${data.full_name}</p>
           </div>`;
-    $(".swiper-wrapper").append(html);
-  }
+      $(".swiper-wrapper").append(html);
+    }
 
-}
+  }
 }
 //when an agent disconnect remove the card in the online agents block
 export function userDisconnection(data) {
@@ -2365,22 +2360,26 @@ export function userDisconnection(data) {
 let totalBalance;
 
 export function getTotalBalance(balance) {
-  console.log("balance",balance)
-  totalBalance=balance
+  console.log("balance lénnnna", !balance)
+  totalBalance = balance
   const balanceDiv = document.querySelector(".ballance-card");
   const balanceNumber = document.querySelector("#balanceNumber");
   const balanceType = document.querySelector("#balanceType");
   const buyMoreButton = document.querySelector("#buyMoreButton");
 
   buyMoreButton.disabled = true;
- 
+
   setTimeout(() => {
-    if (!balance) {
+    if (!balance && role==="GUEST") {
+      const balanceSpinner = document.querySelector('.balance-spinner');
+      console.log("balanceSpinner",balanceSpinner)
+      balanceSpinner.parentNode.removeChild(balanceSpinner)
       balanceNumber.textContent = "Free trial";
       balanceType.textContent = "";
     } else {
+      console.log("balance houni",balance)
       balanceNumber.textContent = balance;
-      balanceType.textContent = "Messages" ;
+      balanceType.textContent = "Messages";
 
       if (balance > 5) {
         balanceDiv.classList.remove("from-purple-500", "to-indigo-600");
@@ -2400,7 +2399,7 @@ export function getTotalBalance(balance) {
       }
     }
     buyMoreButton.disabled = false;
-  }, 2000); 
+  }, 2000);
 }
 
 
@@ -2414,7 +2413,7 @@ export function updateUserBalance() {
 
     balanceNumber.textContent = totalBalance;
     balanceType.textContent = "Messages";
-    if (totalBalance> 5) {
+    if (totalBalance > 5) {
       balanceDiv.classList.remove("from-purple-500", "to-indigo-600");
       balanceDiv.classList.add("from-purple-500", "to-green-400");
     } else if (totalBalance <= 4 && totalBalance >= 2) {
@@ -2426,7 +2425,26 @@ export function updateUserBalance() {
     }
 
     if (totalBalance === 0) {
-      alert('you need to buy more balance to keep chatting')
+      const modalDiv = document.createElement("div");
+      modalDiv.innerHTML = `
+      <div class="modal-bought" id="modal-bought">
+      <div class="modal-overlay"></div>
+      <div class="modal-content">
+        <h2 class="modal-title">ALERT</h2>
+        <p class="modal-text">No more balance</p>
+        <button class="modal-button" id="confirmButton">Confirm</button>
+      </div>
+    </div>
+    
+      `;
+  
+      // Hide the modal when the Confirm button is pressed
+      const confirmButton = modalDiv.querySelector("#confirmButton");
+      confirmButton.addEventListener("click", () => {
+        modalDiv.style.display = "none";
+      });
+  
+      document.body.appendChild(modalDiv);
       messageInput.disabled = true;
       sendButton.disabled = true;
     }
@@ -2434,23 +2452,23 @@ export function updateUserBalance() {
 }
 
 
-export function ableInputArea(){
+export function ableInputArea() {
   messageInput.disabled = false;
-    sendButton.disabled = false;
+  sendButton.disabled = false;
 }
 
-async function redirectToAgent(agentId,conversationId) {
+async function redirectToAgent(agentId, conversationId) {
   try {
-   
-    if(agentId!= null){
-    // Find the corresponding agent slide by ID
-    const $agentSlide = $(`.swiper-slide[id="${agentId}"]`);
-    if ($agentSlide.length > 0) {
-      // Trigger a click event on the agent slide
-      $agentSlide.trigger("click");
-               
+
+    if (agentId != null) {
+      // Find the corresponding agent slide by ID
+      const $agentSlide = $(`.swiper-slide[id="${agentId}"]`);
+      if ($agentSlide.length > 0) {
+        // Trigger a click event on the agent slide
+        $agentSlide.trigger("click");
+
+      }
     }
-  }
 
   } catch (error) {
     console.error('Error:', error);
@@ -2474,38 +2492,57 @@ async function getPlans() {
       }
     });
 
-    if(response){
+    if (response) {
       response.data.data.forEach(plan => {
+        console.log(plan)
         const div = document.createElement('div');
         div.classList.add('mt-4');
         div.innerHTML = `
-        <div class="grid grid-cols-2 gap-2 px-3" id="balance-plan-${plan.id}">
-        <div class="rounded-lg bg-slate-150 px-2.5 py-2 dark:bg-navy-600">
-          <div class="flex items-center justify-between space-x-1">
-            <p>
-              <span class="text-lg font-medium text-slate-700 dark:text-navy-100">${plan.tariff}</span>
-              <span class="text-xs">£</span>
-            </p>
-          </div>
-          <p class="mt-0.5 text-tiny+ uppercase">${plan.name} Messages</p>
-          <div class="flex items-center justify-center mt-3">
-            <button class="plan-btn rounded-full bg-primary text-white hover:bg-primary-light px-3 py-1.5 text-sm font-medium" data-plan="${plan.id}" name="${plan.name}">
-              Buy Plan
+        <div class="w-full md:w-2/3 p-6 grid grid-cols-1 md:grid-cols-2 gap-6 mx-auto "  id="balance-plan-${plan.id}" >
+        <div class="shadow p-5 rounded-lg border-t-4 border-green-400 bg-white">
+          <p class="uppercase text-sm font-medium text-gray-500">
+          ${plan.name}
+                    </p>
+      
+          <p class="mt-4 text-3xl text-gray-700 font-medium">
+          ${plan.billing_volume} message
+          </p>
+      
+          <p class="mt-4 font-semibold text-gray-700">
+          ${plan.tariff}
+          <span class="text-xs">£</span>
+
+          </p>
+      
+          <div class="mt-8">
+            <ul class="grid grid-cols-1 gap-4">
+              <li class="inline-flex items-center text-gray-600">
+                <svg class="w-4 h-4 mr-2 fill-current text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                  <path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM371.8 211.8l-128 128C238.3 345.3 231.2 348 224 348s-14.34-2.719-19.81-8.188l-64-64c-10.91-10.94-10.91-28.69 0-39.63c10.94-10.94 28.69-10.94 39.63 0L224 280.4l108.2-108.2c10.94-10.94 28.69-10.94 39.63 0C382.7 183.1 382.7 200.9 371.8 211.8z"></path>
+                </svg>
+                Available
+              </li>
+      
+           
+      
+          <div class="mt-8">
+            <button class="plan-btn bg-gray-400 hover:bg-gray-500 px-3 py-2 rounded-lg w-full text-white" data-plan="${plan.id}" name="${plan.name}">
+              Purchase plan
             </button>
           </div>
         </div>
       </div>
       `;
-      document.getElementById('plans').appendChild(div);
+        document.getElementById('plans').appendChild(div);
       });
-  
+
       // Add event listeners to the buy buttons
       const buyButtons = document.querySelectorAll('.plan-btn');
       const modal = document.getElementById('ModalPlan');
       const closeModalButtons = modal.querySelectorAll('.close, #closeModal, #buyPlanBtn');
-  
+
       buyButtons.forEach(buyButton => {
-        buyButton.addEventListener('click', function() {
+        buyButton.addEventListener('click', function () {
           const selectedPlan = this.getAttribute('data-plan');
           const planName = this.getAttribute('name');
           modal.classList.remove('hidden');
@@ -2516,18 +2553,18 @@ async function getPlans() {
 
 
       closeModalButtons.forEach(closeButton => {
-        closeButton.addEventListener('click', function() {
+        closeButton.addEventListener('click', function () {
           modal.classList.add('hidden');
         });
       });
-  
-      modal.addEventListener('click', function(event) {
+
+      modal.addEventListener('click', function (event) {
         if (event.target === modal) {
           modal.classList.add('hidden');
         }
       });
     }
-  
+
   } catch (error) {
     console.error(error);
   }
@@ -2539,26 +2576,26 @@ const balanceSpinner = document.querySelector('.balance-spinner');
 
 const failButton = document.getElementById("closeModalPlan");
 
-failButton.addEventListener('click', function() {
+failButton.addEventListener('click', function () {
   console.log("clicked ", failButton);
 
   try {
-    
 
-  foued.buyPlan({
-   contact: newData.contact,
-   conversationId: conversationId,
 
-    
-  })
+    foued.buyPlan({
+      contact: newData.contact,
+      conversationId: conversationId,
+
+
+    })
   } catch (error) {
     console.error('Error adding sale:', error);
-  } 
+  }
 });
 
 
 const successButton = document.getElementById('buyPlanBtn');
-successButton.addEventListener('click', async function() {
+successButton.addEventListener('click', async function () {
   const selectedPlan = this.getAttribute('data-plan');
   const planName = this.getAttribute('name');
   const msgId = this.getAttribute('message-id');
@@ -2579,15 +2616,15 @@ successButton.addEventListener('click', async function() {
     });
   } catch (error) {
     console.error('Error adding sale:', error);
-  } 
+  }
 });
 
-  $(document).ready(function() {
-    $("#buyMoreButton").on("click", function() {
+$(document).ready(function () {
+  $("#buyMoreButton").on("click", function () {
     $("#modalButton").trigger("click");
-    });
   });
-  
+});
+
 $(document).ready(function () {
   guestConnection()
   getAllAgents()
@@ -2598,12 +2635,12 @@ $(document).ready(function () {
   foued.userConnection()
   //disconnection 
   if (newData) {
-    foued.connect(newData?.user,newData.contact)
+    foued.connect(newData?.user, newData.contact)
     foued.onDisconnected(newData?.user)
     getAllConversations()
-    } else {
-      console.log("newData is empty !",newData)
-    }
+  } else {
+    console.log("newData is empty !", newData)
+  }
   //get all the connected user (the agents)
   getExperts();
   //Select Expert to chat with 
@@ -2650,7 +2687,7 @@ $(document).ready(function () {
   //click handler for the conversation 
   $(document).on('click', '.conversation-click', handleConversationClick)
   $(document).on('click', '#emoji-button', showEmoji)
- 
+
 });
 
 
@@ -2666,6 +2703,5 @@ $(document).ready(function () {
 //       "total":totalBalance.balance
 //       })
 //   e.preventDefault();
-  
-// });
 
+// });
