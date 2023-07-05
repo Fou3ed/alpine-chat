@@ -634,6 +634,7 @@ function submitForm(element) {
     return field;
   })
   form.status = 1;
+  form.messageId=messageId
 
   const data = JSON.stringify({
     contact: newData.contact,
@@ -641,7 +642,6 @@ function submitForm(element) {
     messageId,
     form
   })
-
 
   foued.saveFormData(data)
 
@@ -655,8 +655,9 @@ function submitForm(element) {
   addLogs({
     action: "end form",
     element: "21",
-    element_id: +form.form_id
-  });
+    element_id: +form.form_id,
+    messageId:messageId,
+  },form);
 
   setTimeout(() => {
     successMessage?.classList.add('hidden');
@@ -688,9 +689,10 @@ function displayMessages(messages) {
     const time = `${day}:${hour}:${minute}`;
 
     // Check if messageContainer exists
+    const myContent = message.type === "plan" || message.type === "form" || message.type === "link" ? JSON.parse(message.message) : {};
+
     if (!messageContainer) {
       let tableRows = "";
-      const myContent = message.type === "plan" || message.type === "form" || message.type === "link" ? JSON.parse(message.message) : {};
       if (myContent !== {} && message.type === "plan") {
         tableRows = myContent.plans.map(plan => {
           return `
@@ -750,11 +752,12 @@ function displayMessages(messages) {
           `;
           });
         }
+        console.log(myContent)
         tableRows = `
         <div class="form-container ${myContent?.status==1 ?"f-success" :""}  ">
         <span class="error" id="msg"></span>
         <form name="form1" class="box" onsubmit="">
-        <h4>${myContent.text_capture}</h4>
+        <h4>${myContent.friendly_name}</h4>
         <h5>Please fill in all fields</h5>
         ${inputForms.join('')}
         
@@ -804,9 +807,9 @@ function displayMessages(messages) {
       } else {
         let direction =
           message.user === newData.user ? "justify-end" : "justify-start";
-        const msgStyle = role === "GUEST" ?
-          `rounded-2xl break-words rounded-tl-none bg-gray-light p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100` :
-          `rounded-2xl break-words relative rounded-tr-none   bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
+          const msgStyle =(message.user === newData.user && !message.paid)?
+          `rounded-2xl break-words rounded-tl-none bg-white p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100` :
+          `rounded-2xl break-words relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
         messagesContainer.insertAdjacentHTML(
           "afterbegin",
           `
@@ -856,10 +859,15 @@ function displayMessages(messages) {
     }
 
 
+      
+     if(message.type === "form" && myContent?.status==0){
+        
+      
     const submitButton = document.querySelector(`#submit-form-${messageId}`);
     if (submitButton) {
-      submitButton.addEventListener("click", function () {
-        const form = document.forms.form1;
+        console.log(submitButton)
+      submitButton.addEventListener("click", function (event) {
+        const form = event.target.closest("form");
         const inputs = form.elements;
 
         let isValid = true;
@@ -883,7 +891,9 @@ function displayMessages(messages) {
     }
     const allFormInput = document.querySelectorAll(`.field-${messageId}`);
     if (allFormInput.length > 0) {
+      console.log(allFormInput) 
       allFormInput.forEach(input => {
+
         input.addEventListener('input', () => sendTypingNotification(input));
         input.addEventListener('focus', () => sendFocusNotification(input));
       });
@@ -895,7 +905,8 @@ function displayMessages(messages) {
         addLogs({
           action: "fill",
           element: "22",
-          element_id: +input.dataset.fieldId
+          element_id: +input.dataset.fieldId,
+          messageId:input.id.replace("floating_filled_","")
         });
         userHasTyped = input.dataset.fieldId;
       }
@@ -905,21 +916,21 @@ function displayMessages(messages) {
       addLogs({
         action: "focus",
         element: "22",
-        element_id: +input.dataset.fieldId
+        element_id: +input.dataset.fieldId,
+        messageId:input.id.replace("floating_filled_","")
+
       });
     }
 
 
-    function sendClickingNotification(data) {
-
-      foued.linkClick(data.id.replace("linked-msg-", ""))
-      addLogs({
-        action: "link click",
-        element: "7",
-        element_id: +data.dataset.linkId
+    document.querySelectorAll(`#field-${messageId}`).forEach(input => {
+      input.addEventListener('focus', () => {
+        if (isFirstInputFocused) {
+          sendFocusNotification(input);
+        }
       });
-    }
-
+    });
+  }
     function sendPlanClickNotification(data, messageId) {
       modal.classList.remove('hidden');
       successButton.setAttribute('data-plan', data.dataset.planId);
@@ -935,18 +946,24 @@ function displayMessages(messages) {
       addLogs({
         action: "start purchase",
         element: "3",
-        element_id: +data.dataset.planId
+        element_id: +data.dataset.planId,
+        messageId:messageId
       });
     }
 
 
-    document.querySelectorAll(`#field-${messageId}`).forEach(input => {
-      input.addEventListener('focus', () => {
-        if (isFirstInputFocused) {
-          sendFocusNotification(input);
-        }
+    function sendClickingNotification(data) {
+
+      foued.linkClick(data.id.replace("linked-msg-", ""))
+      addLogs({
+        action: "link click",
+        element: "7",
+        element_id: +data.dataset.linkId,
+        messageId:data.id.replace("linked-msg-", "")
+
       });
-    });
+    }
+  
 
 
 
@@ -982,7 +999,7 @@ function displayMessages(messages) {
 }
 
 //whenever a user click on the message link fire this function 
-async function addLogs(log) {
+async function addLogs(log,aux={}) {
   const logData = {
     "user_id": newData.contact.toString(),
     "action": log.action,
@@ -990,25 +1007,26 @@ async function addLogs(log) {
     "element_id": log.element_id,
     "log_date": currentDate,
     "source": "3"
+    
   }
-
+    if(log.messageId){
+      logData.messageId=log.messageId
+    }
   foued.onCreateMessage({
     app: "638dc76312488c6bf67e8fc0",
     user: newData.user,
     action: "message.create",
     metaData: {
       type: "log",
-      conversation_id: conversationId, // Include the conversation ID
+      conversation_id: conversationId, 
       user: newData.user,
       message: JSON.stringify(logData),
       origin: "web",
-
     },
     to: expert,
+    aux:aux,
     logData: logData
   })
-
-
 }
 
 /**
@@ -1025,7 +1043,7 @@ export async function sendFirstMessage(conversation) {
     from: newData.socket_id,
     metaData: {
       type: "MSG",
-      conversation_id: conversation._id, // Include the conversation ID
+      conversation_id: conversation._id, 
       user: newData.user,
       message: messageInput.value,
       data: "non other data",
@@ -1135,7 +1153,6 @@ async function sendMessage() {
 }
 
 export async function sentMessage(data) {
-  console.log("sending")
 
   let conv = conversationContainer.dataset.conversationId
   const isNotNewConversation = document.querySelector(`#left-conversation-${data.conversation}`)
@@ -1194,38 +1211,37 @@ export async function sentMessage(data) {
     let userLog = ""
     const convMessage =isNotNewConversation.querySelector("p#last-message")
     if (data.type === "log") {
-      const log = JSON.parse(data.content) 
-        switch(log.action){
-          case "fill":
-            userLog = `You filled on the form.`;
-            break;
-          case "focus":
-            userLog = `You  focus on the form.`;
-            break;
-          case "purchase":
-            userLog = `You  purchased the <b> ${log.plan_name} </b>plan.`;
-            break;
-          case "start form":
-            userLog = `You  start submit the form.`;
-            break;
-          case "end form":
-            userLog = `You  end submit the form.`;
-            break;
-          case "start purchase":
-            userLog = `You  start purchase a plan.`;
-            break;
-          case "link click":
-            userLog = `You click to link.`;
-            break;
-          case "purchase completed":
-            userLog = `Purchase completed successfully.`
-            break;
-          case "purchase went wrong":
-            userLog = `Purchase went  wrong.`
-            break;
-        }
-        convMessage.textContent = userLog
-      
+      // const log = JSON.parse(data.content) 
+      //   switch(log.action){
+      //     case "fill":
+      //       userLog = `You filled on the form.`;
+      //       break;
+      //     case "focus":
+      //       userLog = `You  focus on the form.`;
+      //       break;
+      //     case "purchase":
+      //       userLog = `You  purchased the <b> ${log.plan_name} </b>plan.`;
+      //       break;
+      //     case "start form":
+      //       userLog = `You  start submit the form.`;
+      //       break;
+      //     case "end form":
+      //       userLog = `You  end submit the form.`;
+      //       break;
+      //     case "start purchase":
+      //       userLog = `You  start purchase a plan.`;
+      //       break;
+      //     case "link click":
+      //       userLog = `You click to link.`;
+      //       break;
+      //     case "purchase completed":
+      //       userLog = `Purchase completed successfully.`
+      //       break;
+      //     case "purchase went wrong":
+      //       userLog = `Purchase went  wrong.`
+      //       break;
+      //   }
+      //   convMessage.textContent = userLog
 
     } else
       convMessage.textContent = data.content
@@ -1236,54 +1252,54 @@ export async function sentMessage(data) {
     messagesContainer = document.getElementById("big-container-message")
     if (!messageContainer) {
       if (data.type === "log") {
-        const log = JSON.parse(data.content)
-        let userLog = ""
-        switch (log.action) {
-          case "fill":
-            userLog = `You filled on the form.`;
-            break;
-          case "focus":
-            userLog = `You focus on the form.`;
-            break;
-          case "purchase":
-            userLog = `You purchased the <b> ${log.plan_name} </b>plan.`;
-            break;
-          case "start form":
-            userLog = `You start submit the form.`;
-            break;
-          case "end form":
-            userLog = `You end submit the form.`;
-            break;
-          case "start purchase":
-            userLog = `You start purchase a plan.`;
-            break;
-          case "link click":
-            userLog = `You click to link.`;
-            break;
-          case "purchase completed":
-            userLog = `Purchase completed successfully.`
-            break;
-          case "purchase went wrong":
-            userLog = `Purchase went wrong.`
-            break;
+        // const log = JSON.parse(data.content)
+        // let userLog = ""
+        // switch (log.action) {
+        //   case "fill":
+        //     userLog = `You filled on the form.`;
+        //     break;
+        //   case "focus":
+        //     userLog = `You focus on the form.`;
+        //     break;
+        //   case "purchase":
+        //     userLog = `You purchased the <b> ${log.plan_name} </b>plan.`;
+        //     break;
+        //   case "start form":
+        //     userLog = `You start submit the form.`;
+        //     break;
+        //   case "end form":
+        //     userLog = `You end submit the form.`;
+        //     break;
+        //   case "start purchase":
+        //     userLog = `You start purchase a plan.`;
+        //     break;
+        //   case "link click":
+        //     userLog = `You click to link.`;
+        //     break;
+        //   case "purchase completed":
+        //     userLog = `Purchase completed successfully.`
+        //     break;
+        //   case "purchase went wrong":
+        //     userLog = `Purchase went wrong.`
+        //     break;
 
-        }
-        const newDivMsg = document.createElement("div");
-        newDivMsg.innerHTML = ` <div
-        class="flex justify-center items-center w-100 m-2"
-        id="msg-${data._id}"
-        >
-        <span class="logs-notification">
-        ${userLog}
-        </span>
-        </div>`
-        let typingBlock = document.getElementById("typing-block-message");
-        messagesContainer.insertBefore(newDivMsg, typingBlock);
+        // }
+        // const newDivMsg = document.createElement("div");
+        // newDivMsg.innerHTML = ` <div
+        // class="flex justify-center items-center w-100 m-2"
+        // id="msg-${data._id}"
+        // >
+        // <span class="logs-notification">
+        // ${userLog}
+        // </span>
+        // </div>`
+        // let typingBlock = document.getElementById("typing-block-message");
+        // messagesContainer.insertBefore(newDivMsg, typingBlock);
       } else {
         let direction = data.direction == "in" ? 'justify-end' : '';
         const msgStyle = role === "GUEST" ?
           `rounded-2xl break-words rounded-tl-none bg-gray-light p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100` :
-          `rounded-2xl break-words relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;;
+          `rounded-2xl break-words relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
 
         messagesContainer.style.display = "block"
         messagesContainer.insertAdjacentHTML("beforeend", `
@@ -1410,7 +1426,7 @@ export async function receiveMessage(data) {
       <div class="form-container f-error f-success">
       <span class="error" id="msg"></span>
       <form name="form1" class="box" onsubmit="">
-      <h4>${myContent.text_capture}</h4>
+      <h4>${myContent.friendly_name}</h4>
       <h5>Please fill in all fields</h5>
       ${inputForms.join('')}
       <button  type="button"  class="btn1" id="submit-form-${data.messageData.id}" data-content='${data.messageData.content}'  >Valider</button>
@@ -1423,10 +1439,9 @@ export async function receiveMessage(data) {
     const messageContainer = document.getElementById(`message-${messageId}`);
     if (!messageContainer) {
       let direction = data.direction == "in" ? "justify-end" : "justify-start";
-      const msgStyle =
-        data.direction == "out" ?
-        `rounded-2xl break-words rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 relative ` :
-        'rounded-2xl rounded-tr-none bg-info/10 p-3 text-slate-700 relative shadow-sm break-words dark:bg-accent dark:text-white';
+      const msgStyle =(data.messageData.user === newData.user && !data.message.paid)?
+      `rounded-2xl break-words rounded-tl-none bg-white p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100` :
+      `rounded-2xl break-words relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
       const messageContent = `
           <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
             <div class="flex flex-col items-end space-y-3.5">
@@ -1440,7 +1455,7 @@ export async function receiveMessage(data) {
                   ${
                     data.messageData.type === "MSG" || data.messageData.type === "link"
                       ? `
-                      <div class="rounded-2xl break-words relative rounded-tr-none bg-violet-300 p-3 text-slate-700 shadow-sm dark:bg-violet-500 dark:text-white" id="message-content-${messageId}">
+                      <div class=" ${data.messageData.type==="MSG" ? msgStyle : "rounded-2xl break-words relative rounded-tr-none bg-violet-300 p-3 text-slate-700 shadow-sm dark:bg-violet-500 dark:text-white" }" id="message-content-${messageId}">
                         ${
                           data.messageData.type === "link"
                             ? `<a class="link-msg  " id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}" href="${myContent.userLink?.url}">${myContent.userLink?.url}</a>`
@@ -1531,8 +1546,10 @@ export async function receiveMessage(data) {
   document.addEventListener('DOMContentLoaded', function () {
     const submitButton = document.querySelector(`#submit-form-${messageId}`);
     if (submitButton) {
-      submitButton.addEventListener("click", function () {
-        const form = document.forms.form1;
+      console.log(submitButton)
+      submitButton.addEventListener("click", function (event) {
+
+        const form = event.target.closest("form");
         const inputs = form.elements;
 
         // Iterate over the input fields and validate them
@@ -1573,9 +1590,11 @@ export async function receiveMessage(data) {
   function sendTypingNotification(input) {
     if (userHasTyped !== input.dataset.fieldId) {
       addLogs({
-        action: "fill",
+        action: "fill", 
         element: "22",
         element_id: +input.dataset.fieldId,
+        messageId:input.id.replace("floating_filled_","")
+
       });
       userHasTyped = input.dataset.fieldId;
     }
@@ -1584,27 +1603,44 @@ export async function receiveMessage(data) {
   let isFirstInputFocused = true;
 
   function sendFocusNotification(input) {
+    console.log("hererere",input)
+
     addLogs({
       action: "focus",
       element: "22",
       element_id: +input.dataset.fieldId,
+      messageId:input.id.replace("floating_filled_","")
+
     });
     isFirstInputFocused = false;
   }
 
   function sendClickingNotification(data) {
+    foued.linkClick(data.id.replace("linked-msg-", ""))
+
     addLogs({
       action: "link click",
       element: "7",
       element_id: +data.dataset.linkId,
+      messageId:data.id.replace("linked-msg-", "")
     });
   }
 
-  function sendPlanClickNotification(data) {
+  function sendPlanClickNotification(data,messageId) {
+    modal.classList.remove('hidden');
+      successButton.setAttribute('data-plan', data.dataset.planId);
+      successButton.setAttribute('message-id', messageId);
+
+      const name = data.getAttribute('name');
+      successButton.setAttribute('name', name);
+      console.log("name:", name);
+
     addLogs({
       action: "start purchase",
       element: "3",
       element_id: +data.dataset.planId,
+      messageId:messageId
+      
     });
   }
 
@@ -1631,7 +1667,7 @@ export async function receiveMessage(data) {
       if (buyButton) {
         buyButton.addEventListener("click", (event) => {
           event.preventDefault(); // Prevent the default behavior of the link
-          sendPlanClickNotification(plan);
+          sendPlanClickNotification(plan,messageId);
         });
       }
     });
@@ -2360,7 +2396,7 @@ export function userDisconnection(data) {
 let totalBalance;
 
 export function getTotalBalance(balance) {
-  console.log("balance lénnnna", !balance)
+  console.log("balance",balance)
   totalBalance = balance
   const balanceDiv = document.querySelector(".ballance-card");
   const balanceNumber = document.querySelector("#balanceNumber");
@@ -2368,16 +2404,16 @@ export function getTotalBalance(balance) {
   const buyMoreButton = document.querySelector("#buyMoreButton");
 
   buyMoreButton.disabled = true;
-
   setTimeout(() => {
     if (!balance && role==="GUEST") {
+      console.log("here balanace")
       const balanceSpinner = document.querySelector('.balance-spinner');
       console.log("balanceSpinner",balanceSpinner)
       balanceSpinner.parentNode.removeChild(balanceSpinner)
       balanceNumber.textContent = "Free trial";
       balanceType.textContent = "";
     } else {
-      console.log("balance houni",balance)
+      console.log("fl else balance")
       balanceNumber.textContent = balance;
       balanceType.textContent = "Messages";
 
@@ -2494,7 +2530,6 @@ async function getPlans() {
 
     if (response) {
       response.data.data.forEach(plan => {
-        console.log(plan)
         const div = document.createElement('div');
         div.classList.add('mt-4');
         div.innerHTML = `

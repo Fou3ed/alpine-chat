@@ -49,6 +49,7 @@ export default class event {
 
   connect = (userId, contact) => {
     this.socket.on("connect", () => {
+
       this.socket.emit("user-connected", {
         app_id: "638dc76312488c6bf67e8fc0",
         user: contact,
@@ -58,7 +59,6 @@ export default class event {
           app_id: "638dc76312488c6bf67e8fc0",
           api_token: "123456789123456",
           user_id: userId
-
         },
         "device": {
           "ip": "123.213.121",
@@ -302,6 +302,7 @@ planBought = () => {
         </div>
       </div>
     `;
+    role = "CLIENT";
 
     // Hide the modal when the Confirm button is pressed
     const confirmButton = modalDiv.querySelector("#confirmButton");
@@ -312,7 +313,6 @@ planBought = () => {
     document.body.appendChild(modalDiv);
     getTotalBalance(newBalance);
     ableInputArea();
-    role = "CLIENT";
     console.log("Data balance: ", data, newBalance);
   });
 };
@@ -955,7 +955,7 @@ planBought = () => {
 
   onGuestCreated = (data) => {
     this.socket.on('guestCreated', (data) => {
-
+      role="GUEST"
       guestCreated(data)
       loader.style.display = "none";
        getTotalBalance()
