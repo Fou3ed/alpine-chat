@@ -22880,3 +22880,12 @@ a.btn {
 .fill-current {
   fill: currentColor;
 }
+.conversationItem .conversationLeftTyping{
+  display: none;
+}
+.conversationItem.smallTyping .conversationLeftTyping {
+  display: block;
+}
+.conversationItem.smallTyping .conversationLeftMsg{
+  display: none;
+}

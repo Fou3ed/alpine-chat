@@ -84,22 +84,20 @@ export default class event {
   };
 
 
-
-
-
   //receive user connection (other user)
 
   userConnection = () => {
     this.socket.on("user-connection", (user) => {
-      if (user ?.role === "AGENT") {
-        const html = `
-        <div id="${user._id}" data-name="${user.full_name}" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center">
-          <div class="h-13 w-13 p-0.5">
-            <img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/unkown.jpg" alt="avatar"/>
-          </div>
-          <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">${user.full_name}</p>
-        </div>`;
-        $(".swiper-wrapper").append(html);
+      if (user?.role === "AGENT") {
+        // const html = `
+        // <div id="${user._id}" data-name="${user.full_name}" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center">
+        //   <div class="h-13 w-13 p-0.5">
+        //     <img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/unkown.jpg" alt="avatar"/>
+        //   </div>
+        //   <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">${user.full_name}</p>
+        // </div>`;
+        // $(".swiper-wrapper").append(html);
+        getExperts()
       }
       userConnection(user)
     })
@@ -107,7 +105,9 @@ export default class event {
 
   onDisconnected = () => {
     this.socket.on("onDisconnected", (reason, socket_id) => {
-      getExperts()
+      if(user?.role==="AGENT"){
+        getExperts()
+      }
       userDisconnection(socket_id)
     })
   }
@@ -290,7 +290,6 @@ export default class event {
   // }
 planBought = () => {
   this.socket.on('planBought', (data, newBalance) => {
-    console.log("data: ", data, newBalance);
     const modalDiv = document.createElement("div");
     modalDiv.innerHTML = `
       <div class="modal-bought" id="modal-bought">
@@ -961,11 +960,31 @@ planBought = () => {
        getTotalBalance()
     })
   }
+
+
   saveFormData = (data) => {
     this.socket.emit('saveForm', data, error => {
 
     })
   }
+
+  savedFormData = () => {
+    this.socket.on('formSaved', (bool) => {
+      const formContainer = document.querySelector('.form-container');
+      console.log("formContainer",formContainer)
+      if (bool) {
+        formContainer.classList.add('f-success');
+        formContainer.classList.remove('f-error');
+      } else {
+        formContainer.classList.add('f-error');
+        formContainer.classList.remove('f-success');
+      }
+  
+      console.log("bool", bool);
+    });
+  };
+  
+
 
   updateBalance = (data) => {
     console.log("data", data)

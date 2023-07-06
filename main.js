@@ -164,7 +164,6 @@ function guestConnection() {
 let firstConv = ""
 //when receiving guest data from server save it in cookies
 export async function guestCreated(data) {
-  console.log("guest data",data)
   const newUser = {
     user: data.user,
     contact: data.contact,
@@ -185,7 +184,7 @@ export async function guestCreated(data) {
     redirectToAgent(expert)
   }
   const html = `
-  <div class="conversation bg-slate-150" data-conversation-id="${data.conversationId}" data-name=${data.senderName} data-timestamp=${timeString} id="left-conversation-${data.conversationId}" data-user-id="${data.availableAgent}">
+  <div class="conversationItem conversation bg-slate-150" data-conversation-id="${data.conversationId}" data-name=${data.senderName} data-timestamp=${timeString} id="left-conversation-${data.conversationId}" data-user-id="${data.availableAgent}">
     <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
       <div
         class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
@@ -205,10 +204,86 @@ export async function guestCreated(data) {
             </p>
             <span class="text-tiny+ text-slate-400 dark:text-navy-300">${timeString}</span>
           </div>
-          <div class="mt-1 flex items-center justify-between space-x-1">
+          <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftMsg"> 
             <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
               Contact form 
             </p>
+       
+          </div>
+          <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftTyping"> 
+          
+          <div>
+            <div class="flex" class="pe-3">
+              <div
+                id="typing-display"
+                class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 relative "
+              >
+                <div class="d-flex">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink"
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="xMidYMid"
+                    style="background: none"
+                    width="45px"
+                    height="20px"
+                  >
+                    <circle
+                      cy="62.5"
+                      fill="#C4C4C46b"
+                      r="20"
+                      cx="1.5"
+                    >
+                      <animate
+                        attributeName="cy"
+                        calcMode="spline"
+                        keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+                        repeatCount="indefinite"
+                        values="62.5;37.5;62.5;62.5"
+                        keyTimes="0;0.25;0.5;1"
+                        dur="1s"
+                        begin="-0.5s"
+                      ></animate>
+                    </circle>
+                    <circle
+                      cy="62.5"
+                      fill="#c4c4c498"
+                      r="20"
+                      cx="52.5"
+                    >
+                      <animate
+                        attributeName="cy"
+                        calcMode="spline"
+                        keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+                        repeatCount="indefinite"
+                        values="62.5;37.5;62.5;62.5"
+                        keyTimes="0;0.25;0.5;1"
+                        dur="1s"
+                        begin="-0.375s"
+                      ></animate>
+                    </circle>
+                    <circle
+                      cy="62.5"
+                      fill="#c4c4c4"
+                      r="20"
+                      cx="107.5"
+                    >
+                      <animate
+                        attributeName="cy"
+                        calcMode="spline"
+                        keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+                        repeatCount="indefinite"
+                        values="62.5;37.5;62.5;62.5"
+                        keyTimes="0;0.25;0.5;1"
+                        dur="1s"
+                        begin="-0.25s"
+                      ></animate>
+                    </circle>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
        
           </div>
         </div>
@@ -397,40 +472,116 @@ export async function getAllConversations() {
           break;
       }
       const html = `
-        <div class="conversation ${index === 0 ? 'active' : ''}" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${name}" data-timestamp="${timestamp}" id="left-conversation-${conversationId}">
-          <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
+      <div class="conversationItem  conversation ${index === 0 ? 'active' : ''}" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${name}" data-timestamp="${timestamp}" id="left-conversation-${conversationId}">
+      <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
+        <div
+          class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
+          data-conversation-id="${conversationId}"
+          data-name="${conversation.name}">
+          <div class="avatar h-10 w-10">
+            <img class="rounded-full" src="images/avatar/unkown.jpg" alt="avatar" />
             <div
-              class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
-              data-conversation-id="${conversationId}"
-              data-name="${conversation.name}">
-              <div class="avatar h-10 w-10">
-                <img class="rounded-full" src="images/avatar/unkown.jpg" alt="avatar" />
-                <div
-                id="active-user"
-                  class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${isActive ? "bg-success" : "bg-slate-300"}  dark:border-navy-700">
-                </div>
-              </div>
-              <div class="flex flex-1 flex-col">
-                <div class="flex items-baseline justify-between space-x-1.5">
-                  <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
-                    ${name}
-                  </p>
-                  <span class="text-tiny+ text-slate-400 dark:text-navy-300">${time}</span>
-                </div>
-                <div class="mt-1 flex items-center justify-between space-x-1">
-                  <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
-                     ${conversation.last_message.status === 0 ? conversation.last_message.user === userId ? "You delete a message" : `${conversation.members[0].full_name} delete a message` : msg}
-                  </p >
-       <div
-     id="unread-count-${conversation._id}"
-        class=" ${conversation.unread_messages ? "flex" : "hidden"} h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-slate-200 px-1.5 text-tiny+ font-medium leading-none text-slate-800 dark:bg-navy-450 dark:text-white">
-        ${conversation.unread_messages?.unread_count}
-      </div>
-                </div >
-              </div >
+            id="active-user"
+              class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${isActive ? "bg-success" : "bg-slate-300"}  dark:border-navy-700">
+            </div>
+          </div>
+          <div class="flex flex-1 flex-col">
+            <div class="flex items-baseline justify-between space-x-1.5">
+              <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
+                ${name}
+              </p>
+              <span class="text-tiny+ text-slate-400 dark:text-navy-300">${time}</span>
+            </div>
+            <div
+              id="unread-count-${conversation._id}"
+                 class=" ${conversation.unread_messages ? "flex" : "hidden"} h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-slate-200 px-1.5 text-tiny+ font-medium leading-none text-slate-800 dark:bg-navy-450 dark:text-white">
+                 ${conversation.unread_messages?.unread_count}
+               </div>
+            <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftMsg">
+              <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
+                 ${conversation.last_message.status === 0 ? conversation.last_message.user === userId ? "You delete a message" : `${conversation.members[0].full_name} delete a message` : msg}
+              </p >
+              
+               <div>
+            <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftTyping"> 
+                    <div class="flex" class="pe-3">
+                      <div
+                        id="typing-display"
+                        class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 relative "
+                      >
+                        <div class="d-flex">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink"
+                            viewBox="0 0 100 100"
+                            preserveAspectRatio="xMidYMid"
+                            style="background: none"
+                            width="45px"
+                            height="20px"
+                          >
+                            <circle
+                              cy="62.5"
+                              fill="#C4C4C46b"
+                              r="20"
+                              cx="1.5"
+                            >
+                              <animate
+                                attributeName="cy"
+                                calcMode="spline"
+                                keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+                                repeatCount="indefinite"
+                                values="62.5;37.5;62.5;62.5"
+                                keyTimes="0;0.25;0.5;1"
+                                dur="1s"
+                                begin="-0.5s"
+                              ></animate>
+                            </circle>
+                            <circle
+                              cy="62.5"
+                              fill="#c4c4c498"
+                              r="20"
+                              cx="52.5"
+                            >
+                              <animate
+                                attributeName="cy"
+                                calcMode="spline"
+                                keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+                                repeatCount="indefinite"
+                                values="62.5;37.5;62.5;62.5"
+                                keyTimes="0;0.25;0.5;1"
+                                dur="1s"
+                                begin="-0.375s"
+                              ></animate>
+                            </circle>
+                            <circle
+                              cy="62.5"
+                              fill="#c4c4c4"
+                              r="20"
+                              cx="107.5"
+                            >
+                              <animate
+                                attributeName="cy"
+                                calcMode="spline"
+                                keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+                                repeatCount="indefinite"
+                                values="62.5;37.5;62.5;62.5"
+                                keyTimes="0;0.25;0.5;1"
+                                dur="1s"
+                                begin="-0.25s"
+                              ></animate>
+                            </circle>
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
             </div >
           </div >
-        </div > `;
+        </div >
+      </div >
+    </div >
+    </div> `;
       // Append the HTML to the container
       leftConversationContainer.innerHTML += html;
     });
@@ -499,7 +650,6 @@ function handleConversationClick() {
 function inputLEngth(conversationMaxMsg) {
   if(conversationMaxMsg){
   messageInput.setAttribute('maxlength', conversationMaxMsg);
-  console.log("messageInput",messageInput)
   document.getElementById('max-length-value').textContent = conversationMaxMsg;
   messageInput.addEventListener('input', function () {
   document.getElementById('message-counter').textContent = `Max Length: ${conversationMaxMsg} | ${conversationMaxMsg - this?.value.length}`;
@@ -609,7 +759,6 @@ if (container)
 
 // The submitForm function definition
 function submitForm(element) {
-  console.log("element", element)
   let messageContent = element.closest('[id^="message-content-"]');
   let messageId = messageContent ?.id ?.replace('message-content-', '');
   const form = JSON.parse(element.dataset.content);
@@ -752,7 +901,6 @@ function displayMessages(messages) {
           `;
           });
         }
-        console.log(myContent)
         tableRows = `
         <div class="form-container ${myContent?.status==1 ?"f-success" :""}  ">
         <span class="error" id="msg"></span>
@@ -857,15 +1005,12 @@ function displayMessages(messages) {
       const msgReacted = messagesContainer.querySelector(`#message-content-${messageId}`);
       msgReacted.innerHTML += `<div class="react-container bg-white dark:bg-navy-700" id="react-content-${messageId}">${messageReactions.join("")}</div>`;
     }
-
-
       
      if(message.type === "form" && myContent?.status==0){
         
-      
     const submitButton = document.querySelector(`#submit-form-${messageId}`);
+    
     if (submitButton) {
-        console.log(submitButton)
       submitButton.addEventListener("click", function (event) {
         const form = event.target.closest("form");
         const inputs = form.elements;
@@ -891,10 +1036,10 @@ function displayMessages(messages) {
     }
     const allFormInput = document.querySelectorAll(`.field-${messageId}`);
     if (allFormInput.length > 0) {
-      console.log(allFormInput) 
       allFormInput.forEach(input => {
 
         input.addEventListener('input', () => sendTypingNotification(input));
+      
         input.addEventListener('focus', () => sendFocusNotification(input));
       });
     }
@@ -923,13 +1068,7 @@ function displayMessages(messages) {
     }
 
 
-    document.querySelectorAll(`#field-${messageId}`).forEach(input => {
-      input.addEventListener('focus', () => {
-        if (isFirstInputFocused) {
-          sendFocusNotification(input);
-        }
-      });
-    });
+
   }
     function sendPlanClickNotification(data, messageId) {
       modal.classList.remove('hidden');
@@ -938,9 +1077,6 @@ function displayMessages(messages) {
 
       const name = data.getAttribute('name');
       successButton.setAttribute('name', name);
-      console.log("name:", name);
-
-
 
       // Update message to status not paid: 2
       addLogs({
@@ -1097,7 +1233,9 @@ async function sendMessage() {
     isSendingMessage = true; // Set the sending state to true
 
     if (!emoji.classList.contains('hidden'))
+
       emoji.classList.add('hidden');
+      console.log("conversationId",conversationId)
     if (conversationId == '') {
       try {
         foued.createConversation({
@@ -1153,7 +1291,7 @@ async function sendMessage() {
 }
 
 export async function sentMessage(data) {
-
+  conversationId=data.conversation
   let conv = conversationContainer.dataset.conversationId
   const isNotNewConversation = document.querySelector(`#left-conversation-${data.conversation}`)
 
@@ -1170,39 +1308,112 @@ export async function sentMessage(data) {
         element.classList.remove("bg-slate-150")
     });
     const html = `
-      <div class="conversation bg-slate-150" data-conversation-id="${data.conversation}" data-name=${senderName} data-timestamp="${timestamp}" id="left-conversation-${data.conversation}" data-user-id="${agentClicked}">
-        <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
-          <div
-            class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
-            data-conversation-id="${data.conversation}"
-            data-name=${senderName}>
-            <div class="avatar h-10 w-10">
-              <img class="rounded-full" src="images/avatar/unkown.jpg" alt="avatar" />
-              <div
-              id=${expert}
-                class="absolute right-0 h-3 w-3 rounded-full border-2 border-white bg-slate-300 dark:border-navy-700">
-              </div>
+    <div class="conversationItem conversation bg-slate-150" data-conversation-id="${data.conversation}" data-name=${senderName} data-timestamp=${timestamp} id="left-conversation-${data.conversation}" data-user-id="${agentClicked}">
+      <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
+        <div
+          class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
+          data-conversation-id="${data.conversation}"
+          data-name=${senderName}>
+          <div class="avatar h-10 w-10">
+            <img class="rounded-full" src="images/avatar/unkown.jpg" alt="avatar" />
+            <div
+            id=${expert}
+              class="absolute right-0 h-3 w-3 rounded-full border-2 border-white bg-success dark:border-navy-700">
             </div>
-            <div class="flex flex-1 flex-col">
-              <div class="flex items-baseline justify-between space-x-1.5">
-                <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
-                  ${senderName}
-                </p>
-                <span class="text-tiny+ text-slate-400 dark:text-navy-300">${time}</span>
-              </div>
-              <div class="mt-1 flex items-center justify-between space-x-1">
-                <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
-                  ${data.content}   
-                </p>
+          </div>
+          <div class="flex flex-1 flex-col">
+            <div class="flex items-baseline justify-between space-x-1.5">
+              <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
+              ${senderName}
+              </p>
+              <span class="text-tiny+ text-slate-400 dark:text-navy-300">${time}</span>
+            </div>
+            <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftMsg"> 
+              <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
+                ${data.content}
+              </p>
+         
+            </div>
+            <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftTyping"> 
+            
+            <div>
+              <div class="flex" class="pe-3">
                 <div
-                  class="flex h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-slate-200 px-1.5 text-tiny+ font-medium leading-none text-slate-800 dark:bg-navy-450 dark:text-white">
-                  
+                  id="typing-display"
+                  class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 relative "
+                >
+                  <div class="d-flex">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      xmlns:xlink="http://www.w3.org/1999/xlink"
+                      viewBox="0 0 100 100"
+                      preserveAspectRatio="xMidYMid"
+                      style="background: none"
+                      width="45px"
+                      height="20px"
+                    >
+                      <circle
+                        cy="62.5"
+                        fill="#C4C4C46b"
+                        r="20"
+                        cx="1.5"
+                      >
+                        <animate
+                          attributeName="cy"
+                          calcMode="spline"
+                          keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+                          repeatCount="indefinite"
+                          values="62.5;37.5;62.5;62.5"
+                          keyTimes="0;0.25;0.5;1"
+                          dur="1s"
+                          begin="-0.5s"
+                        ></animate>
+                      </circle>
+                      <circle
+                        cy="62.5"
+                        fill="#c4c4c498"
+                        r="20"
+                        cx="52.5"
+                      >
+                        <animate
+                          attributeName="cy"
+                          calcMode="spline"
+                          keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+                          repeatCount="indefinite"
+                          values="62.5;37.5;62.5;62.5"
+                          keyTimes="0;0.25;0.5;1"
+                          dur="1s"
+                          begin="-0.375s"
+                        ></animate>
+                      </circle>
+                      <circle
+                        cy="62.5"
+                        fill="#c4c4c4"
+                        r="20"
+                        cx="107.5"
+                      >
+                        <animate
+                          attributeName="cy"
+                          calcMode="spline"
+                          keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+                          repeatCount="indefinite"
+                          values="62.5;37.5;62.5;62.5"
+                          keyTimes="0;0.25;0.5;1"
+                          dur="1s"
+                          begin="-0.25s"
+                        ></animate>
+                      </circle>
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
+         
+            </div>
           </div>
         </div>
-      </div>`;
+      </div>
+    </div>`;
     // Append the HTML to the container
     newConvDiv.innerHTML = html;
     leftConversationContainer.insertBefore(newConvDiv, leftConversationContainer.firstChild)
@@ -1244,6 +1455,7 @@ export async function sentMessage(data) {
       //   convMessage.textContent = userLog
 
     } else
+
       convMessage.textContent = data.content
   }
   if (data.conversation === conv) {
@@ -1543,10 +1755,9 @@ export async function receiveMessage(data) {
       }
     }
   }
-  document.addEventListener('DOMContentLoaded', function () {
-    const submitButton = document.querySelector(`#submit-form-${messageId}`);
+
+   const submitButton = document.querySelector(`#submit-form-${messageId}`);
     if (submitButton) {
-      console.log(submitButton)
       submitButton.addEventListener("click", function (event) {
 
         const form = event.target.closest("form");
@@ -1564,7 +1775,6 @@ export async function receiveMessage(data) {
             isValid = false;
             break;
           }
-          // Add more validation logic for other input types if needed
         }
 
         if (isValid) {
@@ -1575,55 +1785,45 @@ export async function receiveMessage(data) {
       });
     }
 
-  })
+  
 
   const allFormInput = document.querySelectorAll(`#field-${messageId}`);
 
   if (allFormInput.length > 0) {
     allFormInput.forEach((input) => {
       input.oninput = () => sendTypingNotification(input);
+      input.addEventListener('focus', () => sendFocusNotification(input));
     });
   }
 
-  let userHasTyped = "";
-
   function sendTypingNotification(input) {
-    if (userHasTyped !== input.dataset.fieldId) {
       addLogs({
         action: "fill", 
         element: "22",
         element_id: +input.dataset.fieldId,
         messageId:input.id.replace("floating_filled_","")
-
       });
       userHasTyped = input.dataset.fieldId;
-    }
   }
 
-  let isFirstInputFocused = true;
-
   function sendFocusNotification(input) {
-    console.log("hererere",input)
-
     addLogs({
       action: "focus",
       element: "22",
       element_id: +input.dataset.fieldId,
-      messageId:input.id.replace("floating_filled_","")
-
+      messageId:input.id.replace("floating_filled_","")  
     });
-    isFirstInputFocused = false;
   }
 
   function sendClickingNotification(data) {
     foued.linkClick(data.id.replace("linked-msg-", ""))
-
-    addLogs({
-      action: "link click",
-      element: "7",
-      element_id: +data.dataset.linkId,
-      messageId:data.id.replace("linked-msg-", "")
-    });
+      addLogs({
+        action: "link click",
+        element: "7",
+        element_id: +data.dataset.linkId,
+        messageId:data.id.replace("linked-msg-", "")
+      });
+    
   }
 
   function sendPlanClickNotification(data,messageId) {
@@ -1633,8 +1833,6 @@ export async function receiveMessage(data) {
 
       const name = data.getAttribute('name');
       successButton.setAttribute('name', name);
-      console.log("name:", name);
-
     addLogs({
       action: "start purchase",
       element: "3",
@@ -1644,14 +1842,6 @@ export async function receiveMessage(data) {
     });
   }
 
-  document.querySelectorAll(`#field-${messageId}`).forEach((input) => {
-
-    input.addEventListener("focus", () => {
-      if (isFirstInputFocused) {
-        sendFocusNotification(input);
-      }
-    });
-  });
 
   const linkedMessage = document.querySelector(`#linked-msg-${messageId}`);
   if (linkedMessage) {
@@ -2019,7 +2209,7 @@ if (messageInput) {
 
 function onStartTyping() {
   const onTypingStart = {
-    app: "ID",
+    app: "1",
     user: newData.user,
     action: "typing.start",
     metaData: {
@@ -2048,9 +2238,7 @@ function onStopTyping() {
 let typingBlock = document.getElementById("typing-block-message");
 export function startTyping(data) {
   typingBlock = document.getElementById("typing-block-message");
-  console.log("typingBlock")
   if (data.metaData.conversation === conversationId) {
-    console.log("da5let")
     // set the scroll position to the bottom of the conversation container
     conversationContainer.scrollTop = conversationContainer.scrollHeight;
     if (!typingBlock) {
@@ -2132,12 +2320,19 @@ export function startTyping(data) {
                       </div>`
       messagesContainer.appendChild(typingBlock)
 
-
-      // const msgDiv = document.getElementById(`left-conversation-${data.messageData.conversation}`)
+    
+        }
+        console.log("data.messageData",data.metaData.conversation)
+        const typingBar = document.querySelector(`#left-conversation-${data.metaData.conversation}`)
+        console.log("typing barrs",typingBar)
+        if(typingBar){
+          typingBar.classList.add('smallTyping')
       // const msgText = msgDiv?.querySelector("p#last-message")
+      // console.log("awahaxD",msgText)
       // msgText.textContent.appendChild(typingBlock)
 
     }
+
   }
 }
 
@@ -2148,6 +2343,11 @@ export function stopTyping(data) {
     if (typingBlock) {
       typingBlock.remove()
     }
+  }
+  const typingBar = document.querySelector(`#left-conversation-${data.metaData.conversation}`)
+  console.log("typingBar",typingBar)
+  if(typingBar){
+    typingBar.classList.remove('smallTyping')
   }
 }
 
@@ -2248,8 +2448,6 @@ if (messageInput) {
 
   messageInput.addEventListener("keydown", function (event) {
     if (event.keyCode === 13) {
-      console.log("houninni")
-
       event.preventDefault();
       if (messageInput.value !== "")
         // Check if enter key is pressed
@@ -2396,7 +2594,8 @@ export function userDisconnection(data) {
 let totalBalance;
 
 export function getTotalBalance(balance) {
-  console.log("balance",balance)
+  messageInput.placeholder = "Write the message"
+
   totalBalance = balance
   const balanceDiv = document.querySelector(".ballance-card");
   const balanceNumber = document.querySelector("#balanceNumber");
@@ -2406,14 +2605,11 @@ export function getTotalBalance(balance) {
   buyMoreButton.disabled = true;
   setTimeout(() => {
     if (!balance && role==="GUEST") {
-      console.log("here balanace")
       const balanceSpinner = document.querySelector('.balance-spinner');
-      console.log("balanceSpinner",balanceSpinner)
       balanceSpinner.parentNode.removeChild(balanceSpinner)
       balanceNumber.textContent = "Free trial";
       balanceType.textContent = "";
     } else {
-      console.log("fl else balance")
       balanceNumber.textContent = balance;
       balanceType.textContent = "Messages";
 
@@ -2430,8 +2626,10 @@ export function getTotalBalance(balance) {
       }
       if (balance == 0) {
         // Disable input and button if balance is 0
+        messageInput.placeholder = "You need to buy a new plan to start chatting again";
         messageInput.disabled = true;
         sendButton.disabled = true;
+
       }
     }
     buyMoreButton.disabled = false;
@@ -2464,14 +2662,14 @@ export function updateUserBalance() {
       const modalDiv = document.createElement("div");
       modalDiv.innerHTML = `
       <div class="modal-bought" id="modal-bought">
-      <div class="modal-overlay"></div>
-      <div class="modal-content">
-        <h2 class="modal-title">ALERT</h2>
-        <p class="modal-text">No more balance</p>
-        <button class="modal-button" id="confirmButton">Confirm</button>
+        <div class="modal-overlay"></div>
+        <div class="modal-content bg-light-gray">
+          <h2 class="modal-title">ALERT !</h2>
+          <p class="modal-text">Your balance expired,Buy more to keep chatting</i></p>
+          <button class="modal-button bg-soft-color" id="confirmButton">Confirm</button>
+        </div>
       </div>
-    </div>
-    
+      
       `;
   
       // Hide the modal when the Confirm button is pressed
@@ -2479,7 +2677,8 @@ export function updateUserBalance() {
       confirmButton.addEventListener("click", () => {
         modalDiv.style.display = "none";
       });
-  
+      messageInput.placeholder = "You need to buy a new plan to start chatting again";
+
       document.body.appendChild(modalDiv);
       messageInput.disabled = true;
       sendButton.disabled = true;
@@ -2612,8 +2811,6 @@ const balanceSpinner = document.querySelector('.balance-spinner');
 const failButton = document.getElementById("closeModalPlan");
 
 failButton.addEventListener('click', function () {
-  console.log("clicked ", failButton);
-
   try {
 
 
@@ -2718,7 +2915,7 @@ $(document).ready(function () {
     .addEventListener("emoji-click", (event) => {
       messageInput.value = messageInput.value + event.detail.unicode;
     });
-
+foued.savedFormData()
   //click handler for the conversation 
   $(document).on('click', '.conversation-click', handleConversationClick)
   $(document).on('click', '#emoji-button', showEmoji)
@@ -2740,3 +2937,4 @@ $(document).ready(function () {
 //   e.preventDefault();
 
 // });
+
