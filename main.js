@@ -40,6 +40,7 @@ const sendButton = document.querySelector("#send-message");
 let messagesContainer = document.getElementById("big-container-message");
 //the left container that contains the conversations 
 const leftConversationContainer = document.getElementById('left-conversation');
+const minimizedSideBar=document.getElementById('mini-sidebar')
 //the conversation container 
 const $conversationContainer = $('#conversation-container');
 // get the conversation container
@@ -367,6 +368,8 @@ async function selectExpert() {
         window.dispatchEvent(new CustomEvent('change-active-chat', {
           detail: activeChat
         }));
+        markMessageAsSeen(conversationId)
+
         $conversationContainer.attr("data-conversation-id", null);
         console.log(" 'there is no conversation between the both of them yet',start a conversation by sending a message")
       } else {
@@ -407,8 +410,9 @@ export async function getAllConversations() {
     conversationId = conversations[0] ?._id
     const conversationPromises = conversations.map(async (conversation, index) => {
       conversation.members.forEach(user => {
-        if (userId !== user.user_id)
-          userConversation = user.user_id
+        if (userId !== user._id)
+          console.log("user user id ",user)
+          userConversation = user._id
       })
       const {
         _id: conversationId,
@@ -492,16 +496,12 @@ export async function getAllConversations() {
               </p>
               <span class="text-tiny+ text-slate-400 dark:text-navy-300">${time}</span>
             </div>
-            <div
-              id="unread-count-${conversation._id}"
-                 class=" ${conversation.unread_messages ? "flex" : "hidden"} h-4.5 min-w-[1.125rem] items-center justify-center rounded-full bg-slate-200 px-1.5 text-tiny+ font-medium leading-none text-slate-800 dark:bg-navy-450 dark:text-white">
-                 ${conversation.unread_messages?.unread_count}
-               </div>
+           
             <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftMsg">
               <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
                  ${conversation.last_message.status === 0 ? conversation.last_message.user === userId ? "You delete a message" : `${conversation.members[0].full_name} delete a message` : msg}
               </p >
-              
+
                <div>
             <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftTyping"> 
                     <div class="flex" class="pe-3">
@@ -575,15 +575,24 @@ export async function getAllConversations() {
                       </div>
                     </div>
                   </div>
-                  
             </div >
           </div >
         </div >
       </div >
     </div >
     </div> `;
+    const minimizedHtmlSideBar=`
+    <div class="mini-conversation-click flex cursor-pointer items-center justify-center py-2.5 hover:bg-slate-150 dark:hover:bg-navy-600 conversation ${index === 0 ? 'active' : ''}" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${name}" data-timestamp="${timestamp}" id="left-mini-conversation-${conversationId}">
+                    <div class=" avatar h-10 w-10" >
+                      <img class="rounded-full" src="images/avatar/unkown.jpg" alt="avatar">
+                      <div class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${isActive ? "bg-success" : "bg-slate-300"}  dark:border-navy-700"></div>
+                    </div>
+                  </div>
+    `
       // Append the HTML to the container
       leftConversationContainer.innerHTML += html;
+      minimizedSideBar.innerHTML+=minimizedHtmlSideBar;
+
     });
     // Update the latest conversation ID
     latestConversationId = conversationId;
@@ -599,14 +608,14 @@ export async function getAllConversations() {
 // this function is a handle click , so whenever the client click on a conversation it call the load messages function where messages should be displayed in the messagesContainer
 function handleConversationClick() {
   agentClicked = $(this).parent().parent().data('user-id')
-
+  console.log("agent clicked",agentClicked)
   expert = agentClicked
-  const conversationActive = document.querySelectorAll("div.conversation-click")
-  conversationActive.forEach(element => {
 
+  const conversationActive = document.querySelectorAll("div.conversation-click")
+
+  conversationActive.forEach(element => {
     if (element.classList.contains("bg-slate-150"))
       element.classList.remove("bg-slate-150")
-
   });
 
   $(this).addClass('bg-slate-150')
@@ -618,6 +627,7 @@ function handleConversationClick() {
   conversationId = conversation_id;
 
   const exist = allConversation.find(conversation => conversation._id === conversationId)
+  console.log("exist ",exist)
   if (exist?.status == 1) {
     conversationHeaderStatus.textContent = "En ligne"
   } else {
@@ -641,8 +651,6 @@ function handleConversationClick() {
   }));
   // conversationHeaderStatus.textContent = connectUsers.find(user => user._id === expert)? "En ligne" : "last seen recently"
   inputLEngth(exist?.max_length_message)
-
-
   markMessageAsSeen(conversationId)
 }
 
@@ -672,21 +680,23 @@ async function getTheLastMsg(conversationId) {
 async function markMessageAsSeen(conversationId) {
   if (conversationId) {
     getTheLastMsg(conversationId).then((res) => {
-      const onMessageRead = {
-        app: "638dc76312488c6bf67e8fc0",
-        user: newData.user,
-        action: "message.read",
-        metaData: {
-          conversation: conversationId,
-          message: res?._id,
-        },
-      };
-      const unreadCount = document.getElementById(`unread-count-${conversationId}`)
-      if (unreadCount) {
-        unreadCount.classList.add("hidden")
-        unreadCount.classList.remove("flex")
+      if(res.user !== newData.user && !res.read){
+        foued.markMessageAsRead( {
+          app: "638dc76312488c6bf67e8fc0",
+          user: newData.user,
+          action: "message.read",
+          metaData: {
+            conversation: conversationId,
+            message: res?._id,
+          },
+        });
+        // const unreadCount = document.getElementById(`unread-count-${conversationId}`)
+        // if (unreadCount) {
+        //   unreadCount.classList.add("hidden")
+        //   unreadCount.classList.remove("flex")
+        // }
       }
-      foued.markMessageAsRead(onMessageRead);
+      
     });
 
   } else {
@@ -700,35 +710,46 @@ async function markMessageAsSeen(conversationId) {
  * @param {string} conversationId - The ID of the conversation to load messages for.
  */
 let isLoading = false;
-const spinner = document.getElementById('conversation-spinner')
-
+let isEndOfMessages = false; // Track if all messages have been loaded
+const spinner = document.getElementById('conversation-spinner');
 const limit = 10;
 async function loadMessages(page, conversationId) {
   if (page === 2) {
     conversationContainer.scrollTop = conversationContainer.scrollHeight;
-
   }
+
   // Show the big container message
   document.getElementById('big-container-message').style.display = 'block';
-  // Don't make multiple requests if a request is already in progress
-  if (isLoading) {
+
+  // Don't make multiple requests if a request is already in progress or all messages have been loaded
+  if (isLoading || isEndOfMessages) {
     return;
   }
+
   if (conversationId) {
     try {
       isLoading = true;
       // Show the spinner
       spinner.classList.remove("hidden");
+
       // Load messages from the server
       const response = await axios.get(`http://192.168.1.20:3000/messages/conv/${conversationId}?page=${page}&limit=${limit}`);
+
       if (response.data.message !== "success") {
         throw new Error("Failed to load messages");
       }
-      // Do something with the messages
+
       displayMessages(response.data.data);
+
+      if (response.data.data.currentPage === response.data.data.totalPages) {
+        // All messages have been loaded
+        isEndOfMessages = true;
+      }
+
       // Check if the scrollbar has reached the top
       const container = document.getElementById('conversation-container');
-      if (container.scrollTop === 0) {
+      
+      if (container.scrollTop === 0 && !isEndOfMessages) {
         // Call loadMessages() again with the next page
         loadMessages(page + 1, conversationId);
       }
@@ -742,18 +763,24 @@ async function loadMessages(page, conversationId) {
   }
 }
 
-
 // Listen for the scroll event on the container element
 const container = document.getElementById('conversation-container');
-if (container)
+if (container) {
   container.addEventListener('scroll', () => {
-    if (container.scrollTop === 0) {
-      container.scrollTop = container.scrollHeight * 0.1;
-      // Call loadMessages() with the current page
-      const currentPage = Math.ceil(container.scrollHeight / container.clientHeight);
-      loadMessages(currentPage, container.dataset.conversationId);
+    const currentPage = Math.ceil(container.scrollHeight / container.clientHeight);
+
+    if (container.scrollTop === 0 && !isLoading) {
+
+      // Load messages only if all messages have not been loaded
+      if (!isEndOfMessages) {
+        container.scrollTop = container.scrollHeight * 0.1;
+
+        loadMessages(currentPage, container.dataset.conversationId);
+      }
     }
   });
+}
+
 
 
 
@@ -983,7 +1010,7 @@ function displayMessages(messages) {
                     `
                 }
                 <p id="date_msg" data-direction="${direction}" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
-                  ${message.status === 2 ? "(updated) " + time : direction === "justify-start" ? time : message.read ? time + `<i class="fas fa-check-double ps-2" style="font-size:10px;"></i>` : time}
+                  ${message.status === 2 ? "(updated) " + time : direction === "justify-start" ? time : message.read ? time + `<i class="fas fa-eye ps-2" style="font-size:10px;"></i>` : time}
                 </p>
               </div>
               ${message.type === "MSG" && direction === "justify-start" ? msgButt(messageId, direction, message.pinned === 1) : ""}
@@ -1584,18 +1611,18 @@ export async function receiveMessage(data) {
     if (myContent !== {} && data.messageData.type === "plan")
       tableRows = myContent.plans.map((plan) => {
         return `
-        <div class="pricing-item" id="plan-${messageId}" data-plan-id="${plan.id}">
-        <ul>
-          <li class="icon"  style="background-color: ${plan.status === 2 ? 'rgba(255, 105, 105, 0.8)' : (plan.status === 0 ? 'rgba(210, 233, 233, 0.8)' : 'rgba(159, 230, 160, 0.8)')}" ><i class="fas fa-comments"></i></li>
-          <li class="pricing-header">
-            <h4>${plan.billing_volume}<span>${plan.billing_type === "1" ? "Messages" : "Minutes"}</span></h4>
-            <h2><sup>${plan.tariff}</sup>${plan.currency === "EUR" ? "€" : "$"}</h2>
-          </li>
-          <li>${plan.name}</li>
-          <li class="footer"><a class="btn btn-dark border btn-sm" href="#">Buy</a></li>
-        </ul>
-      </div>
-        `;
+        <div class="pricing-item" id="plan-${messageId}" data-plan-id="${plan.id}" name="${plan.name}">
+          <ul>
+            <li class="icon"  style="background-color: ${plan.status === 2 ? 'rgba(255, 105, 105, 0.8)' : (plan.status === 0 ? 'rgba(210, 233, 233, 0.8)' : 'rgba(159, 230, 160, 0.8)')}" ><i class="fas fa-comments"></i></li>
+            <li class="pricing-header">
+              <h4>${plan.billing_volume} <span> Message </span></h4>
+              <h2><sup>${plan.tariff}</sup>  ${plan.currency === "EUR" ? "€" : "$"} </h2>
+            </li>
+            <li>${plan.name}</li>
+            <button class="footer"><a class="btn btn-dark border btn-sm" href="#">Buy</a></button>
+          </ul>
+        </div>    
+          `;
       });
 
     else if (myContent !== {} && data.messageData.type === "form") {
@@ -1918,16 +1945,17 @@ function changeTitle(number) {
 
 export async function onReadMsg() {
   const msgTimeSpans = messagesContainer.querySelectorAll("p#date_msg");
-
   msgTimeSpans.forEach(time => {
     if (time.dataset.direction == "justify-end") {
       const timeContent = time.textContent
-      time.innerHTML = `${timeContent} <i class="fas fa-check ps-2" style="font-size:10px;"></i>`
+
+      time.innerHTML = `${timeContent} <i class="fas fa-eye ps-2" style="font-size:10px;"></i>`
     }
   })
 }
 
 async function reactions() {
+  console.log("1")
   if (conversationContainer.dataset.conversationId === conversationId) {
     let reactButtons = conversationContainer.querySelectorAll("#react-message")
     reactButtons.forEach(reactButton => {
@@ -1963,6 +1991,7 @@ function onReactToMessage(button) {
 };
 
 async function getReactButton() {
+  console.log("3")
   const toUnReact = document.querySelectorAll('.react-container');
   for (const reactContainer of toUnReact) {
     const allReacts = reactContainer.querySelectorAll('a');
@@ -1992,7 +2021,6 @@ async function onUnReactToMessage(button) {
       path: react,
     },
   });
-  // Remove the reaction element from the DOM
 }
 
 export async function reactHide(data) {
@@ -2005,6 +2033,7 @@ export async function reactHide(data) {
 
 
 export async function reactDisplay(data) {
+  console.log("2")
   const reactData = data.metaData ? data.metaData : data
   const msgReacted = messagesContainer.querySelector(`#message-content-${reactData.message_id}`)
   let react = document.getElementById(`react-${reactData._id}`)
@@ -2023,6 +2052,13 @@ export async function reactDisplay(data) {
   }
   getReactButton()
 }
+
+
+
+
+
+
+
 
 async function getDeleteButtons() {
   const allDeleteButtons = document.querySelectorAll("#delete-message")
@@ -2322,13 +2358,10 @@ export function startTyping(data) {
 
     
         }
-        console.log("data.messageData",data.metaData.conversation)
         const typingBar = document.querySelector(`#left-conversation-${data.metaData.conversation}`)
-        console.log("typing barrs",typingBar)
         if(typingBar){
           typingBar.classList.add('smallTyping')
       // const msgText = msgDiv?.querySelector("p#last-message")
-      // console.log("awahaxD",msgText)
       // msgText.textContent.appendChild(typingBlock)
 
     }
@@ -2806,20 +2839,20 @@ async function getPlans() {
 
 const balanceNumber = document.getElementById('balanceNumber');
 const balanceSpinner = document.querySelector('.balance-spinner');
-
-
 const failButton = document.getElementById("closeModalPlan");
 
 failButton.addEventListener('click', function () {
   try {
 
+    console.log("here fail button")
+    modal.classList.add('hidden');
+    
+    // foued.buyPlan({
+    //   contact: newData.contact,
+    //   conversationId: conversationId,
 
-    foued.buyPlan({
-      contact: newData.contact,
-      conversationId: conversationId,
 
-
-    })
+    // })
   } catch (error) {
     console.error('Error adding sale:', error);
   }
@@ -2834,7 +2867,7 @@ successButton.addEventListener('click', async function () {
   try {
     balanceNumber.innerHTML = '';
     balanceNumber.appendChild(balanceSpinner);
-    // Your existing code
+    console.log("this",planName)
     foued.buyPlan({
       contact: newData.contact,
       user: newData.user,
@@ -2918,6 +2951,8 @@ $(document).ready(function () {
 foued.savedFormData()
   //click handler for the conversation 
   $(document).on('click', '.conversation-click', handleConversationClick)
+  $(document).on('click', '.mini-conversation-click', handleConversationClick)
+
   $(document).on('click', '#emoji-button', showEmoji)
 
 });

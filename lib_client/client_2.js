@@ -88,27 +88,28 @@ export default class event {
 
   userConnection = () => {
     this.socket.on("user-connection", (user) => {
-      if (user?.role === "AGENT") {
-        // const html = `
-        // <div id="${user._id}" data-name="${user.full_name}" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center">
-        //   <div class="h-13 w-13 p-0.5">
-        //     <img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/unkown.jpg" alt="avatar"/>
-        //   </div>
-        //   <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">${user.full_name}</p>
-        // </div>`;
-        // $(".swiper-wrapper").append(html);
-        getExperts()
-      }
-      userConnection(user)
+        if (user?.role === "AGENT") {
+          // const html = `
+          // <div id="${user._id}" data-name="${user.full_name}" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center">
+          //   <div class="h-13 w-13 p-0.5">
+          //     <img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/unkown.jpg" alt="avatar"/>
+          //   </div>
+          //   <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">${user.full_name}</p>
+          // </div>`;
+          // $(".swiper-wrapper").append(html);
+          getExperts()
+        }
+        userConnection(user)
     })
   }
 
   onDisconnected = () => {
-    this.socket.on("onDisconnected", (reason, socket_id) => {
+    this.socket.on("onDisconnected", (reason,user) => {
+      console.log("user",user)
       if(user?.role==="AGENT"){
         getExperts()
       }
-      userDisconnection(socket_id)
+      userDisconnection(user.socketId)
     })
   }
   
@@ -609,6 +610,7 @@ planBought = () => {
   }
   onMessageRead = () => {
     this.socket.on('onMessageRead', (data, error) => {
+      console.log("message read",data)
       onReadMsg()
 
 
