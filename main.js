@@ -607,12 +607,11 @@ export async function getAllConversations() {
 
 // this function is a handle click , so whenever the client click on a conversation it call the load messages function where messages should be displayed in the messagesContainer
 function handleConversationClick() {
+  console.log("hererere")
   agentClicked = $(this).parent().parent().data('user-id')
-  console.log("agent clicked",agentClicked)
   expert = agentClicked
 
   const conversationActive = document.querySelectorAll("div.conversation-click")
-
   conversationActive.forEach(element => {
     if (element.classList.contains("bg-slate-150"))
       element.classList.remove("bg-slate-150")
@@ -627,7 +626,6 @@ function handleConversationClick() {
   conversationId = conversation_id;
 
   const exist = allConversation.find(conversation => conversation._id === conversationId)
-  console.log("exist ",exist)
   if (exist?.status == 1) {
     conversationHeaderStatus.textContent = "En ligne"
   } else {
@@ -717,16 +715,12 @@ async function loadMessages(page, conversationId) {
   if (page === 2) {
     conversationContainer.scrollTop = conversationContainer.scrollHeight;
   }
-
   // Show the big container message
   document.getElementById('big-container-message').style.display = 'block';
 
-  // Don't make multiple requests if a request is already in progress or all messages have been loaded
-  if (isLoading || isEndOfMessages) {
-    return;
-  }
 
   if (conversationId) {
+    console.log("conversationId",conversationId)
     try {
       isLoading = true;
       // Show the spinner
@@ -1955,18 +1949,21 @@ export async function onReadMsg() {
 }
 
 async function reactions() {
-  console.log("1")
   if (conversationContainer.dataset.conversationId === conversationId) {
-    let reactButtons = conversationContainer.querySelectorAll("#react-message")
+    let reactButtons = conversationContainer.querySelectorAll("#react-message");
+
     reactButtons.forEach(reactButton => {
-      reactButton.addEventListener("click", function () {
-        onReactToMessage(this);
-      });
+      // Check if event listener is already attached
+      if (!reactButton.hasAttribute("data-event-listener")) {
+        reactButton.addEventListener("click", function () {
+          onReactToMessage(this);
+        });
+        reactButton.setAttribute("data-event-listener", true); // Set flag indicating the event listener is attached
+      }
     });
-
   }
-  getReactButton()
 
+  getReactButton();
 }
 
 function onReactToMessage(button) {
@@ -1991,14 +1988,16 @@ function onReactToMessage(button) {
 };
 
 async function getReactButton() {
-  console.log("3")
   const toUnReact = document.querySelectorAll('.react-container');
+
   for (const reactContainer of toUnReact) {
     const allReacts = reactContainer.querySelectorAll('a');
     allReacts.forEach(react => {
-      react.onclick = function () {
-
-        onUnReactToMessage(this)
+      if (!react.hasAttribute("data-event-listener")) {
+        react.onclick = function () {
+          onUnReactToMessage(this);
+        };
+        react.setAttribute("data-event-listener", true);
       }
     });
   }
@@ -2033,7 +2032,6 @@ export async function reactHide(data) {
 
 
 export async function reactDisplay(data) {
-  console.log("2")
   const reactData = data.metaData ? data.metaData : data
   const msgReacted = messagesContainer.querySelector(`#message-content-${reactData.message_id}`)
   let react = document.getElementById(`react-${reactData._id}`)
@@ -2942,6 +2940,7 @@ $(document).ready(function () {
   foued.planBought()
   foued.joinedDone()
   foued.onConversationStart()
+  foued.conversationStatusUpdated()
   foued.linkClicked()
   document
     .querySelector("emoji-picker")

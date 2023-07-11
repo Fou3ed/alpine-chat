@@ -199,8 +199,14 @@ export default class event {
   }
 
   conversationStatusUpdated = (data) => {
-    this.socket.on("conversationStatusUpdated", async (data, newData) => {
-      this.socket.emit("joinConversationRoom", data._id)
+    this.socket.on("conversationStatusUpdated",  (data, status) => {
+      
+      console.log("data",data,status)
+      if(status==1){
+        console.log("da5let")
+        this.socket.emit("joinRoom", data._id)
+
+      }
     })
   }
 
@@ -697,6 +703,7 @@ planBought = () => {
 
   onReactMsg = () => {
     this.socket.on('onMsgReacted', (data, error) => {
+      console.log("data react",data)
       reactDisplay(data)
     })
   }
