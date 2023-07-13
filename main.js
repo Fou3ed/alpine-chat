@@ -170,6 +170,7 @@ export async function guestCreated(data) {
     contact: data.contact,
     accountId: data.accountId
   }
+
   newData = newUser
   document.cookie = "myData=" + JSON.stringify(newUser) + "; expires=Tue, 31 Dec 9999 23:59:59 GMT; path=/";
   foued.connect(data.user, data.contact)
@@ -720,7 +721,6 @@ async function loadMessages(page, conversationId) {
 
 
   if (conversationId) {
-    console.log("conversationId",conversationId)
     try {
       isLoading = true;
       // Show the spinner
@@ -762,24 +762,20 @@ const container = document.getElementById('conversation-container');
 if (container) {
   container.addEventListener('scroll', () => {
     const currentPage = Math.ceil(container.scrollHeight / container.clientHeight);
-
     if (container.scrollTop === 0 && !isLoading) {
-
       // Load messages only if all messages have not been loaded
       if (!isEndOfMessages) {
         container.scrollTop = container.scrollHeight * 0.1;
-
         loadMessages(currentPage, container.dataset.conversationId);
       }
     }
   });
 }
 
-
-
-
 // The submitForm function definition
+let formElement=""
 function submitForm(element) {
+  formElement=element
   let messageContent = element.closest('[id^="message-content-"]');
   let messageId = messageContent ?.id ?.replace('message-content-', '');
   const form = JSON.parse(element.dataset.content);
@@ -814,20 +810,12 @@ function submitForm(element) {
   })
 
   foued.saveFormData(data)
-
+  element.disabled = true;
   formInputs.forEach(input => {
     input.disabled = true;
   });
-  element.innerHTML = "Sent";
+
   successMessage?.classList.remove('hidden');
-  element.disabled = true;
-  formContent.style.opacity = 0.7;
-  addLogs({
-    action: "end form",
-    element: "21",
-    element_id: +form.form_id,
-    messageId:messageId,
-  },form);
 
   setTimeout(() => {
     successMessage?.classList.add('hidden');
@@ -2637,8 +2625,8 @@ export function getTotalBalance(balance) {
   setTimeout(() => {
     if (!balance && role==="GUEST") {
       const balanceSpinner = document.querySelector('.balance-spinner');
-      balanceSpinner.parentNode.removeChild(balanceSpinner)
-      balanceNumber.textContent = "Free trial";
+      balanceSpinner?.parentNode.removeChild(balanceSpinner)
+      balanceNumber.textContent = "Free ";
       balanceType.textContent = "";
     } else {
       balanceNumber.textContent = balance;
@@ -2700,7 +2688,6 @@ export function updateUserBalance() {
           <button class="modal-button bg-soft-color" id="confirmButton">Confirm</button>
         </div>
       </div>
-      
       `;
   
       // Hide the modal when the Confirm button is pressed
@@ -2716,6 +2703,29 @@ export function updateUserBalance() {
     }
   }
 }
+
+export function submitModalStatus(status){
+  const formContact = formElement.parentNode;
+  const formContent = formContact.parentNode;
+  let messageContent = formElement.closest('[id^="message-content-"]');
+  let messageId = messageContent ?.id ?.replace('message-content-', '');
+  const form = JSON.parse(formElement.dataset.content);
+
+  if(status){
+    addLogs({
+      action: "end form",
+      element: "21",
+      element_id: +form.form_id,
+      messageId:messageId,
+    },form);
+    formContent.style.opacity = 0.7;
+    formElement.innerHTML = "Submitted";
+
+  }else {
+    formElement.disabled = false;
+    formElement.innerHTML = "Try again";
+  }
+  }
 
 
 export function ableInputArea() {

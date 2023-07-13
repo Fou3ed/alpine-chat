@@ -22,6 +22,7 @@ import {
   ableInputArea,
   sendFirstMessage,
   sendBuyMessage,
+  submitModalStatus,
 
 } from "../main.js";
 let messagesContainer = document.getElementById("big-container-message");
@@ -201,9 +202,7 @@ export default class event {
   conversationStatusUpdated = (data) => {
     this.socket.on("conversationStatusUpdated",  (data, status) => {
       
-      console.log("data",data,status)
       if(status==1){
-        console.log("da5let")
         this.socket.emit("joinRoom", data._id)
 
       }
@@ -965,6 +964,24 @@ planBought = () => {
     this.socket.on('guestCreated', (data) => {
       role="GUEST"
       guestCreated(data)
+      console.log("data",data)
+      this.socket.emit("user-connected", {
+        app_id: "1",
+        user: data.contact,
+        contact: data.contact,
+        action: "user-connected",
+        metaData: {
+          app_id: "638dc76312488c6bf67e8fc0",
+          api_token: "123456789123456",
+          user_id: data.user
+        },
+        "device": {
+          "ip": "123.213.121",
+          "timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+          "platform": navigator.platform,
+          "userAgent": navigator.userAgent
+        }
+      });
       loader.style.display = "none";
        getTotalBalance()
     })
@@ -980,17 +997,18 @@ planBought = () => {
   savedFormData = () => {
     this.socket.on('formSaved', (bool) => {
       const formContainer = document.querySelector('.form-container');
-      console.log("formContainer",formContainer)
       if (bool) {
         formContainer.classList.add('f-success');
         formContainer.classList.remove('f-error');
+        //open modal for success submit form 
+        submitModalStatus("1")
       } else {
         formContainer.classList.add('f-error');
         formContainer.classList.remove('f-success');
+        //open modal for fail submit form 
+        submitModalStatus()
       }
-  
-      console.log("bool", bool);
-    });
+      });
   };
   
 
