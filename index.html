@@ -1759,13 +1759,18 @@
               @click="isShowChatInfo = true"
               class="flex cursor-pointer items-center space-x-4 font-inter"
             >
-              <div class="avatar">
+              <div class="avatar" id="conversation-header-icon">
                 <img
                   class="rounded-full"
                   :src="activeChat.avatar_url"
                   alt="avatar"
                 />
+                <div
+                id="active-user-header"
+                  class="absolute right-0 h-3 w-3 rounded-full border-2 border-white bg-slate-300  dark:border-navy-700">
+                </div>
               </div>
+         
               <div>
                 <p
                   class="font-medium text-slate-700 line-clamp-1 dark:text-navy-100"

@@ -22,7 +22,9 @@ import {
   ableInputArea,
   sendFirstMessage,
   sendBuyMessage,
-  submitModalStatus,
+  submitFormStatus,
+  removeExpert,
+  getAllConversations,
 
 } from "../main.js";
 let messagesContainer = document.getElementById("big-container-message");
@@ -37,7 +39,6 @@ export default class event {
     });
   }
   // In the onConnected function:
-
   // In the index.html page:
   // Retrieve the newData value from localStorage
 
@@ -50,7 +51,6 @@ export default class event {
 
   connect = (userId, contact) => {
     this.socket.on("connect", () => {
-
       this.socket.emit("user-connected", {
         app_id: "638dc76312488c6bf67e8fc0",
         user: contact,
@@ -78,8 +78,8 @@ export default class event {
       if (usernameLink) {
         usernameLink.textContent = userData.full_name;
       }
+        getAllConversations()
         getTotalBalance(balance);
-      
       loader.style.display = "none";
     });
   };
@@ -90,14 +90,6 @@ export default class event {
   userConnection = () => {
     this.socket.on("user-connection", (user) => {
         if (user?.role === "AGENT") {
-          // const html = `
-          // <div id="${user._id}" data-name="${user.full_name}" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center">
-          //   <div class="h-13 w-13 p-0.5">
-          //     <img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/unkown.jpg" alt="avatar"/>
-          //   </div>
-          //   <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">${user.full_name}</p>
-          // </div>`;
-          // $(".swiper-wrapper").append(html);
           getExperts()
         }
         userConnection(user)
@@ -106,9 +98,8 @@ export default class event {
 
   onDisconnected = () => {
     this.socket.on("onDisconnected", (reason,user) => {
-      console.log("user",user)
       if(user?.role==="AGENT"){
-        getExperts()
+        removeExpert(user._id)
       }
       userDisconnection(user.socketId)
     })
@@ -1001,12 +992,12 @@ planBought = () => {
         formContainer.classList.add('f-success');
         formContainer.classList.remove('f-error');
         //open modal for success submit form 
-        submitModalStatus("1")
+        submitFormStatus("1")
       } else {
         formContainer.classList.add('f-error');
         formContainer.classList.remove('f-success');
         //open modal for fail submit form 
-        submitModalStatus()
+        submitFormStatus()
       }
       });
   };

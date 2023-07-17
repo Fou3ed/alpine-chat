@@ -305,7 +305,7 @@ export async function guestCreated(data) {
  * Display all connected agents 
  */
 const displayedUsers = new Set();
-let expertMsgAppended = false;
+let expertAppended = false;
 
 export async function getExperts() {
 
@@ -314,21 +314,19 @@ export async function getExperts() {
   if (response.data.message === "success") {
     connectUsers = response.data.data;
 
-    if (response.data.data.length > 0 && !expertMsgAppended) {
+    if (response.data.data.length > 0 && !expertAppended) {
       const html = `<span class="text-xs font-medium uppercase">Meet our new experts</span>`;
       $("#expert-msg").append(html);
-      expertMsgAppended = true;
+      expertAppended = true;
     }
-
     response.data.data.forEach((user) => {
+      
       const {
         _id: agent,
         full_name: name
       } = user;
-
       if (!displayedUsers.has(agent)) {
         displayedUsers.add(agent);
-
         const html = `
           <div id="${agent}" data-name="${name}" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center">
             <div class="h-13 w-13 p-0.5">
@@ -339,6 +337,15 @@ export async function getExperts() {
         $(".swiper-wrapper").append(html);
       }
     });
+  }
+}
+
+export async function removeExpert(userId) {
+  const agentDisco = document.getElementById(`${userId}`);
+  if (agentDisco) {
+    console.log("agent disco",agentDisco)
+    const swiperWrapper = document.querySelector(".swiper-wrapper");
+    swiperWrapper.removeChild(agentDisco);
   }
 }
 
@@ -382,20 +389,14 @@ async function selectExpert() {
             name: name,
             avatar_url: 'images/avatar/unkown.jpg'
           }
-
         }));
-
-
         conversationHeaderStatus.textContent = connectUsers.find(user => user._id === agent) ? "En ligne" : "last seen recently"
-
-
         expert = agent;
         $conversationContainer.attr("data-conversation-id", conversationId);
         // Load the first page of messages on page load
         let currentPage = 1;
         loadMessages(currentPage, conversationId, true);
       }
-
     }
   })
 }
@@ -407,12 +408,12 @@ export async function getAllConversations() {
   const conversationsResponse = await axios.get(`http://192.168.1.20:3000/conversation/1/?user_id=${newData.contact}`);
   if (conversationsResponse.data.data.length > 0) {
     const conversations = conversationsResponse.data.data;
+    console.log(conversations)
     allConversation = conversations
     conversationId = conversations[0] ?._id
     const conversationPromises = conversations.map(async (conversation, index) => {
       conversation.members.forEach(user => {
         if (userId !== user._id)
-          console.log("user user id ",user)
           userConversation = user._id
       })
       const {
@@ -476,6 +477,7 @@ export async function getAllConversations() {
           msg = conversation.last_message.message;
           break;
       }
+      
       const html = `
       <div class="conversationItem  conversation ${index === 0 ? 'active' : ''}" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${name}" data-timestamp="${timestamp}" id="left-conversation-${conversationId}">
       <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
@@ -487,7 +489,7 @@ export async function getAllConversations() {
             <img class="rounded-full" src="images/avatar/unkown.jpg" alt="avatar" />
             <div
             id="active-user"
-              class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${isActive ? "bg-success" : "bg-slate-300"}  dark:border-navy-700">
+              class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${conversation.status=="1" ? "bg-success" : "bg-slate-300"}  dark:border-navy-700">
             </div>
           </div>
           <div class="flex flex-1 flex-col">
@@ -608,7 +610,6 @@ export async function getAllConversations() {
 
 // this function is a handle click , so whenever the client click on a conversation it call the load messages function where messages should be displayed in the messagesContainer
 function handleConversationClick() {
-  console.log("hererere")
   agentClicked = $(this).parent().parent().data('user-id')
   expert = agentClicked
 
@@ -617,8 +618,8 @@ function handleConversationClick() {
     if (element.classList.contains("bg-slate-150"))
       element.classList.remove("bg-slate-150")
   });
-
   $(this).addClass('bg-slate-150')
+
   messagesContainer.innerHTML = '';
   document.getElementById('big-container-message').style.display = 'block';
   $conversationContainer.attr('data-conversation-id', conversationId);
@@ -629,8 +630,14 @@ function handleConversationClick() {
   const exist = allConversation.find(conversation => conversation._id === conversationId)
   if (exist?.status == 1) {
     conversationHeaderStatus.textContent = "En ligne"
+    const activeUser=document.getElementById('active-user-header')
+    activeUser.classList.remove("bg-slate-300")
+    activeUser.classList.add("bg-success")
   } else {
     conversationHeaderStatus.textContent = "Last seen recently"
+    const activeUser=document.getElementById('active-user-header')
+    activeUser.classList.remove("bg-success")
+ 
   }
   // Set the conversation ID as an attribute of the conversation container element
   const conversationName = document.getElementById('conversation-name');
@@ -653,7 +660,6 @@ function handleConversationClick() {
   markMessageAsSeen(conversationId)
 }
 
-
 function inputLEngth(conversationMaxMsg) {
   if(conversationMaxMsg){
   messageInput.setAttribute('maxlength', conversationMaxMsg);
@@ -672,7 +678,6 @@ async function getTheLastMsg(conversationId) {
         const lastMessage = response.data.data;
         return lastMessage;
       }
-
     });
 }
 
@@ -802,14 +807,13 @@ function submitForm(element) {
   form.status = 1;
   form.messageId=messageId
 
-  const data = JSON.stringify({
+  foued.saveFormData(JSON.stringify({
     contact: newData.contact,
     forms,
     messageId,
     form
   })
-
-  foued.saveFormData(data)
+)
   element.disabled = true;
   formInputs.forEach(input => {
     input.disabled = true;
@@ -1244,7 +1248,6 @@ async function sendMessage() {
     if (!emoji.classList.contains('hidden'))
 
       emoji.classList.add('hidden');
-      console.log("conversationId",conversationId)
     if (conversationId == '') {
       try {
         foued.createConversation({
@@ -1503,7 +1506,6 @@ export async function sentMessage(data) {
         //   case "purchase went wrong":
         //     userLog = `Purchase went wrong.`
         //     break;
-
         // }
         // const newDivMsg = document.createElement("div");
         // newDivMsg.innerHTML = ` <div
@@ -1521,14 +1523,12 @@ export async function sentMessage(data) {
         const msgStyle = role === "GUEST" ?
           `rounded-2xl break-words rounded-tl-none bg-gray-light p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100` :
           `rounded-2xl break-words relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
-
         messagesContainer.style.display = "block"
         messagesContainer.insertAdjacentHTML("beforeend", `
         <div id="message-${messageId}"  class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
         <div class="flex flex-col items-end space-y-3.5">
         <div class="flex flex-row">
         ${data.direction == "in" ? msgButt(messageId, direction, data.pinned === 1) : ''}
-
           <div class="ml-2 max-w-lg sm:ml-5">
             <div class="${msgStyle}"  id="message-content-${messageId}">
               ${data.content} 
@@ -1549,7 +1549,6 @@ export async function sentMessage(data) {
       `);
         changeTitle(0)
         const msgDiv = document.getElementById(`left-conversation-${conversationId}`);
-
         if (msgDiv) {
           const msgText = msgDiv.querySelector("p#last-message")
           msgText.textContent = data.content
@@ -1651,7 +1650,6 @@ export async function receiveMessage(data) {
       <h5>Please fill in all fields</h5>
       ${inputForms.join('')}
       <button  type="button"  class="btn1" id="submit-form-${data.messageData.id}" data-content='${data.messageData.content}'  >Valider</button>
-
       </form>
       </div>
       `;
@@ -2704,12 +2702,13 @@ export function updateUserBalance() {
   }
 }
 
-export function submitModalStatus(status){
+export function submitFormStatus(status){
   const formContact = formElement.parentNode;
   const formContent = formContact.parentNode;
   let messageContent = formElement.closest('[id^="message-content-"]');
   let messageId = messageContent ?.id ?.replace('message-content-', '');
   const form = JSON.parse(formElement.dataset.content);
+  const formInputs = formContact.querySelectorAll("input");
 
   if(status){
     addLogs({
@@ -2720,13 +2719,15 @@ export function submitModalStatus(status){
     },form);
     formContent.style.opacity = 0.7;
     formElement.innerHTML = "Submitted";
-
   }else {
     formElement.disabled = false;
+    formInputs.forEach(input => {
+      input.disabled = false;
+    });
+  
     formElement.innerHTML = "Try again";
   }
   }
-
 
 export function ableInputArea() {
   messageInput.disabled = false;
@@ -2778,17 +2779,13 @@ async function getPlans() {
           <p class="uppercase text-sm font-medium text-gray-500">
           ${plan.name}
                     </p>
-      
           <p class="mt-4 text-3xl text-gray-700 font-medium">
           ${plan.billing_volume} message
           </p>
-      
           <p class="mt-4 font-semibold text-gray-700">
           ${plan.tariff}
           <span class="text-xs">£</span>
-
           </p>
-      
           <div class="mt-8">
             <ul class="grid grid-cols-1 gap-4">
               <li class="inline-flex items-center text-gray-600">
@@ -2797,9 +2794,6 @@ async function getPlans() {
                 </svg>
                 Available
               </li>
-      
-           
-      
           <div class="mt-8">
             <button class="plan-btn bg-gray-400 hover:bg-gray-500 px-3 py-2 rounded-lg w-full text-white" data-plan="${plan.id}" name="${plan.name}">
               Purchase plan
@@ -2839,7 +2833,6 @@ async function getPlans() {
         }
       });
     }
-
   } catch (error) {
     console.error(error);
   }
@@ -2851,21 +2844,16 @@ const failButton = document.getElementById("closeModalPlan");
 
 failButton.addEventListener('click', function () {
   try {
-
     console.log("here fail button")
     modal.classList.add('hidden');
-    
     // foued.buyPlan({
     //   contact: newData.contact,
     //   conversationId: conversationId,
-
-
     // })
   } catch (error) {
     console.error('Error adding sale:', error);
   }
 });
-
 
 const successButton = document.getElementById('buyPlanBtn');
 successButton.addEventListener('click', async function () {
@@ -2875,7 +2863,6 @@ successButton.addEventListener('click', async function () {
   try {
     balanceNumber.innerHTML = '';
     balanceNumber.appendChild(balanceSpinner);
-    console.log("this",planName)
     foued.buyPlan({
       contact: newData.contact,
       user: newData.user,
@@ -2910,7 +2897,7 @@ $(document).ready(function () {
   if (newData) {
     foued.connect(newData?.user, newData.contact)
     foued.onDisconnected(newData?.user)
-    getAllConversations()
+    
   } else {
     console.log("newData is empty !", newData)
   }
@@ -2957,28 +2944,9 @@ $(document).ready(function () {
     .addEventListener("emoji-click", (event) => {
       messageInput.value = messageInput.value + event.detail.unicode;
     });
-foued.savedFormData()
+  foued.savedFormData()
   //click handler for the conversation 
   $(document).on('click', '.conversation-click', handleConversationClick)
   $(document).on('click', '.mini-conversation-click', handleConversationClick)
-
   $(document).on('click', '#emoji-button', showEmoji)
-
 });
-
-
-// $(window).on('beforeunload', function(e) {
-//   foued.updateBalance({
-//     "contact_id": newData.contact,
-//     "type" : totalBalance.balance_type,
-//     "total":totalBalance.balance
-//     })
-//     console.log({
-//       "contact_id": newData.contact,
-//       "type" : totalBalance.balance_type,
-//       "total":totalBalance.balance
-//       })
-//   e.preventDefault();
-
-// });
-
