@@ -9805,10 +9805,13 @@ margin-bottom:2rem ;
 }
 
 .to-green-400 {
-  --tw-gradient-from: #4ade80;
+  
+  --tw-gradient-from: #15803d;
   --tw-gradient-to: rgba(74, 222, 128, 0);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
+
+
 
 .from-fuchsia-600 {
   --tw-gradient-from: #c026d3;
@@ -22890,3 +22893,38 @@ a.btn {
   display: none;
 }
 
+/* Styles for the modal overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.alert-text {
+  color: red;
+  font-weight: bold;
+}
+
+.reload-button {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}

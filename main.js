@@ -15,6 +15,8 @@ const timeString =
 // Save user information in local storage
 console.log("LOCAL STORAGE", getCookie("myData"));
 
+import { accountId,token,get_plan_api, get_connected_agents, get_all_conversations, get_last_msg, get_all_agents } from "./env.js";
+
 function getCookie(name) {
 
   var cookieArr = document.cookie.split(";");
@@ -48,6 +50,49 @@ const conversationContainer = document.getElementById('conversation-container');
 const emoji = document.querySelector("emoji-picker")
 const conversationHeaderStatus = document.getElementById('conversation-name').parentNode.querySelector(".text-xs");
 const modal = document.getElementById('ModalPlan');
+conversationContainer.oninput = (event) => {
+  let target = event.target.closest(".form-input")
+  if(target){
+    sendTypingNotification(target)
+
+  }
+}
+
+conversationContainer.addEventListener('focusin', (event) => {
+  console.log("event ",event)
+  let target = event.target.closest(".form-input")
+  if(target){
+    sendFocusNotification(target)
+
+  }
+
+})
+
+
+let userHasTyped = "";
+
+function sendTypingNotification(input) {
+  if (userHasTyped !== input.dataset.fieldId) {
+    addLogs({
+      action: "fill",
+      element: "22",
+      element_id: +input.dataset.fieldId,
+      messageId:input.id.replace("floating_filled_","")
+    });
+    userHasTyped = input.dataset.fieldId;
+  }
+}
+
+function sendFocusNotification(input) { 
+  addLogs({
+    action: "focus",
+    element: "22",
+    element_id: +input.dataset.fieldId,
+    messageId:input.id.replace("floating_filled_","")
+
+  });
+}
+
 
 const msgButt = (messageId, direction, isPinned) => {
   return `
@@ -158,7 +203,7 @@ function guestConnection() {
     foued.createGuestAccount({
       browser: navigator.userAgent,
       platform: navigator.platform,
-      accountId: "1"
+      accountId: accountId
     })
   }
 }
@@ -309,7 +354,7 @@ let expertAppended = false;
 
 export async function getExperts() {
 
-  const response = await axios.get("http://192.168.1.20:3000/users/connected");
+  const response = await axios.get(get_connected_agents);
 
   if (response.data.message === "success") {
     connectUsers = response.data.data;
@@ -343,7 +388,6 @@ export async function getExperts() {
 export async function removeExpert(userId) {
   const agentDisco = document.getElementById(`${userId}`);
   if (agentDisco) {
-    console.log("agent disco",agentDisco)
     const swiperWrapper = document.querySelector(".swiper-wrapper");
     swiperWrapper.removeChild(agentDisco);
   }
@@ -405,10 +449,11 @@ export async function getAllConversations() {
   leftConversationContainer.innerHTML = '';
   let latestConversationId = null;
   let userConversation = ""
-  const conversationsResponse = await axios.get(`http://192.168.1.20:3000/conversation/1/?user_id=${newData.contact}`);
+  
+  const conversationsResponse = await axios.get(`${get_all_conversations}${newData.contact}`);
   if (conversationsResponse.data.data.length > 0) {
     const conversations = conversationsResponse.data.data;
-    console.log(conversations)
+    console.log("conversation",conversations)
     allConversation = conversations
     conversationId = conversations[0] ?._id
     const conversationPromises = conversations.map(async (conversation, index) => {
@@ -584,24 +629,24 @@ export async function getAllConversations() {
       </div >
     </div >
     </div> `;
+    
     const minimizedHtmlSideBar=`
     <div class="mini-conversation-click flex cursor-pointer items-center justify-center py-2.5 hover:bg-slate-150 dark:hover:bg-navy-600 conversation ${index === 0 ? 'active' : ''}" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${name}" data-timestamp="${timestamp}" id="left-mini-conversation-${conversationId}">
                     <div class=" avatar h-10 w-10" >
                       <img class="rounded-full" src="images/avatar/unkown.jpg" alt="avatar">
-                      <div class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${isActive ? "bg-success" : "bg-slate-300"}  dark:border-navy-700"></div>
+                      <div class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${conversation.status==1 ? "bg-success" : "bg-slate-300"}  dark:border-navy-700"></div>
                     </div>
                   </div>
     `
       // Append the HTML to the container
       leftConversationContainer.innerHTML += html;
       minimizedSideBar.innerHTML+=minimizedHtmlSideBar;
-
     });
     // Update the latest conversation ID
     latestConversationId = conversationId;
     // Trigger a click event on the latest conversation
     if (latestConversationId) {
-      $(`[data-conversation-id="${latestConversationId}"]`).trigger('click');
+      $(`.conversation-click[data-conversation-id="${latestConversationId}"]`).trigger('click');
     }
     await Promise.all(conversationPromises);
   }
@@ -672,7 +717,8 @@ function inputLEngth(conversationMaxMsg) {
 
 
 async function getTheLastMsg(conversationId) {
-  return axios.get(`http://192.168.1.20:3000/messages/lastMsg/${conversationId}`)
+  
+  return axios.get(`${get_last_msg}${conversationId}`)
     .then(function (response) {
       if (response) {
         const lastMessage = response.data.data;
@@ -737,9 +783,7 @@ async function loadMessages(page, conversationId) {
       if (response.data.message !== "success") {
         throw new Error("Failed to load messages");
       }
-
       displayMessages(response.data.data);
-
       if (response.data.data.currentPage === response.data.data.totalPages) {
         // All messages have been loaded
         isEndOfMessages = true;
@@ -796,7 +840,7 @@ function submitForm(element) {
       value: formInputs[i].value,
     }];
   }
-
+ console.log("form fields",form.fields)
   form.fields = form.fields.map(field => {
     let fieldValue = forms.find(fild => fild.fieldId == field.field_id);
     if (fieldValue) {
@@ -1019,10 +1063,9 @@ function displayMessages(messages) {
       msgReacted.innerHTML += `<div class="react-container bg-white dark:bg-navy-700" id="react-content-${messageId}">${messageReactions.join("")}</div>`;
     }
       
-     if(message.type === "form" && myContent?.status==0){
-        
+    if(message.type === "form" && myContent?.status==0){
+
     const submitButton = document.querySelector(`#submit-form-${messageId}`);
-    
     if (submitButton) {
       submitButton.addEventListener("click", function (event) {
         const form = event.target.closest("form");
@@ -1047,42 +1090,23 @@ function displayMessages(messages) {
         }
       });
     }
-    const allFormInput = document.querySelectorAll(`.field-${messageId}`);
-    if (allFormInput.length > 0) {
-      allFormInput.forEach(input => {
-
-        input.addEventListener('input', () => sendTypingNotification(input));
-      
-        input.addEventListener('focus', () => sendFocusNotification(input));
-      });
-    }
-    let userHasTyped = "";
-
-    function sendTypingNotification(input) {
-      if (userHasTyped !== input.dataset.fieldId) {
-        addLogs({
-          action: "fill",
-          element: "22",
-          element_id: +input.dataset.fieldId,
-          messageId:input.id.replace("floating_filled_","")
-        });
-        userHasTyped = input.dataset.fieldId;
-      }
-    }
-
-    function sendFocusNotification(input) {
-      addLogs({
-        action: "focus",
-        element: "22",
-        element_id: +input.dataset.fieldId,
-        messageId:input.id.replace("floating_filled_","")
-
-      });
-    }
+    // const allFormInput = document.querySelectorAll(`.field-${messageId}`);
+    // if (allFormInput.length > 0) {
+    //   allFormInput.forEach(input => {
+        
+    //     input.addEventListener('input', () => sendTypingNotification(input));
+        
+    //     input.addEventListener('focus', () =>{ 
+    //     sendFocusNotification(input)});
+    //   });
+    // }
 
 
 
   }
+
+
+
     function sendPlanClickNotification(data, messageId) {
       modal.classList.remove('hidden');
       successButton.setAttribute('data-plan', data.dataset.planId);
@@ -1177,12 +1201,9 @@ async function addLogs(log,aux={}) {
     logData: logData
   })
 }
-
 /**
  * open a new blank conversation 
  */
-
-
 export async function sendFirstMessage(conversation) {
   conversationContainer.dataset.conversationId = conversation._id;
   foued.onCreateMessage({
@@ -1570,7 +1591,7 @@ export async function sentMessage(data) {
 }
 
 export async function receiveMessage(data) {
-
+  console.log("receive message 1111")
   if (firstConv && firstConv === data.messageData.conversation) {
     $(`.conversation-click[data-conversation-id="${firstConv}"]`).trigger("click")
     firstConv = ""
@@ -1766,7 +1787,6 @@ export async function receiveMessage(data) {
    const submitButton = document.querySelector(`#submit-form-${messageId}`);
     if (submitButton) {
       submitButton.addEventListener("click", function (event) {
-
         const form = event.target.closest("form");
         const inputs = form.elements;
 
@@ -1783,7 +1803,6 @@ export async function receiveMessage(data) {
             break;
           }
         }
-
         if (isValid) {
           submitForm(this);
         } else {
@@ -1794,33 +1813,33 @@ export async function receiveMessage(data) {
 
   
 
-  const allFormInput = document.querySelectorAll(`#field-${messageId}`);
+  // const allFormInput = document.querySelectorAll(`#field-${messageId}`);
 
-  if (allFormInput.length > 0) {
-    allFormInput.forEach((input) => {
-      input.oninput = () => sendTypingNotification(input);
-      input.addEventListener('focus', () => sendFocusNotification(input));
-    });
-  }
+  // if (allFormInput.length > 0) {
+  //   allFormInput.forEach((input) => {
+  //     input.oninput = () => sendTypingNotification(input);
+  //     input.addEventListener('focus', () => sendFocusNotification(input));
+  //   });
+  // }
 
-  function sendTypingNotification(input) {
-      addLogs({
-        action: "fill", 
-        element: "22",
-        element_id: +input.dataset.fieldId,
-        messageId:input.id.replace("floating_filled_","")
-      });
-      userHasTyped = input.dataset.fieldId;
-  }
+  // function sendTypingNotification(input) {
+  //     addLogs({
+  //       action: "fill", 
+  //       element: "22",
+  //       element_id: +input.dataset.fieldId,
+  //       messageId:input.id.replace("floating_filled_","")
+  //     });
+  //     userHasTyped = input.dataset.fieldId;
+  // }
 
-  function sendFocusNotification(input) {
-    addLogs({
-      action: "focus",
-      element: "22",
-      element_id: +input.dataset.fieldId,
-      messageId:input.id.replace("floating_filled_","")  
-    });
-  }
+  // function sendFocusNotification(input) {
+  //   addLogs({
+  //     action: "focus",
+  //     element: "22",
+  //     element_id: +input.dataset.fieldId,
+  //     messageId:input.id.replace("floating_filled_","")  
+  //   });
+  // }
 
   function sendClickingNotification(data) {
     foued.linkClick(data.id.replace("linked-msg-", ""))
@@ -2362,7 +2381,6 @@ export function stopTyping(data) {
     }
   }
   const typingBar = document.querySelector(`#left-conversation-${data.metaData.conversation}`)
-  console.log("typingBar",typingBar)
   if(typingBar){
     typingBar.classList.remove('smallTyping')
   }
@@ -2477,7 +2495,7 @@ if (messageInput) {
 
 //get All agents in the platform
 async function getAllAgents() {
-  const response = await axios.get("http://192.168.1.20:3000/users");
+  const response = await axios.get(get_all_agents);
   if (response.data.message === "success") {
     const agents = response.data.data
     agents.forEach((agent) => {
@@ -2638,7 +2656,7 @@ export function getTotalBalance(balance) {
         balanceDiv.classList.add("from-green-400", "to-orange-600");
       } else {
         // Reset to default colors
-        balanceDiv.classList.remove("from-green-400", "to-orang-600");
+        balanceDiv.classList.remove("from-green-400", "to-orange-600");
         balanceDiv.classList.add("from-green-400", "to-fuchsia-600");
       }
       if (balance == 0) {
@@ -2679,7 +2697,6 @@ export function updateUserBalance() {
       const modalDiv = document.createElement("div");
       modalDiv.innerHTML = `
       <div class="modal-bought" id="modal-bought">
-        <div class="modal-overlay"></div>
         <div class="modal-content bg-light-gray">
           <h2 class="modal-title">ALERT !</h2>
           <p class="modal-text">Your balance expired,Buy more to keep chatting</i></p>
@@ -2763,9 +2780,9 @@ function showEmoji() {
 
 async function getPlans() {
   try {
-    const response = await axios.get('https://iheb.local.itwise.pro/private-chat-app/public/plan_client?account=1', {
+    const response = await axios.get(`${get_plan_api}${accountId}`, {
       headers: {
-        Authorization: `Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2Nzg5NzE2OTUsImV4cCI6MTYyMDA1NzIzMzMzLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwidXNlcm5hbWUiOiJ0ZXN0QGdtYWlsLmNvbSJ9.Yy_dUAEfszEpE-aQkBcUBq6rV9OPaUCNaoLxIfJnoNyCqsVWUfbilWNz2sXXImyDBmsNg1n9YIERHUE2iziJpOdhJdbiT6byWmT7MhuyC_QUxbPCko5NQPfP-KB85BjKVSxpr-CNq-Su8LxZ6fysLc7Qe71A86O0TangvsH4UgUb99WE3fMC_EF0PnvXVVxfzdZkV9p1EUTJa989ENP-ytXwdonUXcFUBznlW5PVEWgw-5dyWcND3LXCGaweAO-gMSU2K1Wp2T_rtqTRsXkAhcwF5T_IODee87w4FVARMfbXHvvIizclqyH0TITU8G_MgcoteObO24bECJCV-KpFWg`
+        Authorization: `Bearer ${token}`
       }
     });
 
@@ -2844,7 +2861,6 @@ const failButton = document.getElementById("closeModalPlan");
 
 failButton.addEventListener('click', function () {
   try {
-    console.log("here fail button")
     modal.classList.add('hidden');
     // foued.buyPlan({
     //   contact: newData.contact,
@@ -2884,6 +2900,12 @@ $(document).ready(function () {
     $("#modalButton").trigger("click");
   });
 });
+
+
+ 
+
+
+
 
 $(document).ready(function () {
   guestConnection()
@@ -2945,6 +2967,7 @@ $(document).ready(function () {
       messageInput.value = messageInput.value + event.detail.unicode;
     });
   foued.savedFormData()
+  foued.failGuest()
   //click handler for the conversation 
   $(document).on('click', '.conversation-click', handleConversationClick)
   $(document).on('click', '.mini-conversation-click', handleConversationClick)

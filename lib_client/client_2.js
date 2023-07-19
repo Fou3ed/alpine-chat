@@ -80,6 +80,7 @@ export default class event {
       }
         getAllConversations()
         getTotalBalance(balance);
+
       loader.style.display = "none";
     });
   };
@@ -290,7 +291,6 @@ planBought = () => {
     const modalDiv = document.createElement("div");
     modalDiv.innerHTML = `
       <div class="modal-bought" id="modal-bought">
-        <div class="modal-overlay"></div>
         <div class="modal-content bg-light-gray">
           <h2 class="modal-title">Congratulations</h2>
           <p class="modal-text">You bought ${data.balance} messages.<br>Your new balance: <i>${newBalance}</i></p>
@@ -489,7 +489,6 @@ planBought = () => {
   receiveMessage = async () => {
     const leftConversationContainer = document.getElementById('left-conversation');
     await this.socket.on('onMessageReceived', async (data, error) => {
-      console.log("message received",data)
       const msgDiv = document.getElementById(`left-conversation-${data.messageData.conversation}`);
       if (msgDiv) {
         const msgText = msgDiv.querySelector("p#last-message")
@@ -988,19 +987,33 @@ planBought = () => {
   savedFormData = () => {
     this.socket.on('formSaved', (bool) => {
       const formContainer = document.querySelector('.form-container');
+      // Create a new <p> element to hold the status message
+      const statusMessage = document.createElement('p');
+      statusMessage.classList.add('status-message');
+      formContainer.appendChild(statusMessage);
+      statusMessage.textContent = "saving form data went wrong,Try again";
+
       if (bool) {
         formContainer.classList.add('f-success');
         formContainer.classList.remove('f-error');
-        //open modal for success submit form 
-        submitFormStatus("1")
+        // Update the status message for success
+        statusMessage.textContent = "Form saved successfully";
+        statusMessage.style.color = "#22A699";
+        // Open modal for success submit form
+        submitFormStatus("1");
       } else {
         formContainer.classList.add('f-error');
         formContainer.classList.remove('f-success');
-        //open modal for fail submit form 
-        submitFormStatus()
+        // Update the status message for failure
+
+        statusMessage.textContent = "saving form data went wrong,Try again";
+        statusMessage.style.color = "#F24C3D";
+        // Open modal for fail submit form
+        submitFormStatus();
       }
-      });
+    });
   };
+  
   
 
 
@@ -1027,5 +1040,40 @@ planBought = () => {
     });
   };
   
- 
+// The failGuest function
+failGuest = () => {
+  this.socket.on('createGuestFailed', (data) => {
+    console.log("failed creating guest", data);
+    loader.style.display = "none";
+
+    const modalOverlay = document.createElement('div');
+    modalOverlay.classList.add('modal-overlay');
+
+    const modalContent = document.createElement('div');
+    modalContent.classList.add('modal-content');
+
+    const alertText = document.createElement('p');
+    alertText.classList.add('alert-text');
+    alertText.textContent = 'fail creating guest,Press reload to try again ';
+
+    const reloadButton = document.createElement('button');
+    reloadButton.classList.add('reload-button');
+    reloadButton.textContent = 'Reload';
+
+    reloadButton.addEventListener('click', () => {
+      location.reload(); 
+    });
+
+    // Assemble the modal content
+    modalContent.appendChild(alertText);
+    modalContent.appendChild(reloadButton);
+
+    // Assemble the modal overlay
+    modalOverlay.appendChild(modalContent);
+
+    // Append the modal overlay to the body
+    document.body.appendChild(modalOverlay);
+  });
+}
+
 }
