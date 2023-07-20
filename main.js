@@ -355,41 +355,48 @@ let expertAppended = false;
 export async function getExperts() {
 
   const response = await axios.get(get_connected_agents);
-
   if (response.data.message === "success") {
     connectUsers = response.data.data;
 
     if (response.data.data.length > 0 && !expertAppended) {
+      console.log("da5let xD")
       const html = `<span class="text-xs font-medium uppercase">Meet our new experts</span>`;
       $("#expert-msg").append(html);
       expertAppended = true;
     }
+
     response.data.data.forEach((user) => {
-      
-      const {
-        _id: agent,
-        full_name: name
-      } = user;
-      if (!displayedUsers.has(agent)) {
-        displayedUsers.add(agent);
-        const html = `
-          <div id="${agent}" data-name="${name}" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center">
-            <div class="h-13 w-13 p-0.5">
-              <img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/unkown.jpg" alt="avatar"/>
-            </div>
-            <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">${name}</p>
-          </div>`;
-        $(".swiper-wrapper").append(html);
-      }
+
+        displayExpert(user)
     });
+  }
+}
+export function displayExpert(user){
+
+  const {
+    _id: agent,
+    full_name: name
+  } = user;
+  console.log(agent)
+  const agentDisco = document.getElementById(`${agent}`);
+
+  if (!agentDisco) {
+    displayedUsers.add(agent);
+    const html = `
+      <div id="${agent}" data-name="${name}" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center">
+        <div class="h-13 w-13 p-0.5">
+          <img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/unkown.jpg" alt="avatar"/>
+        </div>
+        <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">${name}</p>
+      </div>`;
+    $(".swiper-wrapper").append(html);
   }
 }
 
 export async function removeExpert(userId) {
   const agentDisco = document.getElementById(`${userId}`);
   if (agentDisco) {
-    const swiperWrapper = document.querySelector(".swiper-wrapper");
-    swiperWrapper.removeChild(agentDisco);
+    agentDisco.remove()
   }
 }
 
@@ -453,7 +460,7 @@ export async function getAllConversations() {
   const conversationsResponse = await axios.get(`${get_all_conversations}${newData.contact}`);
   if (conversationsResponse.data.data.length > 0) {
     const conversations = conversationsResponse.data.data;
-    console.log("conversation",conversations)
+    console.log("conversations",conversations)
     allConversation = conversations
     conversationId = conversations[0] ?._id
     const conversationPromises = conversations.map(async (conversation, index) => {
@@ -476,9 +483,8 @@ export async function getAllConversations() {
           isActive = true;
         }
       }
-
       let userLog = ""
-      if (conversation?.last_message.type === "log") {
+      if (conversation?.last_message?.type === "log") {
         const log = JSON.parse(conversation.last_message.message)
         switch (log.action) {
           case "fill":
@@ -505,7 +511,7 @@ export async function getAllConversations() {
         }
       }
       let msg = ""
-      switch (conversation.last_message.type) {
+      switch (conversation.last_message?.type) {
         case "link":
           msg = conversation.last_message.user === userId ? "You sent a link" : `${"Agent"}  sent a link`;
           break;
@@ -517,7 +523,9 @@ export async function getAllConversations() {
           break;
         case "log":
           msg = userLog;
-          break
+          break;
+          case undefined:
+          break;
         default:
           msg = conversation.last_message.message;
           break;
@@ -547,7 +555,7 @@ export async function getAllConversations() {
            
             <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftMsg">
               <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
-                 ${conversation.last_message.status === 0 ? conversation.last_message.user === userId ? "You delete a message" : `${conversation.members[0].full_name} delete a message` : msg}
+                 ${conversation.last_message?.status === 0 ? conversation.last_message?.user === userId ? "You delete a message" : `${conversation.members[0].full_name} delete a message` : msg}
               </p >
 
                <div>
@@ -634,7 +642,7 @@ export async function getAllConversations() {
     <div class="mini-conversation-click flex cursor-pointer items-center justify-center py-2.5 hover:bg-slate-150 dark:hover:bg-navy-600 conversation ${index === 0 ? 'active' : ''}" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${name}" data-timestamp="${timestamp}" id="left-mini-conversation-${conversationId}">
                     <div class=" avatar h-10 w-10" >
                       <img class="rounded-full" src="images/avatar/unkown.jpg" alt="avatar">
-                      <div class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${conversation.status==1 ? "bg-success" : "bg-slate-300"}  dark:border-navy-700"></div>
+                      <div id="active-user" class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${conversation.status==1 ? "bg-success" : "bg-slate-300"}  dark:border-navy-700"></div>
                     </div>
                   </div>
     `
@@ -2587,17 +2595,7 @@ export function userConnection(data) {
         statusConv.classList.add("bg-success")
       }
     })
-    const agentCard = document.getElementById(`${data?._id}`)
-    if (!agentCard) {
-      const html = `
-          <div id="${data._id}" data-name="${data.full_name}" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center">
-            <div class="h-13 w-13 p-0.5">
-              <img class="h-full w-full dark:border-slate-700 mask is-squircle" src="images/avatar/unkown.jpg" alt="avatar" />
-            </div>
-            <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">${data.full_name}</p>
-          </div>`;
-      $(".swiper-wrapper").append(html);
-    }
+ 
 
   }
 }

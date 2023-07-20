@@ -25,6 +25,7 @@ import {
   submitFormStatus,
   removeExpert,
   getAllConversations,
+  displayExpert,
 
 } from "../main.js";
 let messagesContainer = document.getElementById("big-container-message");
@@ -91,7 +92,7 @@ export default class event {
   userConnection = () => {
     this.socket.on("user-connection", (user) => {
         if (user?.role === "AGENT") {
-          getExperts()
+          displayExpert(user)
         }
         userConnection(user)
     })
@@ -100,7 +101,7 @@ export default class event {
   onDisconnected = () => {
     this.socket.on("onDisconnected", (reason,user) => {
       if(user?.role==="AGENT"){
-        removeExpert(user._id)
+         removeExpert(user._id)
       }
       userDisconnection(user.socketId)
     })
@@ -1046,8 +1047,6 @@ failGuest = () => {
     console.log("failed creating guest", data);
     loader.style.display = "none";
 
-    const modalOverlay = document.createElement('div');
-    modalOverlay.classList.add('modal-overlay');
 
     const modalContent = document.createElement('div');
     modalContent.classList.add('modal-content');
@@ -1075,5 +1074,30 @@ failGuest = () => {
     document.body.appendChild(modalOverlay);
   });
 }
+// JavaScript
+conversationStatusUpdated = () => {
+  this.socket.on('conversationStatusUpdated', (conversation, status) => {
+    const fullConversationContainers = document.querySelectorAll(`[data-conversation-id="${conversation._id}"]`);
+    fullConversationContainers.forEach((container) => {
+      const activeUserDiv = container.querySelector('#active-user');
+      // activeUserDiv.classList.remove('bg-slate-300', 'bg-success');
+      if (status === 0) {
+        activeUserDiv?.classList?.add('bg-slate-300');
+      } else if (status === 1) {
+        activeUserDiv?.classList?.add('bg-success');
+      }
+    });
+    const minimizedConversationContainer = document.getElementById(`left-mini-conversation-${conversation._id}`);
+    if (minimizedConversationContainer) {
+      const activeUserDiv = minimizedConversationContainer.querySelector('#active-user');
+      activeUserDiv.classList.remove('bg-slate-300', 'bg-success');
+      if (status === 0) {
+        activeUserDiv?.classList?.add('bg-slate-300');
+      } else if (status === 1) {
+        activeUserDiv?.classList?.add('bg-success');
+      }
+    }
+  });
+};
 
 }
