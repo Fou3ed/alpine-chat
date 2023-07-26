@@ -230,6 +230,7 @@ export async function guestCreated(data) {
 
     redirectToAgent(expert)
   }
+  console.log("data",data)
   const html = `
   <div class="conversationItem conversation bg-slate-150" data-conversation-id="${data.conversationId}" data-name=${data.senderName} data-timestamp=${timeString} id="left-conversation-${data.conversationId}" data-user-id="${data.availableAgent}">
     <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
@@ -377,11 +378,9 @@ export function displayExpert(user){
     _id: agent,
     full_name: name
   } = user;
-  console.log(agent)
   const agentDisco = document.getElementById(`${agent}`);
-
-  if (!agentDisco) {
-    displayedUsers.add(agent);
+if(!agentDisco){
+  displayedUsers.add(agent);
     const html = `
       <div id="${agent}" data-name="${name}" class="swiper-slide flex w-13 shrink-0 flex-col items-center justify-center">
         <div class="h-13 w-13 p-0.5">
@@ -390,7 +389,9 @@ export function displayExpert(user){
         <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 line-clamp-1 dark:text-navy-100">${name}</p>
       </div>`;
     $(".swiper-wrapper").append(html);
-  }
+}
+  
+
 }
 
 export async function removeExpert(userId) {
@@ -414,8 +415,11 @@ async function selectExpert() {
     const $conversationContainer = $("#conversation-container");
     // Check if they both have conversation, if yes, just handle click to left conversation
     if (userId) {
-      const response = await axios.get(`http://192.168.1.20:3000/conversation/?user1=${userId}&user2=${agent}`);
-
+      const response = await axios.get(`http://192.168.1.23:3000/conversation/?user1=${userId}&user2=${agent}`);
+      conversationHeaderStatus.textContent = connectUsers.find(user => user._id === agent) ? "En ligne" : "last seen recently"
+      const activeUser=document.getElementById('active-user-header')
+      activeUser.classList.remove("bg-slate-300")
+      activeUser.classList.add("bg-success")
       if (!response.data.data) {
         conversationId = "";
         messagesContainer.innerHTML = "";
@@ -441,7 +445,6 @@ async function selectExpert() {
             avatar_url: 'images/avatar/unkown.jpg'
           }
         }));
-        conversationHeaderStatus.textContent = connectUsers.find(user => user._id === agent) ? "En ligne" : "last seen recently"
         expert = agent;
         $conversationContainer.attr("data-conversation-id", conversationId);
         // Load the first page of messages on page load
@@ -530,14 +533,19 @@ export async function getAllConversations() {
           msg = conversation.last_message.message;
           break;
       }
-      
+          
+        const agentFullNames = conversation.member_details
+        .filter((member) => member.role === 'AGENT' || member.role==='BOT')
+        .map((agent) => agent.full_name);
+        console.log("agentFull names ",agentFullNames)
+        console.log("conversation status",conversation.status)
       const html = `
-      <div class="conversationItem  conversation ${index === 0 ? 'active' : ''}" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${name}" data-timestamp="${timestamp}" id="left-conversation-${conversationId}">
+      <div class="conversationItem  conversation ${index === 0 ? 'active' : ''}" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${agentFullNames}" data-timestamp="${timestamp}" id="left-conversation-${conversationId}">
       <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
         <div
           class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
           data-conversation-id="${conversationId}"
-          data-name="${conversation.name}">
+          data-name="${agentFullNames}">
           <div class="avatar h-10 w-10">
             <img class="rounded-full" src="images/avatar/unkown.jpg" alt="avatar" />
             <div
@@ -552,7 +560,6 @@ export async function getAllConversations() {
               </p>
               <span class="text-tiny+ text-slate-400 dark:text-navy-300">${time}</span>
             </div>
-           
             <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftMsg">
               <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
                  ${conversation.last_message?.status === 0 ? conversation.last_message?.user === userId ? "You delete a message" : `${conversation.members[0].full_name} delete a message` : msg}
@@ -637,18 +644,22 @@ export async function getAllConversations() {
       </div >
     </div >
     </div> `;
-    
+
     const minimizedHtmlSideBar=`
-    <div class="mini-conversation-click flex cursor-pointer items-center justify-center py-2.5 hover:bg-slate-150 dark:hover:bg-navy-600 conversation ${index === 0 ? 'active' : ''}" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${name}" data-timestamp="${timestamp}" id="left-mini-conversation-${conversationId}">
+    <div class="mini-conversation-click flex cursor-pointer items-center justify-center py-2.5 hover:bg-slate-150 dark:hover:bg-navy-600 conversation ${index === 0 ? 'active' : ''}" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${agentFullNames}" data-timestamp="${timestamp}" id="left-mini-conversation-${conversationId}">
                     <div class=" avatar h-10 w-10" >
                       <img class="rounded-full" src="images/avatar/unkown.jpg" alt="avatar">
                       <div id="active-user" class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${conversation.status==1 ? "bg-success" : "bg-slate-300"}  dark:border-navy-700"></div>
                     </div>
                   </div>
     `
-      // Append the HTML to the container
-      leftConversationContainer.innerHTML += html;
-      minimizedSideBar.innerHTML+=minimizedHtmlSideBar;
+
+const existingElement = document.querySelector(`[data-conversation-id="${conversationId}"]`);
+
+if (!existingElement) {
+  minimizedSideBar.innerHTML += minimizedHtmlSideBar;
+}
+ leftConversationContainer.innerHTML += html;
     });
     // Update the latest conversation ID
     latestConversationId = conversationId;
@@ -659,13 +670,10 @@ export async function getAllConversations() {
     await Promise.all(conversationPromises);
   }
 }
-
-
 // this function is a handle click , so whenever the client click on a conversation it call the load messages function where messages should be displayed in the messagesContainer
 function handleConversationClick() {
   agentClicked = $(this).parent().parent().data('user-id')
   expert = agentClicked
-
   const conversationActive = document.querySelectorAll("div.conversation-click")
   conversationActive.forEach(element => {
     if (element.classList.contains("bg-slate-150"))
@@ -677,10 +685,11 @@ function handleConversationClick() {
   document.getElementById('big-container-message').style.display = 'block';
   $conversationContainer.attr('data-conversation-id', conversationId);
   const conversation_id = $(this).data('conversation-id');
+
   const name = $(this).data('name');
   conversationId = conversation_id;
-
   const exist = allConversation.find(conversation => conversation._id === conversationId)
+
   if (exist?.status == 1) {
     conversationHeaderStatus.textContent = "En ligne"
     const activeUser=document.getElementById('active-user-header')
@@ -690,7 +699,6 @@ function handleConversationClick() {
     conversationHeaderStatus.textContent = "Last seen recently"
     const activeUser=document.getElementById('active-user-header')
     activeUser.classList.remove("bg-success")
- 
   }
   // Set the conversation ID as an attribute of the conversation container element
   const conversationName = document.getElementById('conversation-name');
@@ -698,7 +706,6 @@ function handleConversationClick() {
   // Load the first page of messages on page load
   let currentPage = 1;
   loadMessages(currentPage, conversationId, true);
-
   // Update the active chat with the conversation data
   let activeChat = {
     chatId: conversationId,
@@ -723,9 +730,7 @@ function inputLEngth(conversationMaxMsg) {
 }
 }
 
-
-async function getTheLastMsg(conversationId) {
-  
+async function getTheLastMsg(conversationId) {  
   return axios.get(`${get_last_msg}${conversationId}`)
     .then(function (response) {
       if (response) {
@@ -786,7 +791,7 @@ async function loadMessages(page, conversationId) {
       spinner.classList.remove("hidden");
 
       // Load messages from the server
-      const response = await axios.get(`http://192.168.1.20:3000/messages/conv/${conversationId}?page=${page}&limit=${limit}`);
+      const response = await axios.get(`http://192.168.1.23:3000/messages/conv/${conversationId}?page=${page}&limit=${limit}`);
 
       if (response.data.message !== "success") {
         throw new Error("Failed to load messages");
@@ -967,7 +972,7 @@ function displayMessages(messages) {
           });
         }
         tableRows = `
-        <div class="form-container ${myContent?.status==1 ?"f-success" :""}  ">
+        <div class="form-container ${myContent?.status==1 ?"f-success" :"bg-gray-500"}  ">
         <span class="error" id="msg"></span>
         <form name="form1" class="box" onsubmit="">
         <h4>${myContent.friendly_name}</h4>
@@ -1288,7 +1293,6 @@ async function sendMessage() {
             channel_url: "foued/test",
             conversation_type: "1",
             description: "private chat",
-            operators: [1],
             owner_id: newData.accountId,
             members: [newData.user, expert],
             permissions: {},
@@ -1599,14 +1603,12 @@ export async function sentMessage(data) {
 }
 
 export async function receiveMessage(data) {
-  console.log("receive message 1111")
   if (firstConv && firstConv === data.messageData.conversation) {
     $(`.conversation-click[data-conversation-id="${firstConv}"]`).trigger("click")
     firstConv = ""
   }
   let tableRows = "";
   const messageId = data.messageData.id;
-
   const myContent =
     data.messageData.type === "plan" ||
     data.messageData.type === "form" ||
@@ -1617,7 +1619,6 @@ export async function receiveMessage(data) {
     "conversationId"
   ];
   if (data.messageData.conversation === conv) {
-
     if (myContent !== {} && data.messageData.type === "plan")
       tableRows = myContent.plans.map((plan) => {
         return `
@@ -1672,7 +1673,7 @@ export async function receiveMessage(data) {
         });
       }
       tableRows = `
-      <div class="form-container f-error f-success">
+      <div class="form-container bg-gray-500">
       <span class="error" id="msg"></span>
       <form name="form1" class="box" onsubmit="">
       <h4>${myContent.friendly_name}</h4>
@@ -2702,14 +2703,13 @@ export function updateUserBalance() {
         </div>
       </div>
       `;
-  
       // Hide the modal when the Confirm button is pressed
       const confirmButton = modalDiv.querySelector("#confirmButton");
       confirmButton.addEventListener("click", () => {
+        $("#modalButton").trigger("click");
         modalDiv.style.display = "none";
       });
       messageInput.placeholder = "You need to buy a new plan to start chatting again";
-
       document.body.appendChild(modalDiv);
       messageInput.disabled = true;
       sendButton.disabled = true;
@@ -2724,7 +2724,6 @@ export function submitFormStatus(status){
   let messageId = messageContent ?.id ?.replace('message-content-', '');
   const form = JSON.parse(formElement.dataset.content);
   const formInputs = formContact.querySelectorAll("input");
-
   if(status){
     addLogs({
       action: "end form",

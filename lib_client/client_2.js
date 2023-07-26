@@ -35,7 +35,7 @@ export let role = ""
 export default class event {
   constructor() {
 
-    this.socket = io("ws://192.168.1.20:3000", {
+    this.socket = io("ws://192.168.1.23:3000", {
       transports: ['websocket']
     });
   }
@@ -92,6 +92,7 @@ export default class event {
   userConnection = () => {
     this.socket.on("user-connection", (user) => {
         if (user?.role === "AGENT") {
+          console.log("ai'nt here",user)
           displayExpert(user)
         }
         userConnection(user)
@@ -194,9 +195,19 @@ export default class event {
 
   conversationStatusUpdated = (data) => {
     this.socket.on("conversationStatusUpdated",  (data, status) => {
-      
+      let parentDiv = $('[data-conversation-id="' + data._id + '"]');
+
+      let activeUser = parentDiv.find('#active-user')[0];
       if(status==1){
-        this.socket.emit("joinRoom", data._id)
+      activeUser.classList.remove("bg-slate-300");  
+      activeUser.classList.add("bg-success");
+
+      this.socket.emit("joinRoom", data._id)
+   
+      }else {
+        activeUser.classList.remove("bg-success");
+
+        activeUser.classList.add("bg-slate-300");
 
       }
     })
@@ -639,7 +650,6 @@ planBought = () => {
 
   onTypingStopped = (data) => {
     this.socket.on('onTypingStopped', (data, error) => {
-      console.log("onTypingStopped")
       stopTyping(data)
 
     })
@@ -955,7 +965,6 @@ planBought = () => {
     this.socket.on('guestCreated', (data) => {
       role="GUEST"
       guestCreated(data)
-      console.log("data",data)
       this.socket.emit("user-connected", {
         app_id: "1",
         user: data.contact,
