@@ -59,18 +59,12 @@ conversationContainer.oninput = (event) => {
 }
 
 conversationContainer.addEventListener('focusin', (event) => {
-  console.log("event ",event)
   let target = event.target.closest(".form-input")
   if(target){
     sendFocusNotification(target)
-
   }
-
 })
-
-
 let userHasTyped = "";
-
 function sendTypingNotification(input) {
   if (userHasTyped !== input.dataset.fieldId) {
     addLogs({
@@ -82,18 +76,14 @@ function sendTypingNotification(input) {
     userHasTyped = input.dataset.fieldId;
   }
 }
-
 function sendFocusNotification(input) { 
   addLogs({
     action: "focus",
     element: "22",
     element_id: +input.dataset.fieldId,
     messageId:input.id.replace("floating_filled_","")
-
   });
 }
-
-
 const msgButt = (messageId, direction, isPinned) => {
   return `
 <div   id="message-options" x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex mt-2">
@@ -169,14 +159,11 @@ const msgButt = (messageId, direction, isPinned) => {
                           
           `;
 }
-
-
 window.connected = async () => {
   console.log("window.connect", newData.user, newData.contact)
   // Receive the connect event and send connection event to save the connection data in database and update the user status (is_active_:true)
   foued.connect(newData.user, newData.contact);
 };
-
 // Receive the connection event and retrieve the user data and save it into local storage 
 foued.onConnected();
 // Global variables 
@@ -1603,6 +1590,9 @@ export async function sentMessage(data) {
 }
 
 export async function receiveMessage(data) {
+  if(data.messageData.type !=="log"){
+
+  
   if (firstConv && firstConv === data.messageData.conversation) {
     $(`.conversation-click[data-conversation-id="${firstConv}"]`).trigger("click")
     firstConv = ""
@@ -1818,6 +1808,7 @@ export async function receiveMessage(data) {
           console.log("Please fill in all fields correctly.");
         }
       });
+    }
     }
 
   
@@ -2885,7 +2876,8 @@ successButton.addEventListener('click', async function () {
       messageId: msgId,
       conversationId: conversationId,
       senderName: senderName,
-      planName: planName
+      planName: planName,
+
     });
   } catch (error) {
     console.error('Error adding sale:', error);

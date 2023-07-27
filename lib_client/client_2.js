@@ -501,39 +501,41 @@ planBought = () => {
   receiveMessage = async () => {
     const leftConversationContainer = document.getElementById('left-conversation');
     await this.socket.on('onMessageReceived', async (data, error) => {
+      
       const msgDiv = document.getElementById(`left-conversation-${data.messageData.conversation}`);
       if (msgDiv) {
         const msgText = msgDiv.querySelector("p#last-message")
         if (data.messageData.type === "log") {
-          const log = JSON.parse(data.messageData.content)
-          let userLog = ""
-          switch (log.action) {
-            case "fill":
-              userLog = `${data.senderName} filled on the form.`;
-              break;
-            case "focus":
-              userLog = `${data.senderName}  focus on the form.`;
-              break;
-            case "purchase":
-              userLog = `${data.senderName}  purchased the <b> ${log.plan_name} </b>plan.`;
-              break;
-            case "start form":
-              userLog = `${data.senderName}  start submit the form.`;
-              break;
-            case "end form":
-              userLog = `${data.senderName}  end submit the form.`;
-              break;
-            case "start purchase":
-              userLog = `${data.senderName}  start purchase a plan.`;
-              break;
-            case "link click":
-              userLog = `${data.senderName} click to link.`;
-              break;
-            default:
-              userLog = `hello`;
-              break;
-          }
-          msgText.textContent = userLog
+          // const log = JSON.parse(data.messageData.content)
+          // let userLog = ""
+          // switch (log.action) {
+          //   case "fill":
+          //     userLog = `${data.senderName} filled on the form.`;
+          //     break;
+          //   case "focus":
+          //     userLog = `${data.senderName}  focus on the form.`;
+          //     break;
+          //   case "purchase":
+          //     userLog = `${data.senderName}  purchased the <b> ${log.plan_name} </b>plan.`;
+          //     break;
+          //   case "start form":
+          //     userLog = `${data.senderName}  start submit the form.`;
+          //     break;
+          //   case "end form":
+          //     userLog = `${data.senderName}  end submit the form.`;
+          //     break;
+          //   case "start purchase":
+          //     userLog = `${data.senderName}  start purchase a plan.`;
+          //     break;
+          //   case "link click":
+          //     userLog = `${data.senderName} click to link.`;
+          //     break;
+          //   default:
+          //     userLog = `hello`;
+          //     break;
+          // }
+          // msgText.textContent = userLog
+          console.log("here")
         } else
           msgText.textContent = data.messageData.type === "plan" ? data.senderName + " sent a plan" : data.messageData.type === "form" ? data.senderName + " sent a form" : data.messageData.type === "link" ? data.senderName + " sent a link" : data.messageData.content
         leftConversationContainer.insertBefore(msgDiv, leftConversationContainer.firstChild)
