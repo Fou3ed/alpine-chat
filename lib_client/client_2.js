@@ -598,8 +598,6 @@ planBought = () => {
 
   onMessageDeleted = () => {
     this.socket.on('onMessageDeleted', (data, error) => {
-
-      console.log('Message deleted:', data)
       messageDeleted(data)
     })
   }
@@ -1088,7 +1086,13 @@ failGuest = () => {
 // JavaScript
 conversationStatusUpdated = () => {
   this.socket.on('conversationStatusUpdated', (conversation, status) => {
-    const fullConversationContainers = document.querySelectorAll(`[data-conversation-id="${conversation._id}"]`);
+    const fullConversationContainers = document.querySelectorAll(`[data-conversation-id="${conversation._id}"]`)
+        //select the given conversation and change it names 
+        const agentFullNames = conversation.member_details
+        .filter((member) => member.role === 'AGENT' || member.role==='BOT')
+        .map((agent) => agent.full_name);
+
+
     fullConversationContainers.forEach((container) => {
       const activeUserDiv = container.querySelector('#active-user');
       // activeUserDiv.classList.remove('bg-slate-300', 'bg-success');
@@ -1100,6 +1104,7 @@ conversationStatusUpdated = () => {
     });
     const minimizedConversationContainer = document.getElementById(`left-mini-conversation-${conversation._id}`);
     if (minimizedConversationContainer) {
+      minimizedConversationContainer.dataset.name = agentFullNames;
       const activeUserDiv = minimizedConversationContainer.querySelector('#active-user');
       activeUserDiv.classList.remove('bg-slate-300', 'bg-success');
       if (status === 0) {

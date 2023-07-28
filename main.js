@@ -76,14 +76,21 @@ function sendTypingNotification(input) {
     userHasTyped = input.dataset.fieldId;
   }
 }
+let focused;
 function sendFocusNotification(input) { 
-  addLogs({
-    action: "focus",
-    element: "22",
-    element_id: +input.dataset.fieldId,
-    messageId:input.id.replace("floating_filled_","")
-  });
+  if(focused !==input.dataset.fieldId){
+    addLogs({
+      action: "focus",
+      element: "22",
+      element_id: +input.dataset.fieldId,
+      messageId:input.id.replace("floating_filled_","")
+    });
+  }
+  
+  focused=input.dataset.fieldId
 }
+
+
 const msgButt = (messageId, direction, isPinned) => {
   return `
 <div   id="message-options" x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex mt-2">
@@ -450,7 +457,6 @@ export async function getAllConversations() {
   const conversationsResponse = await axios.get(`${get_all_conversations}${newData.contact}`);
   if (conversationsResponse.data.data.length > 0) {
     const conversations = conversationsResponse.data.data;
-    console.log("conversations",conversations)
     allConversation = conversations
     conversationId = conversations[0] ?._id
     const conversationPromises = conversations.map(async (conversation, index) => {
@@ -524,113 +530,45 @@ export async function getAllConversations() {
         const agentFullNames = conversation.member_details
         .filter((member) => member.role === 'AGENT' || member.role==='BOT')
         .map((agent) => agent.full_name);
-        console.log("agentFull names ",agentFullNames)
-        console.log("conversation status",conversation.status)
+      
       const html = `
-      <div class="conversationItem  conversation ${index === 0 ? 'active' : ''}" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${agentFullNames}" data-timestamp="${timestamp}" id="left-conversation-${conversationId}">
-      <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
+   
+  <div class="conversationItem  conversation ${index === 0 ? 'active' : ''}" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${agentFullNames}" data-timestamp="${timestamp}" id="left-conversation-${conversationId}">
+  <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
+    <div
+      class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
+      data-conversation-id="${conversationId}"
+      data-name="${agentFullNames}">
+      <div class="avatar h-10 w-10">
+        <img class="rounded-full" src="images/avatar/unkown.jpg" alt="avatar" />
         <div
-          class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
-          data-conversation-id="${conversationId}"
-          data-name="${agentFullNames}">
-          <div class="avatar h-10 w-10">
-            <img class="rounded-full" src="images/avatar/unkown.jpg" alt="avatar" />
-            <div
-            id="active-user"
-              class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${conversation.status=="1" ? "bg-success" : "bg-slate-300"}  dark:border-navy-700">
-            </div>
-          </div>
-          <div class="flex flex-1 flex-col">
-            <div class="flex items-baseline justify-between space-x-1.5">
-              <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
-                ${name}
-              </p>
-              <span class="text-tiny+ text-slate-400 dark:text-navy-300">${time}</span>
-            </div>
-            <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftMsg">
-              <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
-                 ${conversation.last_message?.status === 0 ? conversation.last_message?.user === userId ? "You delete a message" : `${conversation.members[0].full_name} delete a message` : msg}
-              </p >
+        id="active-user"
+          class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${conversation.status=="1" ? "bg-success" : "bg-slate-300"}  dark:border-navy-700">
+        </div>
+      </div>
+      <div class="flex flex-1 flex-col">
+        <div class="flex items-baseline justify-between space-x-1.5">
+          <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
+            ${agentFullNames}
+          </p>
+          <span class="text-tiny+ text-slate-400 dark:text-navy-300">${time}</span>
+        </div>
+        <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftMsg">
+          <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
+             ${conversation.last_message?.status === 0 ? conversation.last_message?.user === userId ? "You delete a message" : `${conversation.members[0].full_name} delete a message` : msg}
+          </p >
 
-               <div>
-            <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftTyping"> 
-                    <div class="flex" class="pe-3">
-                      <div
-                        id="typing-display"
-                        class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 relative "
-                      >
-                        <div class="d-flex">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            xmlns:xlink="http://www.w3.org/1999/xlink"
-                            viewBox="0 0 100 100"
-                            preserveAspectRatio="xMidYMid"
-                            style="background: none"
-                            width="45px"
-                            height="20px"
-                          >
-                            <circle
-                              cy="62.5"
-                              fill="#C4C4C46b"
-                              r="20"
-                              cx="1.5"
-                            >
-                              <animate
-                                attributeName="cy"
-                                calcMode="spline"
-                                keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
-                                repeatCount="indefinite"
-                                values="62.5;37.5;62.5;62.5"
-                                keyTimes="0;0.25;0.5;1"
-                                dur="1s"
-                                begin="-0.5s"
-                              ></animate>
-                            </circle>
-                            <circle
-                              cy="62.5"
-                              fill="#c4c4c498"
-                              r="20"
-                              cx="52.5"
-                            >
-                              <animate
-                                attributeName="cy"
-                                calcMode="spline"
-                                keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
-                                repeatCount="indefinite"
-                                values="62.5;37.5;62.5;62.5"
-                                keyTimes="0;0.25;0.5;1"
-                                dur="1s"
-                                begin="-0.375s"
-                              ></animate>
-                            </circle>
-                            <circle
-                              cy="62.5"
-                              fill="#c4c4c4"
-                              r="20"
-                              cx="107.5"
-                            >
-                              <animate
-                                attributeName="cy"
-                                calcMode="spline"
-                                keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
-                                repeatCount="indefinite"
-                                values="62.5;37.5;62.5;62.5"
-                                keyTimes="0;0.25;0.5;1"
-                                dur="1s"
-                                begin="-0.25s"
-                              ></animate>
-                            </circle>
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-            </div >
-          </div >
+           <div>
+     
         </div >
       </div >
     </div >
-    </div> `;
+  </div >
+</div >
+</div>
+
+
+`;
 
     const minimizedHtmlSideBar=`
     <div class="mini-conversation-click flex cursor-pointer items-center justify-center py-2.5 hover:bg-slate-150 dark:hover:bg-navy-600 conversation ${index === 0 ? 'active' : ''}" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${agentFullNames}" data-timestamp="${timestamp}" id="left-mini-conversation-${conversationId}">
@@ -676,7 +614,7 @@ function handleConversationClick() {
   const name = $(this).data('name');
   conversationId = conversation_id;
   const exist = allConversation.find(conversation => conversation._id === conversationId)
-
+console.log("exist",exist)
   if (exist?.status == 1) {
     conversationHeaderStatus.textContent = "En ligne"
     const activeUser=document.getElementById('active-user-header')
@@ -840,7 +778,7 @@ function submitForm(element) {
       value: formInputs[i].value,
     }];
   }
- console.log("form fields",form.fields)
+
   form.fields = form.fields.map(field => {
     let fieldValue = forms.find(fild => fild.fieldId == field.field_id);
     if (fieldValue) {
@@ -858,13 +796,18 @@ function submitForm(element) {
     form
   })
 )
+
+addLogs({
+  action: "end form",
+  element: "21",
+  element_id: +form.form_id,
+  messageId:messageId,
+},form);
   element.disabled = true;
   formInputs.forEach(input => {
     input.disabled = true;
   });
-
   successMessage?.classList.remove('hidden');
-
   setTimeout(() => {
     successMessage?.classList.add('hidden');
   }, 3000);
@@ -872,6 +815,7 @@ function submitForm(element) {
 
 
 function displayMessages(messages) {
+
   document.getElementById('big-container-message').style.display = 'block';
   if (!messages || !messages.messages) {
     console.log('No messages to display');
@@ -1021,7 +965,7 @@ function displayMessages(messages) {
         <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
           <div class="flex flex-col items-end space-y-3.5">
             <div class="flex flex-row">
-              ${message.type === "MSG" && direction === "justify-end" ? msgButt(messageId, direction, message.pinned === 1) : ""}
+              ${message.type === "MSG" && direction === "justify-end" && message.status !==0 ? msgButt(messageId, direction, message.pinned === 1) : ""}
               <div class="ml-2 max-w-lg sm:ml-5">
                 ${
                   message.type === "MSG" || message.type === "link"
@@ -1043,7 +987,7 @@ function displayMessages(messages) {
                   ${message.status === 2 ? "(updated) " + time : direction === "justify-start" ? time : message.read ? time + `<i class="fas fa-eye ps-2" style="font-size:10px;"></i>` : time}
                 </p>
               </div>
-              ${message.type === "MSG" && direction === "justify-start" ? msgButt(messageId, direction, message.pinned === 1) : ""}
+              ${message.type === "MSG" && direction === "justify-start" && message.status !==0? msgButt(messageId, direction, message.pinned === 1) : ""}
             </div>
             <div class="flex flex-row"></div>
           </div>
@@ -1084,6 +1028,7 @@ function displayMessages(messages) {
           }
         }
         if (isValid) {
+          console.log("here")
           submitForm(this);
         } else {
           console.log("Please fill in all fields correctly.");
@@ -1284,6 +1229,7 @@ async function sendMessage() {
             members: [newData.user, expert],
             permissions: {},
             members_count: 2,
+            status:"1",
             max_length_message: "256",
           },
         })
@@ -1548,7 +1494,7 @@ export async function sentMessage(data) {
         <div id="message-${messageId}"  class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
         <div class="flex flex-col items-end space-y-3.5">
         <div class="flex flex-row">
-        ${data.direction == "in" ? msgButt(messageId, direction, data.pinned === 1) : ''}
+        ${data.direction == "in"  ? msgButt(messageId, direction, data.pinned === 1) : ''}
           <div class="ml-2 max-w-lg sm:ml-5">
             <div class="${msgStyle}"  id="message-content-${messageId}">
               ${data.content} 
@@ -1590,6 +1536,7 @@ export async function sentMessage(data) {
 }
 
 export async function receiveMessage(data) {
+  let messageId;
   if(data.messageData.type !=="log"){
 
   
@@ -1598,7 +1545,7 @@ export async function receiveMessage(data) {
     firstConv = ""
   }
   let tableRows = "";
-  const messageId = data.messageData.id;
+   messageId = data.messageData.id;
   const myContent =
     data.messageData.type === "plan" ||
     data.messageData.type === "form" ||
@@ -1686,7 +1633,7 @@ export async function receiveMessage(data) {
             <div class="flex flex-col items-end space-y-3.5">
               <div class="flex flex-row">
                 ${
-                  data.direction == "in" && data.messageData.type === "MSG"
+                  data.direction == "in" && data.messageData.type === "MSG" && data.messageData.status !==0
                     ? msgButt(messageId, direction, data.messageData.pinned === 1)
                     : ""
                 }
@@ -1803,6 +1750,7 @@ export async function receiveMessage(data) {
           }
         }
         if (isValid) {
+          console.log("here 2")
           submitForm(this);
         } else {
           console.log("Please fill in all fields correctly.");
@@ -1810,8 +1758,6 @@ export async function receiveMessage(data) {
       });
     }
     }
-
-  
 
   // const allFormInput = document.querySelectorAll(`#field-${messageId}`);
 
@@ -1840,7 +1786,6 @@ export async function receiveMessage(data) {
   //     messageId:input.id.replace("floating_filled_","")  
   //   });
   // }
-
   function sendClickingNotification(data) {
     foued.linkClick(data.id.replace("linked-msg-", ""))
       addLogs({
@@ -2073,18 +2018,27 @@ async function getDeleteButtons() {
 }
 
 export async function messageDeleted(data) {
-  const messageDeleted = document.getElementById(`message-content-${data.result._id}`)
-  messageDeleted.innerHTML = `You unsent a message`
-  messageDeleted.classList.add("bg-transparent", "border-2", "border-info/10", "dark:border-navy-700")
-  const direction = messageDeleted.parentNode.querySelector("p").dataset.direction
+  const messageDeleted = document.getElementById(`message-content-${data.result._id}`);
+
+  messageDeleted.innerHTML = `You unsent a message`;
+  messageDeleted.classList.add("bg-transparent", "border-2", "border-info/10", "dark:border-navy-700");
+  const direction = messageDeleted.parentNode.querySelector("p").dataset.direction;
+
   if (direction == "justify-end") {
-    messageDeleted.classList.remove("bg-info/10", "dark:bg-accent")
-    messageDeleted.innerHTML = `You unsent a message`
+    messageDeleted.classList.remove("bg-info/10", "dark:bg-accent");
+    messageDeleted.innerHTML = `You unsent a message`;
   } else {
-    messageDeleted.innerHTML = `${data.userData.full_name} unsent a message`
-    messageDeleted.classList.remove("bg-white", "dark:bg-navy-700")
+    messageDeleted.innerHTML = `${data.userData.full_name} unsent a message`;
+    messageDeleted.classList.remove("bg-white", "dark:bg-navy-700");
+  }
+
+  const parentDiv = document.getElementById(`message-${data.result._id}`);
+  if (parentDiv) {
+    const messageOptionsDivs = parentDiv.querySelectorAll("#message-options");
+    messageOptionsDivs.forEach((div) => div.remove());
   }
 }
+
 
 async function deleteMessage(button) {
   const dropDown = button.parentNode.parentNode.parentNode
@@ -2359,13 +2313,16 @@ export function startTyping(data) {
                       </div>`
       messagesContainer.appendChild(typingBlock)
 
-    
+      // showTypingIndicator();
+
         }
         const typingBar = document.querySelector(`#left-conversation-${data.metaData.conversation}`)
         if(typingBar){
+          console.log("typingBar",typingBar)
           typingBar.classList.add('smallTyping')
-      // const msgText = msgDiv?.querySelector("p#last-message")
-      // msgText.textContent.appendChild(typingBlock)
+       console.log("typing Block",typingBlock)
+
+       msgText.textContent.appendChild(typingBlock)
 
     }
 
@@ -2709,19 +2666,14 @@ export function updateUserBalance() {
 }
 
 export function submitFormStatus(status){
+  // let forms = [];
   const formContact = formElement.parentNode;
   const formContent = formContact.parentNode;
-  let messageContent = formElement.closest('[id^="message-content-"]');
-  let messageId = messageContent ?.id ?.replace('message-content-', '');
-  const form = JSON.parse(formElement.dataset.content);
-  const formInputs = formContact.querySelectorAll("input");
+  // let messageContent = formElement.closest('[id^="message-content-"]');
+  // let messageId = messageContent ?.id ?.replace('message-content-', '');
+  // const form = JSON.parse(formElement.dataset.content);
+
   if(status){
-    addLogs({
-      action: "end form",
-      element: "21",
-      element_id: +form.form_id,
-      messageId:messageId,
-    },form);
     formContent.style.opacity = 0.7;
     formElement.innerHTML = "Submitted";
   }else {
@@ -2733,6 +2685,10 @@ export function submitFormStatus(status){
     formElement.innerHTML = "Try again";
   }
   }
+
+
+
+
 
 export function ableInputArea() {
   messageInput.disabled = false;
@@ -2892,8 +2848,77 @@ $(document).ready(function () {
 
 
  
-
-
+// function showTypingIndicator() {
+//   const lastMessageElement = document.querySelector(`#left-conversation-${conversationId} #last-message`);
+//   if (lastMessageElement) {
+//     lastMessageElement.innerHTML = `
+//     <div style="width: 30px; height: 20px;">
+//     <svg
+//       xmlns="http://www.w3.org/2000/svg"
+//       xmlns:xlink="http://www.w3.org/1999/xlink"
+//       viewBox="0 0 30 100"
+//       preserveAspectRatio="xMidYMid"
+//       style="background: none"
+//       width="30px"
+//       height="20px"
+//     >
+//       <circle
+//         cy="62.5"
+//         fill="#C4C4C46b"
+//         r="8"
+//         cx="1.5"
+//       >
+//         <animate
+//           attributeName="cy"
+//           calcMode="spline"
+//           keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+//           repeatCount="indefinite"
+//           values="62.5;37.5;62.5;62.5"
+//           keyTimes="0;0.25;0.5;1"
+//           dur="1s"
+//           begin="-0.5s"
+//         ></animate>
+//       </circle>
+//       <circle
+//         cy="62.5"
+//         fill="#c4c4c498"
+//         r="8"
+//         cx="15"
+//       >
+//         <animate
+//           attributeName="cy"
+//           calcMode="spline"
+//           keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+//           repeatCount="indefinite"
+//           values="62.5;37.5;62.5;62.5"
+//           keyTimes="0;0.25;0.5;1"
+//           dur="1s"
+//           begin="-0.375s"
+//         ></animate>
+//       </circle>
+//       <circle
+//         cy="62.5"
+//         fill="#c4c4c4"
+//         r="8"
+//         cx="28.5"
+//       >
+//         <animate
+//           attributeName="cy"
+//           calcMode="spline"
+//           keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+//           repeatCount="indefinite"
+//           values="62.5;37.5;62.5;62.5"
+//           keyTimes="0;0.25;0.5;1"
+//           dur="1s"
+//           begin="-0.25s"
+//         ></animate>
+//       </circle>
+//     </svg>
+//   </div>
+  
+//   `;
+//   }
+// }
 
 
 $(document).ready(function () {
