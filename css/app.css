@@ -22929,3 +22929,13 @@ a.btn {
   margin-top: 10px;
 }
 
+/* CSS Styles for the invalid input and error message */
+.invalid-input {
+  border-color: red;
+}
+
+.error-message {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}

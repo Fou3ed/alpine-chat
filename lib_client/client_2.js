@@ -997,13 +997,12 @@ planBought = () => {
   savedFormData = () => {
     this.socket.on('formSaved', (bool) => {
       const formContainer = document.querySelector('.form-container');
-      // Create a new <p> element to hold the status message
       const statusMessage = document.createElement('p');
       statusMessage.classList.add('status-message');
       formContainer.appendChild(statusMessage);
       statusMessage.textContent = "saving form data went wrong,Try again";
-
       if (bool) {
+        
         formContainer.classList.add('f-success');
         formContainer.classList.remove('f-error');
         // Update the status message for success

@@ -91,6 +91,147 @@ function sendFocusNotification(input) {
 }
 
 
+conversationContainer.addEventListener('click', (event) => {
+  let target = event.target.closest("button.btn1")
+  if(target){
+    const form = event.target.closest("form");
+    console.log("form",form)
+    const inputs = form.elements;
+    // Iterate over the input fields and validate them
+    let isValid = true;
+    for (let i = 0; i < inputs.length; i++) {
+      const input = inputs[i];
+      console.log("input",input)
+      if (input.required && !input.value) {
+        isValid = false;
+        showValidationError(input, "This field is required.");
+        break;
+      }
+      if (input.type === "number" && isNaN(Number(input.value))) {
+        isValid = false;
+        showValidationError(input, "Please enter a valid number.");
+        break;
+      }
+      if (input.type === "date" && !isValidDate(input.value)) {
+        isValid = false;
+        showValidationError(input, "Please enter a valid date (YYYY-MM-DD).");
+        break;
+      }
+      if (input.type === "country" && !isValidCountry(input.value)) {
+        isValid = false;
+        showValidationError(input, "Please enter a valid country code (2 characters).");
+        break;
+      }
+      // if (input.type === "email" && !isValidEmail(input.value)) {
+      //   isValid = false;
+      //   showValidationError(input, "Please enter a valid email address.");
+      //   break;
+      // }
+      if (input.type === "tel" && !isValidPhoneNumber(input.value)) {
+        isValid = false;
+        showValidationError(input, "Please enter a valid phone number (10 digits).");
+        break;
+      }
+    }
+    if (isValid) {
+      submitForm(target);
+    } else {
+      console.log("Please fill in all fields correctly.");
+    }
+  }
+})
+
+function isValidDate(dateString) {
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  return dateRegex.test(dateString);
+}
+
+function isValidCountry(country) {
+  // Validate that the country input is exactly two characters
+  if (country.length !== 2) {
+    return false;
+  }
+  // List of allowed country codes
+  const allowedCountryCodes = [
+    "AF", "AX", "AL", "DZ", "AS", "AD", "AO", "AI", "AQ", "AG",
+    "AR", "AM", "AW", "AU", "AT", "AZ", "BS", "BH", "BD", "BB",
+    "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BQ", "BA", "BW",
+    "BV", "BR", "IO", "BN", "BG", "BF", "BI", "KH", "CM", "CA",
+    "CV", "KY", "CF", "TD", "CL", "CN", "CX", "CC", "CO", "KM",
+    "CG", "CD", "CK", "CR", "CI", "HR", "CU", "CW", "CY", "CZ",
+    "DK", "DJ", "DM", "DO", "EC", "EG", "SV", "GQ", "ER", "EE",
+    "ET", "FK", "FO", "FJ", "FI", "FR", "GF", "PF", "TF", "GA",
+    "GM", "GE", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU",
+    "GT", "GG", "GN", "GW", "GY", "HT", "HM", "VA", "HN", "HK",
+    "HU", "IS", "IN", "ID", "IR", "IQ", "IE", "IM", "IT", "JM",
+    "JP", "JE", "JO", "KZ", "KE", "KI", "KP", "KR", "XK", "KW",
+    "KG", "LA", "LV", "LB", "LS", "LR", "LY", "LI", "LT", "LU",
+    "MO", "MK", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ",
+    "MR", "MU", "YT", "MX", "FM", "MD", "MC", "MN", "ME", "MS",
+    "MA", "MZ", "MM", "NA", "NR", "NP", "NL", "AN", "NC", "NZ",
+    "NI", "NE", "NG", "NU", "NF", "MP", "NO", "OM", "PK", "PW",
+    "PS", "PA", "PG", "PY", "PE", "PH", "PN", "PL", "PT", "PR",
+    "QA", "RE", "RO", "RU", "RW", "BL", "SH", "KN", "LC", "MF",
+    "PM", "VC", "WS", "SM", "ST", "SA", "SN", "RS", "SC", "SL",
+    "SG", "SX", "SK", "SI", "SB", "SO", "ZA", "GS", "SS", "ES",
+    "LK", "SD", "SR", "SJ", "SZ", "SE", "CH", "SY", "TW", "TJ",
+    "TZ", "TH", "TL", "TG", "TK", "TO", "TT", "TN", "TR", "TM",
+    "TC", "TV", "UG", "UA", "AE", "GB", "US", "UM", "UY", "UZ",
+    "VU", "VE", "VN", "VG", "VI", "WF", "EH", "YE", "ZM", "ZW"
+  ];
+
+  return allowedCountryCodes.includes(country.toUpperCase());
+}
+
+
+function isValidEmail(email) {
+  if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email))
+   {
+     return true
+   }
+     return false
+ }
+
+
+
+
+function isValidPhoneNumber(phone) {
+  const phoneRegex = /^\d{8}$/; 
+  return phoneRegex.test(phone);
+}
+
+function showValidationError(inputElement, message) {
+  // Add a class to the input element to change its border color to red
+  inputElement.classList.add('invalid-input');
+
+  // Show the validation error message to the user
+  const errorMessageElement = document.createElement('div');
+  errorMessageElement.className = 'error-message';
+  errorMessageElement.innerText = message;
+
+  // Check if an error message is already displayed and remove it if so
+  const existingErrorMessage = inputElement.parentElement.querySelector('.error-message');
+  if (existingErrorMessage) {
+    inputElement.parentElement.removeChild(existingErrorMessage);
+  }
+
+  // Append the new error message element after the input element
+  inputElement.after(errorMessageElement);
+}
+
+// Remove the validation error styles and messages when the input is corrected
+document.addEventListener('input', (event) => {
+  if (event.target.tagName === 'INPUT') {
+    const inputElement = event.target;
+    inputElement.classList.remove('invalid-input');
+    const existingErrorMessage = inputElement.parentElement.querySelector('.error-message');
+    if (existingErrorMessage) {
+      inputElement.parentElement.removeChild(existingErrorMessage);
+    }
+  }
+});
+
+
 const msgButt = (messageId, direction, isPinned) => {
   return `
 <div   id="message-options" x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex mt-2">
@@ -457,6 +598,7 @@ export async function getAllConversations() {
   const conversationsResponse = await axios.get(`${get_all_conversations}${newData.contact}`);
   if (conversationsResponse.data.data.length > 0) {
     const conversations = conversationsResponse.data.data;
+    console.log("conversations",conversations)
     allConversation = conversations
     conversationId = conversations[0] ?._id
     const conversationPromises = conversations.map(async (conversation, index) => {
@@ -640,6 +782,8 @@ console.log("exist",exist)
   window.dispatchEvent(new CustomEvent('change-active-chat', {
     detail: activeChat
   }));
+  conversationContainer.scrollTop = conversationContainer.scrollHeight;
+
   // conversationHeaderStatus.textContent = connectUsers.find(user => user._id === expert)? "En ligne" : "last seen recently"
   inputLEngth(exist?.max_length_message)
   markMessageAsSeen(conversationId)
@@ -759,7 +903,6 @@ if (container) {
   });
 }
 
-// The submitForm function definition
 let formElement=""
 function submitForm(element) {
   formElement=element
@@ -772,6 +915,7 @@ function submitForm(element) {
   const formInputs = formContact.querySelectorAll("input");
   const successMessage = formContact.querySelector('#text_capture');
   element.innerHTML = `<div class="d-flex"><span class="loader2"></span></div>`;
+
   for (let i = 0; i < formInputs.length; i++) {
     forms = [...forms, {
       fieldId: formInputs[i].dataset.fieldId,
@@ -812,6 +956,7 @@ addLogs({
     successMessage?.classList.add('hidden');
   }, 3000);
 }
+
 
 
 function displayMessages(messages) {
@@ -883,6 +1028,11 @@ function displayMessages(messages) {
               case 6:
                 type = 'email';
                 break;
+              case 7:
+                type='tel'
+                break;
+              case 8:
+              type='email'
             }
             return `
             <div class="relative">
@@ -901,6 +1051,7 @@ function displayMessages(messages) {
           </div>
           `;
           });
+
         }
         tableRows = `
         <div class="form-container ${myContent?.status==1 ?"f-success" :"bg-gray-500"}  ">
@@ -1009,32 +1160,7 @@ function displayMessages(messages) {
       
     if(message.type === "form" && myContent?.status==0){
 
-    const submitButton = document.querySelector(`#submit-form-${messageId}`);
-    if (submitButton) {
-      submitButton.addEventListener("click", function (event) {
-        const form = event.target.closest("form");
-        const inputs = form.elements;
 
-        let isValid = true;
-        for (let i = 0; i < inputs.length; i++) {
-          const input = inputs[i];
-          if (input.required && !input.value) {
-            isValid = false;
-            break;
-          }
-          if (input.type === "number" && isNaN(Number(input.value))) {
-            isValid = false;
-            break;
-          }
-        }
-        if (isValid) {
-          console.log("here")
-          submitForm(this);
-        } else {
-          console.log("Please fill in all fields correctly.");
-        }
-      });
-    }
     // const allFormInput = document.querySelectorAll(`.field-${messageId}`);
     // if (allFormInput.length > 0) {
     //   allFormInput.forEach(input => {
@@ -1118,6 +1244,7 @@ function displayMessages(messages) {
 
 //whenever a user click on the message link fire this function 
 async function addLogs(log,aux={}) {
+  
   const logData = {
     "user_id": newData.contact.toString(),
     "action": log.action,
@@ -1130,6 +1257,7 @@ async function addLogs(log,aux={}) {
     if(log.messageId){
       logData.messageId=log.messageId
     }
+
   foued.onCreateMessage({
     app: "638dc76312488c6bf67e8fc0",
     user: newData.user,
@@ -1580,32 +1708,43 @@ export async function receiveMessage(data) {
           let type = "";
           switch (+field.field_type) {
             case 1:
-              type = "text";
+              type = 'text';
               break;
             case 2:
-              type = "number";
+              type = 'number';
               break;
             case 3:
-              type = "date";
+              type = 'date';
               break;
             case 4:
-              type = "datetime-local";
+              type = 'datetime-local';
               break;
             case 5:
-              type = "number";
+              type = 'number';
               break;
             case 6:
-              type = "email";
+              type = 'email';
               break;
+            case 7:
+              type='tel'
+              break;
+            case 8:
+            type='email'
           }
           return `
           <div class="relative">
-          <input type="text" class="form-input field-${messageId} block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer " placeholder=" "
+          <input
+            id="floating_filled_${messageId}"
+            class="form-input field-${messageId} block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-gray-900 bg-gray-50 dark:bg-gray-700 border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder=""
             data-field-id="${field.field_id}"
-            name="${field.field_name.replace(" ", "")}"
+            name="${field.field_name.replace(" ", "")}" 
             type="${type}"
+            value="${field?.field_value ?? ""}"
+            required 
+            ${field?.field_value ? "style='pointer-events:none'" : ""}
           />
-          <label class="form-label absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-6 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4">${field.field_name}</label>
+          <label for="floating_filled_${messageId}" class="form-label absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-6 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4">${field.field_name}</label>
         </div>`;
         });
       }
@@ -1733,28 +1872,7 @@ export async function receiveMessage(data) {
    const submitButton = document.querySelector(`#submit-form-${messageId}`);
     if (submitButton) {
       submitButton.addEventListener("click", function (event) {
-        const form = event.target.closest("form");
-        const inputs = form.elements;
-
-        // Iterate over the input fields and validate them
-        let isValid = true;
-        for (let i = 0; i < inputs.length; i++) {
-          const input = inputs[i];
-          if (input.required && !input.value) {
-            isValid = false;
-            break;
-          }
-          if (input.type === "number" && isNaN(Number(input.value))) {
-            isValid = false;
-            break;
-          }
-        }
-        if (isValid) {
-          console.log("here 2")
-          submitForm(this);
-        } else {
-          console.log("Please fill in all fields correctly.");
-        }
+       
       });
     }
     }
@@ -2312,19 +2430,17 @@ export function startTyping(data) {
                         </div>
                       </div>`
       messagesContainer.appendChild(typingBlock)
-
       // showTypingIndicator();
-
+      const typingBar = document.querySelector(`#left-conversation-${data.metaData.conversation}`)
+      if(typingBar){
+        typingBar.classList.add('smallTyping')
+        const lastMessageElement = typingBar.querySelector('#last-message');
+        console.log("lastMEssage",lastMessageElement)
+        if (lastMessageElement) {
+          
         }
-        const typingBar = document.querySelector(`#left-conversation-${data.metaData.conversation}`)
-        if(typingBar){
-          console.log("typingBar",typingBar)
-          typingBar.classList.add('smallTyping')
-       console.log("typing Block",typingBlock)
-
-       msgText.textContent.appendChild(typingBlock)
-
-    }
+  }
+        }
 
   }
 }
@@ -2678,10 +2794,10 @@ export function submitFormStatus(status){
     formElement.innerHTML = "Submitted";
   }else {
     formElement.disabled = false;
-    formInputs.forEach(input => {
-      input.disabled = false;
-    });
-  
+    // formInputs.forEach(input => {
+    //   input.disabled = false;
+    // });
+    formElement.innerHTML = "";
     formElement.innerHTML = "Try again";
   }
   }
