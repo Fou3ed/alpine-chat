@@ -215,7 +215,6 @@ function showValidationError(inputElement, message) {
     inputElement.parentElement.removeChild(existingErrorMessage);
   }
 
-  // Append the new error message element after the input element
   inputElement.after(errorMessageElement);
 }
 
@@ -598,7 +597,6 @@ export async function getAllConversations() {
   const conversationsResponse = await axios.get(`${get_all_conversations}${newData.contact}`);
   if (conversationsResponse.data.data.length > 0) {
     const conversations = conversationsResponse.data.data;
-    console.log("conversations",conversations)
     allConversation = conversations
     conversationId = conversations[0] ?._id
     const conversationPromises = conversations.map(async (conversation, index) => {
@@ -695,14 +693,38 @@ export async function getAllConversations() {
           </p>
           <span class="text-tiny+ text-slate-400 dark:text-navy-300">${time}</span>
         </div>
+        <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftTyping">
+        <div>
+          <div class="flex">
+            <!-- Smaller typing block -->
+            <div id="typing-display" class="rounded-full bg-white p-2 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 relative">
+              <div class="d-flex">
+                <!-- Decrease the size of the SVG -->
+                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" style="background: none" width="30px" height="15px">
+                  <circle cy="62.5" fill="#C4C4C46b" r="15" cx="1.5">
+                    <animate attributeName="cy" calcMode="spline" keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5" repeatCount="indefinite" values="62.5;37.5;62.5;62.5" keyTimes="0;0.25;0.5;1" dur="1s" begin="-0.5s"></animate>
+                  </circle>
+                  <circle cy="62.5" fill="#c4c4c498" r="15" cx="52.5">
+                    <animate attributeName="cy" calcMode="spline" keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5" repeatCount="indefinite" values="62.5;37.5;62.5;62.5" keyTimes="0;0.25;0.5;1" dur="1s" begin="-0.375s"></animate>
+                  </circle>
+                  <circle cy="62.5" fill="#c4c4c4" r="15" cx="107.5">
+                    <animate attributeName="cy" calcMode="spline" keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5" repeatCount="indefinite" values="62.5;37.5;62.5;62.5" keyTimes="0;0.25;0.5;1" dur="1s" begin="-0.25s"></animate>
+                  </circle>
+                </svg>
+              </div>
+            </div>
+            <!-- End of Smaller typing block -->
+          </div>
+        </div>
+      </div>
+      
         <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftMsg">
+
           <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
              ${conversation.last_message?.status === 0 ? conversation.last_message?.user === userId ? "You delete a message" : `${conversation.members[0].full_name} delete a message` : msg}
           </p >
 
-           <div>
-     
-        </div >
+       
       </div >
     </div >
   </div >
@@ -1836,8 +1858,17 @@ export async function receiveMessage(data) {
       } else messagesContainer.insertAdjacentHTML("beforeend", messageContent);
 
       if (conversationId === data.messageData.conversation) {
-        markMessageAsSeen(conversationId);
+        if(document.visibilityState==="visible"){
+          markMessageAsSeen(conversationId);
+        }else {
+          document.addEventListener("visibilitychange",()=>{
+            if(document.visibilityState==="visible"){
+              markMessageAsSeen(conversationId);
+            }
+          },{once:true})
+        }
       }
+
 
       const conversationContainer = document.getElementById(
         "conversation-container"
@@ -2350,7 +2381,6 @@ let typingBlock = document.getElementById("typing-block-message");
 export function startTyping(data) {
   typingBlock = document.getElementById("typing-block-message");
   if (data.metaData.conversation === conversationId) {
-    // set the scroll position to the bottom of the conversation container
     conversationContainer.scrollTop = conversationContainer.scrollHeight;
     if (!typingBlock) {
       typingBlock = document.createElement("div");
@@ -2430,28 +2460,20 @@ export function startTyping(data) {
                         </div>
                       </div>`
       messagesContainer.appendChild(typingBlock)
-      // showTypingIndicator();
-      const typingBar = document.querySelector(`#left-conversation-${data.metaData.conversation}`)
-      if(typingBar){
-        typingBar.classList.add('smallTyping')
-        const lastMessageElement = typingBar.querySelector('#last-message');
-        console.log("lastMEssage",lastMessageElement)
-        if (lastMessageElement) {
-          
+      
         }
   }
-        }
-
-  }
+  document.querySelector(`.conversationItem[data-conversation-id="${data.metaData.conversation}"]`)?.classList.add('smallTyping');
 }
-
-
 
 export function stopTyping(data) {
   if (data.metaData.conversation === conversationId) {
     if (typingBlock) {
       typingBlock.remove()
+
     }
+
+
   }
   const typingBar = document.querySelector(`#left-conversation-${data.metaData.conversation}`)
   if(typingBar){
@@ -2788,22 +2810,20 @@ export function submitFormStatus(status){
   // let messageContent = formElement.closest('[id^="message-content-"]');
   // let messageId = messageContent ?.id ?.replace('message-content-', '');
   // const form = JSON.parse(formElement.dataset.content);
+  const formInputs = formContact.querySelectorAll("input");
 
   if(status){
     formContent.style.opacity = 0.7;
     formElement.innerHTML = "Submitted";
   }else {
     formElement.disabled = false;
-    // formInputs.forEach(input => {
-    //   input.disabled = false;
-    // });
+    formInputs.forEach(input => {
+      input.disabled = false;
+    });
     formElement.innerHTML = "";
     formElement.innerHTML = "Try again";
   }
   }
-
-
-
 
 
 export function ableInputArea() {
@@ -2963,78 +2983,7 @@ $(document).ready(function () {
 });
 
 
- 
-// function showTypingIndicator() {
-//   const lastMessageElement = document.querySelector(`#left-conversation-${conversationId} #last-message`);
-//   if (lastMessageElement) {
-//     lastMessageElement.innerHTML = `
-//     <div style="width: 30px; height: 20px;">
-//     <svg
-//       xmlns="http://www.w3.org/2000/svg"
-//       xmlns:xlink="http://www.w3.org/1999/xlink"
-//       viewBox="0 0 30 100"
-//       preserveAspectRatio="xMidYMid"
-//       style="background: none"
-//       width="30px"
-//       height="20px"
-//     >
-//       <circle
-//         cy="62.5"
-//         fill="#C4C4C46b"
-//         r="8"
-//         cx="1.5"
-//       >
-//         <animate
-//           attributeName="cy"
-//           calcMode="spline"
-//           keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
-//           repeatCount="indefinite"
-//           values="62.5;37.5;62.5;62.5"
-//           keyTimes="0;0.25;0.5;1"
-//           dur="1s"
-//           begin="-0.5s"
-//         ></animate>
-//       </circle>
-//       <circle
-//         cy="62.5"
-//         fill="#c4c4c498"
-//         r="8"
-//         cx="15"
-//       >
-//         <animate
-//           attributeName="cy"
-//           calcMode="spline"
-//           keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
-//           repeatCount="indefinite"
-//           values="62.5;37.5;62.5;62.5"
-//           keyTimes="0;0.25;0.5;1"
-//           dur="1s"
-//           begin="-0.375s"
-//         ></animate>
-//       </circle>
-//       <circle
-//         cy="62.5"
-//         fill="#c4c4c4"
-//         r="8"
-//         cx="28.5"
-//       >
-//         <animate
-//           attributeName="cy"
-//           calcMode="spline"
-//           keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
-//           repeatCount="indefinite"
-//           values="62.5;37.5;62.5;62.5"
-//           keyTimes="0;0.25;0.5;1"
-//           dur="1s"
-//           begin="-0.25s"
-//         ></animate>
-//       </circle>
-//     </svg>
-//   </div>
-  
-//   `;
-//   }
-// }
+
 
 
 $(document).ready(function () {

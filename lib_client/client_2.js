@@ -535,7 +535,6 @@ planBought = () => {
           //     break;
           // }
           // msgText.textContent = userLog
-          console.log("here")
         } else
           msgText.textContent = data.messageData.type === "plan" ? data.senderName + " sent a plan" : data.messageData.type === "form" ? data.senderName + " sent a form" : data.messageData.type === "link" ? data.senderName + " sent a link" : data.messageData.content
         leftConversationContainer.insertBefore(msgDiv, leftConversationContainer.firstChild)
@@ -619,8 +618,6 @@ planBought = () => {
     this.socket.on('onMessageRead', (data, error) => {
       console.log("message read",data)
       onReadMsg()
-
-
     })
   }
   /**
@@ -1002,7 +999,6 @@ planBought = () => {
       formContainer.appendChild(statusMessage);
       statusMessage.textContent = "saving form data went wrong,Try again";
       if (bool) {
-        
         formContainer.classList.add('f-success');
         formContainer.classList.remove('f-error');
         // Update the status message for success
