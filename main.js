@@ -15,20 +15,17 @@ const timeString =
 // Save user information in local storage
 console.log("LOCAL STORAGE", getCookie("myData"));
 
-import { accountId,token,get_plan_api, get_connected_agents, get_all_conversations, get_last_msg, get_all_agents } from "./env.js";
+import { accountId,get_plan_api, get_connected_agents, get_all_conversations, get_last_msg, get_all_agents, API_KEY } from "./env.js";
 
 function getCookie(name) {
-
   var cookieArr = document.cookie.split(";");
 
   for (var i = 0; i < cookieArr.length; i++) {
     var cookiePair = cookieArr[i].split("=");
-
     if (name == cookiePair[0].trim()) {
       return decodeURIComponent(cookiePair[1]);
     }
   }
-  // return null if cookie not found
   return null;
 }
 
@@ -95,13 +92,11 @@ conversationContainer.addEventListener('click', (event) => {
   let target = event.target.closest("button.btn1")
   if(target){
     const form = event.target.closest("form");
-    console.log("form",form)
     const inputs = form.elements;
     // Iterate over the input fields and validate them
     let isValid = true;
     for (let i = 0; i < inputs.length; i++) {
       const input = inputs[i];
-      console.log("input",input)
       if (input.required && !input.value) {
         isValid = false;
         showValidationError(input, "This field is required.");
@@ -364,7 +359,6 @@ export async function guestCreated(data) {
 
     redirectToAgent(expert)
   }
-  console.log("data",data)
   const html = `
   <div class="conversationItem conversation bg-slate-150" data-conversation-id="${data.conversationId}" data-name=${data.senderName} data-timestamp=${timeString} id="left-conversation-${data.conversationId}" data-user-id="${data.availableAgent}">
     <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
@@ -393,7 +387,6 @@ export async function guestCreated(data) {
        
           </div>
           <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftTyping"> 
-          
           <div>
             <div class="flex" class="pe-3">
               <div
@@ -477,7 +470,6 @@ export async function guestCreated(data) {
   // Append the HTML to the container
   newConvDiv.innerHTML = html;
   leftConversationContainer.insertBefore(newConvDiv, leftConversationContainer.firstChild)
-
 }
 
 
@@ -494,7 +486,6 @@ export async function getExperts() {
     connectUsers = response.data.data;
 
     if (response.data.data.length > 0 && !expertAppended) {
-      console.log("da5let xD")
       const html = `<span class="text-xs font-medium uppercase">Meet our new experts</span>`;
       $("#expert-msg").append(html);
       expertAppended = true;
@@ -568,7 +559,6 @@ async function selectExpert() {
         markMessageAsSeen(conversationId)
 
         $conversationContainer.attr("data-conversation-id", null);
-        console.log(" 'there is no conversation between the both of them yet',start a conversation by sending a message")
       } else {
         conversationId = !response.data.data.conversation ? response.data.data[0]._id : response.data.data.conversation[0]._id
         // Update the active chat with the conversation data
@@ -590,13 +580,16 @@ async function selectExpert() {
 }
 
 export async function getAllConversations() {
+  console.log("houni")
   leftConversationContainer.innerHTML = '';
   let latestConversationId = null;
   let userConversation = ""
   
   const conversationsResponse = await axios.get(`${get_all_conversations}${newData.contact}`);
+
   if (conversationsResponse.data.data.length > 0) {
     const conversations = conversationsResponse.data.data;
+    console.log("conversations",conversations)
     allConversation = conversations
     conversationId = conversations[0] ?._id
     const conversationPromises = conversations.map(async (conversation, index) => {
@@ -778,7 +771,6 @@ function handleConversationClick() {
   const name = $(this).data('name');
   conversationId = conversation_id;
   const exist = allConversation.find(conversation => conversation._id === conversationId)
-console.log("exist",exist)
   if (exist?.status == 1) {
     conversationHeaderStatus.textContent = "En ligne"
     const activeUser=document.getElementById('active-user-header')
@@ -1419,16 +1411,21 @@ async function sendMessage() {
 }
 
 export async function sentMessage(data) {
+
   conversationId=data.conversation
   let conv = conversationContainer.dataset.conversationId
   const isNotNewConversation = document.querySelector(`#left-conversation-${data.conversation}`)
+  const timestamp = data.date;
+  const date = new Date(timestamp);
+  const day = date.toLocaleString('en-us', {
+    weekday: 'long'
+  });
 
+  const hour = date.getHours();
+  const minute = date.getMinutes();
+  const time = `${day}:${hour}:${minute}`;
   if (!isNotNewConversation) {
-    const timestamp = data.date;
-    const date = new Date(timestamp);
-    const hour = date.getHours();
-    const minute = date.getMinutes();
-    const time = `${hour}:${minute}`
+ 
     const newConvDiv = document.createElement("div")
     const conversationActive = document.querySelectorAll("div.conversation-click")
     conversationActive.forEach(element => {
@@ -1436,7 +1433,7 @@ export async function sentMessage(data) {
         element.classList.remove("bg-slate-150")
     });
     const html = `
-    <div class="conversationItem conversation bg-slate-150" data-conversation-id="${data.conversation}" data-name=${senderName} data-timestamp=${timestamp} id="left-conversation-${data.conversation}" data-user-id="${agentClicked}">
+    <div class="conversationItem conversation bg-slate-150" data-conversation-id="${data.conversation}" data-name=${senderName} data-timestamp=${timeString} id="left-conversation-${data.conversation}" data-user-id="${agentClicked}">
       <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
         <div
           class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
@@ -1454,7 +1451,7 @@ export async function sentMessage(data) {
               <p class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
               ${senderName}
               </p>
-              <span class="text-tiny+ text-slate-400 dark:text-navy-300">${time}</span>
+              <span class="text-tiny+ text-slate-400 dark:text-navy-300">${timeString}</span>
             </div>
             <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftMsg"> 
               <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
@@ -1587,6 +1584,7 @@ export async function sentMessage(data) {
       convMessage.textContent = data.content
   }
   if (data.conversation === conv) {
+    
     const messageId = data.id;
     const messageContainer = document.getElementById(`message-${messageId}`);
     messagesContainer = document.getElementById("big-container-message")
@@ -1651,7 +1649,7 @@ export async function sentMessage(data) {
               <div id="pin-div" class="  hidden ${direction == "justify-start" ? "pin-div-sender" : "pin-div"} justify-center  items-center me-2 "><i class="fas fa-thumbtack"></i></div>
             </div>
             <p  id="date_msg" data-direction="${direction}" class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">
-                  ${timeString + `<i class="fas fa-check ps-2" style="font-size:10px;"></i>` }       
+                  ${time + `<i class="fas fa-check ps-2" style="font-size:10px;"></i>` }       
             </p>
           </div>
         ${data.direction == "out" ? msgButt(messageId, direction, data.pinned === 1) : ''}
@@ -1908,33 +1906,6 @@ export async function receiveMessage(data) {
     }
     }
 
-  // const allFormInput = document.querySelectorAll(`#field-${messageId}`);
-
-  // if (allFormInput.length > 0) {
-  //   allFormInput.forEach((input) => {
-  //     input.oninput = () => sendTypingNotification(input);
-  //     input.addEventListener('focus', () => sendFocusNotification(input));
-  //   });
-  // }
-
-  // function sendTypingNotification(input) {
-  //     addLogs({
-  //       action: "fill", 
-  //       element: "22",
-  //       element_id: +input.dataset.fieldId,
-  //       messageId:input.id.replace("floating_filled_","")
-  //     });
-  //     userHasTyped = input.dataset.fieldId;
-  // }
-
-  // function sendFocusNotification(input) {
-  //   addLogs({
-  //     action: "focus",
-  //     element: "22",
-  //     element_id: +input.dataset.fieldId,
-  //     messageId:input.id.replace("floating_filled_","")  
-  //   });
-  // }
   function sendClickingNotification(data) {
     foued.linkClick(data.id.replace("linked-msg-", ""))
       addLogs({
@@ -2667,8 +2638,6 @@ async function getAllAgents() {
 
     })
   }
-
-
 }
 //when an agent connect create an agent card and display it in the online agents block
 export function userConnection(data) {
@@ -2682,8 +2651,6 @@ export function userConnection(data) {
         statusConv.classList.add("bg-success")
       }
     })
- 
-
   }
 }
 //when an agent disconnect remove the card in the online agents block
@@ -2856,16 +2823,13 @@ function showEmoji() {
     emoji.classList.add('hidden')
 }
 
-
-
 async function getPlans() {
   try {
-    const response = await axios.get(`${get_plan_api}${accountId}`, {
+    const response = await axios.get(`${get_plan_api}`, {
       headers: {
-        Authorization: `Bearer ${token}`
+        "key": `${API_KEY}`
       }
     });
-
     if (response) {
       response.data.data.forEach(plan => {
         const div = document.createElement('div');
@@ -2998,7 +2962,6 @@ $(document).ready(function () {
   if (newData) {
     foued.connect(newData?.user, newData.contact)
     foued.onDisconnected(newData?.user)
-    
   } else {
     console.log("newData is empty !", newData)
   }

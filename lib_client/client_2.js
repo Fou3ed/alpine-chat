@@ -30,12 +30,12 @@ import {
 } from "../main.js";
 let messagesContainer = document.getElementById("big-container-message");
 const loader = document.querySelector(".app-preloader1");
-
+import { socketAddress } from "../env.js";
 export let role = ""
 export default class event {
   constructor() {
 
-    this.socket = io("ws://192.168.1.23:3000", {
+    this.socket = io(socketAddress, {
       transports: ['websocket']
     });
   }
