@@ -26,19 +26,18 @@ import {
   removeExpert,
   getAllConversations,
   displayExpert,
+  getAllAgents
 
 } from "../main.js";
 let messagesContainer = document.getElementById("big-container-message");
-const loader = document.querySelector(".app-preloader1");
 import { socketAddress } from "../env.js";
 export let role = ""
 export default class event {
-  constructor() {
 
-    this.socket = io(socketAddress, {
-      transports: ['websocket']
-    });
-  }
+ constructor(){
+  this.socket=null
+ }
+  
   // In the onConnected function:
   // In the index.html page:
   // Retrieve the newData value from localStorage
@@ -50,41 +49,76 @@ export default class event {
 
   //receive a connect  event from the socket 
 
-  connect = (userId, contact) => {
+  connect = (callback) => {
+    this.socket = io(socketAddress, {
+      transports: ['websocket']
+    });
+
     this.socket.on("connect", () => {
-      this.socket.emit("user-connected", {
-        app_id: "638dc76312488c6bf67e8fc0",
-        user: contact,
-        contact: contact,
-        action: "user-connected",
-        metaData: {
-          app_id: "638dc76312488c6bf67e8fc0",
-          api_token: "123456789123456",
-          user_id: userId
-        },
-        "device": {
-          "ip": "123.213.121",
-          "timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-          "platform": navigator.platform,
-          "userAgent": navigator.userAgent
-        }
-      });
+      if(typeof callback === 'function') {
+
+        callback()
+      }
     });
   }
+  
   onConnected = function () {
+    const loader = document.querySelector(".app-preloader");
+
     this.socket.on("onConnected", (userData, balance) => {
-      console.log("new data connection ", userData, balance);
+      console.log("userData",userData)
       role = userData.status == 0 ? "GUEST" : "CLIENT";
-      const usernameLink = document.getElementById("usernameLink");
+      const usernameLink = document.getElementById("userName");
+      const clientIdElement = document.querySelector("#clientId");
+
       if (usernameLink) {
         usernameLink.textContent = userData.full_name;
+        clientIdElement.textContent = `${role} ID : #${userData.id}`;
+
       }
         getAllConversations()
-        getTotalBalance(balance);
+        getTotalBalance(balance,role);
+        loader.style.display = "none";
 
-      loader.style.display = "none";
     });
   };
+  onConnectedError=function(){
+    this.socket.on('connection-error',(data)=>{
+
+      const modalDiv = document.createElement("div");
+      modalDiv.innerHTML = `
+      <div class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5">
+      <div class="absolute inset-0 bg-red transition-opacity duration-300"></div>
+      <div class="relative max-w-lg rounded-lg bg-white px-4 py-10 text-center transition-opacity duration-300 dark:bg-navy-700 sm:px-5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="inline h-28 w-28 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+  
+          <div class="mt-4">
+              <h2 class="text-2xl text-red-700 dark:text-navy-100">
+                  Error Occurred
+              </h2>
+              <p class="mt-2">
+                  An error occurred. Please try again.
+              </p>
+              <button @click="showModal = false" class="btn mt-6 bg-error font-medium text-white hover:bg-error-focus focus:bg-error-focus active:bg-error-focus/90">
+                  Close
+              </button>
+          </div>
+      </div>
+  </div>
+  
+      `;  
+      const closeButton = modalDiv.querySelector("button");
+      closeButton.addEventListener("click", () => {
+        document.body.removeChild(modalDiv);
+      });
+      document.body.appendChild(modalDiv);
+  
+
+
+    })
+  }
 
 
   //receive user connection (other user)
@@ -195,6 +229,7 @@ export default class event {
 
   conversationStatusUpdated = (data) => {
     this.socket.on("conversationStatusUpdated",  (data, status) => {
+      console.log("data conversation status updated",data,status)
       let parentDiv = $('[data-conversation-id="' + data._id + '"]');
 
       let activeUser = parentDiv.find('#active-user')[0];
@@ -298,32 +333,59 @@ export default class event {
   //     this.socket.emit("onConversationMemberJoined", socket_id, info, conversationId)
   //   })
   // }
-planBought = () => {
-  this.socket.on('planBought', (data, newBalance) => {
-    const modalDiv = document.createElement("div");
-    modalDiv.innerHTML = `
-      <div class="modal-bought" id="modal-bought">
-        <div class="modal-content bg-light-gray">
-          <h2 class="modal-title">Congratulations</h2>
-          <p class="modal-text">You bought ${data.balance} messages.<br>Your new balance: <i>${newBalance}</i></p>
-          <button class="modal-button bg-soft-color" id="confirmButton">Confirm</button>
+  planBought = () => {
+    this.socket.on('planBought', (data, newBalance) => {
+      const modalDiv = document.createElement("div");
+      modalDiv.innerHTML = `
+      <div class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5">
+        <div class="absolute inset-0 bg-slate-900/60 transition-opacity duration-300"></div>
+        <div class="relative max-w-lg rounded-lg bg-white px-4 py-10 text-center transition-opacity duration-300 dark:bg-navy-700 sm:px-5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="inline h-28 w-28 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+  
+          <div class="mt-4" style="width:344px" >
+            <h2 class="text-2xl text-slate-700 dark:text-navy-100">
+              Congratulations
+            </h2>
+            <p class="mt-2">
+              You bought ${data.balance} messages.<br>Your new balance :  <i>${newBalance}</i>
+            </p>
+            <button @click="showModal = false" class="btn mt-6 bg-success font-medium text-white hover:bg-success-focus focus:bg-success-focus active:bg-success-focus/90">
+              Close
+            </button>
+          </div>
         </div>
       </div>
-    `;
-    role = "CLIENT";
+      `;
+      role = "CLIENT";
+      const usernameLink = document.getElementById("userName");
 
-    // Hide the modal when the Confirm button is pressed
-    const confirmButton = modalDiv.querySelector("#confirmButton");
-    confirmButton.addEventListener("click", () => {
-      modalDiv.style.display = "none";
+      if (usernameLink) {
+const clientIdElement = document.querySelector("#clientId");
+
+const textContent = clientIdElement.textContent;
+
+const match = textContent.match(/#(\d+)/);
+
+const number = match ? match[1] : null;
+
+        usernameLink.textContent = `Client #${number}`;
+      
+      }
+     
+      // Hide the modal when the Close button is pressed
+      const closeButton = modalDiv.querySelector("button");
+      closeButton.addEventListener("click", () => {
+        document.body.removeChild(modalDiv);
+      });
+  
+      document.body.appendChild(modalDiv);
+      getTotalBalance(newBalance,1);
+      ableInputArea();
     });
-
-    document.body.appendChild(modalDiv);
-    getTotalBalance(newBalance);
-    ableInputArea();
-    console.log("Data balance: ", data, newBalance);
-  });
-};
+  };
+  
 
   
   
@@ -489,11 +551,10 @@ planBought = () => {
 
 
   onMessageSent = async () => {
-    await this.socket.on('onMessageSent', async (data, online, error) => {
+     this.socket.on('onMessageSent', async (data, online, error) => {
       await sentMessage(data)
       if(data?.type==="MSG" ){
         updateUserBalance()
-
       }
     })
   }
@@ -961,7 +1022,6 @@ planBought = () => {
   onGuestCreated = (data) => {
     this.socket.on('guestCreated', (data) => {
       role="GUEST"
-      guestCreated(data)
       this.socket.emit("user-connected", {
         app_id: "1",
         user: data.contact,
@@ -979,8 +1039,9 @@ planBought = () => {
           "userAgent": navigator.userAgent
         }
       });
-      loader.style.display = "none";
-       getTotalBalance()
+      guestCreated(data)
+      // loader.style.display = "none";
+       getTotalBalance(undefined,"GUEST")
     })
   }
 
@@ -991,34 +1052,20 @@ planBought = () => {
     })
   }
 
-  savedFormData = () => {
-    this.socket.on('formSaved', (bool) => {
-      const formContainer = document.querySelector('.form-container');
-      const statusMessage = document.createElement('p');
-      statusMessage.classList.add('status-message');
-      formContainer.appendChild(statusMessage);
-      statusMessage.textContent = "saving form data went wrong,Try again";
+    savedFormData = () => {
+    this.socket.on('formSaved', (bool,userDetails) => {
       if (bool) {
-        formContainer.classList.add('f-success');
-        formContainer.classList.remove('f-error');
-        // Update the status message for success
-        statusMessage.textContent = "Form saved successfully";
-        statusMessage.style.color = "#22A699";
-        // Open modal for success submit form
+        const usernameLink = document.getElementById("userName");
+        if (usernameLink) {
+          usernameLink.textContent = userDetails.full_name;
+        }
         submitFormStatus("1");
       } else {
-        formContainer.classList.add('f-error');
-        formContainer.classList.remove('f-success');
-        // Update the status message for failure
-
-        statusMessage.textContent = "saving form data went wrong,Try again";
-        statusMessage.style.color = "#F24C3D";
-        // Open modal for fail submit form
+        
         submitFormStatus();
       }
     });
   };
-  
   
 
 
@@ -1045,26 +1092,39 @@ planBought = () => {
     });
   };
   
+  getUserPresntations=(accountId)=>{
+    this.socket.emit('getUserPresentations',accountId,(error)=>{
+
+    })
+  }
+  onGetUserPresntations=()=>{
+    this.socket.on('getUserPresentations',(data,error)=>{
+      getAllAgents(data)
+    })
+  }
+
 // The failGuest function
 failGuest = () => {
-  this.socket.on('createGuestFailed', (data) => {
-    console.log("failed creating guest", data);
-    loader.style.display = "none";
+  const modalOverlay = document.createElement('div');
+  modalOverlay.classList.add('modal-overlay');
 
+  this.socket.on('createGuestFailed', (data) => {
+    console.log("Failed creating guest", data);
+    // loader.style.display = "none";
 
     const modalContent = document.createElement('div');
     modalContent.classList.add('modal-content');
 
     const alertText = document.createElement('p');
     alertText.classList.add('alert-text');
-    alertText.textContent = 'fail creating guest,Press reload to try again ';
+    alertText.textContent = 'Failed creating guest. Press reload to try again.';
 
     const reloadButton = document.createElement('button');
     reloadButton.classList.add('reload-button');
     reloadButton.textContent = 'Reload';
 
     reloadButton.addEventListener('click', () => {
-      location.reload(); 
+      location.reload();
     });
 
     // Assemble the modal content
@@ -1077,26 +1137,54 @@ failGuest = () => {
     // Append the modal overlay to the body
     document.body.appendChild(modalOverlay);
   });
+};
+
+
+sendOfflineForm = (data) => {
+  this.socket.emit('sendOfflineForm', data, (error) => {
+    if (error) {
+      setError(error)
+    }
+  })
+}
+
+displayRobotAvatar=()=>{
+  this.socket.on('displayRobotAvatar',(robotId)=>{
+    // const html = `
+    // <div id="${robotId._id}" data-name="Robot" class="swiper-slide flex w-11 shrink-0 flex-col items-center justify-center">
+    //   <div class="h-11 w-11 rounded-full bg-gradient-to-r from-purple-500 to-orange-600 p-0.5">
+    //     <img class="h-full w-full rounded-full border-2 border-white object-cover dark:border-slate-700"
+    //       src="./images/avatar/robotAvatar.jpg" alt="avatar" />
+    //   </div>
+    //   <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 dark:text-navy-100">
+    //     Robot
+    //   </p>
+    // </div>
+    // `;
+    // $(".swiper-wrapper").append(html); 
+   })
 }
 // JavaScript
 conversationStatusUpdated = () => {
   this.socket.on('conversationStatusUpdated', (conversation, status) => {
     const fullConversationContainers = document.querySelectorAll(`[data-conversation-id="${conversation._id}"]`)
         //select the given conversation and change it names 
+              console.log("conversation : ",conversation)
+              if(conversation.member_details){}
         const agentFullNames = conversation.member_details
         .filter((member) => member.role === 'AGENT' || member.role==='BOT')
         .map((agent) => agent.full_name);
 
-
     fullConversationContainers.forEach((container) => {
       const activeUserDiv = container.querySelector('#active-user');
-      // activeUserDiv.classList.remove('bg-slate-300', 'bg-success');
+      activeUserDiv?.classList?.remove('bg-slate-300', 'bg-success');
       if (status === 0) {
         activeUserDiv?.classList?.add('bg-slate-300');
       } else if (status === 1) {
         activeUserDiv?.classList?.add('bg-success');
       }
     });
+
     const minimizedConversationContainer = document.getElementById(`left-mini-conversation-${conversation._id}`);
     if (minimizedConversationContainer) {
       minimizedConversationContainer.dataset.name = agentFullNames;
@@ -1108,7 +1196,19 @@ conversationStatusUpdated = () => {
         activeUserDiv?.classList?.add('bg-success');
       }
     }
+const leftConversation = document.querySelector(`.conversation-click[data-conversation-id="${conversation._id}"]`);
+const conversationName = document.getElementById('conversation-name');
+conversationName.textContent = agentFullNames;
+if (leftConversation) {
+  leftConversation.setAttribute('data-name', agentFullNames);
+  leftConversation.querySelector('[data-conversation-name]').textContent=agentFullNames
+  if( leftConversation.querySelector('[data-conversation-name][data-robot]')){
+  delete  leftConversation.querySelector('[data-conversation-name][data-robot]').dataset.robot
+if(!document.querySelector(`.conversation-click[data-conversation-id] [data-conversation-name][data-robot]`)&& document.querySelector(`[data-robot="Robot"]`)){
+  document.querySelector(`[data-robot="Robot"]`).remove()
+}
+  }
+}
   });
 };
-
 }
