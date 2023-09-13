@@ -520,7 +520,7 @@
           </div>
 
 
-          <button @click="isShowChatInfo = !isShowChatInfo" x-tooltip.placement.bottom.light="'Expert SideBar'"
+          <button id="toggleDrawerButton" @click="isShowChatInfo = !isShowChatInfo" x-tooltip.placement.bottom.light="'Expert SideBar'"
             :class="isShowChatInfo ? 'text-primary dark:text-accent-light' : 'text-slate-500 dark:text-navy-200'"
             class="btn  h-9 w-9 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25 sm:flex">
             <i class="fa fa-chevron-right"></i>
@@ -650,14 +650,14 @@
    
 
           <input type="text" class="form-input h-9 w-full bg-transparent placeholder:text-slate-400/70"
-            placeholder="Write you message" 
+            placeholder="Write your message" 
             id="message-input"
             />
         </div>
         <emoji-picker id="emoji" class="light hidden"></emoji-picker>
         <div class="-mr-1.5 flex">
             <div  class="text-xs text-gray-900 dark:text-white" id="message-counter">
-              Max Length: <span   id="max-length-value"> </span>
+              Max Length:  <span   id="max-length-value"> </span>
 
             </div>
           <button
@@ -692,11 +692,11 @@
         </div>
       </div>
 
-      <template x-teleport="#x-teleport-target">
+      <template x-teleport="#x-teleport-target"  >
         <div class="agent-details" x-data="{
             get showDrawer() {return $data.isShowChatInfo;},
             set showDrawer(val) {$data.isShowChatInfo = val;},
-          }" x-show="showDrawer" @keydown.window.escape="showDrawer = false">
+          }" x-show="showDrawer" x-init="showDrawer = false">
           <div class="fixed inset-0 z-[100] bg-slate-900/60 transition-opacity duration-200" @click="showDrawer = false"
             x-show="showDrawer && $store.breakpoints.mdAndDown" x-transition:enter="ease-out"
             x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in"
@@ -940,7 +940,9 @@
   src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"
 ></script>
   <script>
-    window.addEventListener("DOMContentLoaded", () => Alpine.start());
+
+    window.addEventListener("DOMContentLoaded", () => {Alpine.start()});
+
   </script>
 </body>
 

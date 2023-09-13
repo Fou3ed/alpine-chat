@@ -62,22 +62,29 @@ export default class event {
     });
   }
   
+  
   onConnected = function () {
     const loader = document.querySelector(".app-preloader");
 
     this.socket.on("onConnected", (userData, balance) => {
-      console.log("userData",userData)
       role = userData.status == 0 ? "GUEST" : "CLIENT";
       const usernameLink = document.getElementById("userName");
       const clientIdElement = document.querySelector("#clientId");
 
       if (usernameLink) {
         usernameLink.textContent = userData.full_name;
-        clientIdElement.textContent = `${role} ID : #${userData.id}`;
+        if(userData.role=="CLIENT"){
+          clientIdElement.textContent = `PROFILE ID : #${userData.id}`;
+
+        }else {
+          clientIdElement.textContent = `${role} ID : #${userData.id}`;
+
+        }
 
       }
         getAllConversations()
         getTotalBalance(balance,role);
+
         loader.style.display = "none";
 
     });
@@ -126,7 +133,6 @@ export default class event {
   userConnection = () => {
     this.socket.on("user-connection", (user) => {
         if (user?.role === "AGENT") {
-          console.log("ai'nt here",user)
           displayExpert(user)
         }
         userConnection(user)
@@ -562,7 +568,7 @@ const number = match ? match[1] : null;
   receiveMessage = async () => {
     const leftConversationContainer = document.getElementById('left-conversation');
     await this.socket.on('onMessageReceived', async (data, error) => {
-      
+      console.log("data message received",data)
       const msgDiv = document.getElementById(`left-conversation-${data.messageData.conversation}`);
       if (msgDiv) {
         const msgText = msgDiv.querySelector("p#last-message")
@@ -677,7 +683,6 @@ const number = match ? match[1] : null;
   }
   onMessageRead = () => {
     this.socket.on('onMessageRead', (data, error) => {
-      console.log("message read",data)
       onReadMsg()
     })
   }
@@ -1057,18 +1062,15 @@ const number = match ? match[1] : null;
       if (bool) {
         const usernameLink = document.getElementById("userName");
         if (usernameLink) {
-          usernameLink.textContent = userDetails.full_name;
+          usernameLink.textContent = userDetails?.full_name;
         }
         submitFormStatus("1");
       } else {
-        
         submitFormStatus();
       }
     });
   };
   
-
-
   updateBalance = (data) => {
     console.log("data", data)
     this.socket.emit('updateTotalBalance', data, (error) => {
@@ -1147,30 +1149,36 @@ sendOfflineForm = (data) => {
     }
   })
 }
+// verifyVisitor = (data) => {
+//   this.socket.emit('verifyVisitor', data, (error) => {
+//     if (error) {
+//       setError(error)
+//     }
+//   })
+// }
 
-displayRobotAvatar=()=>{
-  this.socket.on('displayRobotAvatar',(robotId)=>{
-    // const html = `
-    // <div id="${robotId._id}" data-name="Robot" class="swiper-slide flex w-11 shrink-0 flex-col items-center justify-center">
-    //   <div class="h-11 w-11 rounded-full bg-gradient-to-r from-purple-500 to-orange-600 p-0.5">
-    //     <img class="h-full w-full rounded-full border-2 border-white object-cover dark:border-slate-700"
-    //       src="./images/avatar/robotAvatar.jpg" alt="avatar" />
-    //   </div>
-    //   <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 dark:text-navy-100">
-    //     Robot
-    //   </p>
-    // </div>
-    // `;
-    // $(".swiper-wrapper").append(html); 
-   })
-}
+// displayRobotAvatar=()=>{
+//   this.socket.on('displayRobotAvatar',(robot)=>{
+//     console.log("robot id",robot)
+//     const html = `
+//     <div id="${robot._id}" data-name=${robot.full_name} class="swiper-slide flex w-11 shrink-0 flex-col items-center justify-center">
+//       <div class="h-11 w-11 rounded-full bg-gradient-to-r from-purple-500 to-orange-600 p-0.5">
+//         <img class="h-full w-full rounded-full border-2 border-white object-cover dark:border-slate-700"
+//          src=images/avatar/avatar-${robot.id}.jpg alt="avatar" />
+//       </div>
+//       <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 dark:text-navy-100">
+//         Robot
+//       </p>
+//     </div>
+//     `;
+//     $(".swiper-wrapper").append(html); 
+//    })
+// }
 // JavaScript
 conversationStatusUpdated = () => {
   this.socket.on('conversationStatusUpdated', (conversation, status) => {
     const fullConversationContainers = document.querySelectorAll(`[data-conversation-id="${conversation._id}"]`)
         //select the given conversation and change it names 
-              console.log("conversation : ",conversation)
-              if(conversation.member_details){}
         const agentFullNames = conversation.member_details
         .filter((member) => member.role === 'AGENT' || member.role==='BOT')
         .map((agent) => agent.full_name);
@@ -1211,4 +1219,7 @@ if(!document.querySelector(`.conversation-click[data-conversation-id] [data-conv
 }
   });
 };
+
+
+
 }

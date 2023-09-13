@@ -310,6 +310,7 @@ emoji-picker {
 .dropdown button img,
 .dropdown-content li img {
   width: 20px;
+  height: 20px;
   margin-left: 2%;
   border-radius: 60%;
 }
@@ -327,7 +328,7 @@ emoji-picker {
 
 .dropdown button:hover {
   cursor: pointer;
-  background-color: #3c5b77;
+  background-color: #fff;
 }
 /* Style for the dropdown content */
 .dropdown-content {
@@ -423,9 +424,7 @@ emoji-picker {
 }
 .msg-actions {position: relative;}
 
-div#message-options {
-    position: relative;
-}
+
 .card-plan {background: #ede9ee;}
 .card-plan button {border: 1px solid #dcc6e2;
     background: #d8d0db;}
@@ -674,6 +673,7 @@ div#message-options {
 
 div#message-options {
   position: relative;
+  bottom: -6px;
 }
 .card-plan {background: #ede9ee;}
 .card-plan button {border: 1px solid #dcc6e2;
@@ -897,3 +897,22 @@ padding: 5em 0 8.885em 0;
   padding-bottom: 5em;
 }
 
+.card-form.gocc::before {
+  filter: sepia(1);
+  }
+  
+.bg-msg{
+  background-color: #ededed;
+}
+.error-message {
+  color: red;
+  padding-top: 5px; 
+}
+
+#conversation-container.has-not-messages::after {
+  content: "Start chatting by sending a message";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+}
