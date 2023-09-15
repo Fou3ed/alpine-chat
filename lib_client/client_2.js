@@ -4,7 +4,6 @@ import io from "https://cdn.socket.io/4.5.4/socket.io.esm.min.js";
 import {
   receiveMessage,
   sentMessage,
-  getExperts,
   onReadMsg,
   reactDisplay,
   messageDeleted,
@@ -26,10 +25,13 @@ import {
   removeExpert,
   getAllConversations,
   displayExpert,
-  getAllAgents
+  getAllAgents,
+  changeHeaderPicture,
+  checkForExpertMessages
 
 } from "../main.js";
 let messagesContainer = document.getElementById("big-container-message");
+export let last_seen_at;
 import { socketAddress } from "../env.js";
 export let role = ""
 export default class event {
@@ -62,12 +64,14 @@ export default class event {
     });
   }
   
-  
+
   onConnected = function () {
     const loader = document.querySelector(".app-preloader");
 
     this.socket.on("onConnected", (userData, balance) => {
       role = userData.status == 0 ? "GUEST" : "CLIENT";
+      last_seen_at=userData.last_seen_at
+
       const usernameLink = document.getElementById("userName");
       const clientIdElement = document.querySelector("#clientId");
 
@@ -75,6 +79,7 @@ export default class event {
         usernameLink.textContent = userData.full_name;
         if(userData.role=="CLIENT"){
           clientIdElement.textContent = `PROFILE ID : #${userData.id}`;
+
 
         }else {
           clientIdElement.textContent = `${role} ID : #${userData.id}`;
@@ -144,7 +149,8 @@ export default class event {
       if(user?.role==="AGENT"){
          removeExpert(user._id)
       }
-      userDisconnection(user.socketId)
+      checkForExpertMessages()
+      userDisconnection(user)
     })
   }
   
@@ -233,26 +239,25 @@ export default class event {
     })
   }
 
-  conversationStatusUpdated = (data) => {
-    this.socket.on("conversationStatusUpdated",  (data, status) => {
-      console.log("data conversation status updated",data,status)
-      let parentDiv = $('[data-conversation-id="' + data._id + '"]');
+  // conversationStatusUpdated = (data) => {
+  //   this.socket.on("conversationStatusUpdated",  (data, status) => {
+  //     console.log("here",herere)
+  //     let parentDiv = $('[data-conversation-id="' + data._id + '"]');
 
-      let activeUser = parentDiv.find('#active-user')[0];
-      if(status==1){
-      activeUser.classList.remove("bg-slate-300");  
-      activeUser.classList.add("bg-success");
-
-      this.socket.emit("joinRoom", data._id)
+  //     let activeUser = parentDiv.find('#active-user')[0];
+  //     if(status==1){
+  //     activeUser.classList.remove("bg-slate-300");  
+  //     activeUser.classList.add("bg-success");
+  //     this.socket.emit("joinRoom", data._id)
    
-      }else {
-        activeUser.classList.remove("bg-success");
+  //     }else {
+  //       activeUser.classList.remove("bg-success");
 
-        activeUser.classList.add("bg-slate-300");
+  //       activeUser.classList.add("bg-slate-300");
 
-      }
-    })
-  }
+  //     }
+  //   })
+  // }
 
   /**
    *  delete Conversation  
@@ -568,45 +573,27 @@ const number = match ? match[1] : null;
   receiveMessage = async () => {
     const leftConversationContainer = document.getElementById('left-conversation');
     await this.socket.on('onMessageReceived', async (data, error) => {
-      console.log("data message received",data)
+      const minimizedSideBar = document.getElementById("mini-sidebar");
+
       const msgDiv = document.getElementById(`left-conversation-${data.messageData.conversation}`);
+      const msgDivMini = document.getElementById(`left-mini-conversation-${data.messageData.conversation}`);
+
       if (msgDiv) {
         const msgText = msgDiv.querySelector("p#last-message")
-        if (data.messageData.type === "log") {
-          // const log = JSON.parse(data.messageData.content)
-          // let userLog = ""
-          // switch (log.action) {
-          //   case "fill":
-          //     userLog = `${data.senderName} filled on the form.`;
-          //     break;
-          //   case "focus":
-          //     userLog = `${data.senderName}  focus on the form.`;
-          //     break;
-          //   case "purchase":
-          //     userLog = `${data.senderName}  purchased the <b> ${log.plan_name} </b>plan.`;
-          //     break;
-          //   case "start form":
-          //     userLog = `${data.senderName}  start submit the form.`;
-          //     break;
-          //   case "end form":
-          //     userLog = `${data.senderName}  end submit the form.`;
-          //     break;
-          //   case "start purchase":
-          //     userLog = `${data.senderName}  start purchase a plan.`;
-          //     break;
-          //   case "link click":
-          //     userLog = `${data.senderName} click to link.`;
-          //     break;
-          //   default:
-          //     userLog = `hello`;
-          //     break;
-          // }
-          // msgText.textContent = userLog
-        } else
           msgText.textContent = data.messageData.type === "plan" ? data.senderName + " sent a plan" : data.messageData.type === "form" ? data.senderName + " sent a form" : data.messageData.type === "link" ? data.senderName + " sent a link" : data.messageData.content
+        leftConversationContainer.insertBefore(msgDiv, leftConversationContainer.firstChild)
         leftConversationContainer.insertBefore(msgDiv, leftConversationContainer.firstChild)
 
       }
+    
+    if (msgDivMini) {
+ 
+      minimizedSideBar.insertBefore(
+        msgDivMini,
+        minimizedSideBar.firstChild
+      );
+      
+    }
 
 
       // Check if the message was sent by the current user
@@ -1149,40 +1136,21 @@ sendOfflineForm = (data) => {
     }
   })
 }
-// verifyVisitor = (data) => {
-//   this.socket.emit('verifyVisitor', data, (error) => {
-//     if (error) {
-//       setError(error)
-//     }
-//   })
-// }
 
-// displayRobotAvatar=()=>{
-//   this.socket.on('displayRobotAvatar',(robot)=>{
-//     console.log("robot id",robot)
-//     const html = `
-//     <div id="${robot._id}" data-name=${robot.full_name} class="swiper-slide flex w-11 shrink-0 flex-col items-center justify-center">
-//       <div class="h-11 w-11 rounded-full bg-gradient-to-r from-purple-500 to-orange-600 p-0.5">
-//         <img class="h-full w-full rounded-full border-2 border-white object-cover dark:border-slate-700"
-//          src=images/avatar/avatar-${robot.id}.jpg alt="avatar" />
-//       </div>
-//       <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 dark:text-navy-100">
-//         Robot
-//       </p>
-//     </div>
-//     `;
-//     $(".swiper-wrapper").append(html); 
-//    })
-// }
-// JavaScript
 conversationStatusUpdated = () => {
-  this.socket.on('conversationStatusUpdated', (conversation, status) => {
+  this.socket.on('conversationStatusUpdated', (conversation, status,str) => {
+    if(status=="1"){
+      this.socket.emit("joinRoom", conversation._id)
+
+    }
+    if(str=="robotUpdated"){
+      removeExpert("64d0b5dae5965b534fc5997d")
+    }
     const fullConversationContainers = document.querySelectorAll(`[data-conversation-id="${conversation._id}"]`)
         //select the given conversation and change it names 
-        const agentFullNames = conversation.member_details
+        const agent = conversation.member_details
         .filter((member) => member.role === 'AGENT' || member.role==='BOT')
-        .map((agent) => agent.full_name);
-
+        .map((agent) => agent);
     fullConversationContainers.forEach((container) => {
       const activeUserDiv = container.querySelector('#active-user');
       activeUserDiv?.classList?.remove('bg-slate-300', 'bg-success');
@@ -1195,7 +1163,7 @@ conversationStatusUpdated = () => {
 
     const minimizedConversationContainer = document.getElementById(`left-mini-conversation-${conversation._id}`);
     if (minimizedConversationContainer) {
-      minimizedConversationContainer.dataset.name = agentFullNames;
+      minimizedConversationContainer.dataset.name = agent[0].full_name;
       const activeUserDiv = minimizedConversationContainer.querySelector('#active-user');
       activeUserDiv.classList.remove('bg-slate-300', 'bg-success');
       if (status === 0) {
@@ -1205,11 +1173,31 @@ conversationStatusUpdated = () => {
       }
     }
 const leftConversation = document.querySelector(`.conversation-click[data-conversation-id="${conversation._id}"]`);
-const conversationName = document.getElementById('conversation-name');
-conversationName.textContent = agentFullNames;
+
 if (leftConversation) {
-  leftConversation.setAttribute('data-name', agentFullNames);
-  leftConversation.querySelector('[data-conversation-name]').textContent=agentFullNames
+  const miniConversationDiv = document.querySelector(`#left-mini-conversation-${conversation._id}`);
+  if (miniConversationDiv) {
+    // Select the img element within the mini-conversation div
+    const imgElement = miniConversationDiv.querySelector('img');
+    
+    if (imgElement) {
+      imgElement.src = `images/avatar/avatar-${agent[0].id}.jpg`;
+    }
+  }
+  
+const imgElement = document.querySelector(`#left-conversation-${conversation._id} img`);
+if (imgElement) {
+  imgElement.src = `images/avatar/avatar-${agent[0].id}.jpg`;
+}
+
+
+changeHeaderPicture(conversation._id,agent[0],status)
+
+
+
+
+  leftConversation.setAttribute('data-name', agent[0].full_name);
+  leftConversation.querySelector('[data-conversation-name]').textContent=agent[0].full_name
   if( leftConversation.querySelector('[data-conversation-name][data-robot]')){
   delete  leftConversation.querySelector('[data-conversation-name][data-robot]').dataset.robot
 if(!document.querySelector(`.conversation-click[data-conversation-id] [data-conversation-name][data-robot]`)&& document.querySelector(`[data-robot="Robot"]`)){
