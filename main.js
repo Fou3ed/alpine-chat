@@ -441,7 +441,7 @@ function showValidationError(inputElement, message) {
   // Check if an error message is already displayed and remove it if so
   inputElement.closest("label").querySelector(".error-message")?.remove();
   if (inputElement.classList.contains("phoneInput") && inputElement.closest(".iti")) {
-     inputElement.closest(".iti").after(errorMessageElement);
+    inputElement.closest(".iti").after(errorMessageElement);
   } else {
     inputElement.after(errorMessageElement);
   }
@@ -459,8 +459,8 @@ document.addEventListener("input", (event) => {
 
 const msgButt = (messageId, direction, isPinned) => {
   return `<div id="message-options" x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex "><button x-ref="popperRef" @click="isShowPopper = !isShowPopper" class="msg-butt-container btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"><i class="fas fa-ellipsis-h" style="font-size: 18px"></i></button><div x-ref="popperRoot" class="popper-root" :class="isShowPopper &amp;&amp; 'show'" style="position: fixed; inset: 0px 0px auto auto; margin: 0px; transform: translate(-594px, 231px);" data-popper-placement="bottom-end"><div  class="popper-box  rounded-md border border-slate-150 bg-white py-1.5 font-inter dark:border-navy-500 dark:bg-navy-700"><ul>${direction === "justify-start"
-      ? ""
-      : `<li><a href="#" data-message-id="${messageId}" id="edit-message" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Edit</a></li>`
+    ? ""
+    : `<li><a href="#" data-message-id="${messageId}" id="edit-message" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Edit</a></li>`
     }<li><a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Forward</a></li><li><a href="#" id="${isPinned ? "unpin-message" : "pin-message"
     }" data-message-id="${messageId}" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">${isPinned ? "Unpin" : "Pin"
     }</a>
@@ -499,10 +499,10 @@ export async function guestCreated(data) {
     contact: data.contact,
     accountId: data.accountId,
     status: 0,
-    ...(data.goccContactId ? {
-      goccContactId: data.goccContactId
-    } : {})
-  };
+    ...(data.goccContactId && { goccContactId: data.goccContactId }),
+    ...(data.goccLeadId && { goccLeadId: data.goccLeadId })
+  }
+
 
   newData = newUser;
   document.cookie =
@@ -903,7 +903,7 @@ export async function getAllConversations() {
 
         if (bot[0]) {
           const agentDisco = document.getElementById(bot[0]._id);
-  
+
           if (!agentDisco) {
             displayedUsers.add(bot[0]._id);
             const html = `<div id="${bot[0]._id}" data-name=${bot[0].full_name} class="swiper-slide flex w-11 shrink-0 flex-col items-center justify-center"><div class="h-11 w-11 rounded-full bg-gradient-to-r from-purple-500 to-orange-600 p-0.5"><img class="h-full w-full rounded-full border-2 border-white object-cover dark:border-slate-700" src=images/avatar/avatar-0.jpg alt="avatar" /></div><p class="mt-1 w-14 break-words text-center text-xs text-slate-600 dark:text-navy-100">${bot[0].full_name}</p></div>`;
@@ -1113,7 +1113,7 @@ function handleConversationClick() {
     for (const memberDetail of exist.member_details) {
       if (memberDetail.role === "AGENT") {
         agentContactId = memberDetail.id;
-        if (offline && firstTime && exist.last_message.type !== "form" && (new Date() - new Date(last_seen_at)) / (1000 * 60 * 60) > 1)  {
+        if (offline && firstTime && exist.last_message.type !== "form" && (new Date() - new Date(last_seen_at)) / (1000 * 60 * 60) > 1) {
           foued.sendOfflineForm({
             userId: newData.user,
             accountId: accountId,
@@ -1187,7 +1187,7 @@ function inputLEngth(conversationMaxMsg) {
       document.getElementById(
         "max-length-value"
       ).textContent = ` ${conversationMaxMsg} | ${conversationMaxMsg - this?.value.length
-        }`;
+      }`;
     });
   }
 }
@@ -1596,7 +1596,7 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
           tableRows = `
         <div class="mr-4 max-w-lg sm:mr-10">
               <form name="form1" class="box" onsubmit="">
-                  <div class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 ${newData.goccContactId ? "gocc" : ""} card-form" style="position: relative;">
+                  <div class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 ${newData.goccContactId || newData.goccLeadId ? "gocc" : ""} card-form" style="position: relative;">
                       <div class="mt-20 w-full max-w-xl p-4 sm:p-5">
                           <div class="mb-4">
                               <h3 class="text-2xl font-semibold">${myContent.friendly_name
@@ -2604,7 +2604,7 @@ export async function receiveMessage(data) {
           tableRows = `
         <div class="mr-4 max-w-lg sm:mr-10">
               <form name="form1" class="box" onsubmit="">
-                  <div class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 ${newData.goccContactId ? "gocc" : ""} card-form" style="position: relative;">
+                  <div class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 ${newData.goccContactId || newData.goccLeadId ? "gocc" : ""}  card-form" style="position: relative;">
                       <div class="mt-20 w-full max-w-xl p-4 sm:p-5">
                           <div class="mb-4">
                               <h3 class="text-2xl font-semibold">${myContent.friendly_name
@@ -4370,15 +4370,15 @@ $(document).ready(async function () {
   getPlans();
 
   foued.connect(() => {
-
-    if (!newData || ((params?.source == "gocc" && params?.contact) && params?.contact != newData.goccContactId)) {
+    if (!newData || ((params?.source == "gocc" && (params?.contact || params?.lead)) && (params?.contact ? params?.contact != newData.goccContactId : params?.lead != newData.goccLeadId))) {
       foued.socket.emit(
         "createGuest",
         {
           browser: navigator.userAgent,
           platform: navigator.platform,
           accountId: accountId,
-          ...(params.contact ? { source: 'gocc', gocc_contact_id: params.contact } : {})
+          ...(params.contact ? { source: 'gocc', gocc_contact_id: params.contact } : {}),
+          ...(params.lead ? { source: 'gocc', gocc_lead_id: params.lead } : {})
         },
         (error) => { }
       );
@@ -4456,6 +4456,7 @@ $(document).ready(async function () {
     });
   foued.savedFormData();
   foued.failGuest();
+  foued.mergeConversation()
   // foued.displayRobotAvatar();
 
   await getExperts();

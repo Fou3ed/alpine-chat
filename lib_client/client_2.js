@@ -1059,7 +1059,6 @@ const number = match ? match[1] : null;
   };
   
   updateBalance = (data) => {
-    console.log("data", data)
     this.socket.emit('updateTotalBalance', data, (error) => {
 
     });
@@ -1137,6 +1136,11 @@ sendOfflineForm = (data) => {
   })
 }
 
+mergeConversation=()=>{
+  this.socket.on('mergeConversation',(data)=>{
+    console.log("data ::: ",data)
+  })
+}
 conversationStatusUpdated = () => {
   this.socket.on('conversationStatusUpdated', (conversation, status,str) => {
     if(status=="1"){
