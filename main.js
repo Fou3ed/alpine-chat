@@ -31,9 +31,12 @@ function getCookie(name) {
 }
 
 let traduction = {};
+function getTranslationValue (key) {
+  return eval(`traduction.${key}`) ?? key;
+}
 function traduc() {
   document.querySelectorAll("[data-translation]").forEach((element) => {
-    element.textContent = traduction[element.dataset.translation];
+    element.textContent = getTranslationValue(element.dataset.translation);
   });
 }
 import { Languages } from "./languages.js";
@@ -660,7 +663,7 @@ export async function getExperts() {
     connectUsers = response.data.data;
 
     if (response.data.data.length > 0 && !expertAppended) {
-      const html = `<span class="text-xs+ font-medium uppercase">Online Experts</span>`;
+      const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_on">${getTranslationValue("left_side.experts_on")}</span>`;
       $("#expert-msg").empty().append(html);
       expertAppended = true;
     } else {
@@ -679,7 +682,7 @@ export function checkForExpertMessages() {
   const swiperWrapper = swiper.querySelector(".swiper-wrapper");
   const divsInsideSwiper = Array.from(swiperWrapper.querySelectorAll("div.swiper-slide"));
   if (divsInsideSwiper.length > 0) {
-    const html = `<span class="text-xs+ font-medium uppercase">Online Experts</span>`;
+    const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_on">${getTranslationValue("left_side.experts_on")}</span>`;
     $("#expert-msg").empty().append(html);
   } else {
     const html = `<span class="text-xs+ font-medium uppercase">All Experts are offline </span>`;
@@ -746,8 +749,8 @@ async function selectExpert() {
         conversationHeaderStatus.dataset.translation = connectUsers.find(
           (user) => user._id === agent
         )
-          ? "online"
-          : "lastSeen";
+          ? "general.online"
+          : "header.lastSeen";
         conversationHeaderStatus.textContent =
           traduction[conversationHeaderStatus.dataset.translation];
 
@@ -788,7 +791,7 @@ async function selectExpert() {
           $conversationContainer.attr("data-conversation-id", conversationId);
           // Load the first page of messages on page load
           let currentPage = 1;
-          loadMessages(currentPage, conversationId, true);
+          foued.loadMessages({page:currentPage, conversationId:conversationId});
         }
       }
     } else {
@@ -1118,38 +1121,21 @@ if(!exist  && conversation_id){
   });
   $(this).addClass("bg-slate-150");
   let agentContactId = null;
-  if (exist?.member_details) {
-    for (const memberDetail of exist.member_details) {
-      if (memberDetail.role === "AGENT") {
-        agentContactId = memberDetail.id;
-        if (offline && firstTime && exist.last_message.type !== "form" && (new Date() - new Date(last_seen_at)) / (1000 * 60 * 60) > 1) {
-          foued.sendOfflineForm({
-            userId: newData.user,
-            accountId: accountId, 
-            conversationId: conversation_id,
-            agentId: memberDetail._id,
-            agentName: memberDetail.full_name,
-          });
-        }
-        firstTime = false;
-        break;
-      }
-    }
-  }
+
 
   if (exist?.status == 1) {
 
 
-    conversationHeaderStatus.dataset.translation = "online";
-    conversationHeaderStatus.textContent = traduction.online;
+    conversationHeaderStatus.dataset.translation = "general.online";
+    conversationHeaderStatus.textContent = getTranslationValue("general.online");
 
     const activeUser = document.getElementById("active-user-header");
     activeUser.classList.remove("bg-slate-300");
     activeUser.classList.add("bg-success");
     getAgentPresentation(agentContactId, true);
   } else {
-    conversationHeaderStatus.dataset.translation = "lastSeen";
-    conversationHeaderStatus.textContent = traduction.lastSeen;
+    conversationHeaderStatus.dataset.translation = "header.lastseen";
+    conversationHeaderStatus.textContent = getTranslationValue("header.lastseen");
 
     const activeUser = document.getElementById("active-user-header");
     activeUser.classList.remove("bg-success");
@@ -1162,7 +1148,7 @@ if(!exist  && conversation_id){
   // Load the first page of messages on page load
   let currentPage = 1;
 
-  loadMessages(currentPage, conversationId, true);
+  foued.loadMessages({page:currentPage,conversationId:conversationId});
   // Update the active chat with the conversation data
 
   let activeChat = {
@@ -1249,7 +1235,8 @@ let isLoading = false;
 let isEndOfMessages = false; // Track if all messages have been loaded
 const spinner = document.getElementById("conversation-spinner");
 const limit = 10;
-async function loadMessages(page, conversationId) {
+export async function loadMessages(response) {
+  console.log("data",response.data.currentPage)
   // Show the big container message
   document.getElementById("big-container-message").style.display = "block";
 
@@ -1258,27 +1245,25 @@ async function loadMessages(page, conversationId) {
       isLoading = true;
       // Show the spinner
       spinner.classList.remove("hidden");
-
       // Load messages from the server
-      const response = await axios.get(
-        `${MY_API_ADDRESS}/messages/conv/${conversationId}?page=${page}&limit=${limit}`
-      );
-
-      if (response.data.message !== "success") {
+      // const response = await axios.get(
+      //   `${MY_API_ADDRESS}/messages/conv/${conversationId}?page=${1}&limit=${limit}`
+      // );
+        console.log("response ",response.data.totalPages)
+      if (response.message !== "success") {
         throw new Error("Failed to load messages");
       }
-      displayMessages(response.data.data);
-      if (page == 1) {
+      displayMessages(response.data);
+      if (response.data.currentPage == 1) {
         // conversationContainer.scrollTop = conversationContainer.scrollHeight;
         conversationContainer.scrollTo(0, conversationContainer.scrollHeight);
       }
-      if (response.data.data.currentPage === response.data.data.totalPages) {
+      if (response.data.currentPage === response.data.totalPages) {
         // All messages have been loaded
         isEndOfMessages = true;
       }
-
       if (conversationContainer.scrollTop === 0 && !isEndOfMessages) {
-        loadMessages(page + 1, conversationId);
+        foued.loadMessages({page:response.data.currentPage + 1, conversationId:conversationId,limit:limit});
       }
     } catch (error) {
       console.error(error);
@@ -1302,7 +1287,7 @@ if (container) {
       if (!isEndOfMessages) {
         container.scrollTop = container.scrollHeight * 0.1;
 
-        loadMessages(currentPage, container.dataset.conversationId);
+       foued.loadMessages({page:currentPage,conversationId: container.dataset.conversationId});
       }
     }
   });
@@ -3657,7 +3642,7 @@ export function userConnection(data) {
         `left-conversation-${conv._id}`
 
       );
-      const html = `<span class="text-xs+ font-medium uppercase">Online Experts</span>`;
+      const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_on">${getTranslationValue("left_side.experts_on")}</span>`;
       $("#expert-msg").empty().append(html);
       const statusConv = conversationCard.querySelector("#active-user");
       const isConnected = conv.members.find(
@@ -3713,7 +3698,8 @@ export function getTotalBalance(balance, role) {
     balanceSpinner.classList.add("hidden");
 
     if (balance == null && role === "GUEST") {
-      balanceNumber.textContent = "Free";
+      balanceNumber.dataset.translation = "header.free";
+      balanceNumber.textContent = getTranslationValue("header.free");
     } else {
       balanceNumber.textContent = balance;
       if (balance > 5) {
@@ -3722,7 +3708,7 @@ export function getTotalBalance(balance, role) {
       } else {
         balanceNumber.style.color = "#C70039";
       }
-      if (balance === 0) {
+      if (balance === 0) {  
         // Disable input and button if balance is 0
         messageInput.placeholder =
           "You need to buy a new plan to start chatting again";
@@ -4224,7 +4210,7 @@ async function selectAgent(agentId, agentName, UserID) {
       // Load the first page of messages on page load
       let currentPage = 1;
 
-      loadMessages(currentPage, conversationId, true);
+      foued.loadMessages({page:currentPage,conversationId: conversationId});
     }
   }
 }
@@ -4493,7 +4479,7 @@ $(document).ready(async function () {
   foued.failGuest();
   foued.mergeConversation()
   // foued.displayRobotAvatar();
-
+  foued.getMessages()
   await getExperts();
 
   $(document).on("click", ".conversation-click", handleConversationClick);

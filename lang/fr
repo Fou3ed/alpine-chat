@@ -1,3 +1,108 @@
 {
-    "lastSeen":"Hors ligne","online":"En ligne","maxLength":"Longeur maximale"
+    "general": {
+        "offline": "hors ligne",
+        "online": "en ligne",
+        "agent": "agent",
+        "country": "pays",
+        "languages": "langues",
+        "expertise": "expertise",
+        "robot": "Assistant virtuel"
+    },
+    "header": {
+        "free": "gratuit",
+        "buy_credits": "acheter des crédits",
+        "dark_mode": "mode sombre",
+        "expert_card": "carte d'expert",
+        "profile_id": "identifiant du profil",
+        "guest" : "invité",
+        "lastseen" : "vu récemment"
+    },
+    "left_side": {
+        "all_chats": "tous les chats",
+        "experts": "experts",
+        "experts_off": "tous les experts sont",
+        "experts_on": "experts en ligne",
+        "tab_1": {
+            "search": "rechercher des chats",
+            "sent_form": "l'agent a envoyé un formulaire",
+            "sent_link": "l'agent a envoyé un lien",
+            "sent_plan": "l'agent a envoyé un plan tarifaire"
+        },
+        "tab_2": {
+            "title": "découvrez nos meilleurs experts",
+            "start_chat": "commencer à discuter",
+            "send_mail": "Envoyer un email"
+        }
+    },
+    "container": {
+        "edit" : "modifier",
+        "forward" : "transférer",
+        "pin" : "épingler",
+        "reply" : "répondre",
+        "delete" : "supprimer",
+        "write_message" : "écrivez votre message",
+        "no_credits_message" : "",
+        "length" : "longueur maximale",
+        "send" : "Envoyer votre message",
+        "pinned" : "épinglé",
+        "edited" : "modifié",
+        "forms" : {
+            "required" : "Ce champ est requis.",
+            "valid" : "Veuillez remplir correctement les champs.",
+            "phone" : "Veuillez entrer un numéro valide.",
+            "date" : "Veuillez entrer une date valide (AAAA-MM-JJ).",
+            "email" : "Veuillez entrer une adresse e-mail valide.",
+            "error" : "Une erreur s'est produite lors de la sauvegarde des données du formulaire. Réessayez."
+
+        },
+        "experts_selector" : {
+            "title" : "",
+            "sub_title" : "",
+            "by_robot" : "",
+            "by_robot_btn" : "",
+            "by_client" : "",
+            "by_client_btn" : ""
+        }
+    },
+    "right_side": {
+        "expert_card": "carte d'expert",
+        "contact_info": "informations de contact",
+        "files" : "fichiers",
+        "planning" : "planification",
+        "phone" : "numéro de téléphone",
+        "email" : "e-mail",
+        "website" : "site web",
+        "make_call" : "passer un appel",
+        "send_email" : "envoyer un e-mail",
+        "visit_website" : "visiter le site web"
+    },
+    "modals" : {
+        "click_blocker" : {
+            "title" : "",
+            "content" : "",
+            "button" : ""
+        },
+        "payment_success" : {
+            "title" : "",
+            "content" : "",
+            "button" : ""
+        },
+        "payment_failed" : {
+            "title" : "",
+            "content" : "",
+            "button" : ""
+        },
+        "balance_end" : {
+            "title" : "",
+            "content" : "",
+            "button" : ""
+        },
+        "error" : {
+            "title" : "",
+            "content" : "",
+            "button" : ""
+        }
+    },
+    "days" : ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
+    "months" : ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil","Août", "Sep", "Oct", "Nov", "Déc"]
 }

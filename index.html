@@ -465,7 +465,7 @@
              
             <div>
               <p class="font-medium text-slate-700 line-clamp-1 dark:text-navy-100" id="conversation-name" x-text="activeChat.name"></p>
-              <p class="mt-0.5 text-xs" data-translation="lastSeen">Last seen recently</p>
+              <p class="mt-0.5 text-xs" data-translation="header.lastseen">Last seen recently</p>
             </div>
           </div>
         </div>
@@ -490,7 +490,7 @@
           
           <button @click="$store.global.isRightSidebarExpanded = true"
           id="btnPlansContainer"
-            class="btn bg-gradient-to-r from-sky-400 to-blue-600 font-medium text-white py-1 px-4 mr-4 gradient-text">
+            class="btn bg-gradient-to-r from-sky-400 to-blue-600 font-medium text-white py-1 px-4 mr-4 gradient-text" data-translation="header.buy_credits">
             Buy credits
           </button>
 
@@ -728,7 +728,7 @@
                 </div>
                 <h3 x-text="activeChat.name" class="mt-2 text-lg font-medium text-slate-700 dark:text-navy-100"></h3>
                 <div class="mt-0 mb-2 flex space-x-2">
-                  <h3 class="text-medium font-medium text-slate-600 dark:text-navy-100">
+                  <h3 class="text-medium font-medium text-slate-600 dark:text-navy-100" data-translation="right_side.expert_card" >
                     Expert card
                   </h3>
                 </div>
@@ -772,17 +772,17 @@
                   <div class="tabs-list flex">
                     <button @click="activeTab = 'tabContact'"
                       :class="activeTab === 'tabContact' ? 'border-primary dark:border-accent text-primary dark:text-accent-light' : 'border-transparent hover:text-slate-800 focus:text-slate-800 dark:hover:text-navy-100 dark:focus:text-navy-100'"
-                      class="btn shrink-0 rounded-none border-b-2 px-3 py-2 font-medium">
+                      class="btn shrink-0 rounded-none border-b-2 px-3 py-2 font-medium" data-translation="right_side.contact_info">
                       Contact info
                     </button>
                     <button @click="activeTab = 'tabFiles'"
                       :class="activeTab === 'tabFiles' ? 'border-primary dark:border-accent text-primary dark:text-accent-light' : 'border-transparent hover:text-slate-800 focus:text-slate-800 dark:hover:text-navy-100 dark:focus:text-navy-100'"
-                      class="btn shrink-0 rounded-none border-b-2 px-3 py-2 font-medium">
+                      class="btn shrink-0 rounded-none border-b-2 px-3 py-2 font-medium" data-translation="right_side.files">
                       Files
                     </button>
                     <button @click="activeTab = 'tabPlanning'"
                       :class="activeTab === 'tabPlanning' ? 'border-primary dark:border-accent text-primary dark:text-accent-light' : 'border-transparent hover:text-slate-800 focus:text-slate-800 dark:hover:text-navy-100 dark:focus:text-navy-100'"
-                      class="btn shrink-0 rounded-none border-b-2 px-3 py-2 font-medium">
+                      class="btn shrink-0 rounded-none border-b-2 px-3 py-2 font-medium" data-translation="right_side.planning">
                       Planning
                     </button>
                   </div>
@@ -798,7 +798,7 @@
                             <div>
                               <a href="#"
                                 class="phone font-medium text-slate-600 line-clamp-1 dark:text-navy-100"></a>
-                              <p class="text-xs text-slate-400 dark:text-navy-300">
+                              <p class="text-xs text-slate-400 dark:text-navy-300" data-translation="right_side.phone">
                                 Phone number
                               </p>
                             </div>
@@ -813,7 +813,7 @@
                             <div>
                               <a href="#"
                                 class="email font-medium text-slate-600 line-clamp-1 dark:text-navy-100"></a>
-                              <p class="text-xs text-slate-400 dark:text-navy-300">
+                              <p class="text-xs text-slate-400 dark:text-navy-300" data-translation="right_side.email">
                                 E-mail
                               </p>
                             </div>
@@ -828,7 +828,7 @@
                             <div>
                               <a href="#"
                                 class="website font-medium text-slate-600 line-clamp-1 dark:text-navy-100"></a>
-                              <p class="text-xs text-slate-400 dark:text-navy-300">
+                              <p class="text-xs text-slate-400 dark:text-navy-300" data-translation="right_side.website">
                                 Website
                               </p>
                             </div>

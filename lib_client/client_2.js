@@ -28,7 +28,8 @@ import {
   getAllAgents,
   changeHeaderPicture,
   checkForExpertMessages,
-  mergeConversation
+  mergeConversation,
+  loadMessages
 
 } from "../main.js";
 let messagesContainer = document.getElementById("big-container-message");
@@ -1129,28 +1130,25 @@ failGuest = () => {
 };
 
 
-sendOfflineForm = (data) => {
-  this.socket.emit('sendOfflineForm', data, (error) => {
+
+
+mergeConversation=()=>{
+  this.socket.on('mergeConversation',(data)=>{
+    mergeConversation(data)
+  })
+}
+
+
+loadMessages = (data) => {
+  this.socket.emit('loadMessages', data, (error) => {
     if (error) {
       setError(error)
     }
   })
 }
-
-mergeConversation=()=>{
-  this.socket.on('mergeConversation',(data)=>{
-    console.log("data ::: ",data)
-    mergeConversation(data)
-  })
-}
 getMessages=()=>{
-  this.socket.emit('loadMessages',(data)=>{
-
-  })
-}
-loadMessages=()=>{
   this.socket.on('loadMessages',(data)=>{
-    
+     loadMessages(data)
   })
 }
 

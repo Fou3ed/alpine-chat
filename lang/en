@@ -1,3 +1,108 @@
 {
-    "lastSeen":"Last seen recently","online":"Online","maxLength":"Max length"
+    "general": {
+        "offline": "offline",
+        "online": "online",
+        "agent": "agent",
+        "country": "country",
+        "languages": "languages",
+        "expertise": "expertise",
+        "robot": "Virtual assistant"
+    },
+    "header": {
+        "free": "free",
+        "buy_credits": "buy credits",
+        "dark_mode": "dark mode",
+        "expert_card": "expert card",
+        "profile_id": "profile id",
+        "guest" : "guest",
+        "lastseen" : "last seen"
+    },
+    "left_side": {
+        "all_chats": "all chats",
+        "experts": "experts",
+        "experts_off": "all experts are",
+        "experts_on": "online experts",
+        "tab_1": {
+            "search": "search chats",
+            "sent_form": "agent sent a form",
+            "sent_link": "agent sent a link",
+            "sent_plan": "agent sent a pricing plan"
+        },
+        "tab_2": {
+            "title": "discover our best experts",
+            "start_chat": "start chatting",
+            "send_mail": "Send email"
+        }
+    },
+    "container": {
+        "edit" : "edit",
+        "forward" : "forward",
+        "pin" : "pin",
+        "reply" : "reply",
+        "delete" : "delete",
+        "write_message" : "write your message",
+        "no_credits_message" : "",
+        "length" : "max length",
+        "send" : "Send your message",
+        "pinned" : "pinned",
+        "edited" : "edited",
+        "forms" : {
+            "required" : "This field is required.",
+            "valid" : "Please fill in the fields correctly.",
+            "phone" : "Please enter a valid number.",
+            "date" : "Please enter a valid date (YYYY-MM-DD).",
+            "email" : "Please enter a valid email address.",
+            "error" : "saving form data went wrong,Try again"
+
+        },
+        "experts_selector" : {
+            "title" : "",
+            "sub_title" : "",
+            "by_robot" : "",
+            "by_robot_btn" : "",
+            "by_client" : "",
+            "by_client_btn" : ""
+        }
+    },
+    "right_side": {
+        "expert_card": "expert card",
+        "contact_info": "contact info",
+        "files" : "files",
+        "planning" : "planning",
+        "phone" : "phone number",
+        "email" : "e-mail",
+        "website" : "website",
+        "make_call" : "make a call",
+        "send_email" : "send email",
+        "visit_website" : "visit the website"
+    },
+    "modals" : {
+        "click_blocker" : {
+            "title" : "",
+            "content" : "",
+            "button" : ""
+        },
+        "payment_success" : {
+            "title" : "",
+            "content" : "",
+            "button" : ""
+        },
+        "payment_failed" : {
+            "title" : "",
+            "content" : "",
+            "button" : ""
+        },
+        "balance_end" : {
+            "title" : "",
+            "content" : "",
+            "button" : ""
+        },
+        "error" : {
+            "title" : "",
+            "content" : "",
+            "button" : ""
+        }
+    },
+    "days" : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    "months" : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul","Aug", "Sep", "Oct", "Nov", "Dec"]
 }
