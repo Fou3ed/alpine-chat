@@ -729,7 +729,7 @@ async function selectExpert() {
       const agent = $(this).attr("id");
       const name = $(this).data("name");
       const agentContactId = connectUsers.find((user) => user._id === agent);
-      if (name === "Robot") {
+      if (name === "Robot" || name==="Rosie") {
         getAgentPresentation("0", true);
       } else {
         getAgentPresentation(agentContactId.id, true);
@@ -1078,30 +1078,39 @@ export async function getAllConversations() {
   }
 }
 // this function is a handle click , so whenever the client click on a conversation it call the load messages function where messages should be displayed in the messagesContainer
-function handleConversationClick() {
+async function handleConversationClick() {
   agentClicked = $(this).parent().parent().data("user-id");
   messagesContainer.innerHTML = "";
   expert = agentClicked;
   const conversationActive = document.querySelectorAll(
     "div.conversation-click"
   );
-
-
   document.getElementById("big-container-message").style.display = "block";
   const conversation_id = $(this).data("conversation-id");
   conversationId = conversation_id;
 
   $conversationContainer.attr("data-conversation-id", conversationId);
 
-
-
-
   const name = this.dataset.name;
-  const exist = allConversation.find(
+  let exist = allConversation.find(
     (conversation) => conversation._id === conversationId
   );
+if(!exist  && conversation_id){
+  //get conversation_id  details with member_details
+  const conversationsResponse = await axios.get(
+    `${MY_API_ADDRESS}/conversation/${accountId}/?user_id=${newData.contact}`
+  );
 
-
+  if (conversationsResponse.data.data.length > 0) {
+    const conversations = conversationsResponse.data.data;
+    allConversation = conversations;
+    exist = allConversation.find(
+      (conversation) => conversation._id === conversationId
+    );
+  }
+  
+  
+}
   inputLEngth(exist?.max_length_message);
   conversationActive.forEach((element) => {
     if (element.classList.contains("bg-slate-150"))
@@ -1116,13 +1125,12 @@ function handleConversationClick() {
         if (offline && firstTime && exist.last_message.type !== "form" && (new Date() - new Date(last_seen_at)) / (1000 * 60 * 60) > 1) {
           foued.sendOfflineForm({
             userId: newData.user,
-            accountId: accountId,
+            accountId: accountId, 
             conversationId: conversation_id,
             agentId: memberDetail._id,
             agentName: memberDetail.full_name,
           });
         }
-
         firstTime = false;
         break;
       }
@@ -2421,6 +2429,7 @@ getUserCountry()
 
 
 export async function receiveMessage(data) {
+  console.log("data",data)
   let messageId;
   if (data.messageData.type !== "log") {
     // if (firstConv && firstConv === data.messageData.conversation) {
@@ -4330,6 +4339,32 @@ function showEmptyConversation(show = true) {
   conversationContainer.classList.toggle("has-not-messages", show);
 }
 
+export function mergeConversation(data){
+ 
+  $(
+    `.conversation-click[data-conversation-id="${data.newConversation}"]`
+  ).trigger("click");
+
+
+const leftConversation = document.getElementById("left-conversation");
+
+const divToDelete = leftConversation.querySelector(`[data-conversation-id="${data.deletedConversationId}"]`);
+  
+
+if (divToDelete) {
+  divToDelete.remove();
+} 
+
+const miniSidebar = document.getElementById("mini-sidebar");
+
+const miniDivToDelete = miniSidebar.querySelector(`[data-conversation-id="${data.deletedConversationId}"]`);
+
+if (miniDivToDelete) {
+  miniDivToDelete.remove();
+}
+
+
+}
 
 export function changeHeaderPicture(cnv, agent, status) {
   if (conversationId == cnv) {

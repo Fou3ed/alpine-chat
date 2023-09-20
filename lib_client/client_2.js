@@ -27,7 +27,8 @@ import {
   displayExpert,
   getAllAgents,
   changeHeaderPicture,
-  checkForExpertMessages
+  checkForExpertMessages,
+  mergeConversation
 
 } from "../main.js";
 let messagesContainer = document.getElementById("big-container-message");
@@ -1139,22 +1140,39 @@ sendOfflineForm = (data) => {
 mergeConversation=()=>{
   this.socket.on('mergeConversation',(data)=>{
     console.log("data ::: ",data)
+    mergeConversation(data)
   })
 }
+getMessages=()=>{
+  this.socket.emit('loadMessages',(data)=>{
+
+  })
+}
+loadMessages=()=>{
+  this.socket.on('loadMessages',(data)=>{
+    
+  })
+}
+
 conversationStatusUpdated = () => {
   this.socket.on('conversationStatusUpdated', (conversation, status,str) => {
     if(status=="1"){
       this.socket.emit("joinRoom", conversation._id)
-
     }
     if(str=="robotUpdated"){
       removeExpert("64d0b5dae5965b534fc5997d")
+    }
+    if(status===0){
+      const activeUser = document.getElementById("active-user-header");
+      activeUser.classList.remove("bg-success");
+      activeUser.classList.add("bg-slate-300");
     }
     const fullConversationContainers = document.querySelectorAll(`[data-conversation-id="${conversation._id}"]`)
         //select the given conversation and change it names 
         const agent = conversation.member_details
         .filter((member) => member.role === 'AGENT' || member.role==='BOT')
         .map((agent) => agent);
+      
     fullConversationContainers.forEach((container) => {
       const activeUserDiv = container.querySelector('#active-user');
       activeUserDiv?.classList?.remove('bg-slate-300', 'bg-success');
@@ -1167,11 +1185,12 @@ conversationStatusUpdated = () => {
 
     const minimizedConversationContainer = document.getElementById(`left-mini-conversation-${conversation._id}`);
     if (minimizedConversationContainer) {
-      minimizedConversationContainer.dataset.name = agent[0].full_name;
+      minimizedConversationContainer.dataset.name = agent[0]?.full_name;
       const activeUserDiv = minimizedConversationContainer.querySelector('#active-user');
       activeUserDiv.classList.remove('bg-slate-300', 'bg-success');
       if (status === 0) {
         activeUserDiv?.classList?.add('bg-slate-300');
+        
       } else if (status === 1) {
         activeUserDiv?.classList?.add('bg-success');
       }
@@ -1185,20 +1204,17 @@ if (leftConversation) {
     const imgElement = miniConversationDiv.querySelector('img');
     
     if (imgElement) {
-      imgElement.src = `images/avatar/avatar-${agent[0].id}.jpg`;
+      imgElement.src = `images/avatar/avatar-${agent[0]?.id}.jpg`;
     }
   }
   
 const imgElement = document.querySelector(`#left-conversation-${conversation._id} img`);
 if (imgElement) {
-  imgElement.src = `images/avatar/avatar-${agent[0].id}.jpg`;
+  imgElement.src = `images/avatar/avatar-${agent[0]?.id}.jpg`;
 }
 
 
 changeHeaderPicture(conversation._id,agent[0],status)
-
-
-
 
   leftConversation.setAttribute('data-name', agent[0].full_name);
   leftConversation.querySelector('[data-conversation-name]').textContent=agent[0].full_name
@@ -1211,7 +1227,4 @@ if(!document.querySelector(`.conversation-click[data-conversation-id] [data-conv
 }
   });
 };
-
-
-
 }
