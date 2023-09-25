@@ -29,13 +29,20 @@ import {
   changeHeaderPicture,
   checkForExpertMessages,
   mergeConversation,
-  loadMessages
+  loadMessages,
+  selectAgent,
+  displayAgents,
+  connectUsers,
+  onCheckConversation,
+  
+  
 
 } from "../main.js";
 let messagesContainer = document.getElementById("big-container-message");
 export let last_seen_at;
 import { socketAddress } from "../env.js";
 export let role = ""
+
 export default class event {
 
  constructor(){
@@ -141,22 +148,31 @@ export default class event {
     this.socket.on("user-connection", (user) => {
         if (user?.role === "AGENT") {
           displayExpert(user)
+          console.log("user",user)
+          if(connectUsers){
+            connectUsers.push(user)
+
+          }
         }
         userConnection(user)
     })
   }
-
   onDisconnected = () => {
-    this.socket.on("onDisconnected", (reason,user) => {
-      if(user?.role==="AGENT"){
-         removeExpert(user._id)
-      }
-      checkForExpertMessages()
-      userDisconnection(user)
-    })
-  }
+    this.socket.on("onDisconnected", (reason, user) => {
+      console.log(connectUsers);
   
+      if (user?.role === "AGENT") {
+        removeExpert(user._id);
+          if(connectUsers){
+            connectUsers = connectUsers.filter((connectedUser) => connectedUser._id !== user._id);
 
+          }
+      }
+      checkForExpertMessages();
+      userDisconnection(user);
+    });
+  };
+  
 
   /**
    * on disconnect
@@ -576,16 +592,15 @@ const number = match ? match[1] : null;
     const leftConversationContainer = document.getElementById('left-conversation');
     await this.socket.on('onMessageReceived', async (data, error) => {
       const minimizedSideBar = document.getElementById("mini-sidebar");
-
       const msgDiv = document.getElementById(`left-conversation-${data.messageData.conversation}`);
       const msgDivMini = document.getElementById(`left-mini-conversation-${data.messageData.conversation}`);
 
       if (msgDiv) {
         const msgText = msgDiv.querySelector("p#last-message")
-          msgText.textContent = data.messageData.type === "plan" ? data.senderName + " sent a plan" : data.messageData.type === "form" ? data.senderName + " sent a form" : data.messageData.type === "link" ? data.senderName + " sent a link" : data.messageData.content
-        leftConversationContainer.insertBefore(msgDiv, leftConversationContainer.firstChild)
-        leftConversationContainer.insertBefore(msgDiv, leftConversationContainer.firstChild)
+          msgText.textContent = data.messageData.type === "plan" ? data.senderName + " sent a plan" : data.messageData.type === "form" ? data.senderName + " sent a form" : data.messageData.type === "link" ? data.senderName + " sent a link" :  data.messageData.type ==="bloc" ?  "suggestion bloc" : data.messageData.content
 
+        leftConversationContainer.insertBefore(msgDiv, leftConversationContainer.firstChild)
+        // leftConversationContainer.insertBefore(msgDiv, leftConversationContainer.firstChild)
       }
     
     if (msgDivMini) {
@@ -1047,13 +1062,17 @@ const number = match ? match[1] : null;
   }
 
     savedFormData = () => {
-    this.socket.on('formSaved', (bool,userDetails) => {
+    this.socket.on('formSaved', (bool,userDetails,dataForm) => {
       if (bool) {
         const usernameLink = document.getElementById("userName");
         if (usernameLink) {
           usernameLink.textContent = userDetails?.full_name;
         }
-        submitFormStatus("1");
+
+        const parsedData = JSON.parse(dataForm);
+
+
+        submitFormStatus("1",parsedData.form.text_capture);
       } else {
         submitFormStatus();
       }
@@ -1093,6 +1112,16 @@ const number = match ? match[1] : null;
     })
   }
 
+  displayAgents=(accountId)=>{
+    this.socket.emit('displayAgents',accountId,(error)=>{
+
+    })
+  }
+  displayAgentsMessage=()=>{
+    this.socket.on('displayAgents',(data,error)=>{
+      displayAgents(data)
+    })
+  }
 // The failGuest function
 failGuest = () => {
   const modalOverlay = document.createElement('div');
@@ -1146,6 +1175,50 @@ loadMessages = (data) => {
     }
   })
 }
+
+availableAgent = (data) => {
+  this.socket.emit('availableAgent', data, (error) => {
+    if (error) {
+      setError(error)
+    }
+  })
+}
+getAvailableAgent=()=>{
+  this.socket.on('availableAgent',(data,conversationId)=>{
+     selectAgent(
+      data._id,
+      data.full_name,
+      data.id
+    );
+    if(conversationId){
+      removeExpert("64d0b5dae5965b534fc5997d")
+    }
+    const leftConversation = document.querySelector(`.conversation-click[data-conversation-id="${conversationId}"]`);
+    const miniConversation = document.querySelector(`.mini-conversation-click[data-conversation-id="${conversationId}"]`);
+
+    if(leftConversation){
+      leftConversation.remove()
+    }
+    if(miniConversation){
+      miniConversation.remove()
+    }
+    
+  })
+}
+
+checkConversation = (data) => {
+  this.socket.emit('checkConversation', data, (error) => {
+    if (error) {
+      setError(error)
+    }
+  })
+}
+onCheckConversation=()=>{
+  this.socket.on('checkConversation',(data,agentContactId,agentName)=>{
+   onCheckConversation(data,agentContactId,agentName)
+  })
+}
+
 getMessages=()=>{
   this.socket.on('loadMessages',(data)=>{
      loadMessages(data)

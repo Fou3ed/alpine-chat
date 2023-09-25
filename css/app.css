@@ -645,8 +645,8 @@ emoji-picker {
 
 #conversation-spinner {
   display: inline-block;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   border: 3px solid rgba(255, 255, 255, 0.3);
   border-top-color: #9F91CC;
   border-radius: 50%;

@@ -3,7 +3,7 @@ const foued = new Event();
 import { role, last_seen_at } from "./lib_client/client_2.js";
 const currentDate = new Date();
 let allConversation = [];
-let connectUsers = [];
+export let connectUsers = [];
 let agentClicked = "";
 let PhoneNumberValidation = false;
 let userCountry;
@@ -31,9 +31,10 @@ function getCookie(name) {
 }
 
 let traduction = {};
-function getTranslationValue (key) {
+function getTranslationValue(key) {
   return eval(`traduction.${key}`) ?? key;
 }
+
 function traduc() {
   document.querySelectorAll("[data-translation]").forEach((element) => {
     element.textContent = getTranslationValue(element.dataset.translation);
@@ -148,7 +149,6 @@ conversationContainer.addEventListener("click", (event) => {
         showValidationError(input, "Please enter a valid email address.");
         break;
       }
-
 
       if (input.type === "tel" && !PhoneNumberValidation) {
         isValid = false;
@@ -443,7 +443,10 @@ function showValidationError(inputElement, message) {
 
   // Check if an error message is already displayed and remove it if so
   inputElement.closest("label").querySelector(".error-message")?.remove();
-  if (inputElement.classList.contains("phoneInput") && inputElement.closest(".iti")) {
+  if (
+    inputElement.classList.contains("phoneInput") &&
+    inputElement.closest(".iti")
+  ) {
     inputElement.closest(".iti").after(errorMessageElement);
   } else {
     inputElement.after(errorMessageElement);
@@ -456,24 +459,27 @@ document.addEventListener("input", (event) => {
     const inputElement = event.target;
     inputElement.classList.remove("invalid-input");
     inputElement.closest("label")?.querySelector(".error-message")?.remove();
-
   }
 });
 
 const msgButt = (messageId, direction, isPinned) => {
-  return `<div id="message-options" x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex "><button x-ref="popperRef" @click="isShowPopper = !isShowPopper" class="msg-butt-container btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"><i class="fas fa-ellipsis-h" style="font-size: 18px"></i></button><div x-ref="popperRoot" class="popper-root" :class="isShowPopper &amp;&amp; 'show'" style="position: fixed; inset: 0px 0px auto auto; margin: 0px; transform: translate(-594px, 231px);" data-popper-placement="bottom-end"><div  class="popper-box  rounded-md border border-slate-150 bg-white py-1.5 font-inter dark:border-navy-500 dark:bg-navy-700"><ul>${direction === "justify-start"
-    ? ""
-    : `<li><a href="#" data-message-id="${messageId}" id="edit-message" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Edit</a></li>`
-    }<li><a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Forward</a></li><li><a href="#" id="${isPinned ? "unpin-message" : "pin-message"
-    }" data-message-id="${messageId}" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">${isPinned ? "Unpin" : "Pin"
-    }</a>
-  </li><li><a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Reply</a></li></ul>${direction === "justify-start"
+  return `<div id="message-options" x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex "><button x-ref="popperRef" @click="isShowPopper = !isShowPopper" class="msg-butt-container btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"><i class="fas fa-ellipsis-h" style="font-size: 18px"></i></button><div x-ref="popperRoot" class="popper-root" :class="isShowPopper &amp;&amp; 'show'" style="position: fixed; inset: 0px 0px auto auto; margin: 0px; transform: translate(-594px, 231px);" data-popper-placement="bottom-end"><div  class="popper-box  rounded-md border border-slate-150 bg-white py-1.5 font-inter dark:border-navy-500 dark:bg-navy-700"><ul>${
+    direction === "justify-start"
+      ? ""
+      : `<li><a href="#" data-message-id="${messageId}" id="edit-message" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Edit</a></li>`
+  }<li><a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Forward</a></li><li><a href="#" id="${
+    isPinned ? "unpin-message" : "pin-message"
+  }" data-message-id="${messageId}" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">${
+    isPinned ? "Unpin" : "Pin"
+  }</a>
+  </li><li><a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Reply</a></li></ul>${
+    direction === "justify-start"
       ? ""
       : `<div class="my-1 h-px bg-slate-150 dark:bg-navy-500"></div><ul><li><a  data-message-id="${messageId}" id="delete-message" href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Delete</a></li></ul>`
-    }</div></div></div><div id="message-options" x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex"><button x-ref="popperRef" @click="isShowPopper = !isShowPopper" class="react-butt-container btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"><i class="fas fa-smile" style="font-size: 18px"></i></button><div x-ref="popperRoot" class="popper-root" :class="isShowPopper &amp;&amp; 'show'" style="position: fixed; inset: 0px 0px auto auto; margin: 0px; transform: translate(-594px, 231px);" data-popper-placement="bottom-end"><div  data-message-id="${messageId}" class="popper-box rounded-md border border-slate-150 bg-white py-1.5 font-inter dark:border-navy-500 dark:bg-navy-700"><ul class="flex-row flex"><li><a id="react-message" href="#" class="flex h-8 items-center px-3 pr-3 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100 ">👍</a>
+  }</div></div></div><div id="message-options" x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex"><button x-ref="popperRef" @click="isShowPopper = !isShowPopper" class="react-butt-container btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"><i class="fas fa-smile" style="font-size: 18px"></i></button><div x-ref="popperRoot" class="popper-root" :class="isShowPopper &amp;&amp; 'show'" style="position: fixed; inset: 0px 0px auto auto; margin: 0px; transform: translate(-594px, 231px);" data-popper-placement="bottom-end"><div  data-message-id="${messageId}" class="popper-box rounded-md border border-slate-150 bg-white py-1.5 font-inter dark:border-navy-500 dark:bg-navy-700"><ul class="flex-row flex"><li><a id="react-message" href="#" class="flex h-8 items-center px-3 pr-3 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100 ">👍</a>
   </li><li><a id="react-message" href="#" class="flex h-8 items-center px-3 pr-3 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">😂 </a></li><li><a id="react-message" href="#" class="flex h-8 items-center px-3 pr-3 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">😮</a></li><li><a id="react-message" href="#" class="flex h-8 items-center px-3 pr-3 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">😡</a></li><li><a id="react-message" href="#" class="flex h-8 items-center px-3 pr-3 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">❤️</a></li></ul></div></div></div>`;
 };
-window.connected = () => { };
+window.connected = () => {};
 
 // Global variables
 let userId = newData?.user;
@@ -482,7 +488,6 @@ let senderName;
 let expert;
 let notifyNumber = 0;
 let userBalance;
-
 
 // Disable the send message button if it's empty.
 if (messageInput)
@@ -503,9 +508,8 @@ export async function guestCreated(data) {
     accountId: data.accountId,
     status: 0,
     ...(data.goccContactId && { goccContactId: data.goccContactId }),
-    ...(data.goccLeadId && { goccLeadId: data.goccLeadId })
-  }
-
+    ...(data.goccLeadId && { goccLeadId: data.goccLeadId }),
+  };
 
   newData = newUser;
   document.cookie =
@@ -526,18 +530,22 @@ export async function guestCreated(data) {
   //   redirectToAgent(expert);
   // }
   const html = `
-  <div class="conversationItem conversation bg-slate-150" data-conversation-id="${data.conversationId
-    }" data-name=${data.senderName
-    } data-timestamp=${timeString} id="left-conversation-${data.conversationId
-    }" data-user-id="${data.availableAgent}">
+  <div class="conversationItem conversation bg-slate-150" data-conversation-id="${
+    data.conversationId
+  }" data-name=${
+    data.senderName
+  } data-timestamp=${timeString} id="left-conversation-${
+    data.conversationId
+  }" data-user-id="${data.availableAgent}">
     <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
       <div
         class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
         data-conversation-id="${data.conversationId}"
         data-name=${data.senderName}>
         <div class="avatar h-10 w-10">
-          <img class="rounded-full" src=images/avatar/avatar-${data.user.id
-    }.jpg alt="avatar" />
+          <img class="rounded-full" src=images/avatar/avatar-${
+            data.user.id
+          }.jpg alt="avatar" />
           <div
           id="active-user"
             class="absolute right-0 h-3 w-3 rounded-full border-2 border-white bg-success dark:border-navy-700">
@@ -545,8 +553,9 @@ export async function guestCreated(data) {
         </div>
         <div class="flex flex-1 flex-col">
           <div class="flex items-baseline justify-between space-x-1.5">
-            <p  ${data.role === "BOT" ? "data-robot" : ""
-    } data-conversation-name class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
+            <p  ${
+              data.role === "BOT" ? "data-robot" : ""
+            } data-conversation-name class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
             ${data.senderName}
             </p>
             <span class="text-tiny+ text-slate-400 dark:text-navy-300">${timeString}</span>
@@ -646,7 +655,6 @@ export async function guestCreated(data) {
     newConvDiv,
     leftConversationContainer.firstChild
   );
-
 }
 
 /**
@@ -663,7 +671,9 @@ export async function getExperts() {
     connectUsers = response.data.data;
 
     if (response.data.data.length > 0 && !expertAppended) {
-      const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_on">${getTranslationValue("left_side.experts_on")}</span>`;
+      const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_on">${getTranslationValue(
+        "left_side.experts_on"
+      )}</span>`;
       $("#expert-msg").empty().append(html);
       expertAppended = true;
     } else {
@@ -680,9 +690,13 @@ export async function getExperts() {
 export function checkForExpertMessages() {
   const swiper = document.querySelector(".swiper");
   const swiperWrapper = swiper.querySelector(".swiper-wrapper");
-  const divsInsideSwiper = Array.from(swiperWrapper.querySelectorAll("div.swiper-slide"));
+  const divsInsideSwiper = Array.from(
+    swiperWrapper.querySelectorAll("div.swiper-slide")
+  );
   if (divsInsideSwiper.length > 0) {
-    const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_on">${getTranslationValue("left_side.experts_on")}</span>`;
+    const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_on">${getTranslationValue(
+      "left_side.experts_on"
+    )}</span>`;
     $("#expert-msg").empty().append(html);
   } else {
     const html = `<span class="text-xs+ font-medium uppercase">All Experts are offline </span>`;
@@ -732,7 +746,7 @@ async function selectExpert() {
       const agent = $(this).attr("id");
       const name = $(this).data("name");
       const agentContactId = connectUsers.find((user) => user._id === agent);
-      if (name === "Robot" || name==="Rosie") {
+      if (name === "Robot" || name === "Rosie") {
         getAgentPresentation("0", true);
       } else {
         getAgentPresentation(agentContactId.id, true);
@@ -743,9 +757,14 @@ async function selectExpert() {
       const $conversationContainer = $("#conversation-container");
       // Check if they both have conversation, if yes, just handle click to left conversation
       if (userId) {
-        const response = await axios.get(
-          `https://foued.local.itwise.pro/socket_api/conversation/?user1=${userId}&user2=${agent}`
-        );
+        // const response = await axios.get(
+        //   `https://foued.local.itwise.pro/socket_api/conversation/?user1=${userId}&user2=${agent}`
+        // );
+        foued.checkConversation({
+          userId: userId,
+          agentId: agent,
+          accountId: newData.accountId,
+        });
         conversationHeaderStatus.dataset.translation = connectUsers.find(
           (user) => user._id === agent
         )
@@ -757,42 +776,46 @@ async function selectExpert() {
         const activeUser = document.getElementById("active-user-header");
         activeUser.classList.remove("bg-slate-300");
         activeUser.classList.add("bg-success");
-        if (!response.data.data) {
-          conversationId = "";
-          messagesContainer.innerHTML = "";
+        // if (!response.data.data) {
+        //   conversationId = "";
+        //   messagesContainer.innerHTML = "";
 
-          let activeChat = {
-            chatId: conversationId,
-            name: name,
-            avatar_url: `images/avatar/avatar-${agentContactId.id}` + ".jpg",
-          };
-          window.dispatchEvent(
-            new CustomEvent("change-active-chat", {
-              detail: activeChat,
-            })
-          );
+        //   let activeChat = {
+        //     chatId: conversationId,
+        //     name: name,
+        //     avatar_url: `images/avatar/avatar-${agentContactId.id}` + ".jpg",
+        //   };
+        //   window.dispatchEvent(
+        //     new CustomEvent("change-active-chat", {
+        //       detail: activeChat,
+        //     })
+        //   );
 
-          $conversationContainer.attr("data-conversation-id", null);
-        } else {
-          conversationId = !response.data.data.conversation
-            ? response.data.data[0]._id
-            : response.data.data.conversation[0]._id;
-          // Update the active chat with the conversation data
-          window.dispatchEvent(
-            new CustomEvent("change-active-chat", {
-              detail: {
-                chatId: conversationId,
-                name: name,
-                avatar_url: `images/avatar/avatar-${agentContactId.id}` + ".jpg",
-              },
-            })
-          );
-          expert = agent;
-          $conversationContainer.attr("data-conversation-id", conversationId);
-          // Load the first page of messages on page load
-          let currentPage = 1;
-          foued.loadMessages({page:currentPage, conversationId:conversationId});
-        }
+        //   $conversationContainer.attr("data-conversation-id", null);
+        // } else {
+        //   conversationId = !response.data.data.conversation
+        //     ? response.data.data[0]._id
+        //     : response.data.data.conversation[0]._id;
+        //   // Update the active chat with the conversation data
+        //   window.dispatchEvent(
+        //     new CustomEvent("change-active-chat", {
+        //       detail: {
+        //         chatId: conversationId,
+        //         name: name,
+        //         avatar_url:
+        //           `images/avatar/avatar-${agentContactId.id}` + ".jpg",
+        //       },
+        //     })
+        //   );
+        //   expert = agent;
+        //   $conversationContainer.attr("data-conversation-id", conversationId);
+        //   // Load the first page of messages on page load
+        //   let currentPage = 1;
+        //   foued.loadMessages({
+        //     page: currentPage,
+        //     conversationId: conversationId,
+        //   });
+        // }
       }
     } else {
       const modalDiv = document.createElement("div");
@@ -902,7 +925,9 @@ export async function getAllConversations() {
           .filter((member) => member.role === "AGENT" || member.role === "BOT")
           .map((agent) => agent.full_name);
 
-        const bot = conversation.member_details.filter((member) => member.role === "BOT").map((robot => robot))
+        const bot = conversation.member_details
+          .filter((member) => member.role === "BOT")
+          .map((robot) => robot);
 
         if (bot[0]) {
           const agentDisco = document.getElementById(bot[0]._id);
@@ -971,28 +996,31 @@ export async function getAllConversations() {
             break;
         }
         const html = `
-      <div class="conversationItem  conversation ${index === 0 ? "active" : ""
-          }" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${agentFullNames}" data-timestamp="${timestamp}" id="left-conversation-${conversationId}">
+      <div class="conversationItem  conversation ${
+        index === 0 ? "active" : ""
+      }" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${agentFullNames}" data-timestamp="${timestamp}" id="left-conversation-${conversationId}">
       <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
         <div class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600" 
         data-conversation-id="${conversationId}" data-name="${agentFullNames}">
           <div class="avatar h-10 w-10">
             <img class="rounded-full" src=images/avatar/avatar-${conversation.member_details
-            .filter(
-              (member) => member.role === "AGENT" || member.role === "BOT"
-            )
-            .map((agent) => agent.id)}.jpg alt="avatar" />
-            <div id="active-user" class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${conversation.status == "1" ? "bg-success" : "bg-slate-300"
-          } dark:border-navy-700"></div>
+              .filter(
+                (member) => member.role === "AGENT" || member.role === "BOT"
+              )
+              .map((agent) => agent.id)}.jpg alt="avatar" />
+            <div id="active-user" class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${
+              conversation.status == "1" ? "bg-success" : "bg-slate-300"
+            } dark:border-navy-700"></div>
           </div>
           <div class="flex flex-1 flex-col">
             <div class="flex items-baseline justify-between space-x-1.5">
-              <p ${conversation.member_details.find(
-            (member) => member.role === "BOT"
-          )
-            ? "data-robot"
-            : ""
-          } data-conversation-name class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
+              <p ${
+                conversation.member_details.find(
+                  (member) => member.role === "BOT"
+                )
+                  ? "data-robot"
+                  : ""
+              } data-conversation-name class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
                 ${agentFullNames}
               </p>
               <span class="text-tiny+ text-slate-400 dark:text-navy-300">${time}</span>
@@ -1023,16 +1051,17 @@ export async function getAllConversations() {
             </div>
             <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftMsg">
   <p class="text-xs+ text-slate-400 dark:text-navy-300" id="last-message">
-    ${conversation.last_message?.status === 0
-            ? conversation.last_message?.user === userId
-              ? "You deleted a message"
-              : conversation.member_details.find(
-                (member) => member._id === conversation.last_message.user
-              ).full_name + " deleted a message"
-            : conversation.last_message?.user === newData.user
-              ? "Me: " + truncateMessage(msg, 20)
-              : truncateMessage(msg, 20)
-          }
+    ${
+      conversation.last_message?.status === 0
+        ? conversation.last_message?.user === userId
+          ? "You deleted a message"
+          : conversation.member_details.find(
+              (member) => member._id === conversation.last_message.user
+            ).full_name + " deleted a message"
+        : conversation.last_message?.user === newData.user
+        ? "Me: " + truncateMessage(msg, 20)
+        : truncateMessage(msg, 20)
+    }
   </p>
 </div>
           </div>
@@ -1044,17 +1073,19 @@ export async function getAllConversations() {
 `;
 
         const minimizedHtmlSideBar = `
-<div class="mini-conversation-click flex cursor-pointer items-center justify-center py-2.5 hover:bg-slate-150 dark:hover:bg-navy-600 conversation ${index === 0 ? "active" : ""
-          }" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${agentFullNames}" data-timestamp="${timestamp}" id="left-mini-conversation-${conversationId}">
+<div class="mini-conversation-click flex cursor-pointer items-center justify-center py-2.5 hover:bg-slate-150 dark:hover:bg-navy-600 conversation ${
+          index === 0 ? "active" : ""
+        }" data-conversation-id="${conversationId}" data-user-id="${userConversation}" data-name="${agentFullNames}" data-timestamp="${timestamp}" id="left-mini-conversation-${conversationId}">
                 <div class=" avatar h-10 w-10" >
                   <img class="rounded-full"src=images/avatar/avatar-${conversation.member_details
-            .filter(
-              (member) =>
-                member.role === "AGENT" || member.role === "BOT"
-            )
-            .map((agent) => agent.id)}.jpg  alt="avatar">
-                  <div id="active-user" class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${conversation.status == 1 ? "bg-success" : "bg-slate-300"
-          }  dark:border-navy-700"></div>
+                    .filter(
+                      (member) =>
+                        member.role === "AGENT" || member.role === "BOT"
+                    )
+                    .map((agent) => agent.id)}.jpg  alt="avatar">
+                  <div id="active-user" class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${
+                    conversation.status == 1 ? "bg-success" : "bg-slate-300"
+                  }  dark:border-navy-700"></div>
                 </div>
               </div>
 `;
@@ -1083,11 +1114,13 @@ export async function getAllConversations() {
 // this function is a handle click , so whenever the client click on a conversation it call the load messages function where messages should be displayed in the messagesContainer
 async function handleConversationClick() {
   agentClicked = $(this).parent().parent().data("user-id");
+
   messagesContainer.innerHTML = "";
   expert = agentClicked;
   const conversationActive = document.querySelectorAll(
     "div.conversation-click"
   );
+
   document.getElementById("big-container-message").style.display = "block";
   const conversation_id = $(this).data("conversation-id");
   conversationId = conversation_id;
@@ -1098,48 +1131,47 @@ async function handleConversationClick() {
   let exist = allConversation.find(
     (conversation) => conversation._id === conversationId
   );
-if(!exist  && conversation_id){
-  //get conversation_id  details with member_details
-  const conversationsResponse = await axios.get(
-    `${MY_API_ADDRESS}/conversation/${accountId}/?user_id=${newData.contact}`
-  );
-
-  if (conversationsResponse.data.data.length > 0) {
-    const conversations = conversationsResponse.data.data;
-    allConversation = conversations;
-    exist = allConversation.find(
-      (conversation) => conversation._id === conversationId
+  if (!exist && conversation_id) {
+    //get conversation_id  details with member_details
+    const conversationsResponse = await axios.get(
+      `${MY_API_ADDRESS}/conversation/${accountId}/?user_id=${newData.contact}`
     );
+
+    if (conversationsResponse.data.data.length > 0) {
+      const conversations = conversationsResponse.data.data;
+      allConversation = conversations;
+      exist = allConversation.find(
+        (conversation) => conversation._id === conversationId
+      );
+    }
   }
-  
-  
-}
   inputLEngth(exist?.max_length_message);
   conversationActive.forEach((element) => {
     if (element.classList.contains("bg-slate-150"))
       element.classList.remove("bg-slate-150");
   });
+  
   $(this).addClass("bg-slate-150");
-  let agentContactId = null;
-
-
+  let agentContactId = exist.member_details
+  .filter((member) => member.role === "AGENT" || member.role === "BOT")
+  .map((agent) => agent.id);
   if (exist?.status == 1) {
-
-
     conversationHeaderStatus.dataset.translation = "general.online";
-    conversationHeaderStatus.textContent = getTranslationValue("general.online");
+    conversationHeaderStatus.textContent =
+      getTranslationValue("general.online");
 
     const activeUser = document.getElementById("active-user-header");
     activeUser.classList.remove("bg-slate-300");
     activeUser.classList.add("bg-success");
-    getAgentPresentation(agentContactId, true);
+    getAgentPresentation(agentContactId[0], true);
   } else {
     conversationHeaderStatus.dataset.translation = "header.lastseen";
-    conversationHeaderStatus.textContent = getTranslationValue("header.lastseen");
+    conversationHeaderStatus.textContent =
+      getTranslationValue("header.lastseen");
 
     const activeUser = document.getElementById("active-user-header");
     activeUser.classList.remove("bg-success");
-    getAgentPresentation(agentContactId, false);
+    getAgentPresentation(agentContactId[0], false);
   }
   // Set the conversation ID as an attribute of the conversation container element
   const conversationName = document.getElementById("conversation-name");
@@ -1148,7 +1180,7 @@ if(!exist  && conversation_id){
   // Load the first page of messages on page load
   let currentPage = 1;
 
-  foued.loadMessages({page:currentPage,conversationId:conversationId});
+  foued.loadMessages({ page: currentPage, conversationId: conversationId });
   // Update the active chat with the conversation data
 
   let activeChat = {
@@ -1156,9 +1188,7 @@ if(!exist  && conversation_id){
     name: name,
     avatar_url:
       "images/avatar/avatar-" +
-      exist.member_details
-        .filter((member) => member.role === "AGENT" || member.role === "BOT")
-        .map((agent) => agent.id) +
+      agentContactId[0] +
       ".jpg",
   };
 
@@ -1180,16 +1210,21 @@ function inputLEngth(conversationMaxMsg) {
     messageInput.addEventListener("input", function () {
       document.getElementById(
         "max-length-value"
-      ).textContent = ` ${conversationMaxMsg} | ${conversationMaxMsg - this?.value.length
+      ).textContent = ` ${conversationMaxMsg} | ${
+        conversationMaxMsg - this?.value.length
       }`;
     });
   }
 }
 function resetMaxLength(initialMaxLength) {
-  messageInput.setAttribute("maxlength", initialMaxLength);
-  document.getElementById("max-length-value").textContent = ` ${initialMaxLength}`;
-}
+  onStopTyping();
 
+  messageInput.setAttribute("maxlength", initialMaxLength);
+  document.getElementById(
+    "max-length-value"
+  ).textContent = ` ${initialMaxLength}`;
+
+}
 
 async function getTheLastMsg(conversationId) {
   return axios
@@ -1236,20 +1271,13 @@ let isEndOfMessages = false; // Track if all messages have been loaded
 const spinner = document.getElementById("conversation-spinner");
 const limit = 10;
 export async function loadMessages(response) {
-  console.log("data",response.data.currentPage)
   // Show the big container message
   document.getElementById("big-container-message").style.display = "block";
 
   if (conversationId) {
     try {
-      isLoading = true;
-      // Show the spinner
-      spinner.classList.remove("hidden");
-      // Load messages from the server
-      // const response = await axios.get(
-      //   `${MY_API_ADDRESS}/messages/conv/${conversationId}?page=${1}&limit=${limit}`
-      // );
-        console.log("response ",response.data.totalPages)
+
+
       if (response.message !== "success") {
         throw new Error("Failed to load messages");
       }
@@ -1257,13 +1285,27 @@ export async function loadMessages(response) {
       if (response.data.currentPage == 1) {
         // conversationContainer.scrollTop = conversationContainer.scrollHeight;
         conversationContainer.scrollTo(0, conversationContainer.scrollHeight);
+        spinner.classList.remove("hidden");
+        spinner.style.width = "48px"; 
+        spinner.style.height = "48px";
+      
+      }else {
+      console.log("spinner",spinner)
+      spinner.classList.remove("hidden");
       }
-      if (response.data.currentPage === response.data.totalPages) {
+      if (
+        response.data.currentPage === response.data.totalPages ||
+        response.data.currentPage > response.data.totalPages
+      ) {
         // All messages have been loaded
         isEndOfMessages = true;
       }
       if (conversationContainer.scrollTop === 0 && !isEndOfMessages) {
-        foued.loadMessages({page:response.data.currentPage + 1, conversationId:conversationId,limit:limit});
+        foued.loadMessages({
+          page: response.data.currentPage + 1,
+          conversationId: conversationId,
+          limit: limit,
+        });
       }
     } catch (error) {
       console.error(error);
@@ -1287,7 +1329,10 @@ if (container) {
       if (!isEndOfMessages) {
         container.scrollTop = container.scrollHeight * 0.1;
 
-       foued.loadMessages({page:currentPage,conversationId: container.dataset.conversationId});
+        foued.loadMessages({
+          page: currentPage,
+          conversationId: container.dataset.conversationId,
+        });
       }
     }
   });
@@ -1299,7 +1344,7 @@ function submitForm(element) {
   formElement = element;
   let messageContent = element.closest('[id^="message-content-"]');
   let messageId = messageContent?.id?.replace("message-content-", "");
-  const form = JSON.parse(element.dataset.content);
+  const form = JSON.parse(element._form_data);
   let forms = [];
   const formContact = element.closest("form");
   const formContent = formContact.parentNode;
@@ -1307,7 +1352,7 @@ function submitForm(element) {
   const formInputs = formContact.querySelectorAll("input, select,textarea");
   const successMessage = formContact.querySelector("#text_capture");
 
-  element.innerHTML = `<div class="d-flex"><span class="loader2"></span></div>`;
+  element.innerHTML = `<div class="d-flex align-items-center" style="height: 20px;" ><span class="loader2"></span></div>`;
 
   for (let i = 0; i < formInputs.length; i++) {
     forms = [
@@ -1319,19 +1364,20 @@ function submitForm(element) {
     ];
   }
 
-
-  forms = [...formContact.querySelectorAll("input, select,textarea")].map((field) => {
-    let formField = form.fields.find(
-      (fField) => fField.field_id == field.dataset.fieldId
-    );
-    if (formField) {
-      formField.field_value = field.value;
+  forms = [...formContact.querySelectorAll("input, select,textarea")].map(
+    (field) => {
+      let formField = form.fields.find(
+        (fField) => fField.field_id == field.dataset.fieldId
+      );
+      if (formField) {
+        formField.field_value = field.value;
+      }
+      return {
+        fieldId: field.dataset.fieldId,
+        value: field.value,
+      };
     }
-    return {
-      fieldId: field.dataset.fieldId,
-      value: field.value,
-    };
-  });
+  );
 
   form.fields = form.fields.map((field) => {
     let fieldValue = forms.find((fild) => fild.fieldId == field.field_id);
@@ -1392,12 +1438,11 @@ function compareFields(a, b) {
 }
 
 function displayMessages(messages) {
-
   document.getElementById("big-container-message").style.display = "block";
   if (!messages || !messages.messages) {
     return;
   }
-  showEmptyConversation(false)
+  showEmptyConversation(false);
 
   // Loop through the messages
   const convMessages = messages.messages.slice();
@@ -1433,20 +1478,22 @@ function displayMessages(messages) {
         if (currentMonth === messageMonth && currentDay - messageDay <= 7) {
           time = `${dayOfWeek}, ${hour}:${minute}`;
         } else {
-          const formattedDate = `${messageDay}/${messageMonth + 1
-            }/${messageYear}`;
+          const formattedDate = `${messageDay}/${
+            messageMonth + 1
+          }/${messageYear}`;
           time = `${formattedDate}, ${hour}:${minute}`;
         }
       } else {
-        const formattedDate = `${messageDay}/${messageMonth + 1
-          }/${messageYear}`;
+        const formattedDate = `${messageDay}/${
+          messageMonth + 1
+        }/${messageYear}`;
         time = `${formattedDate}, ${hour}:${minute}`;
       }
     }
     const myContent =
       message.type === "plan" ||
-        message.type === "form" ||
-        message.type === "link"
+      message.type === "form" ||
+      message.type === "link"
         ? JSON.parse(message.message)
         : {};
     if (!messageContainer) {
@@ -1478,13 +1525,66 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
 </div>  
           `;
         });
+      } else if (message.type === "bloc") {
+        const messageDiv = document.createElement("div");
+        messageDiv.innerHTML = `<div class="flex flex-col items-start space-y-3.5">
+        <div class="mr-1">
+            <div class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100">
+                <div class="space-y-3.5">
+                    <div class="ml-2 sm:ml-5">
+                        <div id="message-content-${messageId}">
+                            <div class="ml-2 sm:ml-5">
+                                <div class="sm:mr-10">
+                                    <div class="pt-2">
+                                        <p>Formulaire soumis avec succès
+                                        </p>
+                                        <p>Afin de démarrer votre consultation privée totalement confidentielle, veuillez choisir ci-dessous le type souhaité de mise en relation</p>
+                                    </div>
+                                    <div class="flex" style="width: 500px;">
+                                        <div class="flex h-20 w-full items-center rounded-lg dark:bg-navy-500">
+                                            <button id="AvailableAgent" class="btn  space-x-2 bg-primary font-medium text-white shadow-lg shadow-primary/50 hover:bg-warning-focus focus:bg-primary-focus active:bg-warning-focus/90" style="min-height: 50px;width: 225px;">
+                                                <span>Mise en relation directe</span>
+                                            </button>
+                                        </div>
+                                        <div class="mx-4 flex items-center space-y-3">
+                                            <p>ou</p>
+                                        </div>
+                                        <div class="flex h-20 w-full items-center rounded-lg dark:bg-navy-500">
+                                            <button id="selectAgent" class="btn space-x-2 bg-primary font-medium text-white shadow-lg shadow-primary/50 hover:bg-warning-focus focus:bg-primary-focus active:bg-warning-focus/90" style="min-height: 50px;width: 220px;">
+                                                <span>Choisir un Expert</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="pin-div" class="hidden pin-div-sender justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>`;
+        messagesContainer.insertAdjacentElement("afterbegin",messageDiv);
+        const btnAvailableAgent = messageDiv.querySelector("#AvailableAgent");
+        btnAvailableAgent.addEventListener("click", function () {
+          foued.availableAgent({
+            accountId: newData.accountId,
+            conversationId: conversationId,
+            userId: newData.user,
+          });
+        });
+        const btnSelectAgent = messageDiv.querySelector("#selectAgent");
+        btnSelectAgent.addEventListener("click", function () {
+          foued.displayAgents(newData.accountId);
+        });
+        continue;
       } else if (message.type === "form") {
         let inputForms = "";
         if (myContent.fields) {
           myContent.fields.sort(compareFields);
           inputForms = myContent.fields.map((field) => {
             let type = "";
-            switch (+field.field_type) {
+            switch (+field?.field_type) {
               case 1:
                 type = "text";
                 break;
@@ -1512,7 +1612,7 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
                 type = "textarea";
                 break;
             }
-            if (field.field_name.toLowerCase() === "country") {
+            if (field?.field_name?.toLowerCase() === "country") {
               const countryOptions = generateCountryOptions(
                 countries,
                 field?.field_value ?? userCountry
@@ -1528,17 +1628,18 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
                           name="${field.field_name.replace(" ", "")}" 
                           data-field-id="${field.field_id}"
                           required
-                          ${field?.field_value
-                  ? "style='pointer-events:none'"
-                  : ""
-                }
+                          ${
+                            field?.field_value
+                              ? "style='pointer-events:none'"
+                              : ""
+                          }
                           ${myContent.status === 1 ? "disabled" : ""}
                       >
                           <option value="">Select a country</option>
                           ${countryOptions}
                       </select>
                   </label>`;
-            } else if (field.field_name.toLowerCase() === "phone") {
+            } else if (field.field_name?.toLowerCase() === "phone") {
               return `
             <label class="relative">
             <span>${field.field_name}</span>
@@ -1559,8 +1660,9 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
               return `
               <label class="relative">
                 <span>${field.field_name}</span>
-                ${type === "textarea"
-                  ? `<textarea
+                ${
+                  type === "textarea"
+                    ? `<textarea
                       id="floating_field_${messageId}"
                       class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900" 
                       placeholder="${field.field_name}" 
@@ -1568,48 +1670,59 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
                       data-field-id="${field.field_id}"
                       ${field?.field_value ? "style='pointer-events:none'" : ""}
                       ${myContent.status === 1 ? "disabled" : ""}
-                    >${field?.field_value ?? ''}</textarea>`
-                  : `<input
+                    >${field?.field_value ?? ""}</textarea>`
+                    : `<input
                       id="floating_field_${messageId}"
                       class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900" 
-                      placeholder="${field.field_name}" 
-                      name="${field.field_name.replace(" ", "")}" 
-                      data-field-id="${field.field_id}"
+                      placeholder="${field?.field_name}" 
+                      name="${field?.field_name?.replace(" ", "")}" 
+                      data-field-id="${field?.field_id}"
                       value="${field?.field_value ?? ""}"
                       type="${type}"
                       ${field?.field_value ? "style='pointer-events:none'" : ""}
                       ${myContent.status === 1 ? "disabled" : ""}
-                    />`}
+                    />`
+                }
               </label>
             `;
-
             }
           });
-
           tableRows = `
         <div class="mr-4 max-w-lg sm:mr-10">
               <form name="form1" class="box" onsubmit="">
-                  <div class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 ${newData.goccContactId || newData.goccLeadId ? "gocc" : ""} card-form" style="position: relative;">
+                  <div class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 ${
+                    newData.goccContactId || newData.goccLeadId ? "gocc" : ""
+                  } card-form" style="position: relative;">
                       <div class="mt-20 w-full max-w-xl p-4 sm:p-5">
                           <div class="mb-4">
-                              <h3 class="text-2xl font-semibold">${myContent.friendly_name
-            }</h3>
-                              <h5 class="text-sm">${myContent.introduction ? myContent.introduction : ""}
+                              <h3 class="text-2xl font-semibold">${
+                                myContent.friendly_name
+                              }</h3>
+                              <h5 class="text-sm">${
+                                myContent.introduction
+                                  ? myContent.introduction
+                                  : ""
+                              }
                               </h5>
                           </div>
                           <div class="space-y-4">
                               ${inputForms.join("")}
-                              <div class="flex justify-center space-x-2 pt-4">
-                                  ${myContent.status !== 1
-              ? `
-                                      <button class="btn min-w-[7rem] border border-slate-300 font-medium text-slate-800 hover:bg-slate-150 focus:bg-slate-150 active:bg-slate-150/80 dark:border-navy-450 dark:text-navy-50 dark:hover:bg-navy-500 dark:focus:bg-navy-500 dark:active:bg-navy-500/90">
-                                          Cancel
-                                      </button>
+                              <div class="flex justify-end space-x-2 pt-4">
+                                  ${
+                                    myContent.status !== 1
+                                      ? `
+                                     
                                   `
-              : ""
-            }
-                                  ${myContent.status !== 1
-              ? `
+                                      : ` <h5 class="text-sm" style="color: #22A699">${
+                                          myContent.text_capture
+                                            ? myContent.text_capture
+                                            : ""
+                                        }</h5>
+              `
+                                  }
+                                  ${
+                                    myContent.status !== 1
+                                      ? `
                                       <button class="btn1 min-w-[7rem] bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
                                           id="submit-form-${message._id}" data-content='${message.message}'
                                       >
@@ -1618,8 +1731,8 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
                                           Save
                                       </button>
                                   `
-              : ""
-            }
+                                      : ""
+                                  }
                               </div>
                           </div>
                       </div>
@@ -1674,95 +1787,112 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
             : `rounded-2xl break-words text-wrap relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
         messagesContainer.insertAdjacentHTML(
           "afterbegin",
-          `<div id="message-${messageId}" class="flex items-start ${direction} space-x-1.5 ${message.type === "plan" ? "plans-container" : ""
+          `<div id="message-${messageId}" class="flex items-start ${direction} space-x-1.5 ${
+            message.type === "plan" ? "plans-container" : ""
           }">
-              <div class="flex flex-col   ${message.user !== newData.user ? "items-start" : "items-end"
-          }  space-y-3.5">
+              <div class="flex flex-col   ${
+                message.user !== newData.user ? "items-start" : "items-end"
+              }  space-y-3.5">
               ${message.type === "MSG" ? `<div class="flex flex-row">` : ""}
-                ${message.type === "MSG" &&
-            direction === "justify-end" &&
-            message.status !== 0
-            ? msgButt(messageId, direction, message.pinned === 1)
-            : ""
-          }
+                ${
+                  message.type === "MSG" &&
+                  direction === "justify-end" &&
+                  message.status !== 0
+                    ? msgButt(messageId, direction, message.pinned === 1)
+                    : ""
+                }
                 <div class="ml-2 max-w-lg sm:ml-5">
-                  ${message.type === "MSG" || message.type === "link"
-            ? `
-                      <div class="${message.type === "link"
-              ? "rounded-2xl break-words relative rounded-tr-none bg-violet-300 p-3 text-slate-700 shadow-sm dark:bg-violet-500 dark:text-white"
-              : msgStyle
-            }" id="message-content-${messageId}">
-                        ${message.status === 0
-              ? `${direction === "justify-start"
-                ? message.user_data.full_name
-                : "You"
-              } unsent a message`
-              : message.type === "link"
-                ? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}" href="${myContent.userLink?.url}" target="_blank">${myContent.userLink?.url}</a>`
-                : message.type === "plan"
-                  ? tableRows.join("")
-                  : message.type === "form"
-                    ? tableRows
-                    : message.message
-            }
-                      <div id="pin-div" class="${message.pinned === 0 || message.status === 0
-              ? "hidden"
-              : "flex"
-            } ${direction === "justify-start"
-              ? "pin-div-sender"
-              : "pin-div"
-            } justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
-                        ${direction === "justify-start" &&
-              myContent.userLink?.status === "1"
-              ? '<i class="fas fa-eye text-blue-500 ml-1"></i>'
-              : ""
-            }
+                  ${
+                    message.type === "MSG" || message.type === "link"
+                      ? `
+                      <div class="${
+                        message.type === "link"
+                          ? "rounded-2xl break-words relative rounded-tr-none bg-violet-300 p-3 text-slate-700 shadow-sm dark:bg-violet-500 dark:text-white"
+                          : msgStyle
+                      }" id="message-content-${messageId}">
+                        ${
+                          message.status === 0
+                            ? `${
+                                direction === "justify-start"
+                                  ? message.user_data.full_name
+                                  : "You"
+                              } unsent a message`
+                            : message.type === "link"
+                            ? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}" href="${myContent.userLink?.url}" target="_blank">${myContent.userLink?.url}</a>`
+                            : message.type === "plan"
+                            ? tableRows.join("")
+                            : message.type === "form"
+                            ? tableRows
+                            : message.message
+                        }
+                      <div id="pin-div" class="${
+                        message.pinned === 0 || message.status === 0
+                          ? "hidden"
+                          : "flex"
+                      } ${
+                          direction === "justify-start"
+                            ? "pin-div-sender"
+                            : "pin-div"
+                        } justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
+                        ${
+                          direction === "justify-start" &&
+                          myContent.userLink?.status === "1"
+                            ? '<i class="fas fa-eye text-blue-500 ml-1"></i>'
+                            : ""
+                        }
                       </div></div>`
-            : `
+                      : `
                       <div id="message-content-${messageId}">
                       <div class="ml-2 max-w-lg sm:ml-5">
-                        ${message.status === 0
-              ? `${direction === "justify-start"
-                ? message.user_data.full_name
-                : "You"
-              } unsent a message`
-              : message.type === "plan"
-                ? tableRows.join("")
-                : message.type === "form"
-                  ? tableRows
-                  : message.message
-            }
-                        <div id="pin-div" class="${message.pinned === 0 || message.status === 0
-              ? "hidden"
-              : "flex"
-            } ${direction === "justify-start"
-              ? "pin-div-sender"
-              : "pin-div"
-            } justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
+                        ${
+                          message.status === 0
+                            ? `${
+                                direction === "justify-start"
+                                  ? message.user_data.full_name
+                                  : "You"
+                              } unsent a message`
+                            : message.type === "plan"
+                            ? tableRows.join("")
+                            : message.type === "form"
+                            ? tableRows
+                            : message.message
+                        }
+                        <div id="pin-div" class="${
+                          message.pinned === 0 || message.status === 0
+                            ? "hidden"
+                            : "flex"
+                        } ${
+                          direction === "justify-start"
+                            ? "pin-div-sender"
+                            : "pin-div"
+                        } justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
                         </div>
                       </div>
                       `
-          }
+                  }
                   ${message.type === "MSG" ? `</div>` : ""}
-                  <p id="date_msg" data-direction="${direction}" class="mt-1 ${message.user !== newData.user ? "" : "ml-auto"
+                  <p id="date_msg" data-direction="${direction}" class="mt-1 ${
+            message.user !== newData.user ? "" : "ml-auto"
           }  text-xs text-slate-400 dark:text-navy-300">
-                    ${message.status === 2
-            ? "(updated) " + time
-            : direction === "justify-start"
-              ? time
-              : message.read
-                ? time +
-                `<i class="fas fa-eye ps-2" style="font-size:10px;"></i>`
-                : time
-          }
+                    ${
+                      message.status === 2
+                        ? "(updated) " + time
+                        : direction === "justify-start"
+                        ? time
+                        : message.read
+                        ? time +
+                          `<i class="fas fa-eye ps-2" style="font-size:10px;"></i>`
+                        : time
+                    }
                   </p>                 
               </div>
-              ${message.type === "MSG" &&
-            direction === "justify-start" &&
-            message.status !== 0
-            ? msgButt(messageId, direction, message.pinned === 1)
-            : ""
-          }
+              ${
+                message.type === "MSG" &&
+                direction === "justify-start" &&
+                message.status !== 0
+                  ? msgButt(messageId, direction, message.pinned === 1)
+                  : ""
+              }
             </div>
             `
         );
@@ -1771,8 +1901,14 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
           const messageElement = document.querySelector(
             `#message-${messageId} input.phoneInput`
           );
+
           if (messageElement) {
             phoneList(messageElement);
+          }
+
+          if (document.querySelector(`#submit-form-${messageId}`)) {
+            document.querySelector(`#submit-form-${messageId}`)._form_data =
+              message.message;
           }
         }
       }
@@ -1780,8 +1916,9 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
       if (message.reacts.length > 0) {
         let messageReactions = message.reacts.map((react) => {
           return `
-          <a id="react-${react._id}" ${newData.user !== react.user_id ? 'style="pointer-events: none"' : ""
-            }>${react.path}</a>
+          <a id="react-${react._id}" ${
+            newData.user !== react.user_id ? 'style="pointer-events: none"' : ""
+          }>${react.path}</a>
         `;
         });
         const msgReacted = messagesContainer.querySelector(
@@ -2035,8 +2172,9 @@ async function sendMessage() {
 }
 
 export async function sentMessage(data) {
-  showEmptyConversation(false)
-  resetMaxLength(256)
+  showEmptyConversation(false);
+  resetMaxLength(256);
+  const log = JSON.parse(data.content)
 
   conversationId = data.conversation;
   let conv = conversationContainer.dataset.conversationId;
@@ -2052,7 +2190,6 @@ export async function sentMessage(data) {
   const minute = date.getMinutes().toString().padStart(2, "0");
   const time = `${hour}:${minute}`;
   if (!isNotNewConversation) {
-
     const newConvDiv = document.createElement("div");
     const newminiconDiv = document.createElement("div");
 
@@ -2063,173 +2200,41 @@ export async function sentMessage(data) {
       if (element.classList.contains("bg-slate-150"))
         element.classList.remove("bg-slate-150");
     });
-    const html = `
-    <div class="conversationItem conversation bg-slate-150" data-conversation-id="${data.conversation}" data-name=${senderName} data-timestamp=${timeString} id="left-conversation-${data.conversation}" data-user-id="${agentClicked}">
-      <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
-        <div
-          class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
-          data-conversation-id="${data.conversation}"
-          data-name=${senderName}>
-          <div class="avatar h-10 w-10">
-            <img class="rounded-full"  src=images/avatar/avatar-${data.agent_id}.jpg alt="image" />
-            <div
-            id=${expert}
-              class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${data.status == "1" ? "bg-success" : "bg-slate-300"} dark:border-navy-700">
-            </div>
-          </div>
-          <div class="flex flex-1 flex-col">
-            <div class="flex items-baseline justify-between space-x-1.5">
-              <p  data-conversation-name class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
-              ${senderName}
-              </p>
-              <span class="text-tiny+ text-slate-400 dark:text-navy-300">${timeString}</span>
-            </div>
-            <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftMsg"> 
-              <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
-                Me : ${data.content}
-              </p>
-         
-            </div>
-            <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftTyping "> 
-            
-            <div>
-              <div class="flex" class="pe-3">
-                <div
-                  id="typing-display"
-                  class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 relative "
-                >
-                  <div class="d-flex">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      xmlns:xlink="http://www.w3.org/1999/xlink"
-                      viewBox="0 0 100 100"
-                      preserveAspectRatio="xMidYMid"
-                      style="background: none"
-                      width="45px"
-                      height="20px"
-                    >
-                      <circle
-                        cy="62.5"
-                        fill="#C4C4C46b"
-                        r="20"
-                        cx="1.5"
-                      >
-                        <animate
-                          attributeName="cy"
-                          calcMode="spline"
-                          keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
-                          repeatCount="indefinite"
-                          values="62.5;37.5;62.5;62.5"
-                          keyTimes="0;0.25;0.5;1"
-                          dur="1s"
-                          begin="-0.5s"
-                        ></animate>
-                      </circle>
-                      <circle
-                        cy="62.5"
-                        fill="#c4c4c498"
-                        r="20"
-                        cx="52.5"
-                      >
-                        <animate
-                          attributeName="cy"
-                          calcMode="spline"
-                          keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
-                          repeatCount="indefinite"
-                          values="62.5;37.5;62.5;62.5"
-                          keyTimes="0;0.25;0.5;1"
-                          dur="1s"
-                          begin="-0.375s"
-                        ></animate>
-                      </circle>
-                      <circle
-                        cy="62.5"
-                        fill="#c4c4c4"
-                        r="20"
-                        cx="107.5"
-                      >
-                        <animate
-                          attributeName="cy"
-                          calcMode="spline"
-                          keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
-                          repeatCount="indefinite"
-                          values="62.5;37.5;62.5;62.5"
-                          keyTimes="0;0.25;0.5;1"
-                          dur="1s"
-                          begin="-0.25s"
-                        ></animate>
-                      </circle>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-         
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>`;
-    newConvDiv.innerHTML = html;
-    leftConversationContainer.insertBefore(
-      newConvDiv,
-      leftConversationContainer.firstChild
-    );
-    const minimizedHtmlSideBar = `
-    <div class="mini-conversation-click flex cursor-pointer items-center justify-center py-2.5 hover:bg-slate-150 dark:hover:bg-navy-600 conversation " data-conversation-id="${data.conversation}" data-user-id="${agentClicked}" data-name="${senderName}" data-timestamp="${timestamp}" id="left-mini-conversation-${data.conversation}">
-                    <div class=" avatar h-10 w-10" >
-                      <img class="rounded-full" src=images/avatar/avatar-${data.agent_id}.jpg alt="image">
-                      <div id="active-user" class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${data.status == 1 ? "bg-success" : "bg-slate-300"
-      }  dark:border-navy-700"></div>
-                    </div>
-                  </div>
-    `;
 
-    const existingElement = document.querySelector(`#left-mini-conversation-${data.conversation}`);
-
-
-    if (!existingElement) {
-      newminiconDiv.innerHTML = minimizedHtmlSideBar;
-      minimizedSideBar.insertBefore(
-        newminiconDiv,
-        minimizedSideBar.firstChild
-
-      )
-    }
   } else {
     let userLog = "";
     const convMessage = isNotNewConversation.querySelector("p#last-message");
-    if (data.type === "log") {
-      // const log = JSON.parse(data.content)
-      //   switch(log.action){
-      //     case "fill":
-      //       userLog = `You filled on the form.`;
-      //       break;
-      //     case "focus":
-      //       userLog = `You  focus on the form.`;
-      //       break;
-      //     case "purchase":
-      //       userLog = `You  purchased the <b> ${log.plan_name} </b>plan.`;
-      //       break;
-      //     case "start form":
-      //       userLog = `You  start submit the form.`;
-      //       break;
-      //     case "end form":
-      //       userLog = `You  end submit the form.`;
-      //       break;
-      //     case "start purchase":
-      //       userLog = `You  start purchase a plan.`;
-      //       break;
-      //     case "link click":
-      //       userLog = `You click to link.`;
-      //       break;
-      //     case "purchase completed":
-      //       userLog = `Purchase completed successfully.`
-      //       break;
-      //     case "purchase went wrong":
-      //       userLog = `Purchase went  wrong.`
-      //       break;
-      //   }
+
+    if (data.type === "log" && log.element==3) {
+        switch(log.action){
+          case "fill":
+            userLog = `You filled on the form.`;
+            break;
+          case "focus":
+            userLog = `You  focus on the form.`;
+            break;
+          case "purchase":
+            userLog = `You  purchased the <b> ${log.plan_name} </b>plan.`;
+            break;
+          case "start form":
+            userLog = `You  start submit the form.`;
+            break;
+          case "end form":
+            userLog = `You  end submit the form.`;
+            break;
+          case "start purchase":
+            userLog = `You  start purchase a plan.`;
+            break;
+          case "link click":
+            userLog = `You click to link.`;
+            break;
+          case "purchase completed":
+            userLog = `Purchase completed successfully.`
+            break;
+          case "purchase went wrong":
+            userLog = `Purchase went  wrong.`
+            break;
+        }
       //   convMessage.textContent = userLog
     } else convMessage.textContent = data.content;
   }
@@ -2238,49 +2243,49 @@ export async function sentMessage(data) {
     const messageContainer = document.getElementById(`message-${messageId}`);
     messagesContainer = document.getElementById("big-container-message");
     if (!messageContainer) {
-      if (data.type === "log") {
-        // const log = JSON.parse(data.content)
-        // let userLog = ""
-        // switch (log.action) {
-        //   case "fill":
-        //     userLog = `You filled on the form.`;
-        //     break;
-        //   case "focus":
-        //     userLog = `You focus on the form.`;
-        //     break;
-        //   case "purchase":
-        //     userLog = `You purchased the <b> ${log.plan_name} </b>plan.`;
-        //     break;
-        //   case "start form":
-        //     userLog = `You start submit the form.`;
-        //     break;
-        //   case "end form":
-        //     userLog = `You end submit the form.`;
-        //     break;
-        //   case "start purchase":
-        //     userLog = `You start purchase a plan.`;
-        //     break;
-        //   case "link click":
-        //     userLog = `You click to link.`;
-        //     break;
-        //   case "purchase completed":
-        //     userLog = `Purchase completed successfully.`
-        //     break;
-        //   case "purchase went wrong":
-        //     userLog = `Purchase went wrong.`
-        //     break;
-        // }
-        // const newDivMsg = document.createElement("div");
-        // newDivMsg.innerHTML = ` <div
-        // class="flex justify-center items-center w-100 m-2"
-        // id="msg-${data._id}"
-        // >
-        // <span class="logs-notification">
-        // ${userLog}
-        // </span>
-        // </div>`
-        // let typingBlock = document.getElementById("typing-block-message");
-        // messagesContainer.insertBefore(newDivMsg, typingBlock);
+      if (data.type === "log" && log.element==3) {
+        const log = JSON.parse(data.content)
+        let userLog = ""
+        switch (log.action) {
+          case "fill":
+            userLog = `You filled on the form.`;
+            break;
+          case "focus":
+            userLog = `You focus on the form.`;
+            break;
+          case "purchase":
+            userLog = `You purchased the <b> ${log.plan_name} </b>plan.`;
+            break;
+          case "start form":
+            userLog = `You start submit the form.`;
+            break;
+          case "end form":
+            userLog = `You end submit the form.`;
+            break;
+          case "start purchase":
+            userLog = `You start purchase a plan.`;
+            break;
+          case "link click":
+            userLog = `You click to link.`;
+            break;
+          case "purchase completed":
+            userLog = `Purchase completed successfully.`
+            break;
+          case "purchase went wrong":
+            userLog = `Purchase went wrong.`
+            break;
+        }
+        const newDivMsg = document.createElement("div");
+        newDivMsg.innerHTML = ` <div
+        class="flex justify-center items-center w-100 m-2"
+        id="msg-${data._id}"
+        >
+        <span class="logs-notification">
+        ${userLog}
+        </span>
+        </div>`
+        let typingBlock = document.getElementById("typing-block-message");
+        messagesContainer.insertBefore(newDivMsg, typingBlock);
       } else {
         let direction = data.direction == "in" ? "justify-end" : "";
         const msgStyle =
@@ -2294,27 +2299,31 @@ export async function sentMessage(data) {
         <div id="message-${messageId}" class="flex items-start ${direction} space-x-2.5 sm:space-x-5">
           <div class="flex flex-col items-end space-y-3.5">
             <div class="flex flex-row">
-              ${data.direction == "in"
-            ? msgButt(messageId, direction, data.pinned === 1)
-            : ""
-          }
+              ${
+                data.direction == "in"
+                  ? msgButt(messageId, direction, data.pinned === 1)
+                  : ""
+              }
               <div class="ml-2 max-w-lg sm:ml-5">
                 <div class="${msgStyle}" id="message-content-${messageId}">
                   ${data.content} 
-                  <div id="pin-div" class="hidden ${direction == "justify-start" ? "pin-div-sender" : "pin-div"
-          } justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
+                  <div id="pin-div" class="hidden ${
+                    direction == "justify-start" ? "pin-div-sender" : "pin-div"
+                  } justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
                 </div>
               
               </div>
            
-              ${data.direction == "out"
-            ? msgButt(messageId, direction, data.pinned === 1)
-            : ""
-          }
+              ${
+                data.direction == "out"
+                  ? msgButt(messageId, direction, data.pinned === 1)
+                  : ""
+              }
             </div>
             <p id="date_msg" data-direction="${direction}" class="mt-1 ml-10 text-left text-xs text-slate-400 dark:text-navy-300"> <!-- Adjusted ml-10 -->
-            ${time + `<i class="fas fa-check ps-2" style="font-size:10px;"></i>`
-          }       
+            ${
+              time + `<i class="fas fa-check ps-2" style="font-size:10px;"></i>`
+            }       
           </p>
           </div>
       
@@ -2348,7 +2357,9 @@ export async function sentMessage(data) {
         const msgDiv = document.getElementById(
           `left-conversation-${conversationId}`
         );
-        const msgDivMini = document.getElementById(`left-mini-conversation-${conversationId}`)
+        const msgDivMini = document.getElementById(
+          `left-mini-conversation-${conversationId}`
+        );
         if (msgDiv) {
           const msgText = msgDiv.querySelector("p#last-message");
           msgText.textContent = `Me : ${data.content}`;
@@ -2356,22 +2367,17 @@ export async function sentMessage(data) {
             msgDiv,
             leftConversationContainer.firstChild
           );
-
         }
         if (msgDivMini) {
-
           minimizedSideBar.insertBefore(
             msgDivMini,
             minimizedSideBar.firstChild
           );
-
         }
-
       }
     }
-    if (data.type === "MSG") {
       conversationContainer.scrollTop = conversationContainer.scrollHeight;
-    }
+    
 
     getDeleteButtons();
     getEditButtons();
@@ -2384,7 +2390,8 @@ function generateCountryOptions(countries, value) {
   return Object.entries(countries)
     .map(
       ([countryCode, country]) =>
-        `<option value="${countryCode}" ${countryCode === value ? "selected" : ""
+        `<option value="${countryCode}" ${
+          countryCode === value ? "selected" : ""
         }>${country.name}</option>`
     )
     .join("");
@@ -2392,8 +2399,9 @@ function generateCountryOptions(countries, value) {
 
 function getUserCountry() {
   return new Promise((resolve, reject) => {
-    axios.get("https://ipinfo.io/json?token=da800d7bb6c070")
-      .then(response => {
+    axios
+      .get("https://ipinfo.io/json?token=da800d7bb6c070")
+      .then((response) => {
         const data = response.data;
         resolve(data.country);
       })
@@ -2404,19 +2412,15 @@ function getUserCountry() {
 }
 
 getUserCountry()
-  .then(countryCode => {
-    userCountry = countryCode
+  .then((countryCode) => {
+    userCountry = countryCode;
   })
-  .catch(error => {
+  .catch((error) => {
     console.error("Error:", error);
   });
 
-
-
 export async function receiveMessage(data) {
-  console.log("data",data)
   let messageId;
-  if (data.messageData.type !== "log") {
     // if (firstConv && firstConv === data.messageData.conversation) {
     //   $(`.conversation-click[data-conversation-id="${firstConv}"]`).trigger(
     //     "click"
@@ -2427,8 +2431,8 @@ export async function receiveMessage(data) {
     messageId = data.messageData.id;
     const myContent =
       data.messageData.type === "plan" ||
-        data.messageData.type === "form" ||
-        data.messageData.type === "link"
+      data.messageData.type === "form" ||
+      data.messageData.type === "link"
         ? JSON.parse(data.messageData.content)
         : {};
     let conv = document.querySelector("#conversation-container").dataset[
@@ -2456,9 +2460,25 @@ export async function receiveMessage(data) {
       const minute = messageDate.getMinutes().toString().padStart(2, "0");
       time = `${day}:${hour}:${minute}`;
     }
+    const isNotNewConversation = document.querySelector(
+      `#left-conversation-${data.messageData.conversation}`
+    );
+
+    if (isNotNewConversation === null) {
+      displayLeftConversation({
+        conversationId: data.messageData.conversation,
+        senderName: data.senderName,
+        agentId: data.messageData.from,
+        contactAgentId: data.contactAgentId,
+        content: data.messageData.content,
+      });
+    }
 
     if (data.messageData.conversation === conv) {
-      if (Object.keys(myContent).length !== 0 && data.messageData.type === "plan")
+      if (
+        Object.keys(myContent).length !== 0 &&
+        data.messageData.type === "plan"
+      )
         tableRows = myContent.plans.map((plan) => {
           return `
         <div class="">
@@ -2487,7 +2507,10 @@ export async function receiveMessage(data) {
       </div>
           `;
         });
-      else if (Object.keys(myContent).length !== 0 && data.messageData.type === "form") {
+      else if (
+        Object.keys(myContent).length !== 0 &&
+        data.messageData.type === "form"
+      ) {
         let inputForms = "";
         if (myContent.fields) {
           myContent.fields.sort(compareFields);
@@ -2526,7 +2549,6 @@ export async function receiveMessage(data) {
                 countries,
                 field?.field_value ?? userCountry
               );
-
               return `
                   <label class="relative">
                       <span>${field.field_name}</span>
@@ -2537,10 +2559,11 @@ export async function receiveMessage(data) {
                           name="${field.field_name.replace(" ", "")}" 
                           data-field-id="${field.field_id}"
                           required
-                          ${field?.field_value
-                  ? "style='pointer-events:none'"
-                  : ""
-                }
+                          ${
+                            field?.field_value
+                              ? "style='pointer-events:none'"
+                              : ""
+                          }
                           ${myContent.status === 1 ? "disabled" : ""}
                       >
                           <option value="">Select a country</option>
@@ -2568,8 +2591,9 @@ export async function receiveMessage(data) {
               return `
               <label class="relative">
                 <span>${field.field_name}</span>
-                ${type === "textarea"
-                  ? `<textarea
+                ${
+                  type === "textarea"
+                    ? `<textarea
                       id="floating_field_${messageId}"
                       class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900" 
                       placeholder="${field.field_name}" 
@@ -2577,8 +2601,8 @@ export async function receiveMessage(data) {
                       data-field-id="${field.field_id}"
                       ${field?.field_value ? "style='pointer-events:none'" : ""}
                       ${myContent.status === 1 ? "disabled" : ""}
-                    >${field?.field_value ?? ''}</textarea>`
-                  : `<input
+                    >${field?.field_value ?? ""}</textarea>`
+                    : `<input
                       id="floating_field_${messageId}"
                       class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900" 
                       placeholder="${field.field_name}" 
@@ -2588,47 +2612,54 @@ export async function receiveMessage(data) {
                       type="${type}"
                       ${field?.field_value ? "style='pointer-events:none'" : ""}
                       ${myContent.status === 1 ? "disabled" : ""}
-                    />`}
+                    />`
+                }
               </label>
             `;
-
             }
           });
 
           tableRows = `
         <div class="mr-4 max-w-lg sm:mr-10">
               <form name="form1" class="box" onsubmit="">
-                  <div class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 ${newData.goccContactId || newData.goccLeadId ? "gocc" : ""}  card-form" style="position: relative;">
+                  <div class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 ${
+                    newData.goccContactId || newData.goccLeadId ? "gocc" : ""
+                  }  card-form" style="position: relative;">
                       <div class="mt-20 w-full max-w-xl p-4 sm:p-5">
                           <div class="mb-4">
-                              <h3 class="text-2xl font-semibold">${myContent.friendly_name
-            }</h3>
-                              <h5 class="text-sm">${myContent.introduction ? myContent.introduction : ""}
+                              <h3 class="text-2xl font-semibold">${
+                                myContent.friendly_name
+                              }</h3>
+                              <h5 class="text-sm">${
+                                myContent.introduction
+                                  ? myContent.introduction
+                                  : ""
+                              }
                               </h5>
                           </div>
                           <div class="space-y-4">
                               ${inputForms.join("")}
-                              <div class="flex justify-center space-x-2 pt-4">
-                                  ${myContent.status !== 1
-              ? `
-                                      <button class="btn min-w-[7rem] border border-slate-300 font-medium text-slate-800 hover:bg-slate-150 focus:bg-slate-150 active:bg-slate-150/80 dark:border-navy-450 dark:text-navy-50 dark:hover:bg-navy-500 dark:focus:bg-navy-500 dark:active:bg-navy-500/90">
-                                          Cancel
-                                      </button>
+                              <div class="flex justify-end space-x-2 pt-4">
+                                  ${
+                                    myContent.status !== 1
+                                      ? `
+                               
                                   `
-              : ""
-            }
-                                  ${myContent.status !== 1
-              ? `
+                                      : ""
+                                  }
+                                  ${
+                                    myContent.status !== 1
+                                      ? `
                                       <button class="btn1 min-w-[7rem] bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                                          id="submit-form-${data.messageData._id}" data-content='${data.messageData.content}'
+                                          id="submit-form-${messageId}" data-content='${data.messageData.content}'
                                       >
                                           <span class="spinner hidden absolute inset-0 flex justify-center items-center">
                                           </span>
                                           Save
                                       </button>
                                   `
-              : ""
-            }
+                                      : ""
+                                  }
                               </div>
                           </div>
                       </div>
@@ -2637,185 +2668,268 @@ export async function receiveMessage(data) {
           </div>
           `;
         }
+      } else if (data.messageData.type === "bloc") {
+        const messageDiv = document.createElement("div");
+        messageDiv.innerHTML = `<div class="flex flex-col items-start space-y-3.5">
+        <div class="mr-1">
+            <div class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100">
+                <div class="space-y-3.5">
+                    <div class="ml-2 sm:ml-5">
+                        <div id="message-content-${messageId}">
+                            <div class="ml-2 sm:ml-5">
+                                <div class="sm:mr-10">
+                                    <div class="pt-2">
+                                        <p>Formulaire soumis avec succès
+                                        </p>
+                                        <p>Afin de démarrer votre consultation privée totalement confidentielle, veuillez choisir ci-dessous le type souhaité de mise en relation</p>
+                                    </div>
+                                    <div class="flex" style="width: 500px;">
+                                        <div class="flex h-20 w-full items-center rounded-lg dark:bg-navy-500">
+                                            <button id="AvailableAgent" class="btn  space-x-2 bg-primary font-medium text-white shadow-lg shadow-primary/50 hover:bg-warning-focus focus:bg-primary-focus active:bg-warning-focus/90" style="min-height: 50px;width: 225px;">
+                                                <span>Mise en relation directe</span>
+                                            </button>
+                                        </div>
+                                        <div class="mx-4 flex items-center space-y-3">
+                                            <p>ou</p>
+                                        </div>
+                                        <div class="flex h-20 w-full items-center rounded-lg dark:bg-navy-500">
+                                            <button id="selectAgent" class="btn space-x-2 bg-primary font-medium text-white shadow-lg shadow-primary/50 hover:bg-warning-focus focus:bg-primary-focus active:bg-warning-focus/90" style="min-height: 50px;width: 220px;">
+                                                <span>Choisir un Expert</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="pin-div" class="hidden pin-div-sender justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>`;
+        messagesContainer.appendChild(messageDiv);
+        const btnAvailableAgent = messageDiv.querySelector("#AvailableAgent");
+        btnAvailableAgent.addEventListener("click", function () {
+          foued.availableAgent({
+            accountId: newData.accountId,
+            conversationId: conversationId,
+            userId: newData.user,
+          });
+        });
+
+        const btnSelectAgent = messageDiv.querySelector("#selectAgent");
+        btnSelectAgent.addEventListener("click", function () {
+          foued.displayAgents(newData.accountId);
+        });
+
       }
-      const messageContainer = document.getElementById(`message-${messageId}`);
-      if (!messageContainer) {
-        let direction =
-          data.direction == "in" ? "justify-end" : "justify-start";
-        const msgStyle =
-          data.messageData.user === newData.user && !data.message.paid
-            ? `rounded-2xl break-words text-wrap rounded-tl-none bg-white p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
-            : `rounded-2xl break-words text-wrap relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
-        const messageContent = `
-      <div id="message-${messageId}" class="flex items-start ${direction} space-x-1.5 ${data.messageData.type === "plan" ? "plans-container" : ""
+      if (data.messageData.type !== "bloc") {
+        const messageContainer = document.getElementById(
+          `message-${messageId}`
+        );
+        if (!messageContainer) {
+          let direction =
+            data.direction == "in" ? "justify-end" : "justify-start";
+          const msgStyle =
+            data.messageData.user === newData.user && !data.message.paid
+              ? `rounded-2xl break-words text-wrap rounded-tl-none bg-white p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
+              : `rounded-2xl break-words text-wrap relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
+          const messageContent = `
+      <div id="message-${messageId}" class="flex items-start ${direction} space-x-1.5 ${
+            data.messageData.type === "plan" ? "plans-container" : ""
           }">     
-              <div class="flex flex-col   ${data.messageData.user !== newData.user
-            ? "items-start"
-            : "items-end"
-          }  space-y-3.5">
-              ${data.messageData.type === "MSG"
-            ? `<div class="flex flex-row">`
-            : ""
-          }
-                ${data.messageData.type === "MSG" &&
-            direction === "justify-end" &&
-            data.messageData.status !== 0
-            ? msgButt(
-              messageId,
-              direction,
-              data.messageData.pinned === 1
-            )
-            : ""
-          }
+              <div class="flex flex-col   ${
+                data.messageData.user !== newData.user
+                  ? "items-start"
+                  : "items-end"
+              }  space-y-3.5">
+              ${
+                data.messageData.type === "MSG"
+                  ? `<div class="flex flex-row">`
+                  : ""
+              }
+                ${
+                  data.messageData.type === "MSG" &&
+                  direction === "justify-end" &&
+                  data.messageData.status !== 0
+                    ? msgButt(
+                        messageId,
+                        direction,
+                        data.messageData.pinned === 1
+                      )
+                    : ""
+                }
                 <div class="ml-2 max-w-lg sm:ml-5">
-                ${data.messageData.type === "MSG" ||
-            data.messageData.type === "link"
-            ? `
-                      <div class="${data.messageData.type === "link"
-              ? "rounded-2xl break-words relative rounded-tr-none bg-violet-300 p-3 text-slate-700 shadow-sm dark:bg-violet-500 dark:text-white"
-              : msgStyle
-            }" id="message-content-${messageId}">
-                      ${data.messageData.status === 0
-              ? `${direction === "justify-start"
-                ? data.messageData.user_data.full_name
-                : "You"
-              } unsent a message`
-              : data.messageData.type === "link"
-                ? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}" href="${myContent.userLink?.url}" target="_blank">${myContent.userLink?.url}</a>`
-                : data.messageData.type === "plan"
-                  ? tableRows.join("")
-                  : data.messageData.type === "form"
-                    ? tableRows
-                    : data.messageData.content
-            }
-                        <div id="pin-div" class="hidden ${direction === "justify-start"
-              ? "pin-div-sender"
-              : "pin-div"
-            } justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
-                        ${direction === "justify-start" &&
-              myContent.userLink?.status === "1"
-              ? '<i class="fas fa-eye text-blue-500 ml-1"></i>'
-              : ""
-            }
+                ${
+                  data.messageData.type === "MSG" ||
+                  data.messageData.type === "link"
+                    ? `
+                      <div class="${
+                        data.messageData.type === "link"
+                          ? "rounded-2xl break-words relative rounded-tr-none bg-violet-300 p-3 text-slate-700 shadow-sm dark:bg-violet-500 dark:text-white"
+                          : msgStyle
+                      }" id="message-content-${messageId}">
+                      ${
+                        data.messageData.status === 0
+                          ? `${
+                              direction === "justify-start"
+                                ? data.messageData.user_data.full_name
+                                : "You"
+                            } unsent a message`
+                          : data.messageData.type === "link"
+                          ? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}" href="${myContent.userLink?.url}" target="_blank">${myContent.userLink?.url}</a>`
+                          : data.messageData.type === "plan"
+                          ? tableRows.join("")
+                          : data.messageData.type === "form"
+                          ? tableRows
+                          : data.messageData.content
+                      }
+                        <div id="pin-div" class="hidden ${
+                          direction === "justify-start"
+                            ? "pin-div-sender"
+                            : "pin-div"
+                        } justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
+                        ${
+                          direction === "justify-start" &&
+                          myContent.userLink?.status === "1"
+                            ? '<i class="fas fa-eye text-blue-500 ml-1"></i>'
+                            : ""
+                        }
                       </div>
                         </div>
                        
                       `
-            : `
+                    : `
                       <div id="message-content-${messageId}">
                       <div class="ml-2 max-w-lg sm:ml-5">
 
-                        ${data.messageData.status === 0
-              ? `${direction === "justify-start"
-                ? data.messageData.user_data.full_name
-                : "You"
-              } unsent a message`
-              : data.messageData.type === "plan"
-                ? tableRows.join("")
-                : data.messageData.type === "form"
-                  ? tableRows
-                  : data.messageData.content
-            }
-                        <div id="pin-div" class="${data.messageData.pinned === 0 ||
-              data.messageData.status === 0
-              ? "hidden"
-              : "flex"
-            } ${direction === "justify-start"
-              ? "pin-div-sender"
-              : "pin-div"
-            } justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
+                        ${
+                          data.messageData.status === 0
+                            ? `${
+                                direction === "justify-start"
+                                  ? data.messageData.user_data.full_name
+                                  : "You"
+                              } unsent a message`
+                            : data.messageData.type === "plan"
+                            ? tableRows.join("")
+                            : data.messageData.type === "form"
+                            ? tableRows
+                            : data.messageData.content
+                        }
+                        <div id="pin-div" class="${
+                          data.messageData.pinned === 0 ||
+                          data.messageData.status === 0
+                            ? "hidden"
+                            : "flex"
+                        } ${
+                        direction === "justify-start"
+                          ? "pin-div-sender"
+                          : "pin-div"
+                      } justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
                       </div>
                       </div>
                       `
-          }    
+                }    
                   ${data.messageData.type === "MSG" ? `</div>` : ""}  
-                  <p id="date_msg" data-direction="${direction}" class="mt-1 ${data.messageData.user !== newData.user ? "" : "ml-auto"
+                  <p id="date_msg" data-direction="${direction}" class="mt-1 ${
+            data.messageData.user !== newData.user ? "" : "ml-auto"
           }  text-xs text-slate-400 dark:text-navy-300">
                     ${timeString}
                   </p>
               </div>
-              ${data.messageData.type === "MSG" &&
-            direction === "justify-start" &&
-            data.messageData.status !== 0
-            ? msgButt(messageId, direction, data.messageData.pinned === 1)
-            : ""
-          }
+              ${
+                data.messageData.type === "MSG" &&
+                direction === "justify-start" &&
+                data.messageData.status !== 0
+                  ? msgButt(messageId, direction, data.messageData.pinned === 1)
+                  : ""
+              }
             </div>
       `;
 
-        let typingBlock = document.getElementById("typing-block-message");
-        if (typingBlock) {
-          const msgDiv = document.createElement("div");
-          msgDiv.innerHTML = messageContent;
-          typingBlock.replaceWith(msgDiv);
-        } else
-          messagesContainer.insertAdjacentHTML("beforeend", messageContent);
-        if (conversationId === data.messageData.conversation) {
-          if (document.visibilityState === "visible") {
-            markMessageAsSeen(conversationId);
-          } else {
-            document.addEventListener(
-              "visibilitychange",
-              () => {
-                if (document.visibilityState === "visible") {
-                  markMessageAsSeen(conversationId);
-                }
-              },
-              { once: true }
-            );
-          }
-        }
-        conversationContainer.scrollTop = conversationContainer.scrollHeight;
-
-        if (data.messageData.type === "form") {
-          const messageElement = document.querySelector(
-            `#message-${messageId} input.phoneInput`
-          );
-          if (messageElement) {
-            phoneList(messageElement);
-          }
-        }
-        if (data.messageData.type === "MSG") {
-          const messageElement = document.getElementById(
-            `message-${messageId}`
-          );
-          const msgButtContainer = messageElement.querySelector(
-            ".msg-butt-container"
-          );
-          const reactButtContainer = messageElement.querySelector(
-            ".react-butt-container"
-          );
-          messageElement.addEventListener("mouseenter", () => {
-            msgButtContainer.style.display = "block";
-            reactButtContainer.style.display = "block";
-          });
-
-          messageElement.addEventListener("mouseleave", () => {
-            msgButtContainer.style.display = "none";
-            reactButtContainer.style.display = "none";
-          });
-        }
-
-        const selectElement = document.querySelector(
-          `#floating_field_${messageId}[data-country]`
-        );
-
-        $(selectElement).select2({
-          placeholder: "Select your Country",
-        });
-        $(selectElement).on("change.select2", () => {
-          const selectedCountryCode = $(selectElement).val();
-          const phoneInput = document.querySelector(
-            `.phoneInput.field-${messageId}`
-          );
-          if (phoneInput) {
-            let instance = window.intlTelInputGlobals.getInstance(phoneInput);
-            if (typeof instance !== "undefined") {
-              instance.setCountry(selectedCountryCode);
+          let typingBlock = document.getElementById("typing-block-message");
+          if (typingBlock) {
+            const msgDiv = document.createElement("div");
+            msgDiv.innerHTML = messageContent;
+            if (
+              data.messageData.type === "form" &&
+              msgDiv.querySelector(`#submit-form-${data.messageData._id}`)
+            ) {
+              msgDiv.querySelector(
+                `#submit-form-${data.messageData._id}`
+              )._form_data = data.messageData.content;
+            }
+            typingBlock.replaceWith(msgDiv);
+          } else
+            messagesContainer.insertAdjacentHTML("beforeend", messageContent);
+          if (conversationId === data.messageData.conversation) {
+            if (document.visibilityState === "visible") {
+              markMessageAsSeen(conversationId);
+            } else {
+              document.addEventListener(
+                "visibilitychange",
+                () => {
+                  if (document.visibilityState === "visible") {
+                    markMessageAsSeen(conversationId);
+                  }
+                },
+                { once: true }
+              );
             }
           }
-        });
+          conversationContainer.scrollTop = conversationContainer.scrollHeight;
+
+          if (data.messageData.type === "form") {
+            const messageElement = document.querySelector(
+              `#message-${messageId} input.phoneInput`
+            );
+            if (messageElement) {
+              phoneList(messageElement);
+            }
+          }
+          if (data.messageData.type === "MSG") {
+            const messageElement = document.getElementById(
+              `message-${messageId}`
+            );
+            const msgButtContainer = messageElement.querySelector(
+              ".msg-butt-container"
+            );
+            const reactButtContainer = messageElement.querySelector(
+              ".react-butt-container"
+            );
+            messageElement.addEventListener("mouseenter", () => {
+              msgButtContainer.style.display = "block";
+              reactButtContainer.style.display = "block";
+            });
+
+            messageElement.addEventListener("mouseleave", () => {
+              msgButtContainer.style.display = "none";
+              reactButtContainer.style.display = "none";
+            });
+          }
+
+          const selectElement = document.querySelector(
+            `#floating_field_${messageId}[data-country]`
+          );
+
+          $(selectElement).select2({
+            placeholder: "Select your Country",
+          });
+          $(selectElement).on("change.select2", () => {
+            const selectedCountryCode = $(selectElement).val();
+            const phoneInput = document.querySelector(
+              `.phoneInput.field-${messageId}`
+            );
+            if (phoneInput) {
+              let instance = window.intlTelInputGlobals.getInstance(phoneInput);
+              if (typeof instance !== "undefined") {
+                instance.setCountry(selectedCountryCode);
+              }
+            }
+          });
+        }
       }
+      conversationContainer.scrollTop = conversationContainer.scrollHeight;
 
       reactions();
       getReactButton();
@@ -2840,7 +2954,7 @@ export async function receiveMessage(data) {
         }
       }
     }
-  }
+ 
 
   function sendClickingNotification(data) {
     foued.linkClick(data.id.replace("linked-msg-", ""));
@@ -2894,34 +3008,53 @@ function playNotificationSound() {
   sendSound.play();
 }
 
+// const notifyMe = () => {
+//   if (!window.Notification) {
+//   } else {
+//     // check if permission is already granted
+//     if (Notification.permission === "granted") {
+//       // show notification here
+//       const notify = new Notification("New Message", {
+//         body: "You have received a new message!",
+//         icon: "images/favicon.png",
+//       });
+//     } else {
+//       // request permission from the user
+//       Notification.requestPermission()
+//         .then(function (p) {
+//           if (p === "granted") {
+//             // show notification here
+//             const notify = new Notification("New Message", {
+//               body: "You have received a new message!",
+//               icon: "images/favicon.png",
+//             });
+//           } else {
+//             //blocked notification
+//           }
+//         })
+//         .catch(function (err) {
+//           console.error(err);
+//         });
+//     }
+//   }
+// };
 const notifyMe = () => {
   if (!window.Notification) {
   } else {
-    // check if permission is already granted
-    if (Notification.permission === "granted") {
-      // show notification here
-      const notify = new Notification("New Message", {
-        body: "You have received a new message!",
-        icon: "images/favicon.png",
+    Notification.requestPermission()
+      .then(function (p) {
+        if (p === "granted") {
+          // show notification here
+          const notify = new Notification("New Message", {
+            body: "You have received a new message!",
+            icon: "images/favicon.png",
+          });
+        } else {
+        }
+      })
+      .catch(function (err) {
+        console.error(err);
       });
-    } else {
-      // request permission from the user
-      Notification.requestPermission()
-        .then(function (p) {
-          if (p === "granted") {
-            // show notification here
-            const notify = new Notification("New Message", {
-              body: "You have received a new message!",
-              icon: "images/favicon.png",
-            });
-          } else {
-            //blocked notification
-          }
-        })
-        .catch(function (err) {
-          console.error(err);
-        });
-    }
   }
 };
 
@@ -3038,14 +3171,18 @@ export async function reactDisplay(data) {
     if (react) {
       react.innerHTML = reactData.path;
     } else {
-      reactContent.innerHTML += `<a id="react-${reactData._id}" ${newData.user !== reactData.user_id ? 'style="pointer-events: none"' : ""
-        }> ${reactData.path}</a>`;
+      reactContent.innerHTML += `<a id="react-${reactData._id}" ${
+        newData.user !== reactData.user_id ? 'style="pointer-events: none"' : ""
+      }> ${reactData.path}</a>`;
     }
   } else {
-    msgReacted.innerHTML += `<div id="react-content-${reactData.message_id
-      }" class="react-container bg-white  dark:bg-navy-700" > <a   id="react-${reactData._id
-      }" ${newData.user !== reactData.user_id ? 'style="pointer-events: none"' : ""
-      }> ${reactData.path}</a> </div>`;
+    msgReacted.innerHTML += `<div id="react-content-${
+      reactData.message_id
+    }" class="react-container bg-white  dark:bg-navy-700" > <a   id="react-${
+      reactData._id
+    }" ${
+      newData.user !== reactData.user_id ? 'style="pointer-events: none"' : ""
+    }> ${reactData.path}</a> </div>`;
     let react = document.getElementById(`react-${reactData._id}`);
     react.innerHTML = reactData.path;
   }
@@ -3073,8 +3210,10 @@ export async function messageDeleted(data) {
     "dark:border-navy-700"
   );
 
-  const leftConversation = document.querySelector(`[data-conversation-id="${data.result.conversation_id}"]`);
-  const pElement = leftConversation.querySelector('.conversationLeftMsg p');
+  const leftConversation = document.querySelector(
+    `[data-conversation-id="${data.result.conversation_id}"]`
+  );
+  const pElement = leftConversation.querySelector(".conversationLeftMsg p");
   pElement.textContent = `${data.userData.full_name} unsent a message`;
 
   const direction =
@@ -3226,25 +3365,30 @@ export async function updateMessage(data) {
       "dark:bg-accent-focus"
     );
     newMessage.textContent = data.message;
-    const leftConversation = document.querySelector(`[data-conversation-id="${data.conversation_id}"]`);
-    const pElement = leftConversation.querySelector('.conversationLeftMsg p');
+    const leftConversation = document.querySelector(
+      `[data-conversation-id="${data.conversation_id}"]`
+    );
+    const pElement = leftConversation.querySelector(".conversationLeftMsg p");
     pElement.textContent = `${data.message} `;
     input.replaceWith(newMessage);
     newMessage
       .closest(`#message-${data._id}`)
       .querySelector("#date_msg").textContent = "(Updated) " + timeMsg;
-    newMessage.innerHTML += ` <div id="pin-div" class=" ${data.pinned === 0 || data.status === 0 ? "hidden" : "flex"
-      } ${"pin-div"} justify-center  items-center me-2 "><i class="fas fa-thumbtack"></i></div>`;
+    newMessage.innerHTML += ` <div id="pin-div" class=" ${
+      data.pinned === 0 || data.status === 0 ? "hidden" : "flex"
+    } ${"pin-div"} justify-center  items-center me-2 "><i class="fas fa-thumbtack"></i></div>`;
     if (data.reacts.length > 0) {
       let messageReactions = data.reacts.map((react) => {
         return `
-      <a id="react-${react._id}" ${newData.user !== react.user_id ? 'style="pointer-events: none"' : ""
-          }> ${react.path}</a>
+      <a id="react-${react._id}" ${
+          newData.user !== react.user_id ? 'style="pointer-events: none"' : ""
+        }> ${react.path}</a>
         `;
       });
 
-      newMessage.innerHTML += `<div class="react-container bg-white  dark:bg-navy-700" id="react-content-${data._id
-        }" >${messageReactions.join("")} </div>`;
+      newMessage.innerHTML += `<div class="react-container bg-white  dark:bg-navy-700" id="react-content-${
+        data._id
+      }" >${messageReactions.join("")} </div>`;
     }
   } else {
     const messageEdited = document.getElementById(
@@ -3254,17 +3398,20 @@ export async function updateMessage(data) {
     messageEdited.textContent = data.message;
     const timeSpan = messageEdited.parentNode.querySelector("p");
     timeSpan.innerHTML = `(Updated) ${timeMsg}`;
-    messageEdited.innerHTML += ` <div id="pin-div" class=" ${data.pinned === 0 || data.status === 0 ? "hidden" : "flex"
-      } ${"pin-div"} justify-center  items-center me-2 "><i class="fas fa-thumbtack"></i></div>`;
+    messageEdited.innerHTML += ` <div id="pin-div" class=" ${
+      data.pinned === 0 || data.status === 0 ? "hidden" : "flex"
+    } ${"pin-div"} justify-center  items-center me-2 "><i class="fas fa-thumbtack"></i></div>`;
     if (data.reacts.length > 0) {
       let messageReactions = data.reacts.map((react) => {
         return `
-      <a id="react-${react._id}" ${newData.user !== react.user_id ? 'style="pointer-events: none"' : ""
-          }> ${react.path}</a>
+      <a id="react-${react._id}" ${
+          newData.user !== react.user_id ? 'style="pointer-events: none"' : ""
+        }> ${react.path}</a>
         `;
       });
-      messageEdited.innerHTML += `<div class="react-container bg-white  dark:bg-navy-700" id="react-content-${data._id
-        }" >${messageReactions.join("")} </div>`;
+      messageEdited.innerHTML += `<div class="react-container bg-white  dark:bg-navy-700" id="react-content-${
+        data._id
+      }" >${messageReactions.join("")} </div>`;
     }
   }
 }
@@ -3280,9 +3427,9 @@ if (messageInput) {
     }
   };
 
-  messageInput.onblur = function () {
-    onStopTyping();
-  };
+  // messageInput.onblur = function () {
+  //   onStopTyping();
+  // };
 }
 
 function onStartTyping() {
@@ -3506,8 +3653,7 @@ if (messageInput) {
   messageInput.addEventListener("keydown", function (event) {
     if (event.keyCode === 13) {
       event.preventDefault();
-      if (messageInput.value !== "")
-        sendMessage();
+      if (messageInput.value !== "") sendMessage();
     }
   });
 }
@@ -3579,59 +3725,59 @@ export async function getAllAgents(response) {
       
       
     </div>`;
+
       $(".all-agents").append(html);
       $(`#left-agent-${agent.user_id}`).on("click", async () => {
-        if (newData.status == 1) {
-          messagesContainer.innerHTML = "";
-
-          const mongoAgent = await axios.get(
-            `${MY_API_ADDRESS}/users/${agent.user_id}`
-          );
-
-          selectAgent(
-            mongoAgent.data.data[0]._id,
-            mongoAgent.data.data[0].full_name,
-            agent.UserID
-          );
-          if (mongoAgent.data.data[0].is_active) {
-            getAgentPresentation(agent.user_id, true);
-          } else {
-            getAgentPresentation(agent.user_id, false);
-          }
-
-
-        } else {
-          const modalDiv = document.createElement("div");
-          modalDiv.innerHTML = `
-    <div class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5">
-      <div class="absolute inset-0 bg-slate-900/60 transition-opacity duration-300"></div>
-      <div class="relative max-w-lg rounded-lg bg-white px-4 py-10 text-center transition-opacity duration-300 dark:bg-navy-700 sm:px-5">
-        <svg xmlns="http://www.w3.org/2000/svg" class="inline h-28 w-28 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-
-        <div class="mt-4" style="width:344px" >
-          <h2 class="text-2xl text-slate-700 dark:text-navy-100">
-            Welcome to Dellastro
-          </h2>
-          <p class="mt-2">
-            Please feel free to fill the form .
-          </p>
-          <button @click="showModal = false" class="btn mt-6 bg-success font-medium text-white hover:bg-success-focus focus:bg-success-focus active:bg-success-focus/90">
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-    `;
-          const closeButton = modalDiv.querySelector("button");
-          closeButton.addEventListener("click", () => {
-            document.body.removeChild(modalDiv);
-          });
-          document.body.appendChild(modalDiv);
-        }
+        clickedAgent(agent.user_id, agent.UserID);
       });
     });
+  }
+}
+async function clickedAgent(agentId, agentContactId) {
+  if (newData.status == 1) {
+    messagesContainer.innerHTML = "";
+
+    const mongoAgent = await axios.get(`${MY_API_ADDRESS}/users/${agentId}`);
+
+    selectAgent(
+      mongoAgent.data.data[0]._id,
+      mongoAgent.data.data[0].full_name,
+      agentContactId
+    );
+    if (mongoAgent.data.data[0].is_active) {
+      getAgentPresentation(agentId, true);
+    } else {
+      getAgentPresentation(agentId, false);
+    }
+  } else {
+    const modalDiv = document.createElement("div");
+    modalDiv.innerHTML = `
+<div class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5">
+<div class="absolute inset-0 bg-slate-900/60 transition-opacity duration-300"></div>
+<div class="relative max-w-lg rounded-lg bg-white px-4 py-10 text-center transition-opacity duration-300 dark:bg-navy-700 sm:px-5">
+  <svg xmlns="http://www.w3.org/2000/svg" class="inline h-28 w-28 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+  </svg>
+
+  <div class="mt-4" style="width:344px" >
+    <h2 class="text-2xl text-slate-700 dark:text-navy-100">
+      Welcome to Dellastro
+    </h2>
+    <p class="mt-2">
+      Please feel free to fill the form .
+    </p>
+    <button @click="showModal = false" class="btn mt-6 bg-success font-medium text-white hover:bg-success-focus focus:bg-success-focus active:bg-success-focus/90">
+      Close
+    </button>
+  </div>
+</div>
+</div>
+`;
+    const closeButton = modalDiv.querySelector("button");
+    closeButton.addEventListener("click", () => {
+      document.body.removeChild(modalDiv);
+    });
+    document.body.appendChild(modalDiv);
   }
 }
 //when an agent connect create an agent card and display it in the online agents block
@@ -3640,9 +3786,10 @@ export function userConnection(data) {
     allConversation.map((conv) => {
       const conversationCard = document.getElementById(
         `left-conversation-${conv._id}`
-
       );
-      const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_on">${getTranslationValue("left_side.experts_on")}</span>`;
+      const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_on">${getTranslationValue(
+        "left_side.experts_on"
+      )}</span>`;
       $("#expert-msg").empty().append(html);
       const statusConv = conversationCard.querySelector("#active-user");
       const isConnected = conv.members.find(
@@ -3666,10 +3813,14 @@ export function userDisconnection(data) {
     if (isConnected) {
       const agentCard = document.getElementById(`${data?._id}`);
       if (agentCard) agentCard.remove();
-      document.querySelectorAll(`#left-conversation-${conv._id} #active-user, #left-mini-conversation-${conv._id} #active-user`).forEach(statusConv => {
-        statusConv.classList.remove("bg-success");
-        statusConv.classList.add("bg-slate-300");
-      })
+      document
+        .querySelectorAll(
+          `#left-conversation-${conv._id} #active-user, #left-mini-conversation-${conv._id} #active-user`
+        )
+        .forEach((statusConv) => {
+          statusConv.classList.remove("bg-success");
+          statusConv.classList.add("bg-slate-300");
+        });
     }
   });
   const agentCard = document.getElementById(`${data?._id}`);
@@ -3708,7 +3859,7 @@ export function getTotalBalance(balance, role) {
       } else {
         balanceNumber.style.color = "#C70039";
       }
-      if (balance === 0) {  
+      if (balance === 0) {
         // Disable input and button if balance is 0
         messageInput.placeholder =
           "You need to buy a new plan to start chatting again";
@@ -3781,9 +3932,6 @@ export function updateUserBalance() {
   }
 }
 
-
-
-
 function updateStatusInCookie() {
   const existingCookie = document.cookie
     .split(";")
@@ -3796,15 +3944,13 @@ function updateStatusInCookie() {
       "myData=" +
       JSON.stringify(cookieData) +
       "; expires=Tue, 31 Dec 9999 23:59:59 GMT; path=/";
-    newData = cookieData
+    newData = cookieData;
   } else {
     console.log("Cookie  not found.");
   }
 }
 
-
-
-export function submitFormStatus(status) {
+export function submitFormStatus(status, text_capture) {
   const formContact = formElement.parentNode;
   const formContent = formContact.parentNode;
   // let messageContent = formElement.closest('[id^="message-content-"]');
@@ -3821,14 +3967,13 @@ export function submitFormStatus(status) {
     }
 
     formContent.style.opacity = 0.7;
-    // formContent.parentElement.classList.remove('f-error');
-    // formContent.parentElement.classList.add('f-success');
+
     // Update the status message for success
-    statusMessage.textContent = "Form saved successfully";
+    statusMessage.textContent = "";
+    statusMessage.innerText = text_capture;
     statusMessage.style.color = "#22A699";
     // Open modal for success submit form
-    formElement.innerHTML = "Saved";
-    formElement.disabled = true;
+    formElement.remove();
     formContent.dataset.submitted = "true";
   } else {
     formElement.disabled = false;
@@ -3838,11 +3983,17 @@ export function submitFormStatus(status) {
     formElement.innerHTML = "";
     formElement.innerHTML = "Try again";
     // Update the status message for failure
-    statusMessage.textContent = "saving form data went wrong,Try again";
+    statusMessage.innerText = "saving form data went wrong,Try again";
     statusMessage.style.color = "#F24C3D";
     // Open modal for fail submit form
   }
 }
+
+// export function displayMessageBloc(){
+
+//
+
+// }
 
 export function ableInputArea() {
   messageInput.disabled = false;
@@ -4066,7 +4217,7 @@ const getAgentPresentation = async (id, online) => {
         },
       }
     );
-
+      console.log("respone",response.data.data[0])
     if (response?.status === 200) {
       const agentData = response.data.data[0];
       // Update skills
@@ -4144,10 +4295,9 @@ const getAgentPresentation = async (id, online) => {
         let toggleButton = document.getElementById("toggleDrawerButton");
         if (toggleButton) {
           toggleButton.click();
-          clicked = true
+          clicked = true;
         }
       }
-
     } else {
       throw new Error("Request failed with status: " + response.status);
     }
@@ -4156,16 +4306,24 @@ const getAgentPresentation = async (id, online) => {
   }
 };
 
-async function selectAgent(agentId, agentName, UserID) {
+export async function selectAgent(agentId, agentName, UserID) {
   messagesContainer.innerHTML = "";
   expert = agentId;
   agentClicked = agentId;
   senderName = agentName;
+
   if (userId) {
     //check if there is conversation between user and agent
-    const response = await axios.get(
-      `${MY_API_ADDRESS}/conversation/?user1=${userId}&user2=${agentId}`
-    );
+    // const response = await axios.get(
+    //   `${MY_API_ADDRESS}/conversation/?user1=${userId}&user2=${agentId}`
+    // );
+
+    foued.checkConversation({
+      userId: userId,
+      agentId: agentId,
+      accountId: newData.accountId,
+    });
+
     conversationHeaderStatus.textContent = connectUsers.find(
       (user) => user._id === agentId
     )
@@ -4177,46 +4335,49 @@ async function selectAgent(agentId, agentName, UserID) {
     connectUsers.find((user) => user._id === agentId)
       ? activeUser.classList.add("bg-success")
       : activeUser.classList.remove("bg-success") &&
-      activeUser.classList.add("bg-slate-300");
-    if (!response.data.data) {
-      conversationId = "";
-      messagesContainer.innerHTML = "";
-      let activeChat = {
-        chatId: conversationId,
-        name: agentName,
-        avatar_url: `images/avatar/avatar-${UserID}` + ".jpg",
-      };
-      window.dispatchEvent(
-        new CustomEvent("change-active-chat", {
-          detail: activeChat,
-        })
-      );
-      $conversationContainer.attr("data-conversation-id", null);
-      showEmptyConversation()
-    } else {
-      conversationId = !response.data.data.conversation
-        ? response.data.data[0]._id
-        : response.data.data.conversation[0]._id;
-      window.dispatchEvent(
-        new CustomEvent("change-active-chat", {
-          detail: {
-            chatId: conversationId,
-            name: agentName,
-            avatar_url: `images/avatar/avatar-${UserID}` + ".jpg",
-          },
-        })
-      );
-      $conversationContainer.attr("data-conversation-id", conversationId);
-      // Load the first page of messages on page load
-      let currentPage = 1;
-
-      foued.loadMessages({page:currentPage,conversationId: conversationId});
-    }
+        activeUser.classList.add("bg-slate-300");
   }
 }
 
-
-
+export async function onCheckConversation(data, agentContactId, agentName) {
+  if (!data.data) {
+    conversationId = "";
+    messagesContainer.innerHTML = "";
+    let activeChat = {
+      chatId: conversationId,
+      name: agentName,
+      avatar_url: `images/avatar/avatar-${agentContactId}` + ".jpg",
+    };
+    window.dispatchEvent(
+      new CustomEvent("change-active-chat", {
+        detail: activeChat,
+      })
+    );
+    $conversationContainer.attr("data-conversation-id", null);
+    showEmptyConversation();
+  } else {
+    // conversationId = !data.data.conversation
+    //   ? data.data[0]._id
+    //   : data.data.conversation[0]._id;
+    conversationId = data.data.conversation[0]._id;
+    window.dispatchEvent(
+      new CustomEvent("change-active-chat", {
+        detail: {
+          chatId: conversationId,
+          name: agentName,
+          avatar_url: `images/avatar/avatar-${agentContactId}` + ".jpg",
+        },
+      })
+    );
+    $conversationContainer.attr("data-conversation-id", conversationId);
+    // Load the first page of messages on page load
+    $(`.conversation-click[data-conversation-id="${conversationId}"]`).trigger(
+      "click"
+    );
+    let currentPage = 1;
+    foued.loadMessages({ page: currentPage, conversationId: conversationId });
+  }
+}
 
 $(document).ready(function () {
   $("#buyMoreButton").on("click", function () {
@@ -4270,7 +4431,6 @@ async function setSelectedLocale(locale) {
   traduc();
 }
 
-
 const browserLang = new Intl.Locale(navigator.language).language;
 for (const locale of locales) {
   const localeLang = new Intl.Locale(locale).language;
@@ -4281,9 +4441,9 @@ for (const locale of locales) {
 function phoneList(input) {
   let form = input.closest("form");
   let iti = window.intlTelInput(input, {
-    utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
-    initialCountry: userCountry.toLowerCase()
-
+    utilsScript:
+      "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+    initialCountry: userCountry.toLowerCase(),
   });
   function validatePhoneNumber() {
     let phoneNumber = input.value;
@@ -4291,7 +4451,10 @@ function phoneList(input) {
 
     if (phoneNumber.startsWith("+")) {
       if (!phoneNumber.startsWith("+" + selectedCountryData.dialCode)) {
-        showValidationError(input, "Please enter a valid phone number for " + selectedCountryData.name);
+        showValidationError(
+          input,
+          "Please enter a valid phone number for " + selectedCountryData.name
+        );
         return;
       }
     } else {
@@ -4299,11 +4462,14 @@ function phoneList(input) {
       input.value = phoneNumber;
     }
     let valid = iti.isValidNumber(phoneNumber);
-    PhoneNumberValidation = true
+    PhoneNumberValidation = true;
     if (!valid) {
-      PhoneNumberValidation = false
+      PhoneNumberValidation = false;
 
-      showValidationError(input, "Please enter a valid phone number for " + selectedCountryData.name);
+      showValidationError(
+        input,
+        "Please enter a valid phone number for " + selectedCountryData.name
+      );
     } else {
     }
   }
@@ -4312,96 +4478,369 @@ function phoneList(input) {
 
   input.addEventListener("blur", validatePhoneNumber);
 
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
-    let valid = iti.isValidNumber(input.value);
-    if (!valid) {
-      showValidationError(input, "Please enter a valid phone number.");
-    }
-  }, false);
+  form.addEventListener(
+    "submit",
+    function (e) {
+      e.preventDefault();
+      let valid = iti.isValidNumber(input.value);
+      if (!valid) {
+        showValidationError(input, "Please enter a valid phone number.");
+      }
+    },
+    false
+  );
 }
 
 function showEmptyConversation(show = true) {
   conversationContainer.classList.toggle("has-not-messages", show);
 }
 
-export function mergeConversation(data){
- 
+export function mergeConversation(data) {
   $(
     `.conversation-click[data-conversation-id="${data.newConversation}"]`
   ).trigger("click");
 
+  const leftConversation = document.getElementById("left-conversation");
 
-const leftConversation = document.getElementById("left-conversation");
+  const divToDelete = leftConversation.querySelector(
+    `[data-conversation-id="${data.deletedConversationId}"]`
+  );
 
-const divToDelete = leftConversation.querySelector(`[data-conversation-id="${data.deletedConversationId}"]`);
-  
+  if (divToDelete) {
+    divToDelete.remove();
+  }
 
-if (divToDelete) {
-  divToDelete.remove();
-} 
+  const miniSidebar = document.getElementById("mini-sidebar");
 
-const miniSidebar = document.getElementById("mini-sidebar");
+  const miniDivToDelete = miniSidebar.querySelector(
+    `[data-conversation-id="${data.deletedConversationId}"]`
+  );
 
-const miniDivToDelete = miniSidebar.querySelector(`[data-conversation-id="${data.deletedConversationId}"]`);
-
-if (miniDivToDelete) {
-  miniDivToDelete.remove();
+  if (miniDivToDelete) {
+    miniDivToDelete.remove();
+  }
 }
 
+function createAgentCard(agent) {
+  const agentCard = document.createElement("div");
+  agentCard.className = "card w-72 shrink-0 space-y-2 rounded-xl p-4 sm:px-5";
 
+  agentCard.innerHTML = `
+    <div class="flex items-center justify-between space-x-2">
+      <div class="flex items-center space-x-3">
+        <div class="avatar">
+          <img class="mask is-squircle" src="images/avatar/avatar-${agent.UserID}.jpg" alt="image">
+        </div>
+        <div>
+          <p class="font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
+            ${agent.firstname} ${agent.lastname}
+          </p>
+          <div class="badge bg-primary/10 text-primary dark:bg-accent-light/15 dark:text-accent-light text-tiny px-2 py-1">
+            ${agent.skills}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flex justify-between space-x-31">
+      <div>
+        <p class="text-tiny">Country</p>
+        <p class="text-md font-semibold text-slate-700 dark:text-navy-100">${agent.country}</p>
+      </div>
+      <div>
+        <p class="text-tiny">Languages</p>
+        <p class="text-md font-semibold text-slate-700 dark:text-navy-100">${agent.languages}</p>
+      </div>
+      <div>
+        <p class="text-tiny">Expertise</p>
+        <p class="text-md font-semibold text-slate-700 dark:text-navy-100">${agent.expertise}</p>
+      </div>
+    </div>
+    <div class="grow">
+      <p class="text-xs text-left">
+      ${truncateMessage(agent.presentation,150)}
+       
+      </p>
+    </div>
+    <button id="right-agent-${agent.user_id}" class="btn h-9 w-full justify-between bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
+    <span>Chatter</span>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
+    </svg>
+  </button>
+</div>
+  `;
+
+  return agentCard;
+}
+
+export function displayAgents(agents) {
+  const agentBlock = document.getElementById("agentBlock");
+  if (!agentBlock) {
+    const containerDiv = document.createElement("div");
+    containerDiv.className =
+      "mt-4 grid grid-cols-12 gap-4 bg-slate-150 py-3 dark:bg-navy-800 sm:mt-5 sm:gap-5 lg:mt-6 lg:gap-6";
+    containerDiv.id = "agentBlock";
+    containerDiv.style.paddingLeft = "10px";
+
+    const agentContainer = document.createElement("div");
+    agentContainer.className =
+      "is-scrollbar-hidden col-span-12 flex space-x-4 overflow-x-auto px-[var(--margin-x)] transition-all duration-[.25s] lg:col-span-9 lg:pl-0";
+
+    agents.forEach(async (agent) => {
+      const agentCard = await createAgentCard(agent);
+      agentContainer.appendChild(agentCard);
+      conversationContainer.scrollTop = conversationContainer.scrollHeight;
+
+      const button = document.getElementById(`right-agent-${agent.user_id}`);
+      if (button) {
+        button.addEventListener("click", async () => {
+          // clickedAgent(agent.user_id, agent.UserID);
+          foued.availableAgent({
+            accountId: newData.accountId,
+            conversationId: conversationId,
+            userId: newData.user,
+            agentId: agent.user_id,
+          });
+        });
+      }
+    });
+
+    containerDiv.appendChild(agentContainer);
+    messagesContainer.appendChild(containerDiv);
+  }
 }
 
 export function changeHeaderPicture(cnv, agent, status) {
   if (conversationId == cnv) {
-    const headerIconDiv = document.querySelector('#conversation-header-icon');
-    const activeUserHeader = document.querySelector('#active-user-header');
+    const headerIconDiv = document.querySelector("#conversation-header-icon");
+    const activeUserHeader = document.querySelector("#active-user-header");
 
-    const conversationName = document.getElementById('conversation-name');
+    const conversationName = document.getElementById("conversation-name");
     conversationName.textContent = agent.full_name;
 
     if (headerIconDiv) {
-
-      const imgElement = headerIconDiv.querySelector('img');
+      const imgElement = headerIconDiv.querySelector("img");
 
       if (imgElement) {
-
-        imgElement.src = `images/avatar/avatar-${agent.id}.jpg`
+        imgElement.src = `images/avatar/avatar-${agent.id}.jpg`;
       }
     }
     if (activeUserHeader) {
-      activeUserHeader.classList.remove('bg-slate-300', 'bg-success');
+      activeUserHeader.classList.remove("bg-slate-300", "bg-success");
 
       if (status === 0) {
-        activeUserHeader?.classList?.add('bg-slate-300');
+        activeUserHeader?.classList?.add("bg-slate-300");
       } else if (status === 1) {
-        activeUserHeader?.classList?.add('bg-success');
+        activeUserHeader?.classList?.add("bg-success");
       }
     }
-
-
   }
 }
+
+export function displayLeftConversation(data) {
+  const isNotNewConversation = document.querySelector(
+    `#left-conversation-${data.conversationId}`
+  );
+  const timestamp = data.date;
+  const date = new Date(timestamp);
+  const day = date.toLocaleString("en-us", {
+    weekday: "long",
+  });
+  const hour = date.getHours();
+  const minute = date.getMinutes().toString().padStart(2, "0");
+  const time = `${hour}:${minute}`;
+  if (!isNotNewConversation) {
+    const newConvDiv = document.createElement("div");
+    const newminiconDiv = document.createElement("div");
+
+    const conversationActive = document.querySelectorAll(
+      "div.conversation-click"
+    );
+    conversationActive.forEach((element) => {
+      if (element.classList.contains("bg-slate-150"))
+        element.classList.remove("bg-slate-150");
+    });
+    const html = `
+    <div class="conversationItem conversation bg-slate-150" data-conversation-id="${
+      data.conversationId
+    }" data-name=${
+      data.senderName
+    } data-timestamp=${timeString} id="left-conversation-${
+      data.conversationId
+    }" data-user-id="${data.agentId}">
+      <div class="is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
+        <div
+          class="conversation-click flex cursor-pointer items-center space-x-2.5 px-4 py-2.5 font-inter hover:bg-slate-150 dark:hover:bg-navy-600"
+          data-conversation-id="${data.conversationId}"
+          data-name=${data.senderName}>
+          <div class="avatar h-10 w-10">
+            <img class="rounded-full"  src=images/avatar/avatar-${
+              data.contactAgentId
+            }.jpg alt="image" />
+            <div
+            id=${data.agentId}
+              class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${
+                data.status == "1" ? "bg-success" : "bg-slate-300"
+              } dark:border-navy-700">
+            </div>
+          </div>
+          <div class="flex flex-1 flex-col">
+            <div class="flex items-baseline justify-between space-x-1.5">
+              <p  data-conversation-name class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
+              ${data.senderName}
+              </p>
+              <span class="text-tiny+ text-slate-400 dark:text-navy-300">${timeString}</span>
+            </div>
+            <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftMsg"> 
+              <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
+                Agent sent a form 
+              </p>
+         
+            </div>
+            <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftTyping "> 
+            
+            <div>
+              <div class="flex" class="pe-3">
+                <div
+                  id="typing-display"
+                  class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 relative "
+                >
+                  <div class="d-flex">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      xmlns:xlink="http://www.w3.org/1999/xlink"
+                      viewBox="0 0 100 100"
+                      preserveAspectRatio="xMidYMid"
+                      style="background: none"
+                      width="45px"
+                      height="20px"
+                    >
+                      <circle
+                        cy="62.5"
+                        fill="#C4C4C46b"
+                        r="20"
+                        cx="1.5"
+                      >
+                        <animate
+                          attributeName="cy"
+                          calcMode="spline"
+                          keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+                          repeatCount="indefinite"
+                          values="62.5;37.5;62.5;62.5"
+                          keyTimes="0;0.25;0.5;1"
+                          dur="1s"
+                          begin="-0.5s"
+                        ></animate>
+                      </circle>
+                      <circle
+                        cy="62.5"
+                        fill="#c4c4c498"
+                        r="20"
+                        cx="52.5"
+                      >
+                        <animate
+                          attributeName="cy"
+                          calcMode="spline"
+                          keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+                          repeatCount="indefinite"
+                          values="62.5;37.5;62.5;62.5"
+                          keyTimes="0;0.25;0.5;1"
+                          dur="1s"
+                          begin="-0.375s"
+                        ></animate>
+                      </circle>
+                      <circle
+                        cy="62.5"
+                        fill="#c4c4c4"
+                        r="20"
+                        cx="107.5"
+                      >
+                        <animate
+                          attributeName="cy"
+                          calcMode="spline"
+                          keySplines="0 0.5 0.5 1;0.5 0 1 0.5;0.5 0.5 0.5 0.5"
+                          repeatCount="indefinite"
+                          values="62.5;37.5;62.5;62.5"
+                          keyTimes="0;0.25;0.5;1"
+                          dur="1s"
+                          begin="-0.25s"
+                        ></animate>
+                      </circle>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+         
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+    newConvDiv.innerHTML = html;
+    leftConversationContainer.insertBefore(
+      newConvDiv,
+      leftConversationContainer.firstChild
+    );
+    const minimizedHtmlSideBar = `
+    <div class="mini-conversation-click flex cursor-pointer items-center justify-center py-2.5 hover:bg-slate-150 dark:hover:bg-navy-600 conversation " data-conversation-id="${
+      data.conversationId
+    }" data-user-id="${data.agentId}" data-name="${
+      data.senderName
+    }" data-timestamp="${timestamp}" id="left-mini-conversation-${
+      data.conversationId
+    }">
+                    <div class=" avatar h-10 w-10" >
+                      <img class="rounded-full" src=images/avatar/avatar-${
+                        data.contactAgentId
+                      }.jpg alt="image">
+                      <div id="active-user" class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${
+                        data.status == 1 ? "bg-success" : "bg-slate-300"
+                      }  dark:border-navy-700"></div>
+                    </div>
+                  </div>
+    `;
+
+    const existingElement = document.querySelector(
+      `#left-mini-conversation-${data.conversation}`
+    );
+
+    if (!existingElement) {
+      newminiconDiv.innerHTML = minimizedHtmlSideBar;
+      minimizedSideBar.insertBefore(newminiconDiv, minimizedSideBar.firstChild);
+    }
+  }
+}
+
 $(document).ready(async function () {
   let params = Object.fromEntries(
     new URLSearchParams(window.location.search).entries()
   );
-  console.log("params :", params)
+  console.log("params :", params);
   showSpinner();
   getPlans();
 
   foued.connect(() => {
-    if (!newData || ((params?.source == "gocc" && (params?.contact || params?.lead)) && (params?.contact ? params?.contact != newData.goccContactId : params?.lead != newData.goccLeadId))) {
+    if (
+      !newData ||
+      (params?.source == "gocc" &&
+        (params?.contact || params?.lead) &&
+        (params?.contact
+          ? params?.contact != newData.goccContactId
+          : params?.lead != newData.goccLeadId))
+    ) {
       foued.socket.emit(
         "createGuest",
         {
           browser: navigator.userAgent,
           platform: navigator.platform,
           accountId: accountId,
-          ...(params.contact ? { source: 'gocc', gocc_contact_id: params.contact } : {}),
-          ...(params.lead ? { source: 'gocc', gocc_lead_id: params.lead } : {})
+          ...(params.contact
+            ? { source: "gocc", gocc_contact_id: params.contact }
+            : {}),
+          ...(params.lead ? { source: "gocc", gocc_lead_id: params.lead } : {}),
         },
-        (error) => { }
+        (error) => {}
       );
       params = {};
     } else {
@@ -4425,7 +4864,7 @@ $(document).ready(async function () {
     }
   });
 
-
+  foued.getAvailableAgent();
   foued.onDisconnected();
   foued.onConnected();
   //get all the connected user (the agents)
@@ -4470,6 +4909,7 @@ $(document).ready(async function () {
   foued.linkClicked();
   foued.onConnectedError();
   foued.onGetUserPresntations();
+  foued.onCheckConversation();
   document
     .querySelector("emoji-picker")
     .addEventListener("emoji-click", (event) => {
@@ -4477,13 +4917,12 @@ $(document).ready(async function () {
     });
   foued.savedFormData();
   foued.failGuest();
-  foued.mergeConversation()
+  foued.mergeConversation();
   // foued.displayRobotAvatar();
-  foued.getMessages()
+  foued.getMessages();
   await getExperts();
-
+  foued.displayAgentsMessage();
   $(document).on("click", ".conversation-click", handleConversationClick);
   $(document).on("click", ".mini-conversation-click", handleConversationClick);
   $(document).on("click", "#emoji-button", showEmoji);
-
 });
