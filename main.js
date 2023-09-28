@@ -1,9 +1,10 @@
+export let connectUsers = [];
+
 import Event from "./lib_client/client_2.js";
 const foued = new Event();
 import { role, last_seen_at } from "./lib_client/client_2.js";
 const currentDate = new Date();
 let allConversation = [];
-export let connectUsers = [];
 let agentClicked = "";
 let PhoneNumberValidation = false;
 let userCountry;
@@ -16,7 +17,7 @@ const timeString =
   hours.toString().padStart(2, "0") + ":" + minutes.toString().padStart(2, "0");
 // Save user information in local storage
 
-import { accountId, API_KEY, MY_API_ADDRESS, SQL_API } from "./env.js";
+import { accountId, API_KEY, max_length_message, MY_API_ADDRESS, SQL_API } from "./env.js";
 
 function getCookie(name) {
   let cookieArr = document.cookie.split(";");
@@ -648,7 +649,7 @@ export async function guestCreated(data) {
     </div>
   </div>`;
   const newConvDiv = document.createElement("div");
-  inputLEngth(256);
+  inputLEngth(max_length_message);
   // Append the HTML to the container
   newConvDiv.innerHTML = html;
   leftConversationContainer.insertBefore(
@@ -678,7 +679,7 @@ export async function getExperts() {
       expertAppended = true;
     } else {
       offline = true;
-      const html = `<span class="text-xs+ font-medium uppercase">All Experts are offline </span>`;
+      const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_off" >All Experts are offline </span>`;
       $("#expert-msg").empty().append(html);
       expertAppended = true;
     }
@@ -699,7 +700,7 @@ export function checkForExpertMessages() {
     )}</span>`;
     $("#expert-msg").empty().append(html);
   } else {
-    const html = `<span class="text-xs+ font-medium uppercase">All Experts are offline </span>`;
+    const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_off" >All Experts are offline </span>`;
     $("#expert-msg").empty().append(html);
   }
 }
@@ -1269,6 +1270,7 @@ async function markMessageAsSeen(conversationId) {
 let isLoading = false;
 let isEndOfMessages = false; // Track if all messages have been loaded
 const spinner = document.getElementById("conversation-spinner");
+const bigSpinner=document.getElementById("page-one-spinner")
 const limit = 10;
 export async function loadMessages(response) {
   // Show the big container message
@@ -1277,20 +1279,14 @@ export async function loadMessages(response) {
   if (conversationId) {
     try {
 
-
       if (response.message !== "success") {
         throw new Error("Failed to load messages");
       }
       displayMessages(response.data);
       if (response.data.currentPage == 1) {
-        // conversationContainer.scrollTop = conversationContainer.scrollHeight;
-        conversationContainer.scrollTo(0, conversationContainer.scrollHeight);
-        spinner.classList.remove("hidden");
-        spinner.style.width = "48px"; 
-        spinner.style.height = "48px";
-      
+        conversationContainer.scrollTop = conversationContainer.scrollHeight;
+        bigSpinner.classList.remove("hidden");
       }else {
-      console.log("spinner",spinner)
       spinner.classList.remove("hidden");
       }
       if (
@@ -1783,8 +1779,8 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
           message.user === newData.user ? "justify-end" : "justify-start";
         const msgStyle =
           message.user === newData.user && !message.paid
-            ? `rounded-2xl break-words text-wrap rounded-tl-none bg-msg p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
-            : `rounded-2xl break-words text-wrap relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
+            ? `rounded-2xl break-words  rounded-tl-none bg-msg p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
+            : `rounded-2xl break-words  relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
         messagesContainer.insertAdjacentHTML(
           "afterbegin",
           `<div id="message-${messageId}" class="flex items-start ${direction} space-x-1.5 ${
@@ -2135,7 +2131,7 @@ async function sendMessage() {
             permissions: {},
             members_count: 2,
             status: "0",
-            max_length_message: "256",
+            max_length_message: max_length_message,
           },
         });
       } catch (error) {
@@ -2173,9 +2169,7 @@ async function sendMessage() {
 
 export async function sentMessage(data) {
   showEmptyConversation(false);
-  resetMaxLength(256);
-  const log = JSON.parse(data.content)
-
+  resetMaxLength(max_length_message);
   conversationId = data.conversation;
   let conv = conversationContainer.dataset.conversationId;
   const isNotNewConversation = document.querySelector(
@@ -2190,8 +2184,8 @@ export async function sentMessage(data) {
   const minute = date.getMinutes().toString().padStart(2, "0");
   const time = `${hour}:${minute}`;
   if (!isNotNewConversation) {
-    const newConvDiv = document.createElement("div");
-    const newminiconDiv = document.createElement("div");
+    // const newConvDiv = document.createElement("div");
+    // const newminiconDiv = document.createElement("div");
 
     const conversationActive = document.querySelectorAll(
       "div.conversation-click"
@@ -2203,9 +2197,10 @@ export async function sentMessage(data) {
 
   } else {
     let userLog = "";
-    const convMessage = isNotNewConversation.querySelector("p#last-message");
-
-    if (data.type === "log" && log.element==3) {
+    const convMessage = isNotNewConversation.querySelector("#last-message");
+    if (data.type === "log"  ) {
+      const log = JSON.parse(data.content)
+      if(log.action ==='purchase completed' ){ 
         switch(log.action){
           case "fill":
             userLog = `You filled on the form.`;
@@ -2235,16 +2230,20 @@ export async function sentMessage(data) {
             userLog = `Purchase went  wrong.`
             break;
         }
-      //   convMessage.textContent = userLog
-    } else convMessage.textContent = data.content;
+        convMessage.textContent = userLog
+           
+      }
+    } else convMessage.textContent = truncateMessage(data.content,20);
   }
   if (data.conversation === conv) {
     const messageId = data.id;
     const messageContainer = document.getElementById(`message-${messageId}`);
     messagesContainer = document.getElementById("big-container-message");
     if (!messageContainer) {
-      if (data.type === "log" && log.element==3) {
-        const log = JSON.parse(data.content)
+      if (data.type === "log" ) {
+   const log = JSON.parse(data.content)
+   if(log.action ==='purchase completed' ){
+
         let userLog = ""
         switch (log.action) {
           case "fill":
@@ -2286,12 +2285,13 @@ export async function sentMessage(data) {
         </div>`
         let typingBlock = document.getElementById("typing-block-message");
         messagesContainer.insertBefore(newDivMsg, typingBlock);
+      }
       } else {
         let direction = data.direction == "in" ? "justify-end" : "";
         const msgStyle =
           role === "GUEST"
-            ? `rounded-2xl break-words text-wrap rounded-tl-none bg-msg p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
-            : `rounded-2xl break-words text-wrap rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
+            ? `rounded-2xl break-words  rounded-tl-none bg-msg p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
+            : `rounded-2xl break-words  rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
         messagesContainer.style.display = "block";
         messagesContainer.insertAdjacentHTML(
           "beforeend",
@@ -2362,7 +2362,7 @@ export async function sentMessage(data) {
         );
         if (msgDiv) {
           const msgText = msgDiv.querySelector("p#last-message");
-          msgText.textContent = `Me : ${data.content}`;
+          msgText.textContent = `Me :  ${truncateMessage(data.content,20)}`;
           leftConversationContainer.insertBefore(
             msgDiv,
             leftConversationContainer.firstChild
@@ -2500,7 +2500,7 @@ export async function receiveMessage(data) {
           <h3 class="pricing-title">${plan.name}</h3>
         </div>
         <ul class="pricing-feature-list">
-          <li class="pricing-feature">${plan.billing_volume} Messages</li>
+          <li class="pricing-feature">${plan.billing_volume}Messages</li>
         </ul>
         <button class="pricing-action">Buy Plan</button>
       </div>  
@@ -2721,8 +2721,8 @@ export async function receiveMessage(data) {
         btnSelectAgent.addEventListener("click", function () {
           foued.displayAgents(newData.accountId);
         });
-
       }
+
       if (data.messageData.type !== "bloc") {
         const messageContainer = document.getElementById(
           `message-${messageId}`
@@ -2732,8 +2732,8 @@ export async function receiveMessage(data) {
             data.direction == "in" ? "justify-end" : "justify-start";
           const msgStyle =
             data.messageData.user === newData.user && !data.message.paid
-              ? `rounded-2xl break-words text-wrap rounded-tl-none bg-white p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
-              : `rounded-2xl break-words text-wrap relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
+              ? `rounded-2xl break-words  rounded-tl-none bg-white p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
+              : `rounded-2xl break-words  relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
           const messageContent = `
       <div id="message-${messageId}" class="flex items-start ${direction} space-x-1.5 ${
             data.messageData.type === "plan" ? "plans-container" : ""
@@ -3953,13 +3953,15 @@ function updateStatusInCookie() {
 export function submitFormStatus(status, text_capture) {
   const formContact = formElement.parentNode;
   const formContent = formContact.parentNode;
-  // let messageContent = formElement.closest('[id^="message-content-"]');
-  // let messageId = messageContent ?.id ?.replace('message-content-', '');
-  // const form = JSON.parse(formElement.dataset.content);
-  const statusMessage = document.createElement("p");
+  
+  let statusMessage = formContent.querySelector("p");
+
+  if (!statusMessage) {
+    statusMessage = document.createElement("p");
+    formContent.appendChild(statusMessage);
+  }
 
   const formInputs = formContact.querySelectorAll("input");
-  formContent.appendChild(statusMessage);
 
   if (status) {
     if (newData.status == "0") {
@@ -3983,7 +3985,7 @@ export function submitFormStatus(status, text_capture) {
     formElement.innerHTML = "";
     formElement.innerHTML = "Try again";
     // Update the status message for failure
-    statusMessage.innerText = "saving form data went wrong,Try again";
+    statusMessage.innerText = "Saving form data went wrong, Try again";
     statusMessage.style.color = "#F24C3D";
     // Open modal for fail submit form
   }
@@ -4063,8 +4065,7 @@ async function getPlans() {
                       <li class='pricing-feature'>${plan.billing_volume} Messages</li>
                     </ul>
                     <button id="startChatButton" class='plan-btn pricing-action' data-plan="${plan.id}" name="${plan.name}">Start chatting</button>
-                    </div>
-             
+                    </div>         
       `
         );
       });
@@ -4217,7 +4218,6 @@ const getAgentPresentation = async (id, online) => {
         },
       }
     );
-      console.log("respone",response.data.data[0])
     if (response?.status === 200) {
       const agentData = response.data.data[0];
       // Update skills
@@ -4307,17 +4307,13 @@ const getAgentPresentation = async (id, online) => {
 };
 
 export async function selectAgent(agentId, agentName, UserID) {
+  console.log("selectAgent")
   messagesContainer.innerHTML = "";
   expert = agentId;
   agentClicked = agentId;
   senderName = agentName;
 
   if (userId) {
-    //check if there is conversation between user and agent
-    // const response = await axios.get(
-    //   `${MY_API_ADDRESS}/conversation/?user1=${userId}&user2=${agentId}`
-    // );
-
     foued.checkConversation({
       userId: userId,
       agentId: agentId,
@@ -4354,11 +4350,11 @@ export async function onCheckConversation(data, agentContactId, agentName) {
       })
     );
     $conversationContainer.attr("data-conversation-id", null);
-    showEmptyConversation();
+    // showEmptyConversation();
   } else {
-    // conversationId = !data.data.conversation
-    //   ? data.data[0]._id
-    //   : data.data.conversation[0]._id;
+    conversationId = !data.data.conversation
+      ? data.data[0]._id
+      : data.data.conversation[0]._id;
     conversationId = data.data.conversation[0]._id;
     window.dispatchEvent(
       new CustomEvent("change-active-chat", {
@@ -4438,6 +4434,9 @@ for (const locale of locales) {
     setSelectedLocale(locale);
   }
 }
+
+
+
 function phoneList(input) {
   let form = input.closest("form");
   let iti = window.intlTelInput(input, {
@@ -4636,7 +4635,10 @@ export function changeHeaderPicture(cnv, agent, status) {
     }
   }
 }
+export function removeConnectUser(id){
+  connectUsers = connectUsers.filter((connectedUser) => connectedUser._id !== id);
 
+}
 export function displayLeftConversation(data) {
   const isNotNewConversation = document.querySelector(
     `#left-conversation-${data.conversationId}`
@@ -4660,6 +4662,9 @@ export function displayLeftConversation(data) {
       if (element.classList.contains("bg-slate-150"))
         element.classList.remove("bg-slate-150");
     });
+    console.log("data conversation ",data)
+    const agentContactId = connectUsers.find((user) => user._id === data.agentId);
+    console.log("agentCtazezaea",agentContactId)
     const html = `
     <div class="conversationItem conversation bg-slate-150" data-conversation-id="${
       data.conversationId
@@ -4680,7 +4685,7 @@ export function displayLeftConversation(data) {
             <div
             id=${data.agentId}
               class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${
-                data.status == "1" ? "bg-success" : "bg-slate-300"
+                agentContactId?.is_active  ? "bg-success" : "bg-slate-300"
               } dark:border-navy-700">
             </div>
           </div>
@@ -4692,7 +4697,7 @@ export function displayLeftConversation(data) {
               <span class="text-tiny+ text-slate-400 dark:text-navy-300">${timeString}</span>
             </div>
             <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftMsg"> 
-              <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message">
+              <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message" data-translation="left_side.tab_1.sent_form">
                 Agent sent a form 
               </p>
          
@@ -4795,7 +4800,7 @@ export function displayLeftConversation(data) {
                         data.contactAgentId
                       }.jpg alt="image">
                       <div id="active-user" class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${
-                        data.status == 1 ? "bg-success" : "bg-slate-300"
+                        agentContactId?.is_active  ? "bg-success" : "bg-slate-300"
                       }  dark:border-navy-700"></div>
                     </div>
                   </div>

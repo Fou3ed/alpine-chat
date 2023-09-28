@@ -20,7 +20,7 @@
     "left_side": {
         "all_chats": "all chats",
         "experts": "experts",
-        "experts_off": "all experts are",
+        "experts_off": "all experts are offline",
         "experts_on": "online experts",
         "tab_1": {
             "search": "search chats",

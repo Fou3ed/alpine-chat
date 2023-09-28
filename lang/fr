@@ -20,7 +20,7 @@
     "left_side": {
         "all_chats": "tous les chats",
         "experts": "experts",
-        "experts_off": "tous les experts sont",
+        "experts_off": "tous les experts sont hors-ligne",
         "experts_on": "experts en ligne",
         "tab_1": {
             "search": "rechercher des chats",

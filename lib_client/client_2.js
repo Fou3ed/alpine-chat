@@ -34,6 +34,7 @@ import {
   displayAgents,
   connectUsers,
   onCheckConversation,
+  removeConnectUser,
   
   
 
@@ -92,9 +93,7 @@ export default class event {
 
         }else {
           clientIdElement.textContent = `${role} ID : #${userData.id}`;
-
         }
-
       }
         getAllConversations()
         getTotalBalance(balance,role);
@@ -151,7 +150,6 @@ export default class event {
           console.log("user",user)
           if(connectUsers){
             connectUsers.push(user)
-
           }
         }
         userConnection(user)
@@ -164,8 +162,7 @@ export default class event {
       if (user?.role === "AGENT") {
         removeExpert(user._id);
           if(connectUsers){
-            connectUsers = connectUsers.filter((connectedUser) => connectedUser._id !== user._id);
-
+            removeConnectUser(user._id)
           }
       }
       checkForExpertMessages();

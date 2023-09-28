@@ -123,7 +123,7 @@
                   x-transition:enter-start="opacity-0 [transform:translate3d(1rem,0,0)]"
                   x-transition:enter-end="opacity-100 [transform:translate3d(0,0,0)]">
                   <div>
-                    <h2 class="text-sm+ font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 items-start px-4 pt-6">
+                    <h2 class="text-sm+ font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 items-start px-4 pt-6" data-translation="left_side.tab_2.title">
                       Discover our best experts
                     </h2>
                     <div class="all-agents flex flex-col items-center pb-20 pt-4">
@@ -541,10 +541,11 @@
                       class="absolute right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-success dark:border-navy-700"></span>
                   </div>
                   <div class="text-left whitespace-nowrap">
-                    <a href="#"  id="userName"
-                      class="text-medium font-medium text-slate-700 hover:text-primary focus:text-primary dark:text-navy-100 dark:hover:text-accent-light dark:focus:text-accent-light">
+                    <a href="#"  id="userName" 
+                      class="text-medium font-medium text-slate-700 hover:text-primary focus:text-primary dark:text-navy-100 dark:hover:text-accent-light dark:focus:text-accent-light" >
                     </a>
-                    <p id="clientId" class="text-xs text-slate-400 dark:text-navy-300"></p>
+                    <p id="clientId" class="text-xs text-slate-400 dark:text-navy-300" data-translation="header.profile_id"
+                    ></p>
                   </div>
                 </div>
               </button>
@@ -624,6 +625,8 @@
       <div class="flex items-center justify-center w-full">
         <span class="loader hidden" id="conversation-spinner"></span>
       </div>
+
+
       
 
       <div :class="$store.breakpoints.smAndUp && 'scrollbar-sm'"
@@ -635,10 +638,10 @@
           x-transition:enter-end="opacity-100 [transform:translate3d(0,0,0)]" class="space-y-5"
           id="big-container-message"
           >             
-          
+                <div class="flex  items-center justify-center w-full">
+        <span class="loader " id="page-one-spinner"></span>
+      </div>
           <div class="flex items-start space-x-2.5 sm:space-x-5 plans-container">
-          
-       
           </div>
         </div>
    
@@ -649,9 +652,10 @@
         <div class="-ml-1.5 flex flex-1 space-x-2">
    
 
-          <input type="text" class="form-input h-9 w-full bg-transparent placeholder:text-slate-400/70"
+          <input type="text" class="form-input h-9 w-full bg-transparent placeholder:text-slate-400/70" 
             placeholder="Write your message" 
             id="message-input"
+            data-translation="container.write_message"
             />
         </div>
         <emoji-picker id="emoji" class="light hidden"></emoji-picker>
