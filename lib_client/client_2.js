@@ -35,6 +35,7 @@ import {
   connectUsers,
   onCheckConversation,
   removeConnectUser,
+  getTranslationValue,
   
   
 
@@ -87,14 +88,11 @@ export default class event {
 
       if (usernameLink) {
         usernameLink.textContent = userData.full_name;
-        if(userData.role=="CLIENT"){
-          clientIdElement.textContent = `PROFILE ID : #${userData.id}`;
-
-
-        }else {
-          clientIdElement.textContent = `${role} ID : #${userData.id}`;
-        }
+  
+          clientIdElement.textContent = getTranslationValue("header.profile_id")  + " " + `#${userData.id}`;
+     
       }
+
         getAllConversations()
         getTotalBalance(balance,role);
 
@@ -371,7 +369,7 @@ export default class event {
           </svg>
   
           <div class="mt-4" style="width:344px" >
-            <h2 class="text-2xl text-slate-700 dark:text-navy-100">
+            <h2 class="text-2xl text-slate-700 dark:text-navy-100" data-translation="bought.congratulations">
               Congratulations
             </h2>
             <p class="mt-2">
@@ -593,11 +591,10 @@ const number = match ? match[1] : null;
       const msgDivMini = document.getElementById(`left-mini-conversation-${data.messageData.conversation}`);
 
       if (msgDiv) {
-        const msgText = msgDiv.querySelector("p#last-message")
+        const msgText = msgDiv.querySelector("#last-message")
           msgText.textContent = data.messageData.type === "plan" ? data.senderName + " sent a plan" : data.messageData.type === "form" ? data.senderName + " sent a form" : data.messageData.type === "link" ? data.senderName + " sent a link" :  data.messageData.type ==="bloc" ?  "suggestion bloc" : data.messageData.content
 
         leftConversationContainer.insertBefore(msgDiv, leftConversationContainer.firstChild)
-        // leftConversationContainer.insertBefore(msgDiv, leftConversationContainer.firstChild)
       }
     
     if (msgDivMini) {

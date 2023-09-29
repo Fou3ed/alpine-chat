@@ -105,4 +105,9 @@
     },
     "days" : ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
     "months" : ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil","Août", "Sep", "Oct", "Nov", "Déc"]
+    ,"bought":{
+        "congratulations":"félicitations",
+        "success":"vous avez acheter" 
+
+    }
 }

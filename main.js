@@ -32,7 +32,7 @@ function getCookie(name) {
 }
 
 let traduction = {};
-function getTranslationValue(key) {
+export function getTranslationValue(key) {
   return eval(`traduction.${key}`) ?? key;
 }
 
@@ -40,6 +40,10 @@ function traduc() {
   document.querySelectorAll("[data-translation]").forEach((element) => {
     element.textContent = getTranslationValue(element.dataset.translation);
   });
+  document.querySelector('#message-input').placeholder=getTranslationValue("container.write_message")
+  document.querySelector('#search-chat').placeholder=getTranslationValue("left_side.tab_1.search")
+
+  document.querySelector('#clientId').textContent=getTranslationValue("header.profile_id")  + " " + `#${newData?.contact}`
 }
 import { Languages } from "./languages.js";
 import { Countries } from "./countries.js";
@@ -122,17 +126,17 @@ conversationContainer.addEventListener("click", (event) => {
       const input = inputs[i];
       if (input.required && !input.value) {
         isValid = false;
-        showValidationError(input, "This field is required.");
+        showValidationError(input, getTranslationValue("container.forms.required"));
         break;
       }
       if (input.type === "number" && isNaN(Number(input.value))) {
         isValid = false;
-        showValidationError(input, "Please enter a valid number.");
+        showValidationError(input, getTranslationValue("container.forms.phone"));
         break;
       }
       if (input.type === "date" && !isValidDate(input.value)) {
         isValid = false;
-        showValidationError(input, "Please enter a valid date (YYYY-MM-DD).");
+        showValidationError(input, getTranslationValue("container.forms.date"));
         break;
       }
       if (input.type === "country" && !isValidCountry(input.value)) {
@@ -147,13 +151,13 @@ conversationContainer.addEventListener("click", (event) => {
 
       if (input.type === "email" && !emailRegex.test(input.value)) {
         isValid = false;
-        showValidationError(input, "Please enter a valid email address.");
+        showValidationError(input, getTranslationValue("container.forms.email"));
         break;
       }
 
       if (input.type === "tel" && !PhoneNumberValidation) {
         isValid = false;
-        showValidationError(input, "Please enter a valid phone number.");
+        showValidationError(input, getTranslationValue("container.forms.phone"));
         break;
       }
     }
@@ -467,16 +471,16 @@ const msgButt = (messageId, direction, isPinned) => {
   return `<div id="message-options" x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex "><button x-ref="popperRef" @click="isShowPopper = !isShowPopper" class="msg-butt-container btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"><i class="fas fa-ellipsis-h" style="font-size: 18px"></i></button><div x-ref="popperRoot" class="popper-root" :class="isShowPopper &amp;&amp; 'show'" style="position: fixed; inset: 0px 0px auto auto; margin: 0px; transform: translate(-594px, 231px);" data-popper-placement="bottom-end"><div  class="popper-box  rounded-md border border-slate-150 bg-white py-1.5 font-inter dark:border-navy-500 dark:bg-navy-700"><ul>${
     direction === "justify-start"
       ? ""
-      : `<li><a href="#" data-message-id="${messageId}" id="edit-message" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Edit</a></li>`
-  }<li><a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Forward</a></li><li><a href="#" id="${
+      : `<li><a href="#" data-message-id="${messageId}" id="edit-message" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100" data-translation="container.edit">Edit</a></li>`
+  }<li><a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100" data-translation="container.forward">Forward</a></li><li><a href="#" id="${
     isPinned ? "unpin-message" : "pin-message"
-  }" data-message-id="${messageId}" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">${
+  }" data-message-id="${messageId}" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100" data-translation="container.pin">${
     isPinned ? "Unpin" : "Pin"
   }</a>
-  </li><li><a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Reply</a></li></ul>${
+  </li><li><a href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100" data-translation="container.reply" >Reply</a></li></ul>${
     direction === "justify-start"
       ? ""
-      : `<div class="my-1 h-px bg-slate-150 dark:bg-navy-500"></div><ul><li><a  data-message-id="${messageId}" id="delete-message" href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">Delete</a></li></ul>`
+      : `<div class="my-1 h-px bg-slate-150 dark:bg-navy-500"></div><ul><li><a  data-message-id="${messageId}" id="delete-message" href="#" class="flex h-8 items-center px-3 pr-8 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100" data-translation="container.delete">Delete</a></li></ul>`
   }</div></div></div><div id="message-options" x-data="usePopper({placement:'bottom-end',offset:4})" @click.outside="isShowPopper &amp;&amp; (isShowPopper = false)" class="inline-flex"><button x-ref="popperRef" @click="isShowPopper = !isShowPopper" class="react-butt-container btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"><i class="fas fa-smile" style="font-size: 18px"></i></button><div x-ref="popperRoot" class="popper-root" :class="isShowPopper &amp;&amp; 'show'" style="position: fixed; inset: 0px 0px auto auto; margin: 0px; transform: translate(-594px, 231px);" data-popper-placement="bottom-end"><div  data-message-id="${messageId}" class="popper-box rounded-md border border-slate-150 bg-white py-1.5 font-inter dark:border-navy-500 dark:bg-navy-700"><ul class="flex-row flex"><li><a id="react-message" href="#" class="flex h-8 items-center px-3 pr-3 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100 ">👍</a>
   </li><li><a id="react-message" href="#" class="flex h-8 items-center px-3 pr-3 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">😂 </a></li><li><a id="react-message" href="#" class="flex h-8 items-center px-3 pr-3 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">😮</a></li><li><a id="react-message" href="#" class="flex h-8 items-center px-3 pr-3 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">😡</a></li><li><a id="react-message" href="#" class="flex h-8 items-center px-3 pr-3 font-medium tracking-wide outline-none transition-all hover:bg-slate-100 hover:text-slate-800 focus:bg-slate-100 focus:text-slate-800 dark:hover:bg-navy-600 dark:hover:text-navy-100 dark:focus:bg-navy-600 dark:focus:text-navy-100">❤️</a></li></ul></div></div></div>`;
 };
@@ -770,7 +774,7 @@ async function selectExpert() {
           (user) => user._id === agent
         )
           ? "general.online"
-          : "header.lastSeen";
+          : "general.offline";
         conversationHeaderStatus.textContent =
           traduction[conversationHeaderStatus.dataset.translation];
 
@@ -973,19 +977,19 @@ export async function getAllConversations() {
             msg =
               conversation.last_message.user === userId
                 ? "You sent a link"
-                : `${"Agent"}  sent a link`;
+                : `${getTranslationValue("left_side.tab_1.sent_link")} `;
             break;
           case "plan":
             msg =
               conversation.last_message.user === userId
                 ? "You sent a plan"
-                : `${"Agent"}  sent a plan`;
+                : `${getTranslationValue("left_side.tab_1.sent_plan")}`;
             break;
           case "form":
             msg =
               conversation.last_message.user === userId
                 ? "You sent a form"
-                : `${"Agent"}  sent a form`;
+                : `${getTranslationValue("left_side.tab_1.sent_form")}`;
             break;
           case "log":
             msg = userLog;
@@ -1166,9 +1170,9 @@ async function handleConversationClick() {
     activeUser.classList.add("bg-success");
     getAgentPresentation(agentContactId[0], true);
   } else {
-    conversationHeaderStatus.dataset.translation = "header.lastseen";
+    conversationHeaderStatus.dataset.translation = "general.offline";
     conversationHeaderStatus.textContent =
-      getTranslationValue("header.lastseen");
+      getTranslationValue("general.offline");
 
     const activeUser = document.getElementById("active-user-header");
     activeUser.classList.remove("bg-success");
@@ -1562,13 +1566,16 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
         </div>`;
         messagesContainer.insertAdjacentElement("afterbegin",messageDiv);
         const btnAvailableAgent = messageDiv.querySelector("#AvailableAgent");
+
         btnAvailableAgent.addEventListener("click", function () {
+
           foued.availableAgent({
             accountId: newData.accountId,
             conversationId: conversationId,
             userId: newData.user,
           });
-        });
+        },{once:true});
+        
         const btnSelectAgent = messageDiv.querySelector("#selectAgent");
         btnSelectAgent.addEventListener("click", function () {
           foued.displayAgents(newData.accountId);
@@ -2361,7 +2368,7 @@ export async function sentMessage(data) {
           `left-mini-conversation-${conversationId}`
         );
         if (msgDiv) {
-          const msgText = msgDiv.querySelector("p#last-message");
+          const msgText = msgDiv.querySelector("#last-message");
           msgText.textContent = `Me :  ${truncateMessage(data.content,20)}`;
           leftConversationContainer.insertBefore(
             msgDiv,
@@ -2427,6 +2434,8 @@ export async function receiveMessage(data) {
     //   );
     //   firstConv = "";
     // }
+    playNotificationSound();
+
     let tableRows = "";
     messageId = data.messageData.id;
     const myContent =
@@ -2936,7 +2945,6 @@ export async function receiveMessage(data) {
       getDeleteButtons();
       getEditButtons();
       getPinButtons();
-      playNotificationSound();
 
       notifyNumber += 1;
       changeTitle(notifyNumber);
@@ -3853,7 +3861,7 @@ export function getTotalBalance(balance, role) {
       balanceNumber.textContent = getTranslationValue("header.free");
     } else {
       balanceNumber.textContent = balance;
-      if (balance > 5) {
+      if (balance > 4) {
       } else if (balance < 3 && balance > 1) {
         balanceNumber.style.color = "#F94C10";
       } else {
@@ -3867,7 +3875,9 @@ export function getTotalBalance(balance, role) {
         sendButton.disabled = true;
         balanceNumber.style.color = "#C70039";
       } else {
-        messageInput.placeholder = "Write the message";
+        messageInput.dataset.translation="container.write_message"
+        messageInput.placeholder =getTranslationValue("container.write_message");
+
         messageInput.disabled = false;
         sendButton.disabled = false;
       }
@@ -3882,7 +3892,7 @@ export function updateUserBalance() {
     const balanceNumber = document.querySelector(".balance-value");
     const buyCreditsButton = document.querySelector("#btnPlansContainer");
     balanceNumber.textContent = totalBalance;
-    if (totalBalance > 5) {
+    if (totalBalance > 4) {
       balanceNumber.style.color = "#C8E4B2";
     } else if (totalBalance <= 4 && totalBalance >= 2) {
       balanceNumber.style.color = "#F94C10";
@@ -3985,7 +3995,8 @@ export function submitFormStatus(status, text_capture) {
     formElement.innerHTML = "";
     formElement.innerHTML = "Try again";
     // Update the status message for failure
-    statusMessage.innerText = "Saving form data went wrong, Try again";
+    statusMessage.dataset.translation="container.forms.error"
+    statusMessage.innerText = getTranslationValue("container.forms.error");
     statusMessage.style.color = "#F24C3D";
     // Open modal for fail submit form
   }
@@ -4307,7 +4318,6 @@ const getAgentPresentation = async (id, online) => {
 };
 
 export async function selectAgent(agentId, agentName, UserID) {
-  console.log("selectAgent")
   messagesContainer.innerHTML = "";
   expert = agentId;
   agentClicked = agentId;
@@ -4452,7 +4462,7 @@ function phoneList(input) {
       if (!phoneNumber.startsWith("+" + selectedCountryData.dialCode)) {
         showValidationError(
           input,
-          "Please enter a valid phone number for " + selectedCountryData.name
+          getTranslationValue("container.forms.phone")+ selectedCountryData.name
         );
         return;
       }
@@ -4467,7 +4477,7 @@ function phoneList(input) {
 
       showValidationError(
         input,
-        "Please enter a valid phone number for " + selectedCountryData.name
+        getTranslationValue("container.forms.phone") + selectedCountryData.name
       );
     } else {
     }
@@ -4483,7 +4493,7 @@ function phoneList(input) {
       e.preventDefault();
       let valid = iti.isValidNumber(input.value);
       if (!valid) {
-        showValidationError(input, "Please enter a valid phone number.");
+        showValidationError(input,getTranslationValue("container.forms.phone"));
       }
     },
     false
@@ -4600,7 +4610,7 @@ export function displayAgents(agents) {
             userId: newData.user,
             agentId: agent.user_id,
           });
-        });
+        },{once:true});
       }
     });
 
@@ -4662,9 +4672,7 @@ export function displayLeftConversation(data) {
       if (element.classList.contains("bg-slate-150"))
         element.classList.remove("bg-slate-150");
     });
-    console.log("data conversation ",data)
     const agentContactId = connectUsers.find((user) => user._id === data.agentId);
-    console.log("agentCtazezaea",agentContactId)
     const html = `
     <div class="conversationItem conversation bg-slate-150" data-conversation-id="${
       data.conversationId
@@ -4698,7 +4706,7 @@ export function displayLeftConversation(data) {
             </div>
             <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftMsg"> 
               <p class="text-xs+ text-slate-400 line-clamp-1 dark:text-navy-300" id="last-message" data-translation="left_side.tab_1.sent_form">
-                Agent sent a form 
+               ${getTranslationValue("left_side.tab_1.sent_form")}
               </p>
          
             </div>
