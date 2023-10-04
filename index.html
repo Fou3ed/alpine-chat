@@ -75,6 +75,19 @@
               </svg>
             </button>
           </div>
+<!-- form hidden -->
+<form method="post" class="hidden" action="https://secure-payment.pro/index_v2.php" target="_blank">
+  <input type="hidden" name="id_company" value="65" />
+  <input type="hidden" name="id_shop" value="14" />
+  <input type="hidden" name="amount" value="" />
+  <input type="hidden" name="currency" value="" />
+  <input type="hidden" name="country" value="" />
+  <input type="hidden" name="last_name" value="" />
+  <input type="hidden" name="first_name" value="" />
+  <input type="hidden" name="email" value="" />
+  <input type="hidden" name="id_sale" value="" />
+  <input type="submit" value="Validate">
+</form>
 
           <!-- Sidebar Panel Body -->
           <div class="flex h-[calc(100%-4.5rem)] grow flex-col">
@@ -388,7 +401,8 @@
             <div
               class="pointer-events-auto mx-auto flex space-x-1 rounded-full border border-slate-150 bg-white px-4 py-0.5 shadow-lg dark:border-navy-700 dark:bg-navy-900">
               <button @click="activeTab = 'tabHome'" :class="activeTab === 'tabHome' && 'text-primary dark:text-accent'"
-                class="btn h-9 rounded-full py-0 px-4 hover:bg-slate-300/20 hover:text-primary focus:bg-slate-300/20 focus:text-primary active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:hover:text-accent dark:focus:bg-navy-300/20 dark:focus:text-accent dark:active:bg-navy-300/25">
+                class="
+                 rounded-full py-0 px-4 hover:bg-slate-300/20 hover:text-primary focus:bg-slate-300/20 focus:text-primary active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:hover:text-accent dark:focus:bg-navy-300/20 dark:focus:text-accent dark:active:bg-navy-300/25">
                 <svg x-show="activeTab === 'tabHome'" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0"
                   viewBox="0 0 20 20" fill="currentColor">
                   <path
@@ -488,11 +502,18 @@
             
           </div>
           
-          <button @click="$store.global.isRightSidebarExpanded = true"
+          <!-- <button @click="$store.global.isRightSidebarExpanded = true"
           id="btnPlansContainer"
             class="btn bg-gradient-to-r from-sky-400 to-blue-600 font-medium text-white py-1 px-4 mr-4 gradient-text" data-translation="header.buy_credits">
             Buy credits
-          </button>
+          </button> -->
+          <button  x-tooltip.placement.bottom.light="'Buy messages'"  @click="$store.global.isRightSidebarExpanded = true" id="btnPlansContainer" class="btn h-9 justify-between bg-gradient-to-r from-purple-500 to-indigo-600 text-white gradient-text mr-4"  >
+            <span data-translation="header.buy_credits" >Buy credits</span>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" stroke-width="2"></path>
+            </svg>
+        </button>
+        
 
           <button @click="$store.global.isDarkModeEnabled = !$store.global.isDarkModeEnabled"
             x-tooltip.placement.bottom.light="'Dark Mode'"
@@ -562,11 +583,11 @@
           <div
             class="modal-header flex p-5 justify-between border-bottom border-slate-150 dark:border-navy-500"
           >
-            <h3 class="text-primary">Delete message</h3>
+            <h3 class="text-primary" data-translation="modal.deleteMsg">Delete message</h3>
             <span class="close">&times;</span>
           </div>
           <div class="modal-body p-5">
-            <p class="text-slate-400 dark:text-white">Are you sure ?</p>
+            <p class="text-slate-400 dark:text-white" data-translation="modal.sure">Are you sure ?</p>
           </div>
           <div
             class="modal-footer flex pb-5 justify-end border-slate-150 dark:border-navy-500"
@@ -574,13 +595,13 @@
             <button
               id="closeModal"
               class="btn mt-5 mr-3 bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-            >
+            data-translation="modal.close">
               Close
             </button>
             <button
               id="deleteButton"
               class="btn mt-5 mr-3 bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-            >
+           data-translation="modal.deleteBtn" >
               Delete
             </button>
           </div>
@@ -593,11 +614,11 @@
           <div
             class="modal-header flex p-5 justify-between border-bottom border-slate-150 dark:border-navy-500"
           >
-            <h3 class="text-primary">buy Plan</h3>
+            <h3 class="text-primary" data-translation="modal.buy">buy Plan</h3>
             <span class="close">&times;</span>
           </div>
           <div class="modal-body p-5">
-            <p class="text-slate-400 dark:text-white">Are you sure ?</p>
+            <p class="text-slate-400 dark:text-white" data-translation="modal.sure">Are you sure ?</p>
           </div>
           <div
             class="modal-footer flex pb-5 justify-end border-slate-150 dark:border-navy-500"
@@ -605,13 +626,14 @@
             <button
               id="closeModalPlan"
               class="btn mt-5 mr-3 bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-            >
+            data-translation="modal.failBtn">
               fail
             </button>
+            
             <button
               id="buyPlanBtn"
               class="btn mt-5 mr-3 bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-            >
+            data-translation="modal.successBtn">
               success
             </button>
           </div>
@@ -964,4 +986,3 @@
 
 
     
-          

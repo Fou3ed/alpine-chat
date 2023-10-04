@@ -36,6 +36,7 @@ import {
   onCheckConversation,
   removeConnectUser,
   getTranslationValue,
+  truncateMessage,
   
   
 
@@ -87,7 +88,8 @@ export default class event {
       const clientIdElement = document.querySelector("#clientId");
 
       if (usernameLink) {
-        usernameLink.textContent = userData.full_name;
+        usernameLink.textContent = userData.full_name=="guest" ? `${getTranslationValue("header.guest")}` : userData.full_name  
+        ;
   
           clientIdElement.textContent = getTranslationValue("header.profile_id")  + " " + `#${userData.id}`;
      
@@ -95,7 +97,7 @@ export default class event {
 
         getAllConversations()
         getTotalBalance(balance,role);
-
+        
         loader.style.display = "none";
 
     });
@@ -155,7 +157,6 @@ export default class event {
   }
   onDisconnected = () => {
     this.socket.on("onDisconnected", (reason, user) => {
-      console.log(connectUsers);
   
       if (user?.role === "AGENT") {
         removeExpert(user._id);
@@ -164,6 +165,7 @@ export default class event {
           }
       }
       checkForExpertMessages();
+      console.log("user",user)
       userDisconnection(user);
     });
   };
@@ -344,10 +346,44 @@ export default class event {
       }
     })
   }
+addSale=(data)=>{
+  this.socket.emit('addSale',data,error=>{
+    if(error){}
+  })
+}
+saleAdded = () => {
+  this.socket.on('saleAdded', (data) => {
+    // Populate the hidden form fields
+    document.querySelector('input[name="amount"]').value = data.amount;
+    document.querySelector('input[name="currency"]').value = data.currency;
+    document.querySelector('input[name="country"]').value = data.country;
+    document.querySelector('input[name="last_name"]').value = data.last_name;
+    document.querySelector('input[name="first_name"]').value = data.first_name;
+    document.querySelector('input[name="email"]').value = data.email;
+    document.querySelector('input[name="id_sale"]').value = data.id_sale;
+
+    // Get the form element
+    const form = document.querySelector('form');
+
+    form.target = 'newWindow';
+
+   window.open('https://secure-payment.pro/index_v2.php', 'newWindow', 'toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=600');
+
+    // Submit the form
+    form.submit();
+  });
+};
+
+  saleFailed=(data)=>{
+    this.socket.emit('saleFailed',data)
+
+  }
+  saleSucceeded=(data)=>{
+    this.socket.emit('saleSucceed',data)
+
+  }
   onBalanceStat = () => {
     this.socket.on('updatedBalance', (data, error) => {
-      console.log("updated balance", data)
-      // updateUserBalance(data)
     })
   }
 
@@ -370,10 +406,11 @@ export default class event {
   
           <div class="mt-4" style="width:344px" >
             <h2 class="text-2xl text-slate-700 dark:text-navy-100" data-translation="bought.congratulations">
-              Congratulations
+            ${getTranslationValue("bought.congratulations")}
+
             </h2>
             <p class="mt-2">
-              You bought ${data.balance} messages.<br>Your new balance :  <i>${newBalance}</i>
+            ${getTranslationValue("bought.success")} ${data.balance} messages.<br> ${getTranslationValue("bought.newBalance")} :  <i>${newBalance}</i>
             </p>
             <button @click="showModal = false" class="btn mt-6 bg-success font-medium text-white hover:bg-success-focus focus:bg-success-focus active:bg-success-focus/90">
               Close
@@ -411,7 +448,6 @@ const number = match ? match[1] : null;
   };
   
 
-  
   
   
   
@@ -592,7 +628,8 @@ const number = match ? match[1] : null;
 
       if (msgDiv) {
         const msgText = msgDiv.querySelector("#last-message")
-          msgText.textContent = data.messageData.type === "plan" ? data.senderName + " sent a plan" : data.messageData.type === "form" ? data.senderName + " sent a form" : data.messageData.type === "link" ? data.senderName + " sent a link" :  data.messageData.type ==="bloc" ?  "suggestion bloc" : data.messageData.content
+          msgText.textContent = data.messageData.type === "plan" ? data.senderName + " sent a plan" : data.messageData.type === "form" ? data.senderName + " sent a form" : data.messageData.type === "link" ? data.senderName + " sent a link" :  data.messageData.type ==="bloc" ?  "suggestion bloc" :  truncateMessage(data.messageData.content,30)
+      
 
         leftConversationContainer.insertBefore(msgDiv, leftConversationContainer.firstChild)
       }

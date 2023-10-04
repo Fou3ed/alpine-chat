@@ -6,14 +6,16 @@
         "country": "pays",
         "languages": "langues",
         "expertise": "expertise",
-        "robot": "Assistant virtuel"
+        "robot": "Assistant virtuel",
+        "me":"Moi"
+     
     },
     "header": {
         "free": "gratuit",
         "buy_credits": "acheter des crédits",
         "dark_mode": "mode sombre",
         "expert_card": "carte d'expert",
-        "profile_id": "identifiant du profil",
+        "profile_id": "id profil",
         "guest" : "invité",
         "lastseen" : "vu récemment"
     },
@@ -66,7 +68,7 @@
     },
     "right_side": {
         "expert_card": "carte d'expert",
-        "contact_info": "informations de contact",
+        "contact_info": "Contact",
         "files" : "fichiers",
         "planning" : "planification",
         "phone" : "numéro de téléphone",
@@ -106,8 +108,23 @@
     "days" : ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"],
     "months" : ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil","Août", "Sep", "Oct", "Nov", "Déc"]
     ,"bought":{
-        "congratulations":"félicitations",
-        "success":"vous avez acheter" 
+        "congratulations":"Félicitations",
+        "success":"Vous avez acheter" ,
+        "newBalance":"votre nouveau solde",
+        "purchase":"L'achat a été effectué avec succès."
+    },
+    "modal":{
+        "fail":"Quelque chose n'a pas fonctionné, essayez à nouveau",
+        "close":"Fermer",
+        "welcome":"Welcome to",
+        "fillForm":"Please feel free to fill the form .",
+        "successBtn":"succés",
+        "failBtn":" échouer",
+        "sure":"Êtes-vous sûr ?",
+        "buy":"Acheter le plan",
+        "deleteMsg":"supprimer le message",
+        "deleteBtn":"supprimer"
+
 
     }
 }

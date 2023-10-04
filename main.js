@@ -17,7 +17,14 @@ const timeString =
   hours.toString().padStart(2, "0") + ":" + minutes.toString().padStart(2, "0");
 // Save user information in local storage
 
-import { accountId, API_KEY, max_length_message, MY_API_ADDRESS, SQL_API } from "./env.js";
+import {
+  accountId,
+  API_KEY,
+  applicationName,
+  max_length_message,
+  MY_API_ADDRESS,
+  SQL_API,
+} from "./env.js";
 
 function getCookie(name) {
   let cookieArr = document.cookie.split(";");
@@ -33,17 +40,24 @@ function getCookie(name) {
 
 let traduction = {};
 export function getTranslationValue(key) {
-  return eval(`traduction.${key}`) ?? key;
+  return eval(`traduction.${key}`)
+    ? eval(`traduction.${key}`).toUpperCase()
+    : key;
 }
 
 function traduc() {
   document.querySelectorAll("[data-translation]").forEach((element) => {
     element.textContent = getTranslationValue(element.dataset.translation);
   });
-  document.querySelector('#message-input').placeholder=getTranslationValue("container.write_message")
-  document.querySelector('#search-chat').placeholder=getTranslationValue("left_side.tab_1.search")
+  document.querySelector("#message-input").placeholder = getTranslationValue(
+    "container.write_message"
+  );
+  document.querySelector("#search-chat").placeholder = getTranslationValue(
+    "left_side.tab_1.search"
+  );
 
-  document.querySelector('#clientId').textContent=getTranslationValue("header.profile_id")  + " " + `#${newData?.contact}`
+  document.querySelector("#clientId").textContent =
+    getTranslationValue("header.profile_id") + " " + `#${newData?.contact}`;
 }
 import { Languages } from "./languages.js";
 import { Countries } from "./countries.js";
@@ -119,19 +133,25 @@ conversationContainer.addEventListener("click", (event) => {
   if (target) {
     const form = event.target.closest("form");
 
-    const inputs = form.elements;
+    const inputs = form.querySelectorAll('input, select, textarea');
     // Iterate over the input fields and validate them
     let isValid = true;
     for (let i = 0; i < inputs.length; i++) {
       const input = inputs[i];
-      if (input.required && !input.value) {
+      if (!input.value) {
         isValid = false;
-        showValidationError(input, getTranslationValue("container.forms.required"));
+        showValidationError(
+          input,
+          getTranslationValue("container.forms.required")
+        );
         break;
       }
       if (input.type === "number" && isNaN(Number(input.value))) {
         isValid = false;
-        showValidationError(input, getTranslationValue("container.forms.phone"));
+        showValidationError(
+          input,
+          getTranslationValue("container.forms.phone")
+        );
         break;
       }
       if (input.type === "date" && !isValidDate(input.value)) {
@@ -151,13 +171,19 @@ conversationContainer.addEventListener("click", (event) => {
 
       if (input.type === "email" && !emailRegex.test(input.value)) {
         isValid = false;
-        showValidationError(input, getTranslationValue("container.forms.email"));
+        showValidationError(
+          input,
+          getTranslationValue("container.forms.email")
+        );
         break;
       }
 
       if (input.type === "tel" && !PhoneNumberValidation) {
         isValid = false;
-        showValidationError(input, getTranslationValue("container.forms.phone"));
+        showValidationError(
+          input,
+          getTranslationValue("container.forms.phone")
+        );
         break;
       }
     }
@@ -439,7 +465,6 @@ function isValidCountry(country) {
 function showValidationError(inputElement, message) {
   // Add a class to the input element to change its border color to red
   inputElement.classList.add("invalid-input");
-
   // Show the validation error message to the user
   const errorMessageElement = document.createElement("div");
   errorMessageElement.className = "error-message";
@@ -447,6 +472,7 @@ function showValidationError(inputElement, message) {
   errorMessageElement.innerText = message;
 
   // Check if an error message is already displayed and remove it if so
+  console.log("inout elem",inputElement)
   inputElement.closest("label").querySelector(".error-message")?.remove();
   if (
     inputElement.classList.contains("phoneInput") &&
@@ -735,7 +761,7 @@ export async function removeExpert(userId) {
   }
 }
 
-function truncateMessage(message, maxLength) {
+export function truncateMessage(message, maxLength) {
   if (message.length > maxLength) {
     return message.substring(0, maxLength) + "...";
   }
@@ -1064,7 +1090,10 @@ export async function getAllConversations() {
               (member) => member._id === conversation.last_message.user
             ).full_name + " deleted a message"
         : conversation.last_message?.user === newData.user
-        ? "Me: " + truncateMessage(msg, 20)
+        ? getTranslationValue("general.me") +
+          " " +
+          ":" +
+          truncateMessage(msg, 20)
         : truncateMessage(msg, 20)
     }
   </p>
@@ -1155,11 +1184,11 @@ async function handleConversationClick() {
     if (element.classList.contains("bg-slate-150"))
       element.classList.remove("bg-slate-150");
   });
-  
+
   $(this).addClass("bg-slate-150");
   let agentContactId = exist.member_details
-  .filter((member) => member.role === "AGENT" || member.role === "BOT")
-  .map((agent) => agent.id);
+    .filter((member) => member.role === "AGENT" || member.role === "BOT")
+    .map((agent) => agent.id);
   if (exist?.status == 1) {
     conversationHeaderStatus.dataset.translation = "general.online";
     conversationHeaderStatus.textContent =
@@ -1191,10 +1220,7 @@ async function handleConversationClick() {
   let activeChat = {
     chatId: conversationId,
     name: name,
-    avatar_url:
-      "images/avatar/avatar-" +
-      agentContactId[0] +
-      ".jpg",
+    avatar_url: "images/avatar/avatar-" + agentContactId[0] + ".jpg",
   };
 
   window.dispatchEvent(
@@ -1228,7 +1254,6 @@ function resetMaxLength(initialMaxLength) {
   document.getElementById(
     "max-length-value"
   ).textContent = ` ${initialMaxLength}`;
-
 }
 
 async function getTheLastMsg(conversationId) {
@@ -1274,7 +1299,7 @@ async function markMessageAsSeen(conversationId) {
 let isLoading = false;
 let isEndOfMessages = false; // Track if all messages have been loaded
 const spinner = document.getElementById("conversation-spinner");
-const bigSpinner=document.getElementById("page-one-spinner")
+const bigSpinner = document.getElementById("page-one-spinner");
 const limit = 10;
 export async function loadMessages(response) {
   // Show the big container message
@@ -1282,7 +1307,6 @@ export async function loadMessages(response) {
 
   if (conversationId) {
     try {
-
       if (response.message !== "success") {
         throw new Error("Failed to load messages");
       }
@@ -1290,8 +1314,8 @@ export async function loadMessages(response) {
       if (response.data.currentPage == 1) {
         conversationContainer.scrollTop = conversationContainer.scrollHeight;
         bigSpinner.classList.remove("hidden");
-      }else {
-      spinner.classList.remove("hidden");
+      } else {
+        spinner.classList.remove("hidden");
       }
       if (
         response.data.currentPage === response.data.totalPages ||
@@ -1355,13 +1379,10 @@ function submitForm(element) {
   element.innerHTML = `<div class="d-flex align-items-center" style="height: 20px;" ><span class="loader2"></span></div>`;
 
   for (let i = 0; i < formInputs.length; i++) {
-    forms = [
-      ...forms,
-      {
-        fieldId: formInputs[i].dataset.fieldId,
-        value: formInputs[i].value,
-      },
-    ];
+    forms.push({
+      fieldId: formInputs[i].dataset.fieldId,
+      value: formInputs[i].classList.contains('phoneInput') ? intlTelInputGlobals.getInstance(formInputs[i]).getNumber(intlTelInputUtils.numberFormat.E164) : formInputs[i].value,
+    });
   }
 
   forms = [...formContact.querySelectorAll("input, select,textarea")].map(
@@ -1529,7 +1550,7 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
         const messageDiv = document.createElement("div");
         messageDiv.innerHTML = `<div class="flex flex-col items-start space-y-3.5">
         <div class="mr-1">
-            <div class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100">
+            <div class="rounded-2xl break-words  relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white">
                 <div class="space-y-3.5">
                     <div class="ml-2 sm:ml-5">
                         <div id="message-content-${messageId}">
@@ -1555,31 +1576,40 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
                                             </button>
                                         </div>
                                     </div>
-                                </div>
-                                <div id="pin-div" class="hidden pin-div-sender justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
-                            </div>
+                                
                         </div>
                     </div>
                 </div>
+                
             </div>
         </div>
+        </div>
+        <p class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">${time} </p>
+    </div>
         </div>`;
-        messagesContainer.insertAdjacentElement("afterbegin",messageDiv);
+        messagesContainer.insertAdjacentElement("afterbegin", messageDiv);
         const btnAvailableAgent = messageDiv.querySelector("#AvailableAgent");
 
-        btnAvailableAgent.addEventListener("click", function () {
+        btnAvailableAgent.addEventListener(
+          "click",
+          function () {
+            foued.availableAgent({
+              accountId: newData.accountId,
+              conversationId: conversationId,
+              userId: newData.user,
+            });
+          },
+          { once: true }
+        );
 
-          foued.availableAgent({
-            accountId: newData.accountId,
-            conversationId: conversationId,
-            userId: newData.user,
-          });
-        },{once:true});
-        
         const btnSelectAgent = messageDiv.querySelector("#selectAgent");
-        btnSelectAgent.addEventListener("click", function () {
-          foued.displayAgents(newData.accountId);
-        });
+        btnSelectAgent.addEventListener(
+          "click",
+          function () {
+            foued.displayAgents(newData.accountId);
+          },
+          { once: true }
+        );
         continue;
       } else if (message.type === "form") {
         let inputForms = "";
@@ -1667,18 +1697,35 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
                   type === "textarea"
                     ? `<textarea
                       id="floating_field_${messageId}"
-                      class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900" 
-                      placeholder="${field.field_name}" 
-                      name="${field.field_name.replace(" ", "")}" 
+                      class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
+                      placeholder="${field.field_name}"
+                      name="${field.field_name.replace(" ", "")}"
                       data-field-id="${field.field_id}"
                       ${field?.field_value ? "style='pointer-events:none'" : ""}
                       ${myContent.status === 1 ? "disabled" : ""}
                     >${field?.field_value ?? ""}</textarea>`
+                    : type === "date"
+                    ? `<input
+                      id="floating_field_${messageId}"
+                      class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
+                      placeholder="Enter Date"
+                      name="${field?.field_name?.replace(" ", "")}"
+                      data-field-id="${field?.field_id}"
+                      value="${field?.field_value ?? ""}"
+                      type="text"
+                      ${field?.field_value ? "style='pointer-events:none'" : ""}
+                      ${myContent.status === 1 ? "disabled" : ""}
+                      x-input-mask='{
+                        date: true,
+                        delimiter: "-",
+                        datePattern: ["m", "d", "Y"]
+                      }'
+                    />`
                     : `<input
                       id="floating_field_${messageId}"
-                      class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900" 
-                      placeholder="${field?.field_name}" 
-                      name="${field?.field_name?.replace(" ", "")}" 
+                      class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
+                      placeholder="${field?.field_name}"
+                      name="${field?.field_name?.replace(" ", "")}"
                       data-field-id="${field?.field_id}"
                       value="${field?.field_value ?? ""}"
                       type="${type}"
@@ -1696,7 +1743,7 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
                   <div class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 ${
                     newData.goccContactId || newData.goccLeadId ? "gocc" : ""
                   } card-form" style="position: relative;">
-                      <div class="mt-20 w-full max-w-xl p-4 sm:p-5">
+                      <div class=" w-full max-w-xl p-4 sm:p-5">
                           <div class="mb-4">
                               <h3 class="text-2xl font-semibold">${
                                 myContent.friendly_name
@@ -1771,7 +1818,7 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
             userLog = `You click to link.`;
             break;
           case "purchase completed":
-            userLog = `Purchase completed successfully.`;
+            userLog = `${getTranslationValue("bought.purchase")}`;
             break;
           case "purchase went wrong":
             userLog = `Purchase went  wrong.`;
@@ -1945,6 +1992,7 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
           });
         }
       }
+      //lénna mta3 l plan message
       function sendPlanClickNotification(data, messageId) {
         modal.classList.remove("hidden");
         successButton.setAttribute("data-plan", data.dataset.planId);
@@ -1959,6 +2007,7 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
           messageId: messageId,
         });
       }
+      
       function sendClickingNotification(data) {
         foued.linkClick(data.id.replace("linked-msg-", ""));
         addLogs({
@@ -2201,14 +2250,13 @@ export async function sentMessage(data) {
       if (element.classList.contains("bg-slate-150"))
         element.classList.remove("bg-slate-150");
     });
-
   } else {
     let userLog = "";
     const convMessage = isNotNewConversation.querySelector("#last-message");
-    if (data.type === "log"  ) {
-      const log = JSON.parse(data.content)
-      if(log.action ==='purchase completed' ){ 
-        switch(log.action){
+    if (data.type === "log") {
+      const log = JSON.parse(data.content);
+      if (log.action === "purchase completed") {
+        switch (log.action) {
           case "fill":
             userLog = `You filled on the form.`;
             break;
@@ -2231,68 +2279,66 @@ export async function sentMessage(data) {
             userLog = `You click to link.`;
             break;
           case "purchase completed":
-            userLog = `Purchase completed successfully.`
+            userLog = `${getTranslationValue("bought.purchase")}`;
             break;
           case "purchase went wrong":
-            userLog = `Purchase went  wrong.`
+            userLog = `Purchase went  wrong.`;
             break;
         }
-        convMessage.textContent = userLog
-           
+        convMessage.textContent = userLog;
       }
-    } else convMessage.textContent = truncateMessage(data.content,20);
+    } else convMessage.textContent = truncateMessage(data.content, 20);
   }
   if (data.conversation === conv) {
     const messageId = data.id;
     const messageContainer = document.getElementById(`message-${messageId}`);
     messagesContainer = document.getElementById("big-container-message");
     if (!messageContainer) {
-      if (data.type === "log" ) {
-   const log = JSON.parse(data.content)
-   if(log.action ==='purchase completed' ){
-
-        let userLog = ""
-        switch (log.action) {
-          case "fill":
-            userLog = `You filled on the form.`;
-            break;
-          case "focus":
-            userLog = `You focus on the form.`;
-            break;
-          case "purchase":
-            userLog = `You purchased the <b> ${log.plan_name} </b>plan.`;
-            break;
-          case "start form":
-            userLog = `You start submit the form.`;
-            break;
-          case "end form":
-            userLog = `You end submit the form.`;
-            break;
-          case "start purchase":
-            userLog = `You start purchase a plan.`;
-            break;
-          case "link click":
-            userLog = `You click to link.`;
-            break;
-          case "purchase completed":
-            userLog = `Purchase completed successfully.`
-            break;
-          case "purchase went wrong":
-            userLog = `Purchase went wrong.`
-            break;
-        }
-        const newDivMsg = document.createElement("div");
-        newDivMsg.innerHTML = ` <div
+      if (data.type === "log") {
+        const log = JSON.parse(data.content);
+        if (log.action === "purchase completed") {
+          let userLog = "";
+          switch (log.action) {
+            case "fill":
+              userLog = `You filled on the form.`;
+              break;
+            case "focus":
+              userLog = `You focus on the form.`;
+              break;
+            case "purchase":
+              userLog = `You purchased the <b> ${log.plan_name} </b>plan.`;
+              break;
+            case "start form":
+              userLog = `You start submit the form.`;
+              break;
+            case "end form":
+              userLog = `You end submit the form.`;
+              break;
+            case "start purchase":
+              userLog = `You start purchase a plan.`;
+              break;
+            case "link click":
+              userLog = `You click to link.`;
+              break;
+            case "purchase completed":
+              userLog = `${getTranslationValue("bought.purchase")}`;
+              break;
+            case "purchase went wrong":
+              userLog = `Purchase went wrong.`;
+              break;
+          }
+          const newDivMsg = document.createElement("div");
+          newDivMsg.innerHTML = ` <div
         class="flex justify-center items-center w-100 m-2"
         id="msg-${data._id}"
         >
         <span class="logs-notification">
         ${userLog}
         </span>
-        </div>`
-        let typingBlock = document.getElementById("typing-block-message");
-        messagesContainer.insertBefore(newDivMsg, typingBlock);
-      }
+        </div>`;
+          let typingBlock = document.getElementById("typing-block-message");
+          messagesContainer.insertBefore(newDivMsg, typingBlock);
+        }
       } else {
         let direction = data.direction == "in" ? "justify-end" : "";
         const msgStyle =
@@ -2369,7 +2415,9 @@ export async function sentMessage(data) {
         );
         if (msgDiv) {
           const msgText = msgDiv.querySelector("#last-message");
-          msgText.textContent = `Me :  ${truncateMessage(data.content,20)}`;
+          msgText.textContent = `${getTranslationValue(
+            "general.me"
+          )} :  ${truncateMessage(data.content, 20)}`;
           leftConversationContainer.insertBefore(
             msgDiv,
             leftConversationContainer.firstChild
@@ -2383,8 +2431,7 @@ export async function sentMessage(data) {
         }
       }
     }
-      conversationContainer.scrollTop = conversationContainer.scrollHeight;
-    
+    conversationContainer.scrollTop = conversationContainer.scrollHeight;
 
     getDeleteButtons();
     getEditButtons();
@@ -2428,68 +2475,65 @@ getUserCountry()
 
 export async function receiveMessage(data) {
   let messageId;
-    // if (firstConv && firstConv === data.messageData.conversation) {
-    //   $(`.conversation-click[data-conversation-id="${firstConv}"]`).trigger(
-    //     "click"
-    //   );
-    //   firstConv = "";
-    // }
-    playNotificationSound();
+  // if (firstConv && firstConv === data.messageData.conversation) {
+  //   $(`.conversation-click[data-conversation-id="${firstConv}"]`).trigger(
+  //     "click"
+  //   );
+  //   firstConv = "";
+  // }
+  playNotificationSound();
 
-    let tableRows = "";
-    messageId = data.messageData.id;
-    const myContent =
-      data.messageData.type === "plan" ||
-      data.messageData.type === "form" ||
-      data.messageData.type === "link"
-        ? JSON.parse(data.messageData.content)
-        : {};
-    let conv = document.querySelector("#conversation-container").dataset[
-      "conversationId"
-    ];
+  let tableRows = "";
+  messageId = data.messageData.id;
+  const myContent =
+    data.messageData.type === "plan" ||
+    data.messageData.type === "form" ||
+    data.messageData.type === "link"
+      ? JSON.parse(data.messageData.content)
+      : {};
+  let conv = document.querySelector("#conversation-container").dataset[
+    "conversationId"
+  ];
 
-    const messageDate = new Date(data.date);
+  const messageDate = new Date(data.date);
 
-    const currentDate = new Date();
-    const currentDay = currentDate.getDate();
+  const currentDate = new Date();
+  const currentDay = currentDate.getDate();
 
-    const messageDay = messageDate.getDate();
+  const messageDay = messageDate.getDate();
 
-    let time;
+  let time;
 
-    if (currentDay === messageDay) {
-      const hour = messageDate.getHours();
-      const minute = messageDate.getMinutes().toString().padStart(2, "0");
-      time = `${hour}:${minute}`;
-    } else {
-      const day = messageDate.toLocaleString("en-us", {
-        weekday: "long",
-      });
-      const hour = messageDate.getHours();
-      const minute = messageDate.getMinutes().toString().padStart(2, "0");
-      time = `${day}:${hour}:${minute}`;
-    }
-    const isNotNewConversation = document.querySelector(
-      `#left-conversation-${data.messageData.conversation}`
-    );
+  if (currentDay === messageDay) {
+    const hour = messageDate.getHours();
+    const minute = messageDate.getMinutes().toString().padStart(2, "0");
+    time = `${hour}:${minute}`;
+  } else {
+    const day = messageDate.toLocaleString("en-us", {
+      weekday: "long",
+    });
+    const hour = messageDate.getHours();
+    const minute = messageDate.getMinutes().toString().padStart(2, "0");
+    time = `${day}:${hour}:${minute}`;
+  }
+  const isNotNewConversation = document.querySelector(
+    `#left-conversation-${data.messageData.conversation}`
+  );
 
-    if (isNotNewConversation === null) {
-      displayLeftConversation({
-        conversationId: data.messageData.conversation,
-        senderName: data.senderName,
-        agentId: data.messageData.from,
-        contactAgentId: data.contactAgentId,
-        content: data.messageData.content,
-      });
-    }
+  if (isNotNewConversation === null) {
+    displayLeftConversation({
+      conversationId: data.messageData.conversation,
+      senderName: data.senderName,
+      agentId: data.messageData.from,
+      contactAgentId: data.contactAgentId,
+      content: data.messageData.content,
+    });
+  }
 
-    if (data.messageData.conversation === conv) {
-      if (
-        Object.keys(myContent).length !== 0 &&
-        data.messageData.type === "plan"
-      )
-        tableRows = myContent.plans.map((plan) => {
-          return `
+  if (data.messageData.conversation === conv) {
+    if (Object.keys(myContent).length !== 0 && data.messageData.type === "plan")
+      tableRows = myContent.plans.map((plan) => {
+        return `
         <div class="">
         <div class="pricing pricing-palden">
         <div class="pricing-item" id="plan-${messageId}" data-plan-id="${plan.id}" name="${plan.name}">
@@ -2515,50 +2559,50 @@ export async function receiveMessage(data) {
       </div>  
       </div>
           `;
-        });
-      else if (
-        Object.keys(myContent).length !== 0 &&
-        data.messageData.type === "form"
-      ) {
-        let inputForms = "";
-        if (myContent.fields) {
-          myContent.fields.sort(compareFields);
-          inputForms = myContent.fields.map((field) => {
-            let type = "";
-            switch (+field.field_type) {
-              case 1:
-                type = "text";
-                break;
-              case 2:
-                type = "number";
-              case 3:
-                type = "date";
-                break;
-              case 4:
-                type = "datetime-local";
-                break;
-              case 5:
-                type = "number";
-                break;
-              case 6:
-                type = "email";
-                break;
-              case 7:
-                type = "tel";
-                break;
-              case 8:
-                type = "select";
-                break;
-              case 9:
-                type = "textarea";
-                break;
-            }
-            if (field.field_name.toLowerCase() === "country") {
-              const countryOptions = generateCountryOptions(
-                countries,
-                field?.field_value ?? userCountry
-              );
-              return `
+      });
+    else if (
+      Object.keys(myContent).length !== 0 &&
+      data.messageData.type === "form"
+    ) {
+      let inputForms = "";
+      if (myContent.fields) {
+        myContent.fields.sort(compareFields);
+        inputForms = myContent.fields.map((field) => {
+          let type = "";
+          switch (+field.field_type) {
+            case 1:
+              type = "text";
+              break;
+            case 2:
+              type = "number";
+            case 3:
+              type = "date";
+              break;
+            case 4:
+              type = "datetime-local";
+              break;
+            case 5:
+              type = "number";
+              break;
+            case 6:
+              type = "email";
+              break;
+            case 7:
+              type = "tel";
+              break;
+            case 8:
+              type = "select";
+              break;
+            case 9:
+              type = "textarea";
+              break;
+          }
+          if (field.field_name.toLowerCase() === "country") {
+            const countryOptions = generateCountryOptions(
+              countries,
+              field?.field_value ?? userCountry
+            );
+            return `
                   <label class="relative">
                       <span>${field.field_name}</span>
                       <select 
@@ -2579,8 +2623,8 @@ export async function receiveMessage(data) {
                           ${countryOptions}
                       </select>
                   </label>`;
-            } else if (field.field_name.toLowerCase() === "phone") {
-              return `
+          } else if (field.field_name.toLowerCase() === "phone") {
+            return `
             <label class="relative">
             <span>${field.field_name}</span>
             <input 
@@ -2596,8 +2640,8 @@ export async function receiveMessage(data) {
             />
         </label>
         `;
-            } else {
-              return `
+          } else {
+            return `
               <label class="relative">
                 <span>${field.field_name}</span>
                 ${
@@ -2611,6 +2655,27 @@ export async function receiveMessage(data) {
                       ${field?.field_value ? "style='pointer-events:none'" : ""}
                       ${myContent.status === 1 ? "disabled" : ""}
                     >${field?.field_value ?? ""}</textarea>`
+                    : type === "date"
+                    ? `<input
+                        id="floating_field_${messageId}"
+                        class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
+                        placeholder="Enter Date"
+                        name="${field?.field_name?.replace(" ", "")}"
+                        data-field-id="${field?.field_id}"
+                        value="${field?.field_value ?? ""}"
+                        type="text"
+                        ${
+                          field?.field_value
+                            ? "style='pointer-events:none'"
+                            : ""
+                        }
+                        ${myContent.status === 1 ? "disabled" : ""}
+                        x-input-mask='{
+                          date: true,
+                          delimiter: "-",
+                          datePattern: ["m", "d", "Y"]
+                        }'
+                      />`
                     : `<input
                       id="floating_field_${messageId}"
                       class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900" 
@@ -2625,16 +2690,16 @@ export async function receiveMessage(data) {
                 }
               </label>
             `;
-            }
-          });
+          }
+        });
 
-          tableRows = `
+        tableRows = `
         <div class="mr-4 max-w-lg sm:mr-10">
               <form name="form1" class="box" onsubmit="">
                   <div class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 ${
                     newData.goccContactId || newData.goccLeadId ? "gocc" : ""
                   }  card-form" style="position: relative;">
-                      <div class="mt-20 w-full max-w-xl p-4 sm:p-5">
+                      <div class=" w-full max-w-xl p-4 sm:p-5">
                           <div class="mb-4">
                               <h3 class="text-2xl font-semibold">${
                                 myContent.friendly_name
@@ -2676,13 +2741,13 @@ export async function receiveMessage(data) {
               </form>
           </div>
           `;
-        }
-      } else if (data.messageData.type === "bloc") {
-        const messageDiv = document.createElement("div");
-        messageDiv.innerHTML = `<div class="flex flex-col items-start space-y-3.5">
+      }
+    } else if (data.messageData.type === "bloc") {
+      const messageDiv = document.createElement("div");
+      messageDiv.innerHTML = `<div class="flex flex-col items-start space-y-3.5">
         <div class="mr-1">
-            <div class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100">
-                <div class="space-y-3.5">
+        <div class="rounded-2xl break-words  relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white">
+        <div class="space-y-3.5">
                     <div class="ml-2 sm:ml-5">
                         <div id="message-content-${messageId}">
                             <div class="ml-2 sm:ml-5">
@@ -2715,38 +2780,47 @@ export async function receiveMessage(data) {
                 </div>
             </div>
         </div>
+        </div>
+        <p class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">${timeString} </p>
+    </div>
         </div>`;
-        messagesContainer.appendChild(messageDiv);
-        const btnAvailableAgent = messageDiv.querySelector("#AvailableAgent");
-        btnAvailableAgent.addEventListener("click", function () {
+      messagesContainer.appendChild(messageDiv);
+      const btnAvailableAgent = messageDiv.querySelector("#AvailableAgent");
+      btnAvailableAgent.addEventListener(
+        "click",
+        function () {
           foued.availableAgent({
             accountId: newData.accountId,
             conversationId: conversationId,
             userId: newData.user,
           });
-        });
+        },
+        { once: true }
+      );
 
-        const btnSelectAgent = messageDiv.querySelector("#selectAgent");
-        btnSelectAgent.addEventListener("click", function () {
+      const btnSelectAgent = messageDiv.querySelector("#selectAgent");
+      btnSelectAgent.addEventListener(
+        "click",
+        function () {
           foued.displayAgents(newData.accountId);
-        });
-      }
+        },
+        { once: true }
+      );
+    }
 
-      if (data.messageData.type !== "bloc") {
-        const messageContainer = document.getElementById(
-          `message-${messageId}`
-        );
-        if (!messageContainer) {
-          let direction =
-            data.direction == "in" ? "justify-end" : "justify-start";
-          const msgStyle =
-            data.messageData.user === newData.user && !data.message.paid
-              ? `rounded-2xl break-words  rounded-tl-none bg-white p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
-              : `rounded-2xl break-words  relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
-          const messageContent = `
+    if (data.messageData.type !== "bloc") {
+      const messageContainer = document.getElementById(`message-${messageId}`);
+      if (!messageContainer) {
+        let direction =
+          data.direction == "in" ? "justify-end" : "justify-start";
+        const msgStyle =
+          data.messageData.user === newData.user && !data.message.paid
+            ? `rounded-2xl break-words  rounded-tl-none bg-white p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
+            : `rounded-2xl break-words  relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
+        const messageContent = `
       <div id="message-${messageId}" class="flex items-start ${direction} space-x-1.5 ${
-            data.messageData.type === "plan" ? "plans-container" : ""
-          }">     
+          data.messageData.type === "plan" ? "plans-container" : ""
+        }">     
               <div class="flex flex-col   ${
                 data.messageData.user !== newData.user
                   ? "items-start"
@@ -2841,8 +2915,8 @@ export async function receiveMessage(data) {
                 }    
                   ${data.messageData.type === "MSG" ? `</div>` : ""}  
                   <p id="date_msg" data-direction="${direction}" class="mt-1 ${
-            data.messageData.user !== newData.user ? "" : "ml-auto"
-          }  text-xs text-slate-400 dark:text-navy-300">
+          data.messageData.user !== newData.user ? "" : "ml-auto"
+        }  text-xs text-slate-400 dark:text-navy-300">
                     ${timeString}
                   </p>
               </div>
@@ -2856,113 +2930,112 @@ export async function receiveMessage(data) {
             </div>
       `;
 
-          let typingBlock = document.getElementById("typing-block-message");
-          if (typingBlock) {
-            const msgDiv = document.createElement("div");
-            msgDiv.innerHTML = messageContent;
-            if (
-              data.messageData.type === "form" &&
-              msgDiv.querySelector(`#submit-form-${data.messageData._id}`)
-            ) {
-              msgDiv.querySelector(
-                `#submit-form-${data.messageData._id}`
-              )._form_data = data.messageData.content;
-            }
-            typingBlock.replaceWith(msgDiv);
-          } else
-            messagesContainer.insertAdjacentHTML("beforeend", messageContent);
-          if (conversationId === data.messageData.conversation) {
-            if (document.visibilityState === "visible") {
-              markMessageAsSeen(conversationId);
-            } else {
-              document.addEventListener(
-                "visibilitychange",
-                () => {
-                  if (document.visibilityState === "visible") {
-                    markMessageAsSeen(conversationId);
-                  }
-                },
-                { once: true }
-              );
-            }
+        let typingBlock = document.getElementById("typing-block-message");
+        if (typingBlock) {
+          const msgDiv = document.createElement("div");
+          msgDiv.innerHTML = messageContent;
+          if (
+            data.messageData.type === "form" &&
+            msgDiv.querySelector(`#submit-form-${data.messageData._id}`)
+          ) {
+            msgDiv.querySelector(
+              `#submit-form-${data.messageData._id}`
+            )._form_data = data.messageData.content;
           }
-          conversationContainer.scrollTop = conversationContainer.scrollHeight;
-
-          if (data.messageData.type === "form") {
-            const messageElement = document.querySelector(
-              `#message-${messageId} input.phoneInput`
+          typingBlock.replaceWith(msgDiv);
+        } else
+          messagesContainer.insertAdjacentHTML("beforeend", messageContent);
+        if (conversationId === data.messageData.conversation) {
+          if (document.visibilityState === "visible") {
+            markMessageAsSeen(conversationId);
+          } else {
+            document.addEventListener(
+              "visibilitychange",
+              () => {
+                if (document.visibilityState === "visible") {
+                  markMessageAsSeen(conversationId);
+                }
+              },
+              { once: true }
             );
-            if (messageElement) {
-              phoneList(messageElement);
-            }
           }
-          if (data.messageData.type === "MSG") {
-            const messageElement = document.getElementById(
-              `message-${messageId}`
-            );
-            const msgButtContainer = messageElement.querySelector(
-              ".msg-butt-container"
-            );
-            const reactButtContainer = messageElement.querySelector(
-              ".react-butt-container"
-            );
-            messageElement.addEventListener("mouseenter", () => {
-              msgButtContainer.style.display = "block";
-              reactButtContainer.style.display = "block";
-            });
+        }
+        conversationContainer.scrollTop = conversationContainer.scrollHeight;
 
-            messageElement.addEventListener("mouseleave", () => {
-              msgButtContainer.style.display = "none";
-              reactButtContainer.style.display = "none";
-            });
-          }
-
-          const selectElement = document.querySelector(
-            `#floating_field_${messageId}[data-country]`
+        if (data.messageData.type === "form") {
+          const messageElement = document.querySelector(
+            `#message-${messageId} input.phoneInput`
           );
-
-          $(selectElement).select2({
-            placeholder: "Select your Country",
+          if (messageElement) {
+            phoneList(messageElement);
+          }
+        }
+        if (data.messageData.type === "MSG") {
+          const messageElement = document.getElementById(
+            `message-${messageId}`
+          );
+          const msgButtContainer = messageElement.querySelector(
+            ".msg-butt-container"
+          );
+          const reactButtContainer = messageElement.querySelector(
+            ".react-butt-container"
+          );
+          messageElement.addEventListener("mouseenter", () => {
+            msgButtContainer.style.display = "block";
+            reactButtContainer.style.display = "block";
           });
-          $(selectElement).on("change.select2", () => {
-            const selectedCountryCode = $(selectElement).val();
-            const phoneInput = document.querySelector(
-              `.phoneInput.field-${messageId}`
-            );
-            if (phoneInput) {
-              let instance = window.intlTelInputGlobals.getInstance(phoneInput);
-              if (typeof instance !== "undefined") {
-                instance.setCountry(selectedCountryCode);
-              }
+
+          messageElement.addEventListener("mouseleave", () => {
+            msgButtContainer.style.display = "none";
+            reactButtContainer.style.display = "none";
+          });
+        }
+
+        const selectElement = document.querySelector(
+          `#floating_field_${messageId}[data-country]`
+        );
+
+        $(selectElement).select2({
+          placeholder: "Select your Country",
+        });
+        $(selectElement).on("change.select2", () => {
+          const selectedCountryCode = $(selectElement).val();
+          const phoneInput = document.querySelector(
+            `.phoneInput.field-${messageId}`
+          );
+          if (phoneInput) {
+            let instance = window.intlTelInputGlobals.getInstance(phoneInput);
+            if (typeof instance !== "undefined") {
+              instance.setCountry(selectedCountryCode);
             }
-          });
-        }
-      }
-      conversationContainer.scrollTop = conversationContainer.scrollHeight;
-
-      reactions();
-      getReactButton();
-      getDeleteButtons();
-      getEditButtons();
-      getPinButtons();
-
-      notifyNumber += 1;
-      changeTitle(notifyNumber);
-    } else {
-      const unreadCount = document.getElementById(
-        `unread-count-${data.messageData.conversation}`
-      );
-      if (unreadCount?.classList.contains("hidden")) {
-        unreadCount?.classList.remove("hidden");
-        unreadCount?.classList.add("flex");
-        unreadCount.textContent = 1;
-      } else {
-        if (unreadCount?.textContent) {
-          unreadCount.textContent = +unreadCount?.textContent + 1;
-        }
+          }
+        });
       }
     }
- 
+    conversationContainer.scrollTop = conversationContainer.scrollHeight;
+
+    reactions();
+    getReactButton();
+    getDeleteButtons();
+    getEditButtons();
+    getPinButtons();
+
+    notifyNumber += 1;
+    changeTitle(notifyNumber);
+  } else {
+    const unreadCount = document.getElementById(
+      `unread-count-${data.messageData.conversation}`
+    );
+    if (unreadCount?.classList.contains("hidden")) {
+      unreadCount?.classList.remove("hidden");
+      unreadCount?.classList.add("flex");
+      unreadCount.textContent = 1;
+    } else {
+      if (unreadCount?.textContent) {
+        unreadCount.textContent = +unreadCount?.textContent + 1;
+      }
+    }
+  }
 
   function sendClickingNotification(data) {
     foued.linkClick(data.id.replace("linked-msg-", ""));
@@ -3769,13 +3842,14 @@ async function clickedAgent(agentId, agentContactId) {
 
   <div class="mt-4" style="width:344px" >
     <h2 class="text-2xl text-slate-700 dark:text-navy-100">
-      Welcome to Dellastro
+    ${getTranslationValue("modal.welcome")} ${applicationName}
     </h2>
     <p class="mt-2">
-      Please feel free to fill the form .
-    </p>
+    ${getTranslationValue("modal.fillForm")}  
+      </p>
     <button @click="showModal = false" class="btn mt-6 bg-success font-medium text-white hover:bg-success-focus focus:bg-success-focus active:bg-success-focus/90">
-      Close
+    ${getTranslationValue("modal.close")}  
+
     </button>
   </div>
 </div>
@@ -3795,6 +3869,8 @@ export function userConnection(data) {
       const conversationCard = document.getElementById(
         `left-conversation-${conv._id}`
       );
+      const leftConversationId = conversationCard.getAttribute('data-conversation-id');
+
       const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_on">${getTranslationValue(
         "left_side.experts_on"
       )}</span>`;
@@ -3803,6 +3879,12 @@ export function userConnection(data) {
       const isConnected = conv.members.find(
         (user) => user.user_id === data._id
       );
+      if(conversationId==leftConversationId){
+          conversationHeaderStatus.textContent=getTranslationValue("general.online")
+        conversationHeaderStatus.dataset.translation = "general.online";
+
+      }
+      
       if (isConnected) {
         statusConv.classList.remove("bg-slate-300");
         statusConv.classList.add("bg-success");
@@ -3812,8 +3894,9 @@ export function userConnection(data) {
 }
 //when an agent disconnect remove the card in the online agents block
 export function userDisconnection(data) {
+  let conversationCard;
   allConversation.map((conv) => {
-    const conversationCard = document.getElementById(
+     conversationCard = document.getElementById(
       `left-conversation-${conv._id}`
     );
     const isConnected = conv.members.find((user) => user.user_id === data?._id);
@@ -3831,6 +3914,14 @@ export function userDisconnection(data) {
         });
     }
   });
+  const leftConversationId = conversationCard.getAttribute('data-conversation-id');
+  if(conversationId==leftConversationId){
+    
+    conversationHeaderStatus.textContent=getTranslationValue("general.offline")
+
+    conversationHeaderStatus.dataset.translation = "general.offline";
+  }
+  
   const agentCard = document.getElementById(`${data?._id}`);
   if (agentCard) {
     agentCard.remove();
@@ -3849,7 +3940,7 @@ export function getTotalBalance(balance, role) {
   const messageInput = document.querySelector("#message-input");
   const sendButton = document.querySelector("#send-message");
   // Show spinner
-  // balanceSpinner.classList.remove("hidden");
+  balanceSpinner.classList.remove("hidden");
 
   totalBalance = balance;
   setTimeout(() => {
@@ -3862,9 +3953,13 @@ export function getTotalBalance(balance, role) {
     } else {
       balanceNumber.textContent = balance;
       if (balance > 4) {
+        console.log("here");
+        balanceNumber.style.color = "";
+        balanceNumber.style.color = "#000000";
       } else if (balance < 3 && balance > 1) {
         balanceNumber.style.color = "#F94C10";
       } else {
+        balanceNumber.style.color = "";
         balanceNumber.style.color = "#C70039";
       }
       if (balance === 0) {
@@ -3873,10 +3968,13 @@ export function getTotalBalance(balance, role) {
           "You need to buy a new plan to start chatting again";
         messageInput.disabled = true;
         sendButton.disabled = true;
+        balanceNumber.style.color = "";
         balanceNumber.style.color = "#C70039";
       } else {
-        messageInput.dataset.translation="container.write_message"
-        messageInput.placeholder =getTranslationValue("container.write_message");
+        messageInput.dataset.translation = "container.write_message";
+        messageInput.placeholder = getTranslationValue(
+          "container.write_message"
+        );
 
         messageInput.disabled = false;
         sendButton.disabled = false;
@@ -3893,10 +3991,13 @@ export function updateUserBalance() {
     const buyCreditsButton = document.querySelector("#btnPlansContainer");
     balanceNumber.textContent = totalBalance;
     if (totalBalance > 4) {
+      balanceNumber.style.color = "";
       balanceNumber.style.color = "#C8E4B2";
     } else if (totalBalance <= 4 && totalBalance >= 2) {
+      balanceNumber.style.color = "";
       balanceNumber.style.color = "#F94C10";
     } else {
+      balanceNumber.style.color = "";
       balanceNumber.style.color = "#C70039";
     }
 
@@ -3924,6 +4025,7 @@ export function updateUserBalance() {
       </div>
     </div>
       `;
+      balanceNumber.style.color = "";
       balanceNumber.style.color = "#C70039";
 
       const confirmButton = modalDiv.querySelector("#confirmButton");
@@ -3963,7 +4065,7 @@ function updateStatusInCookie() {
 export function submitFormStatus(status, text_capture) {
   const formContact = formElement.parentNode;
   const formContent = formContact.parentNode;
-  
+
   let statusMessage = formContent.querySelector("p");
 
   if (!statusMessage) {
@@ -3995,7 +4097,7 @@ export function submitFormStatus(status, text_capture) {
     formElement.innerHTML = "";
     formElement.innerHTML = "Try again";
     // Update the status message for failure
-    statusMessage.dataset.translation="container.forms.error"
+    statusMessage.dataset.translation = "container.forms.error";
     statusMessage.innerText = getTranslationValue("container.forms.error");
     statusMessage.style.color = "#F24C3D";
     // Open modal for fail submit form
@@ -4083,39 +4185,27 @@ async function getPlans() {
 
       // Add event listeners to the buy buttons
       const buyButtons = document.querySelectorAll(".plan-btn");
-      const modal = document.getElementById("ModalPlan");
-      const closeModalButtons = modal.querySelectorAll(
-        ".close, #closeModal, #buyPlanBtn"
-      );
 
       buyButtons.forEach((buyButton) => {
         buyButton.addEventListener("click", function () {
           const selectedPlan = this.getAttribute("data-plan");
           const planName = this.getAttribute("name");
-          modal.classList.remove("hidden");
 
-          successButton.setAttribute("data-plan", selectedPlan);
-          successButton.setAttribute("name", planName);
-
-          const closePlansContainerButton = document.getElementById(
-            "closePlansContainerButton"
-          );
-          if (closePlansContainerButton) {
-            closePlansContainerButton.click();
-          }
+          const msgId = this.getAttribute("message-id");
+          // balanceSpinner.classList.remove("hidden");
+          foued.addSale({
+            contact: newData.contact,
+            user: newData.user,
+            plan: selectedPlan,
+            payment_method: "1",
+            provider_id: "1",
+            messageId: msgId,
+            conversationId: conversationId,
+            senderName: senderName,
+            planName: planName,
+            sale_status: 0,
+          });
         });
-      });
-
-      closeModalButtons.forEach((closeButton) => {
-        closeButton.addEventListener("click", function () {
-          modal.classList.add("hidden");
-        });
-      });
-
-      modal.addEventListener("click", function (event) {
-        if (event.target === modal) {
-          modal.classList.add("hidden");
-        }
       });
     }
   } catch (error) {
@@ -4155,10 +4245,10 @@ failButton.addEventListener("click", function () {
           Error
         </h2>
         <p class="mt-2">
-         something went wront,try again  
+        ${getTranslationValue("modal.fail")}
         </p>
         <button id="closeModal" class="btn mt-6 bg-error font-medium text-white hover:bg-success-focus focus:bg-error-focus active:bg-error-focus/90">
-          Close
+        ${getTranslationValue("modal.close")}
         </button>
       </div>
     `;
@@ -4182,14 +4272,15 @@ failButton.addEventListener("click", function () {
 
 const successButton = document.getElementById("buyPlanBtn");
 successButton.addEventListener("click", async function () {
+  console.log("herere");
   const selectedPlan = this.getAttribute("data-plan");
-  const balanceSpinner = document.querySelector(".balance-spinner");
+  // const balanceSpinner = document.querySelector(".balance-spinner");
 
   const planName = this.getAttribute("name");
   const msgId = this.getAttribute("message-id");
   try {
-    balanceSpinner.classList.remove("hidden");
-    foued.buyPlan({
+    // balanceSpinner.classList.remove("hidden");
+    foued.addSale({
       contact: newData.contact,
       user: newData.user,
       plan: selectedPlan,
@@ -4199,6 +4290,7 @@ successButton.addEventListener("click", async function () {
       conversationId: conversationId,
       senderName: senderName,
       planName: planName,
+      sale_status: 0,
     });
   } catch (error) {
     console.error("Error adding sale:", error);
@@ -4445,39 +4537,37 @@ for (const locale of locales) {
   }
 }
 
-
-
 function phoneList(input) {
   let form = input.closest("form");
   let iti = window.intlTelInput(input, {
     utilsScript:
       "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
     initialCountry: userCountry.toLowerCase(),
+    separateDialCode:true,
+
   });
+  let selectedCountryData = iti.getSelectedCountryData();
   function validatePhoneNumber() {
     let phoneNumber = input.value;
-    let selectedCountryData = iti.getSelectedCountryData();
-
     if (phoneNumber.startsWith("+")) {
       if (!phoneNumber.startsWith("+" + selectedCountryData.dialCode)) {
         showValidationError(
           input,
-          getTranslationValue("container.forms.phone")+ selectedCountryData.name
+          getTranslationValue("container.forms.phone") +
+            selectedCountryData.name
         );
         return;
       }
     } else {
-      phoneNumber = "+" + selectedCountryData.dialCode + phoneNumber;
       input.value = phoneNumber;
     }
     let valid = iti.isValidNumber(phoneNumber);
     PhoneNumberValidation = true;
     if (!valid) {
       PhoneNumberValidation = false;
-
       showValidationError(
         input,
-        getTranslationValue("container.forms.phone") + selectedCountryData.name
+        getTranslationValue("container.forms.phone") 
       );
     } else {
     }
@@ -4493,7 +4583,10 @@ function phoneList(input) {
       e.preventDefault();
       let valid = iti.isValidNumber(input.value);
       if (!valid) {
-        showValidationError(input,getTranslationValue("container.forms.phone"));
+        showValidationError(
+          input,
+          getTranslationValue("container.forms.phone")
+        );
       }
     },
     false
@@ -4538,7 +4631,9 @@ function createAgentCard(agent) {
     <div class="flex items-center justify-between space-x-2">
       <div class="flex items-center space-x-3">
         <div class="avatar">
-          <img class="mask is-squircle" src="images/avatar/avatar-${agent.UserID}.jpg" alt="image">
+          <img class="mask is-squircle" src="images/avatar/avatar-${
+            agent.UserID
+          }.jpg" alt="image">
         </div>
         <div>
           <p class="font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
@@ -4553,24 +4648,32 @@ function createAgentCard(agent) {
     <div class="flex justify-between space-x-31">
       <div>
         <p class="text-tiny">Country</p>
-        <p class="text-md font-semibold text-slate-700 dark:text-navy-100">${agent.country}</p>
+        <p class="text-md font-semibold text-slate-700 dark:text-navy-100">${
+          agent.country
+        }</p>
       </div>
       <div>
         <p class="text-tiny">Languages</p>
-        <p class="text-md font-semibold text-slate-700 dark:text-navy-100">${agent.languages}</p>
+        <p class="text-md font-semibold text-slate-700 dark:text-navy-100">${
+          agent.languages
+        }</p>
       </div>
       <div>
         <p class="text-tiny">Expertise</p>
-        <p class="text-md font-semibold text-slate-700 dark:text-navy-100">${agent.expertise}</p>
+        <p class="text-md font-semibold text-slate-700 dark:text-navy-100">${
+          agent.expertise
+        }</p>
       </div>
     </div>
     <div class="grow">
       <p class="text-xs text-left">
-      ${truncateMessage(agent.presentation,150)}
+      ${truncateMessage(agent.presentation, 150)}
        
       </p>
     </div>
-    <button id="right-agent-${agent.user_id}" class="btn h-9 w-full justify-between bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
+    <button id="right-agent-${
+      agent.user_id
+    }" class="btn h-9 w-full justify-between bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
     <span>Chatter</span>
     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
@@ -4602,15 +4705,19 @@ export function displayAgents(agents) {
 
       const button = document.getElementById(`right-agent-${agent.user_id}`);
       if (button) {
-        button.addEventListener("click", async () => {
-          // clickedAgent(agent.user_id, agent.UserID);
-          foued.availableAgent({
-            accountId: newData.accountId,
-            conversationId: conversationId,
-            userId: newData.user,
-            agentId: agent.user_id,
-          });
-        },{once:true});
+        button.addEventListener(
+          "click",
+          async () => {
+            // clickedAgent(agent.user_id, agent.UserID);
+            foued.availableAgent({
+              accountId: newData.accountId,
+              conversationId: conversationId,
+              userId: newData.user,
+              agentId: agent.user_id,
+            });
+          },
+          { once: true }
+        );
       }
     });
 
@@ -4645,9 +4752,10 @@ export function changeHeaderPicture(cnv, agent, status) {
     }
   }
 }
-export function removeConnectUser(id){
-  connectUsers = connectUsers.filter((connectedUser) => connectedUser._id !== id);
-
+export function removeConnectUser(id) {
+  connectUsers = connectUsers.filter(
+    (connectedUser) => connectedUser._id !== id
+  );
 }
 export function displayLeftConversation(data) {
   const isNotNewConversation = document.querySelector(
@@ -4672,7 +4780,9 @@ export function displayLeftConversation(data) {
       if (element.classList.contains("bg-slate-150"))
         element.classList.remove("bg-slate-150");
     });
-    const agentContactId = connectUsers.find((user) => user._id === data.agentId);
+    const agentContactId = connectUsers.find(
+      (user) => user._id === data.agentId
+    );
     const html = `
     <div class="conversationItem conversation bg-slate-150" data-conversation-id="${
       data.conversationId
@@ -4693,7 +4803,7 @@ export function displayLeftConversation(data) {
             <div
             id=${data.agentId}
               class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${
-                agentContactId?.is_active  ? "bg-success" : "bg-slate-300"
+                agentContactId?.is_active ? "bg-success" : "bg-slate-300"
               } dark:border-navy-700">
             </div>
           </div>
@@ -4808,7 +4918,9 @@ export function displayLeftConversation(data) {
                         data.contactAgentId
                       }.jpg alt="image">
                       <div id="active-user" class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${
-                        agentContactId?.is_active  ? "bg-success" : "bg-slate-300"
+                        agentContactId?.is_active
+                          ? "bg-success"
+                          : "bg-slate-300"
                       }  dark:border-navy-700"></div>
                     </div>
                   </div>
@@ -4877,6 +4989,103 @@ $(document).ready(async function () {
     }
   });
 
+  function waitForConversationId(callback) {
+    const maxAttempts = 10; // Adjust the number of attempts as needed
+    let attempts = 0;
+  
+    function checkConversationId() {
+      if (conversationId !== undefined) {
+        callback();
+      } else if (attempts < maxAttempts) {
+        attempts++;
+        setTimeout(checkConversationId, 200); // Check every 200 milliseconds
+      } else {
+        console.error('Timed out waiting for conversationId');
+      }
+    }
+  
+    checkConversationId();
+  }
+  
+  if (params.response === "ok") {
+    waitForConversationId(function () {
+      // Send event success purchase
+      foued.saleSucceeded({
+        id_sale: params.id_sale,
+        reason: params.reason,
+        date_end: new Date(),
+        contact: newData.contact,
+        conversationId: conversationId,
+        userId: newData.user,
+        accountId: newData.accountId,
+      });
+    });
+  } else if (params.response === "ko") {
+    waitForConversationId(function () {
+      // Send event fail purchase
+      // Update sale in the database status=params.status, id_sale=params.id_sale, reason=params.reason, date_end=DataNow()
+      foued.saleFailed({
+        id_sale: params?.id_sale,
+        reason: params?.reason,
+        id_company: params?.id_company,
+        date_end: new Date(),
+      });
+  
+      try {
+        modal.classList.add("hidden");
+  
+        // Create the modal container
+        const modalContainer = document.createElement("div");
+        modalContainer.className =
+          "fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5";
+  
+        // Create the background overlay
+        const backgroundOverlay = document.createElement("div");
+        backgroundOverlay.className =
+          "absolute inset-0 bg-slate-900/60 transition-opacity duration-300";
+  
+        // Create the modal content
+        const modalContent = document.createElement("div");
+        modalContent.className =
+          "relative max-w-lg rounded-lg bg-white px-4 py-10 text-center transition-opacity duration-300 dark:bg-navy-700 sm:px-5";
+  
+        // Add your modal content (replace data.balance and newBalance with actual values)
+        modalContent.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="inline h-28 w-28 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+        <div class="mt-4" style="344px">
+          <h2 class="text-2xl text-slate-700 dark:text-navy-100">
+            Error
+          </h2>
+          <p class="mt-2">
+          ${getTranslationValue("modal.fail")}
+          </p>
+          <button id="closeModal" class="btn mt-6 bg-error font-medium text-white hover:bg-success-focus focus:bg-error-focus active:bg-error-focus/90">
+          ${getTranslationValue("modal.close")}
+          </button>
+        </div>
+      `;
+  
+        // Append the elements to the modal container
+        modalContainer.appendChild(backgroundOverlay);
+        modalContainer.appendChild(modalContent);
+  
+        // Append the modal container to the document body
+        document.body.appendChild(modalContainer);
+  
+        // Close modal event listener
+        const closeModalButton = modalContent.querySelector("#closeModal");
+        closeModalButton.addEventListener("click", function () {
+          document.body.removeChild(modalContainer);
+        });
+      } catch (error) {
+        console.error("Error displaying modal:", error);
+      }
+      //add log
+    });
+  }
+  
   foued.getAvailableAgent();
   foued.onDisconnected();
   foued.onConnected();
@@ -4923,6 +5132,7 @@ $(document).ready(async function () {
   foued.onConnectedError();
   foued.onGetUserPresntations();
   foued.onCheckConversation();
+  foued.saleAdded();
   document
     .querySelector("emoji-picker")
     .addEventListener("emoji-click", (event) => {

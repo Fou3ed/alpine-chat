@@ -1,4 +1,5 @@
 export const accountId="36"
+export const applicationName="DELLASTRO"
 export const API_KEY="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ1"
 export const SQL_API="https://iheb.local.itwise.pro/private-chat-app/public"
 // export const socketAddress="wss://foued.local.itwise.pro:3002"

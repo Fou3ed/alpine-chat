@@ -6,7 +6,9 @@
         "country": "country",
         "languages": "languages",
         "expertise": "expertise",
-        "robot": "Virtual assistant"
+        "robot": "Virtual assistant",
+        "me":"Me"
+     
     },
     "header": {
         "free": "free",
@@ -107,7 +109,21 @@
     "months" : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul","Aug", "Sep", "Oct", "Nov", "Dec"]
     ,"bought":{
         "congratulations":"congratulations",
-        "success":"you bought" 
+        "success":"you bought",
+        "newBalance":"your new balance ",
+        "purchase":"Purchase completed successfully."
 
+    },
+    "modal":{
+        "fail":"something went wrong,try again",
+        "close":"Close",
+        "welcome":"Welcome to",
+        "fillForm":"Please feel free to fill the form .",
+        "successBtn":"success",
+        "failBtn":" fail",
+        "sure":"Are you sure ?",
+        "buy":"buy Plan",
+        "deleteMsg":"Delete message",
+        "deleteBtn":"delete"
     }
 }
