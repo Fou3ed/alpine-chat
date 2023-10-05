@@ -40,9 +40,15 @@ function getCookie(name) {
 
 let traduction = {};
 export function getTranslationValue(key) {
-  return eval(`traduction.${key}`)
-    ? eval(`traduction.${key}`).toUpperCase()
-    : key;
+  const translationValue = eval(`traduction.${key}`);
+  
+  if (translationValue) {
+    const firstLetter = translationValue.charAt(0).toUpperCase();
+    const restOfString = translationValue.slice(1);
+    return firstLetter + restOfString;
+  } else {
+    return key;
+  }
 }
 
 function traduc() {
@@ -472,7 +478,6 @@ function showValidationError(inputElement, message) {
   errorMessageElement.innerText = message;
 
   // Check if an error message is already displayed and remove it if so
-  console.log("inout elem",inputElement)
   inputElement.closest("label").querySelector(".error-message")?.remove();
   if (
     inputElement.classList.contains("phoneInput") &&
@@ -1365,6 +1370,7 @@ if (container) {
 let formElement = "";
 
 function submitForm(element) {
+  console.log("element ",element)
   formElement = element;
   let messageContent = element.closest('[id^="message-content-"]');
   let messageId = messageContent?.id?.replace("message-content-", "");
@@ -1957,6 +1963,7 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
           }
 
           if (document.querySelector(`#submit-form-${messageId}`)) {
+            console.log("form_data",message.message)
             document.querySelector(`#submit-form-${messageId}`)._form_data =
               message.message;
           }
@@ -1994,17 +2001,21 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
       }
       //lénna mta3 l plan message
       function sendPlanClickNotification(data, messageId) {
-        modal.classList.remove("hidden");
         successButton.setAttribute("data-plan", data.dataset.planId);
         successButton.setAttribute("message-id", messageId);
         const name = data.getAttribute("name");
         successButton.setAttribute("name", name);
-        // Update message to status not paid: 2
-        addLogs({
-          action: "start purchase",
-          element: "3",
-          element_id: +data.dataset.planId,
+   
+        foued.addSale({
+          contact: newData.contact,
+          user: newData.user,
+          plan: +data.dataset.planId,
+          payment_method: "1",
+          provider_id: "1",
           messageId: messageId,
+          conversationId: conversationId,
+          planName: name,
+          sale_status: 0,
         });
       }
       
@@ -2929,19 +2940,20 @@ export async function receiveMessage(data) {
               }
             </div>
       `;
+      if (
+        data.messageData.type === "form" &&
+        msgDiv.querySelector(`#submit-form-${data.messageData._id}`)
+      ) {
 
+        msgDiv.querySelector(
+          `#submit-form-${data.messageData._id}`
+        )._form_data = data.messageData.content;
+      }
         let typingBlock = document.getElementById("typing-block-message");
         if (typingBlock) {
           const msgDiv = document.createElement("div");
           msgDiv.innerHTML = messageContent;
-          if (
-            data.messageData.type === "form" &&
-            msgDiv.querySelector(`#submit-form-${data.messageData._id}`)
-          ) {
-            msgDiv.querySelector(
-              `#submit-form-${data.messageData._id}`
-            )._form_data = data.messageData.content;
-          }
+       
           typingBlock.replaceWith(msgDiv);
         } else
           messagesContainer.insertAdjacentHTML("beforeend", messageContent);
@@ -3048,7 +3060,6 @@ export async function receiveMessage(data) {
   }
 
   function sendPlanClickNotification(data, messageId) {
-    modal.classList.remove("hidden");
     successButton.setAttribute("data-plan", data.dataset.planId);
     successButton.setAttribute("message-id", messageId);
 
@@ -3056,11 +3067,16 @@ export async function receiveMessage(data) {
     successButton.setAttribute("name", name);
 
     // Update message to status not paid: 2
-    addLogs({
-      action: "start purchase",
-      element: "3",
-      element_id: +data.dataset.planId,
+    foued.addSale({
+      contact: newData.contact,
+      user: newData.user,
+      plan: +data.dataset.planId,
+      payment_method: "1",
+      provider_id: "1",
       messageId: messageId,
+      conversationId: conversationId,
+      planName: name,
+      sale_status: 0,
     });
   }
 
@@ -4193,6 +4209,7 @@ async function getPlans() {
 
           const msgId = this.getAttribute("message-id");
           // balanceSpinner.classList.remove("hidden");
+
           foued.addSale({
             contact: newData.contact,
             user: newData.user,
@@ -4201,7 +4218,6 @@ async function getPlans() {
             provider_id: "1",
             messageId: msgId,
             conversationId: conversationId,
-            senderName: senderName,
             planName: planName,
             sale_status: 0,
           });
@@ -4394,13 +4410,13 @@ const getAgentPresentation = async (id, online) => {
       const websiteElement = document.querySelector(".website");
       websiteElement.href = agentData.website;
       websiteElement.textContent = agentData.website;
-      if (!clicked) {
-        let toggleButton = document.getElementById("toggleDrawerButton");
-        if (toggleButton) {
-          toggleButton.click();
-          clicked = true;
-        }
-      }
+      // if (!clicked) {
+      //   let toggleButton = document.getElementById("toggleDrawerButton");
+      //   if (toggleButton) {
+      //     toggleButton.click();
+      //     clicked = true;
+      //   }
+      // }
     } else {
       throw new Error("Request failed with status: " + response.status);
     }
@@ -4550,7 +4566,7 @@ function phoneList(input) {
   function validatePhoneNumber() {
     let phoneNumber = input.value;
     if (phoneNumber.startsWith("+")) {
-      if (!phoneNumber.startsWith("+" + selectedCountryData.dialCode)) {
+      if (phoneNumber.startsWith("+" + selectedCountryData.dialCode)) {
         showValidationError(
           input,
           getTranslationValue("container.forms.phone") +
@@ -4937,11 +4953,12 @@ export function displayLeftConversation(data) {
   }
 }
 
+
+
 $(document).ready(async function () {
   let params = Object.fromEntries(
     new URLSearchParams(window.location.search).entries()
   );
-  console.log("params :", params);
   showSpinner();
   getPlans();
 
@@ -4990,7 +5007,7 @@ $(document).ready(async function () {
   });
 
   function waitForConversationId(callback) {
-    const maxAttempts = 10; // Adjust the number of attempts as needed
+    const maxAttempts = 20; 
     let attempts = 0;
   
     function checkConversationId() {
@@ -4998,7 +5015,7 @@ $(document).ready(async function () {
         callback();
       } else if (attempts < maxAttempts) {
         attempts++;
-        setTimeout(checkConversationId, 200); // Check every 200 milliseconds
+        setTimeout(checkConversationId, 600); 
       } else {
         console.error('Timed out waiting for conversationId');
       }
@@ -5011,8 +5028,14 @@ $(document).ready(async function () {
     waitForConversationId(function () {
       // Send event success purchase
       foued.saleSucceeded({
+        id_company:newData.accountId,
+        id_shop:params.id_shop,
+        amount:params.amount,
+        currency:params.currency,
         id_sale: params.id_sale,
-        reason: params.reason,
+        first_name:params.first_name,
+        last_name:params.last_name,
+        email:params.email,
         date_end: new Date(),
         contact: newData.contact,
         conversationId: conversationId,
@@ -5022,18 +5045,25 @@ $(document).ready(async function () {
     });
   } else if (params.response === "ko") {
     waitForConversationId(function () {
+      console.log("params ",params.error_code)
       // Send event fail purchase
       // Update sale in the database status=params.status, id_sale=params.id_sale, reason=params.reason, date_end=DataNow()
       foued.saleFailed({
         id_sale: params?.id_sale,
-        reason: params?.reason,
-        id_company: params?.id_company,
+        id_shop:params.id_shop,
+        amount:params.amount,
+        first_name:params.first_name,
+        last_name:params.last_name,
+        email:params.email,
+        currency:params.currency,
+        reason: params?.error_code,
+        id_company: newData.accountId,
         date_end: new Date(),
       });
-  
+
       try {
         modal.classList.add("hidden");
-  
+
         // Create the modal container
         const modalContainer = document.createElement("div");
         modalContainer.className =
@@ -5085,7 +5115,15 @@ $(document).ready(async function () {
       //add log
     });
   }
-  
+    // Get the current URL
+
+let url = new URL(window.location.href);
+url.search = ''; 
+let newURL = url.toString(); 
+
+// Update the browser's address bar
+window.history.replaceState({}, document.title, newURL);
+
   foued.getAvailableAgent();
   foued.onDisconnected();
   foued.onConnected();

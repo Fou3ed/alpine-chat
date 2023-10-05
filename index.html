@@ -137,7 +137,8 @@
                   x-transition:enter-end="opacity-100 [transform:translate3d(0,0,0)]">
                   <div>
                     <h2 class="text-sm+ font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 items-start px-4 pt-6" data-translation="left_side.tab_2.title">
-                      Discover our best experts
+                   
+
                     </h2>
                     <div class="all-agents flex flex-col items-center pb-20 pt-4">
                   
@@ -146,34 +147,30 @@
                   </div>
                 </div>
               </div>
-              <div
-                  class="flex tabs-list h-12 shrink-0 justify-between border-t border-slate-150 px-6 py-1 dark:border-navy-600">
+              
+
+                <div class="flex tabs-list h-12 shrink-0 justify-between border-t border-slate-150 px-6 py-1 dark:border-navy-600">
                   <button href="#" @click="activeTab = 'tabAllChats'"
-                    :class="activeTab === 'tabAllChats' ? 'border-primary dark:border-accent text-primary dark:text-accent-light' : 'border-transparent hover:text-slate-800 focus:text-slate-800 dark:hover:text-navy-100 dark:focus:text-navy-100'"
+                    :class="{ 'bg-slate-300/20': activeTab === 'tabAllChats', 'active-tab': activeTab === 'tabAllChats' }"
                     class="btn h-9 text-primary hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:text-accent dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                       <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"></path>
-                      <path
-                        d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z">
-                      </path>
+                      <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z"></path>
                     </svg>
-                    <h2 class="font-medium tracking-wide text-slate-700 dark:text-navy-100 whitespace-nowrap ml-1 text-xs" data-translation="left_side.all_chats">All
-                      chats</h2>
-  
+                    <h2 class="font-medium tracking-wide text-slate-700 dark:text-navy-100 whitespace-nowrap ml-1 text-xs" data-translation="left_side.all_chats">All Chats</h2>
                   </button>
                   <button href="#" @click="activeTab = 'tabExperts'"
-                    :class="activeTab === 'tabExperts' ? 'border-primary dark:border-accent text-primary dark:text-accent-light' : 'border-transparent hover:text-slate-800 focus:text-slate-800 dark:hover:text-navy-100 dark:focus:text-navy-100'"
+                    :class="{ 'active-tab': activeTab === 'tabExperts' }"
                     class="btn h-9 hover:bg-slate-300/20 hover:text-primary focus:bg-slate-300/20 focus:text-primary active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:hover:text-accent dark:focus:bg-navy-300/20 dark:focus:text-accent dark:active:bg-navy-300/25">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                      stroke="currentColor" stroke-width="1.5">
-                      <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
-                      </path>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                     </svg>
-                    <h2 class="font-medium tracking-wide text-slate-700 dark:text-navy-100 whitespace-nowrap ml-1 text-xs" data-translation="left_side.experts">
-                      Experts</h2>
+                    <h2 class="font-medium tracking-wide text-slate-700 dark:text-navy-100 whitespace-nowrap ml-1 text-xs" data-translation="left_side.experts">Experts</h2>
                   </button>
                 </div>
+
+              
+            
             </div>
 
 
@@ -479,7 +476,7 @@
              
             <div>
               <p class="font-medium text-slate-700 line-clamp-1 dark:text-navy-100" id="conversation-name" x-text="activeChat.name"></p>
-              <p class="mt-0.5 text-xs" data-translation="general.offline">Last seen recently</p>
+              <p class="mt-0.5 text-xs" data-translation="general.offline"></p>
             </div>
           </div>
         </div>
@@ -508,7 +505,7 @@
             Buy credits
           </button> -->
           <button  x-tooltip.placement.bottom.light="'Buy messages'"  @click="$store.global.isRightSidebarExpanded = true" id="btnPlansContainer" class="btn h-9 justify-between bg-gradient-to-r from-purple-500 to-indigo-600 text-white gradient-text mr-4"  >
-            <span data-translation="header.buy_credits" >Buy credits</span>
+            <span data-translation="header.buy_credits" ></span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" stroke-width="2"></path>
             </svg>
@@ -583,11 +580,11 @@
           <div
             class="modal-header flex p-5 justify-between border-bottom border-slate-150 dark:border-navy-500"
           >
-            <h3 class="text-primary" data-translation="modal.deleteMsg">Delete message</h3>
+            <h3 class="text-primary" data-translation="modal.deleteMsg"></h3>
             <span class="close">&times;</span>
           </div>
           <div class="modal-body p-5">
-            <p class="text-slate-400 dark:text-white" data-translation="modal.sure">Are you sure ?</p>
+            <p class="text-slate-400 dark:text-white" data-translation="modal.sure"></p>
           </div>
           <div
             class="modal-footer flex pb-5 justify-end border-slate-150 dark:border-navy-500"
@@ -596,13 +593,13 @@
               id="closeModal"
               class="btn mt-5 mr-3 bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
             data-translation="modal.close">
-              Close
+              
             </button>
             <button
               id="deleteButton"
               class="btn mt-5 mr-3 bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
            data-translation="modal.deleteBtn" >
-              Delete
+              
             </button>
           </div>
         </div>
@@ -614,11 +611,11 @@
           <div
             class="modal-header flex p-5 justify-between border-bottom border-slate-150 dark:border-navy-500"
           >
-            <h3 class="text-primary" data-translation="modal.buy">buy Plan</h3>
+            <h3 class="text-primary" data-translation="modal.buy"></h3>
             <span class="close">&times;</span>
           </div>
           <div class="modal-body p-5">
-            <p class="text-slate-400 dark:text-white" data-translation="modal.sure">Are you sure ?</p>
+            <p class="text-slate-400 dark:text-white" data-translation="modal.sure"></p>
           </div>
           <div
             class="modal-footer flex pb-5 justify-end border-slate-150 dark:border-navy-500"
@@ -627,14 +624,14 @@
               id="closeModalPlan"
               class="btn mt-5 mr-3 bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
             data-translation="modal.failBtn">
-              fail
+              
             </button>
             
             <button
               id="buyPlanBtn"
               class="btn mt-5 mr-3 bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
             data-translation="modal.successBtn">
-              success
+              
             </button>
           </div>
         </div>
@@ -683,7 +680,7 @@
         <emoji-picker id="emoji" class="light hidden"></emoji-picker>
         <div class="-mr-1.5 flex">
             <div  class="text-xs text-gray-900 dark:text-white"  id="message-counter" >
-              <span data-translation="container.length">Max Length:</span>   <span   id="max-length-value"> </span>
+              <span data-translation="container.length"></span>   <span   id="max-length-value"> </span>
 
             </div>
           <button
@@ -755,7 +752,7 @@
                 <h3 x-text="activeChat.name" class="mt-2 text-lg font-medium text-slate-700 dark:text-navy-100"></h3>
                 <div class="mt-0 mb-2 flex space-x-2">
                   <h3 class="text-medium font-medium text-slate-600 dark:text-navy-100" data-translation="right_side.expert_card" >
-                    Expert card
+                    
                   </h3>
                 </div>
                 <div class="skills my-2">
@@ -795,7 +792,7 @@
               </div>
               <div x-data="{activeTab:'tabContact'}" class="tabs mt-6 flex flex-col">
                 <div class="is-scrollbar-hidden overflow-x-auto px-4">
-                  <div class="tabs-list flex">
+                  <div class="tabs-list  grid grid-cols-3">
                     <button @click="activeTab = 'tabContact'"
                       :class="activeTab === 'tabContact' ? 'border-primary dark:border-accent text-primary dark:text-accent-light' : 'border-transparent hover:text-slate-800 focus:text-slate-800 dark:hover:text-navy-100 dark:focus:text-navy-100'"
                       class="btn shrink-0 rounded-none border-b-2 px-3 py-2 font-medium" data-translation="right_side.contact_info">
