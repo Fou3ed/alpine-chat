@@ -5019,6 +5019,10 @@ $(document).ready(async function () {
     checkConversationId();
   }
   
+  if(params.response && window.opener){
+    window.opener.location=window.location
+    window.close()
+  }
   if (params.response === "ok") {
     waitForConversationId(function () {
       // Send event success purchase
