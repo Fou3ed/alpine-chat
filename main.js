@@ -1370,7 +1370,6 @@ if (container) {
 let formElement = "";
 
 function submitForm(element) {
-  console.log("element ",element)
   formElement = element;
   let messageContent = element.closest('[id^="message-content-"]');
   let messageId = messageContent?.id?.replace("message-content-", "");
@@ -1963,7 +1962,6 @@ c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.9
           }
 
           if (document.querySelector(`#submit-form-${messageId}`)) {
-            console.log("form_data",message.message)
             document.querySelector(`#submit-form-${messageId}`)._form_data =
               message.message;
           }
@@ -3105,55 +3103,55 @@ function playNotificationSound() {
   sendSound.play();
 }
 
-// const notifyMe = () => {
-//   if (!window.Notification) {
-//   } else {
-//     // check if permission is already granted
-//     if (Notification.permission === "granted") {
-//       // show notification here
-//       const notify = new Notification("New Message", {
-//         body: "You have received a new message!",
-//         icon: "images/favicon.png",
-//       });
-//     } else {
-//       // request permission from the user
-//       Notification.requestPermission()
-//         .then(function (p) {
-//           if (p === "granted") {
-//             // show notification here
-//             const notify = new Notification("New Message", {
-//               body: "You have received a new message!",
-//               icon: "images/favicon.png",
-//             });
-//           } else {
-//             //blocked notification
-//           }
-//         })
-//         .catch(function (err) {
-//           console.error(err);
-//         });
-//     }
-//   }
-// };
 const notifyMe = () => {
   if (!window.Notification) {
   } else {
-    Notification.requestPermission()
-      .then(function (p) {
-        if (p === "granted") {
-          // show notification here
-          const notify = new Notification("New Message", {
-            body: "You have received a new message!",
-            icon: "images/favicon.png",
-          });
-        } else {
-        }
-      })
-      .catch(function (err) {
-        console.error(err);
+    // check if permission is already granted
+    if (Notification.permission === "granted") {
+      // show notification here
+      const notify = new Notification("New Message", {
+        body: "You have received a new message!",
+        icon: "images/favicon.png",
       });
+    } else {
+      // request permission from the user
+      Notification.requestPermission()
+        .then(function (p) {
+          if (p === "granted") {
+            // show notification here
+            const notify = new Notification("New Message", {
+              body: "You have received a new message!",
+              icon: "images/favicon.png",
+            });
+          } else {
+            //blocked notification
+          }
+        })
+        .catch(function (err) {
+          console.error(err);
+        });
+    }
   }
 };
+// const notifyMe = () => {
+//   if (!window.Notification) {
+//   } else {
+//     Notification.requestPermission()
+//       .then(function (p) {
+//         if (p === "granted") {
+//           // show notification here
+//           const notify = new Notification("New Message", {
+//             body: "You have received a new message!",
+//             icon: "images/favicon.png",
+//           });
+//         } else {
+//         }
+//       })
+//       .catch(function (err) {
+//         console.error(err);
+//       });
+//   }
+// };
 
 function changeTitle(number) {
   if (number === 0) {
@@ -3422,7 +3420,7 @@ async function editMessage(button) {
 }
 //updated message
 export async function updateMessage(data) {
-  const date = new Date(data.updated_at);
+  const date = new Date(data.res.updated_at);
   const today = new Date();
   let timeMsg = "";
   if (date.toDateString() === today.toDateString()) {
@@ -3445,11 +3443,10 @@ export async function updateMessage(data) {
     timeMsg = formattedString;
   }
 
-  if (data.user === newData.user) {
-    const input = document.getElementById(`edit-input-${data._id}`);
+  if (data.res.user === newData.user) {
+    const input = document.getElementById(`edit-input-${data.res._id}`);
     const newMessage = document.createElement("div");
-    newMessage.id = `message-content-${data?._id}`;
-
+    newMessage.id = `message-content-${data?.res._id}`;
     newMessage.classList.add(
       "rounded-2xl",
       "rounded-tr-none",
@@ -3461,21 +3458,21 @@ export async function updateMessage(data) {
       "text-white",
       "dark:bg-accent-focus"
     );
-    newMessage.textContent = data.message;
+    newMessage.textContent = data.res.message;
     const leftConversation = document.querySelector(
-      `[data-conversation-id="${data.conversation_id}"]`
+      `[data-conversation-id="${data.res.conversation_id}"]`
     );
     const pElement = leftConversation.querySelector(".conversationLeftMsg p");
-    pElement.textContent = `${data.message} `;
+    pElement.textContent = `${data.res.message} `;
     input.replaceWith(newMessage);
     newMessage
-      .closest(`#message-${data._id}`)
+      .closest(`#message-${data.res._id}`)
       .querySelector("#date_msg").textContent = "(Updated) " + timeMsg;
     newMessage.innerHTML += ` <div id="pin-div" class=" ${
-      data.pinned === 0 || data.status === 0 ? "hidden" : "flex"
+      data.res.pinned === 0 || data.res.status === 0 ? "hidden" : "flex"
     } ${"pin-div"} justify-center  items-center me-2 "><i class="fas fa-thumbtack"></i></div>`;
-    if (data.reacts.length > 0) {
-      let messageReactions = data.reacts.map((react) => {
+    if (data.res.reacts.length > 0) {
+      let messageReactions = data.res.reacts.map((react) => {
         return `
       <a id="react-${react._id}" ${
           newData.user !== react.user_id ? 'style="pointer-events: none"' : ""
@@ -3484,22 +3481,22 @@ export async function updateMessage(data) {
       });
 
       newMessage.innerHTML += `<div class="react-container bg-white  dark:bg-navy-700" id="react-content-${
-        data._id
+        data.res._id
       }" >${messageReactions.join("")} </div>`;
     }
   } else {
     const messageEdited = document.getElementById(
-      `message-content-${data?._id}`
+      `message-content-${data.res?._id}`
     );
     messageEdited.classList.add("bg-navy-100", "dark:bg-navy-500");
-    messageEdited.textContent = data.message;
+    messageEdited.textContent = data.res.message;
     const timeSpan = messageEdited.parentNode.querySelector("p");
     timeSpan.innerHTML = `(Updated) ${timeMsg}`;
     messageEdited.innerHTML += ` <div id="pin-div" class=" ${
-      data.pinned === 0 || data.status === 0 ? "hidden" : "flex"
+      data.res.pinned === 0 || data.res.status === 0 ? "hidden" : "flex"
     } ${"pin-div"} justify-center  items-center me-2 "><i class="fas fa-thumbtack"></i></div>`;
-    if (data.reacts.length > 0) {
-      let messageReactions = data.reacts.map((react) => {
+    if (data.res.reacts.length > 0) {
+      let messageReactions = data.res.reacts.map((react) => {
         return `
       <a id="react-${react._id}" ${
           newData.user !== react.user_id ? 'style="pointer-events: none"' : ""
@@ -3507,7 +3504,7 @@ export async function updateMessage(data) {
         `;
       });
       messageEdited.innerHTML += `<div class="react-container bg-white  dark:bg-navy-700" id="react-content-${
-        data._id
+        data.res._id
       }" >${messageReactions.join("")} </div>`;
     }
   }
@@ -3969,7 +3966,6 @@ export function getTotalBalance(balance, role) {
     } else {
       balanceNumber.textContent = balance;
       if (balance > 4) {
-        console.log("here");
         balanceNumber.style.color = "";
         balanceNumber.style.color = "#000000";
       } else if (balance < 3 && balance > 1) {
@@ -4288,7 +4284,6 @@ failButton.addEventListener("click", function () {
 
 const successButton = document.getElementById("buyPlanBtn");
 successButton.addEventListener("click", async function () {
-  console.log("herere");
   const selectedPlan = this.getAttribute("data-plan");
   // const balanceSpinner = document.querySelector(".balance-spinner");
 
@@ -5045,7 +5040,6 @@ $(document).ready(async function () {
     });
   } else if (params.response === "ko") {
     waitForConversationId(function () {
-      console.log("params ",params.error_code)
       // Send event fail purchase
       // Update sale in the database status=params.status, id_sale=params.id_sale, reason=params.reason, date_end=DataNow()
       foued.saleFailed({
