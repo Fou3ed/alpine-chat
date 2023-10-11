@@ -2,41 +2,20 @@ import io from "https://cdn.socket.io/4.5.4/socket.io.esm.min.js";
 
 
 import {
-  receiveMessage,
-  sentMessage,
-  onReadMsg,
-  reactDisplay,
-  messageDeleted,
-  updateMessage,
-  startTyping,
-  stopTyping,
-  pinMessage,
-  unpinMessage,
-  userDisconnection,
-  userConnection,
-  reactHide,
-  updateUserBalance,
-  guestCreated,
-  getTotalBalance,
-  ableInputArea,
-  sendFirstMessage,
-  sendBuyMessage,
-  submitFormStatus,
-  removeExpert,
-  getAllConversations,
-  displayExpert,
-  getAllAgents,
-  changeHeaderPicture,
-  checkForExpertMessages,
-  mergeConversation,
-  loadMessages,
-  selectAgent,
-  displayAgents,
+
+ 
+  
+
+
+
+
+
+
+
+  // mergeConversation,
+
   connectUsers,
-  onCheckConversation,
-  removeConnectUser,
-  getTranslationValue,
-  truncateMessage,
+  
   
   
 
@@ -44,6 +23,28 @@ import {
 let messagesContainer = document.getElementById("big-container-message");
 export let last_seen_at;
 import { socketAddress } from "../env.js";
+import { getAllConversations } from "../general/getConversations.js";
+import { getTranslationValue } from "../utils/traduction.js";
+import { pinMessage, unpinMessage } from "../messageActions/pinMessage.js";
+import { sentMessage } from "../general/sendMessage.js";
+import { receiveMessage } from "../general/receiveMessage.js";
+import { submitFormStatus } from "../formActions.js/submitForm.js";
+import { guestCreated } from "../general/guestCreated.js";
+import { checkForExpertMessages, displayExpert, removeExpert } from "../general/getConnectedAgents.js";
+import { truncateMessage } from "../utils/truncateMessage.js";
+import { displayAgents } from "../general/displayAllAgents.js";
+import { loadMessages } from "../general/loadMessages.js";
+import { onReadMsg } from "../messageActions/readMessage.js";
+import { reactDisplay, reactHide } from "../messageActions/reactMessage.js";
+import { messageDeleted } from "../messageActions/deleteMessage.js";
+import { updateMessage } from "../messageActions/editMessage.js";
+import { startTyping, stopTyping } from "../conversationActions/conversationTyping.js";
+import { getAllAgents } from "../general/getAllAgents.js";
+import { removeConnectUser, userConnection, userDisconnection } from "../general/agentConnection.js";
+import { getTotalBalance, updateUserBalance } from "../general/balance.js";
+import { onCheckConversation, selectAgent } from "../general/selectAgent.js";
+import { changeHeaderPicture } from "../conversationActions/changeHeaderPic.js";
+import { ableInputArea } from "../utils/messageInputArea.js";
 export let role = ""
 
 export default class event {
@@ -147,7 +148,6 @@ export default class event {
     this.socket.on("user-connection", (user) => {
         if (user?.role === "AGENT") {
           displayExpert(user)
-          console.log("user",user)
           if(connectUsers){
             connectUsers.push(user)
           }
@@ -165,7 +165,6 @@ export default class event {
           }
       }
       checkForExpertMessages();
-      console.log("user",user)
       userDisconnection(user);
     });
   };
@@ -228,7 +227,7 @@ export default class event {
       this.socket.on("onConversationStarted", (conversationId, guest) => {
         resolve(conversationId)
         if (!guest) {
-          sendFirstMessage(conversationId)
+          // sendFirstMessage(conversationId)
         }
 
       })
@@ -803,7 +802,6 @@ const number = match ? match[1] : null;
 
   onReactMsg = () => {
     this.socket.on('onMsgReacted', (data, error) => {
-      console.log("data react",data)
       reactDisplay(data)
     })
   }
@@ -1196,7 +1194,7 @@ failGuest = () => {
 
 mergeConversation=()=>{
   this.socket.on('mergeConversation',(data)=>{
-    mergeConversation(data)
+    // mergeConversation(data)
   })
 }
 

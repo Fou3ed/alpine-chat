@@ -49,7 +49,7 @@ export const onConversationCreate = {
     action: "conversation.create",
     metaData: {
         name: "room 1",
-        channel_url: "foued/test",
+        channel_url: "socketLib/test",
         conversation_type: "private",
         description: "private chat",
         operators: [1],
