@@ -1,3 +1,4 @@
+import { accountId } from "../env.js";
 import { conversationId, newData } from "../main.js";
 
 
@@ -43,7 +44,7 @@ export async function reactions() {
     let react = button.textContent;
   
     const onMessageReact = {
-      app: "ID",
+      app: accountId,
       user: newData.user,
       action: "message.react",
       metaData: {
@@ -66,7 +67,7 @@ export async function reactions() {
     // Construct metadata for removing the reaction
     // Call the UnReact function with the metadata object
     socketLib.unReactMsg({
-      app: "ID",
+      app: accountId,
       user: newData.user,
       action: "message.Unreact",
       metaData: {

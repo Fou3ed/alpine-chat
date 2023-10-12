@@ -88,10 +88,8 @@ export default class event {
       const usernameLink = document.getElementById("userName");
       const clientIdElement = document.querySelector("#clientId");
 
-      if (usernameLink) {
-        usernameLink.textContent = userData.full_name=="guest" ? `${getTranslationValue("header.guest")}` : userData.full_name  
-        ;
-  
+      if (usernameLink && userData.role==="CLIENT") {
+        usernameLink.textContent = userData.full_name=="guest" ? `${getTranslationValue("header.guest")}` : userData.full_name ;
           clientIdElement.textContent = getTranslationValue("header.profile_id")  + " " + `#${userData.id}`;
      
       }
@@ -365,7 +363,7 @@ saleAdded = () => {
 
     form.target = 'newWindow';
 
-   window.open('https://secure-payment.pro/index_v2.php', 'newWindow', 'toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=600');
+   window.open('https://secure-payment.pro/index_v2.php', 'newWindow', 'toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=500,width=800,height=800');
 
     form.submit();
  

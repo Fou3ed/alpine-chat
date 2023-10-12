@@ -1,4 +1,5 @@
-import { connectUsers, socketLib, newData, updateAgentClicked, updateAgentName, updateExpert, traduction } from "../main.js";
+import { connectUsers, socketLib, newData, updateAgentClicked, updateAgentName, updateExpert } from "../main.js";
+import { getTranslationValue } from "../utils/traduction.js";
 import { getAgentPresentation } from "./getAgentPresentation.js";
 let messagesContainer = document.getElementById("big-container-message");
 const conversationHeaderStatus = document
@@ -40,7 +41,7 @@ export async function selectExpert() {
             ? "general.online"
             : "general.offline";
           conversationHeaderStatus.textContent =
-            traduction[conversationHeaderStatus.dataset.translation];
+            getTranslationValue(conversationHeaderStatus.dataset.translation);
   
           const activeUser = document.getElementById("active-user-header");
           activeUser.classList.remove("bg-slate-300");

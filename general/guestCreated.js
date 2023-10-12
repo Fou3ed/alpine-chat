@@ -12,6 +12,7 @@ export async function guestCreated(data) {
       ...(data.goccContactId && { goccContactId: data.goccContactId }),
       ...(data.goccLeadId && { goccLeadId: data.goccLeadId }),
     };
+
     updateNewData(newUser)
     document.cookie =
       "myData=" +
@@ -25,7 +26,7 @@ export async function guestCreated(data) {
       clientIdElement.textContent = `Client ID : #${data.contact}`;
     }
     updateExpert(data.availableAgent)
-        updateConversationId(data.conversationId)
+    updateConversationId(data.conversationId)
    
     const html = `
     <div class="conversationItem conversation bg-slate-150" data-conversation-id="${

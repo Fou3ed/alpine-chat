@@ -1,4 +1,4 @@
-import { agentClicked, allConversation, connectUsers, conversationHeaderStatus, conversationId, traduction } from "../main.js";
+import { agentClicked, allConversation, connectUsers, conversationHeaderStatus, conversationId,  updateConnectUsers } from "../main.js";
 import { getTranslationValue } from "../utils/traduction.js";
 
 export function userConnection(data) {
@@ -66,12 +66,12 @@ export function userConnection(data) {
     }
     if (agentClicked == data._id) {
       conversationHeaderStatus.dataset.translation = "lastSeen";
-      conversationHeaderStatus.textContent = traduction.lastSeen;
+      conversationHeaderStatus.textContent = getTranslationValue("header.lastseen");
     }
   }
 
   export function removeConnectUser(id) {
-    connectUsers = connectUsers.filter(
+    updateConnectUsers(connectUsers.filter(
       (connectedUser) => connectedUser._id !== id
-    );
+    ))
   }

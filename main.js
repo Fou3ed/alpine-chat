@@ -1,23 +1,24 @@
 export let connectUsers = [];
 import Event from "./lib_client/client_2.js";
 export const socketLib = new Event();
-const currentDate = new Date();
 export let agentClicked = "";
 export let PhoneNumberValidation = false;
 // let userCountry;
+
+  const currentDate = new Date();
 const hours = currentDate.getHours();
 const minutes = currentDate.getMinutes();
 export const timeString =
   hours.toString().padStart(2, "0") + ":" + minutes.toString().padStart(2, "0");
+
 // Save user information in local storage
 import {
   accountId,
 } from "./env.js";
 export let allConversation = [];
 export let totalBalance;
-export let traduction = {};
 
-import { getTranslationValue, traduc } from "./utils/traduction.js";
+import { getTranslationValue, lan, traduc } from "./utils/traduction.js";
 import { getCookie } from "./utils/getCookie.js";
 import { getExperts } from "./general/getConnectedAgents.js";
 import { selectExpert } from "./general/selectExpert.js";
@@ -94,59 +95,7 @@ export const displayedUsers = new Set();
 
 
 
-const locales = ["en-GB", "fr-FR"];
 
-function getFlagSrc(countryCode) {
-  return /^[A-Z]{2}$/.test(countryCode)
-    ? `./images/flags/${countryCode.toLowerCase()}.svg`
-    : "";
-}
-
-const dropdownBtn = document.getElementById("dropdown-btn");
-const dropdownContent = document.getElementById("dropdown-content");
-
-async function setSelectedLocale(locale) {
-  const intlLocale = new Intl.Locale(locale);
-  const langName = new Intl.DisplayNames([locale], {
-    type: "language",
-  }).of(intlLocale.language);
-
-  dropdownContent.innerHTML = "";
-
-  const otherLocales = locales.filter((loc) => loc !== locale);
-  otherLocales.forEach((otherLocale) => {
-    const otherIntlLocale = new Intl.Locale(otherLocale);
-    const otherLangName = new Intl.DisplayNames([otherLocale], {
-      type: "language",
-    }).of(otherIntlLocale.language);
-
-    const listEl = document.createElement("li");
-    listEl.innerHTML = `${otherLangName}<img src="${getFlagSrc(
-      otherIntlLocale.region
-    )}" />`;
-    listEl.value = otherLocale;
-    listEl.addEventListener("mousedown", function () {
-      setSelectedLocale(otherLocale);
-    });120
-    dropdownContent.appendChild(listEl);
-  });
-
-  dropdownBtn.innerHTML = `<img src="${getFlagSrc(intlLocale.region)}" />`;
-
-  const { data: lang } = await axios.get(
-    "./lang/" + locale.substring(0, 2).toLowerCase()
-  );
-  traduction = lang;
-  traduc();
-}
-
-const browserLang = new Intl.Locale(navigator.language).language;
-for (const locale of locales) {
-  const localeLang = new Intl.Locale(locale).language;
-  if (localeLang === browserLang) {
-    setSelectedLocale(locale);
-  }
-}
 
 
 
@@ -154,6 +103,7 @@ for (const locale of locales) {
 
 
 $(document).ready(async function () {
+  
   let params = Object.fromEntries(
     new URLSearchParams(window.location.search).entries()
   );
@@ -172,6 +122,7 @@ $(document).ready(async function () {
       socketLib.socket.emit(
         "createGuest",
         {
+          language:lan,
           browser: navigator.userAgent,
           platform: navigator.platform,
           accountId: accountId,
@@ -388,4 +339,8 @@ window.history.replaceState({}, document.title, newURL);
   $(document).on("click", ".conversation-click", handleConversationClick);
   $(document).on("click", ".mini-conversation-click", handleConversationClick);
   $(document).on("click", "#emoji-button", showEmoji);
+
+
+
+  
 });

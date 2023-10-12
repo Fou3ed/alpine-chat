@@ -1,6 +1,7 @@
 import { MY_API_ADDRESS, applicationName } from "../env.js";
 import { newData } from "../main.js";
 import { getTranslationValue } from "../utils/traduction.js";
+import { truncateMessage } from "../utils/truncateMessage.js";
 import { getAgentPresentation } from "./getAgentPresentation.js";
 import { selectAgent } from "./selectAgent.js";
 let messagesContainer = document.getElementById("big-container-message");
@@ -66,7 +67,7 @@ export async function getAllAgents(response) {
           </div>
         </div>
         <p class="text-xs mt-2">
-          ${agent.presentation}
+        ${truncateMessage(agent.presentation || '', 180)}
         </p>
         
         

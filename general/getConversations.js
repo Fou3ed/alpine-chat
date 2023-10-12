@@ -29,21 +29,30 @@ export async function getAllConversations() {
   
         //   const timestamp = conversation.updated_at;
         //   const now = new Date();
-          const messageDate = new Date(conversation.updated_at);
-  
-          let time;
-  
-          if (new Date().toDateString() === messageDate.toDateString()) {
-            time = formatDate(messageDate);
-          } else if (
-            new Date().getFullYear() === messageDate.getFullYear() &&
-            new Date().getMonth() === messageDate.getMonth() &&
-            new Date().getDate() - messageDate.getDate() <= 6
-          ) {
-            time = formatWeekdayDate(messageDate);
-          } else {
-            time = formatFullDate(messageDate);
-          }
+        const messageDate = new Date(conversation.updated_at);
+
+        function formatTime(date) {
+          const hours = date.getHours();
+          const minutes = date.getMinutes();
+          const timeString =
+            hours.toString().padStart(2, "0") + ":" + minutes.toString().padStart(2, "0");
+          return timeString;
+        }
+        
+        let time;
+        
+        if (new Date().toDateString() === messageDate.toDateString()) {
+          time = formatTime(messageDate);
+        } else if (
+          new Date().getFullYear() === messageDate.getFullYear() &&
+          new Date().getMonth() === messageDate.getMonth() &&
+          new Date().getDate() - messageDate.getDate() <= 6
+        ) {
+          time = formatWeekdayDate(messageDate);
+        } else {
+          time = formatFullDate(messageDate);
+        }
+        
           let isActive = false;
           for (let i = 0; i < connectUsers.length; i++) {
             if (

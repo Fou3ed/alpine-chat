@@ -13,6 +13,7 @@ import { conversationId } from "../main.js";
 import { sendFocusNotification, sendTypingNotification } from "../formActions.js/inputEvents.js";
 import { addLogs } from "../utils/addLogs.js";
 import { showEmptyConversation } from "../conversationActions/conversationClick.js";
+import { getTranslationValue } from "../utils/traduction.js";
 export function displayMessages(messages) {
     document.getElementById("big-container-message").style.display = "block";
     if (!messages || !messages.messages) {

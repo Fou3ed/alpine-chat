@@ -15,7 +15,7 @@
         "buy_credits": "acheter des crédits",
         "dark_mode": "mode sombre",
         "expert_card": "carte d'expert",
-        "profile_id": "id profil",
+        "profile_id": "mon compte",
         "guest" : "invité",
         "lastseen" : "vu récemment"
     },
@@ -44,7 +44,7 @@
         "delete" : "supprimer",
         "write_message" : "écrivez votre message",
         "no_credits_message" : "",
-        "length" : "longueur maximale",
+        "length" : "Longueur du message : ",
         "send" : "Envoyer votre message",
         "pinned" : "épinglé",
         "edited" : "modifié",
@@ -76,7 +76,9 @@
         "website" : "site web",
         "make_call" : "passer un appel",
         "send_email" : "envoyer un e-mail",
-        "visit_website" : "visiter le site web"
+        "visit_website" : "visiter le site web",
+        "badge":"empty"
+
     },
     "modals" : {
         "click_blocker" : {
@@ -124,7 +126,8 @@
         "buy":"Acheter le plan",
         "deleteMsg":"supprimer le message",
         "deleteBtn":"supprimer"
-
-
+    },
+    "tooltips": {
+        "conversationsSideBar": "conversations Barre latérale"
     }
 }

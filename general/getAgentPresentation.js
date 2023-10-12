@@ -1,7 +1,7 @@
 import { Countries } from "../countries.js";
 import { API_KEY, SQL_API } from "../env.js";
 import { Languages } from "../languages.js";
-
+import { getTranslationValue } from "../utils/traduction.js";
 export const getAgentPresentation = async (id, online) => {
     try {
       const response = await axios.post(
@@ -43,7 +43,7 @@ export const getAgentPresentation = async (id, online) => {
         } else {
           console.error("Presentation element not found.");
         }
-  
+        
         // Update country
         const countryElement = document.querySelector(".country");
         let img = countryElement.parentElement.querySelector(".flag");
@@ -87,6 +87,33 @@ export const getAgentPresentation = async (id, online) => {
         const websiteElement = document.querySelector(".website");
         websiteElement.href = agentData.website;
         websiteElement.textContent = agentData.website;
+
+     
+        const phoneButton = document.querySelector('.btnPhone');
+        const emailButton = document.querySelector('.btnemail');
+        const websiteButton = document.querySelector('.btnwebsite');
+        if (agentData?.contact_phone?.length>0) {
+          phoneButton.removeAttribute('disabled');
+        } else {
+          phoneElement.innerHTML=`
+          <span class="tag rounded-full bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80" data-translation="general.offline" >${getTranslationValue("right_side.badge")}</span>`
+        }
+      
+        if (agentData?.contact_mail?.length>0) {
+          emailButton.removeAttribute('disabled');
+        }else {
+        emailElement.innerHTML=`          <span class="tag rounded-full bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80" data-translation="general.offline" >${getTranslationValue("right_side.badge")}</span>
+
+        `
+        } 
+      
+        if (agentData?.website?.length>0) {
+          websiteButton.removeAttribute('disabled');
+        }else {
+          websiteElement.innerHTML=`
+          <span class="tag rounded-full bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80" data-translation="general.offline" >${getTranslationValue("right_side.badge")}</span>`
+        } 
+        
         // if (!clicked) {
         //   let toggleButton = document.getElementById("toggleDrawerButton");
         //   if (toggleButton) {

@@ -11,12 +11,12 @@ export async function getExperts() {
     //   connectUsers = response.data.data;
         updateConnectUsers(response.data.data)
       if (response.data.data.length > 0 && !expertAppended) {
-        const html = `<span class="text-xs+ font-medium uppercase"  data-translation="left_side.experts_on" ></span>`;
+        const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_on"  >${getTranslationValue("left_side.experts_on")}</span>`;
         $("#expert-msg").empty().append(html);
         expertAppended = true;
       } else {
         offline = true;
-        const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_off" > </span>`;
+        const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_off" >${getTranslationValue("left_side.experts_off")} </span>`;
         $("#expert-msg").empty().append(html);
         expertAppended = true;
       }
@@ -34,10 +34,10 @@ export async function getExperts() {
       swiperWrapper.querySelectorAll("div.swiper-slide")
     );
     if (divsInsideSwiper.length > 0) {
-      const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_on"></span>`;
+      const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_on">${getTranslationValue("left_side.experts_on")}</span>`;
       $("#expert-msg").empty().append(html);
     } else {
-      const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_off" > </span>`;
+      const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_off" >${getTranslationValue("left_side.experts_off")} </span>`;
       $("#expert-msg").empty().append(html);
     }
   }
@@ -52,7 +52,7 @@ export async function getExperts() {
           <img class="h-full w-full rounded-full border-2 border-white object-cover dark:border-slate-700"
           src=images/avatar/avatar-${user.id}.jpg  alt="avatar" />
         </div>
-        <p class="mt-1 w-14 break-words text-center text-xs text-slate-600 dark:text-navy-100">
+        <p class="mt-1 w-14  text-center text-xs text-slate-600 dark:text-navy-100">
           ${user.full_name}
         </p>
       </div>

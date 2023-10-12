@@ -940,3 +940,7 @@ padding: 5em 0 8.885em 0;
   background-color:#FAF0E6;
   /* color: #DAFFFB; */
 }
+
+.balance-value {
+  font-size: 18px; 
+}

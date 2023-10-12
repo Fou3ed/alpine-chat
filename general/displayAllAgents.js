@@ -53,55 +53,55 @@ export function displayAgents(agents) {
       <div class="flex items-center justify-between space-x-2">
         <div class="flex items-center space-x-3">
           <div class="avatar">
-            <img class="mask is-squircle" src="images/avatar/avatar-${
-              agent.UserID
-            }.jpg" alt="image">
+            <img class="mask is-squircle" src="images/avatar/avatar-${agent.UserID || ''}.jpg" alt="image">
           </div>
           <div>
             <p class="font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
-              ${agent.firstname} ${agent.lastname}
+              ${agent.firstname || ''} ${agent.lastname || ''}
             </p>
             <div class="badge bg-primary/10 text-primary dark:bg-accent-light/15 dark:text-accent-light text-tiny px-2 py-1">
-              ${agent.skills}
+              ${agent.skills || ''}
             </div>
           </div>
         </div>
       </div>
+      
       <div class="flex justify-between space-x-31">
-        <div>
+        <div style="${agent.country ? '' : 'display: none;'}">
           <p class="text-tiny">Country</p>
-          <p class="text-md font-semibold text-slate-700 dark:text-navy-100">${
-            agent.country
-          }</p>
+          <p class="text-md font-semibold text-slate-700 dark:text-navy-100">
+            ${agent.country || ''}
+          </p>
         </div>
-        <div>
+        
+        <div style="${agent.languages ? '' : 'display: none;'}">
           <p class="text-tiny">Languages</p>
-          <p class="text-md font-semibold text-slate-700 dark:text-navy-100">${
-            agent.languages
-          }</p>
+          <p class="text-md font-semibold text-slate-700 dark:text-navy-100">
+            ${agent.languages || ''}
+          </p>
         </div>
-        <div>
+        
+        <div style="${agent.expertise ? '' : 'display: none;'}">
           <p class="text-tiny">Expertise</p>
-          <p class="text-md font-semibold text-slate-700 dark:text-navy-100">${
-            agent.expertise
-          }</p>
+          <p class="text-md font-semibold text-slate-700 dark:text-navy-100">
+            ${agent.expertise || ''}
+          </p>
         </div>
       </div>
+      
       <div class="grow">
         <p class="text-xs text-left">
-        ${truncateMessage(agent.presentation, 150)}
-         
+          ${truncateMessage(agent.presentation || '', 150)}
         </p>
       </div>
-      <button id="right-agent-${
-        agent.user_id
-      }" class="btn h-9 w-full justify-between bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
-      <span>Chatter</span>
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
-      </svg>
-    </button>
-  </div>
+      
+      <button id="right-agent-${agent.user_id || ''}" class="btn h-9 w-full justify-between bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
+        <span>Chatter</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
+        </svg>
+      </button>
+    </div>
     `;
   
     return agentCard;
