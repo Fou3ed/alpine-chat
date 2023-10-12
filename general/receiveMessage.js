@@ -37,7 +37,7 @@ export async function receiveMessage(data) {
     let conv = document.querySelector("#conversation-container").dataset[
       "conversationId"
     ];
-  
+  console.log("conv",conv)
     const messageDate = new Date(data.date);
   
     const currentDate = new Date();

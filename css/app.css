@@ -944,3 +944,8 @@ padding: 5em 0 8.885em 0;
 .balance-value {
   font-size: 18px; 
 }
+
+.ConversationSpinner{
+  justify-content: center;
+  align-items: center; 
+}

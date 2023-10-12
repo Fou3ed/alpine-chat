@@ -1,11 +1,12 @@
+import { cnvBigSpinner } from "../components/spinner.js";
 import { connectUsers, conversationHeaderStatus, conversationId, newData, socketLib, updateAgentClicked, updateAgentName, updateConversationId, updateExpert } from "../main.js";
+import { getTranslationValue } from "../utils/traduction.js";
 const $conversationContainer = $("#conversation-container");
 
 let messagesContainer = document.getElementById("big-container-message");
-
 export async function selectAgent(agentId, agentName, UserID) {
     messagesContainer.innerHTML = "";
-        updateExpert(agentId)
+    messagesContainer.innerHTML =cnvBigSpinner()
         updateAgentClicked(agentId)
         updateAgentName(agentName)
 
@@ -20,8 +21,8 @@ export async function selectAgent(agentId, agentName, UserID) {
       conversationHeaderStatus.textContent = connectUsers.find(
         (user) => user._id === agentId
       )
-        ? "En ligne"
-        : "last seen recently";
+        ? getTranslationValue("general.online")
+        : getTranslationValue("general.offline");
       const activeUser = document.getElementById("active-user-header");
       // activeUser.classList.remove("bg-slate-300")
       // activeUser.classList.add("bg-success")
@@ -32,8 +33,8 @@ export async function selectAgent(agentId, agentName, UserID) {
     }
   }
   
-  export async function onCheckConversation(data, agentContactId, agentName) {
-    if (!data.data) {
+  export async function onCheckConversation(convId, agentContactId, agentName) {
+    if (!convId) {
       updateConversationId("");
       messagesContainer.innerHTML = "";
       let activeChat = {
@@ -49,28 +50,25 @@ export async function selectAgent(agentId, agentName, UserID) {
       $conversationContainer.attr("data-conversation-id", null);
       // showEmptyConversation();
     } else {
-        let cnvId;
-        cnvId = !data.data.conversation
-        ? data.data[0]._id
-        : data.data.conversation[0]._id;
-        cnvId = data.data.conversation[0]._id;
-        updateConversationId(cnvId)
+      messagesContainer.innerHTML = "";
+
+        updateConversationId(convId)
 
       window.dispatchEvent(
         new CustomEvent("change-active-chat", {
           detail: {
-            chatId: cnvId,
+            chatId: convId,
             name: agentName,
             avatar_url: `images/avatar/avatar-${agentContactId}` + ".jpg",
           },
         })
       );
-      $conversationContainer.attr("data-conversation-id", conversationId);
+      $conversationContainer.attr("data-conversation-id", convId);
       // Load the first page of messages on page load
-      $(`.conversation-click[data-conversation-id="${conversationId}"]`).trigger(
+      $(`.conversation-click[data-conversation-id="${convId}"]`).trigger(
         "click"
       );
       let currentPage = 1;
-      socketLib.loadMessages({ page: currentPage, conversationId: conversationId });
+      socketLib.loadMessages({ page: currentPage, conversationId: convId });
     }
   }

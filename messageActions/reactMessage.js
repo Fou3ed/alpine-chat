@@ -1,5 +1,5 @@
 import { accountId } from "../env.js";
-import { conversationId, newData } from "../main.js";
+import { conversationId, newData, socketLib } from "../main.js";
 
 
 const conversationContainer = document.getElementById("conversation-container");
@@ -42,7 +42,7 @@ export async function reactions() {
     let reaction = button.parentNode;
     let messageId = reaction.parentNode.parentNode.dataset.messageId;
     let react = button.textContent;
-  
+
     const onMessageReact = {
       app: accountId,
       user: newData.user,
@@ -58,8 +58,6 @@ export async function reactions() {
     socketLib.reactMsg(onMessageReact);
     playNotificationSound();
   }
-
-
 
   async function onUnReactToMessage(button) {
     let messageId = button.id.replace("react-", "");
