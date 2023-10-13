@@ -17,7 +17,9 @@ import { addLogs } from "../utils/addLogs.js";
 const conversationContainer = document.getElementById("conversation-container");
 
 export async function receiveMessage(data) {
-    let messageId;
+
+  let messageId;
+
     // if (firstConv && firstConv === data.messageData.conversation) {
     //   $(`.conversation-click[data-conversation-id="${firstConv}"]`).trigger(
     //     "click"
@@ -37,7 +39,6 @@ export async function receiveMessage(data) {
     let conv = document.querySelector("#conversation-container").dataset[
       "conversationId"
     ];
-  console.log("conv",conv)
     const messageDate = new Date(data.date);
   
     const currentDate = new Date();
@@ -99,6 +100,8 @@ export async function receiveMessage(data) {
             <li class="pricing-feature">${plan.billing_volume}Messages</li>
           </ul>
           <button class="pricing-action">Buy Plan</button>
+          <div class="spinner-container" style="display: none;">
+          <div class="d-flex align-items-center" style="height: 20px;"><span class="loader2"></span></div>
         </div>  
         </div>
             `;
@@ -114,6 +117,8 @@ export async function receiveMessage(data) {
             let type = "";
             switch (+field.field_type) {
               case 1:
+                case 10: //first name
+                  case 11: //last name:
                 type = "text";
                 break;
               case 2:
@@ -140,7 +145,7 @@ export async function receiveMessage(data) {
                 type = "textarea";
                 break;
             }
-            if (field?.field_name?.toLowerCase() ==="country") {
+            if (field?.field_type ===8) {
               const countryOptions = generateCountryOptions(
                 countries,
                 field?.field_value ?? userCountry
@@ -166,7 +171,7 @@ export async function receiveMessage(data) {
                             ${countryOptions}
                         </select>
                     </label>`;
-            } else if (field.field_name.toLowerCase() === "phone") {
+            } else if (field.field_type === 7) {
               return `
               <label class="relative">
               <span>${field.field_name}</span>
@@ -202,7 +207,7 @@ export async function receiveMessage(data) {
                       ? `<input
                           id="floating_field_${messageId}"
                           class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
-                          placeholder="Enter Date"
+                          placeholder=${getTranslationValue("date_format.date_form")}
                           name="${field?.field_name?.replace(" ", "")}"
                           data-field-id="${field?.field_id}"
                           value="${field?.field_value ?? ""}"
@@ -244,9 +249,7 @@ export async function receiveMessage(data) {
                     }  card-form" style="position: relative;">
                         <div class=" w-full max-w-xl p-4 sm:p-5">
                             <div class="mb-4">
-                                <h3 class="text-2xl font-semibold">${
-                                  myContent.friendly_name
-                                }</h3>
+                                <h3 class="text-2xl font-semibold"></h3>
                                 <h5 class="text-sm">${
                                   myContent.introduction
                                     ? myContent.introduction
@@ -268,7 +271,7 @@ export async function receiveMessage(data) {
                                       myContent.status !== 1
                                         ? `
                                         <button class="btn1 min-w-[7rem] bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                                            id="submit-form-${messageId}" 
+                                          type="button"  id="submit-form-${messageId}" 
                                         >
                                             <span class="spinner hidden absolute inset-0 flex justify-center items-center">
                                             </span>
@@ -597,11 +600,9 @@ if(data.messageData.type !="log"){
     }
   
     function sendPlanClickNotification(data, messageId) {
-      successButton.setAttribute("data-plan", data.dataset.planId);
-      successButton.setAttribute("message-id", messageId);
+  
   
       const name = data.getAttribute("name");
-      successButton.setAttribute("name", name);
   
       // Update message to status not paid: 2
       socketLib.addSale({

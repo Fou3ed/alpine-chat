@@ -50,19 +50,19 @@ export async function getAllAgents(response) {
           <div>
             <p class="text-tiny">Country</p>
             <p class="text-xs font-medium text-slate-700 dark:text-navy-100">
-              ${agent.country}
+              ${agent?.country ? agent.country : ""}
             </p>
           </div>
           <div>
             <p class="text-tiny">Languages</p>
             <p class="text-xs font-medium text-slate-700 dark:text-navy-100">
-              ${agent.languages}
+              ${agent?.languages ? agent.languages : ""}
             </p>
           </div>
           <div>
             <p class="text-tiny">Expertise</p>
             <p class="text-xs font-medium text-slate-700 dark:text-navy-100">
-              ${agent.expertise}
+              ${agent?.expertise ? agent.expertise : ""}
             </p>
           </div>
         </div>

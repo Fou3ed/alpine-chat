@@ -46,13 +46,15 @@
         "no_credits_message" : "",
         "length" : "Longueur du message : ",
         "send" : "Envoyer votre message",
+        "balance_message":"Vous devez acheter un nouveau plan pour recommencer à chatter.",
+
         "pinned" : "épinglé",
         "edited" : "modifié",
         "forms" : {
             "required" : "Ce champ est requis.",
             "valid" : "Veuillez remplir correctement les champs.",
             "phone" : "Veuillez entrer un numéro valide.",
-            "date" : "Veuillez entrer une date valide (AAAA-MM-JJ).",
+            "date" : "Veuillez entrer une date valide (MM-JJ-AAAA).",
             "email" : "Veuillez entrer une adresse e-mail valide.",
             "error" : "Une erreur s'est produite lors de la sauvegarde des données du formulaire. Réessayez."
 
@@ -77,7 +79,7 @@
         "make_call" : "passer un appel",
         "send_email" : "envoyer un e-mail",
         "visit_website" : "visiter le site web",
-        "badge":"empty"
+        "badge":"vide"
 
     },
     "modals" : {
@@ -129,5 +131,8 @@
     },
     "tooltips": {
         "conversationsSideBar": "conversations Barre latérale"
+    },
+    "date_format":{
+                "date_form":"JJ-MM-AAAA"
     }
 }

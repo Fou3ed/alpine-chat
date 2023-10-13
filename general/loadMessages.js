@@ -1,5 +1,7 @@
+import { cnvBigSpinner } from "../components/spinner.js";
 import { conversationId, socketLib } from "../main.js";
 import { displayMessages } from "./displayMessages.js";
+let messagesContainer = document.getElementById("big-container-message");
 
 let isLoading = false;
 let isEndOfMessages = false; // Track if all messages have been loaded

@@ -21,11 +21,11 @@ export const getAgentPresentation = async (id, online) => {
         skillsContainer.innerHTML = "";
         if (Array.isArray(agentData.skills)) {
           agentData.skills.forEach((skill) => {
-            const skillTag = `<span class="tag rounded-full bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80">${skill}</span>`;
+            const skillTag = `<span class="tag rounded-full bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80">${skill ? skill : ""}</span>`;
             skillsContainer.insertAdjacentHTML("beforeend", skillTag);
           });
         } else if (typeof agentData.skills === "string") {
-          const skillTag = `<span class="tag rounded-full bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80">${agentData.skills}</span>`;
+          const skillTag = `<span class="tag rounded-full bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80">${agentData?.skills ? agentData.skills : ""} </span>`;
           skillsContainer.insertAdjacentHTML("beforeend", skillTag);
         }
         if (online) {
@@ -39,7 +39,7 @@ export const getAgentPresentation = async (id, online) => {
         const presentationElement = document.querySelector(".presentation");
   
         if (presentationElement) {
-          presentationElement.textContent = agentData.presentation;
+          presentationElement.textContent = agentData?.presentation ? agentData.presentation : "";
         } else {
           console.error("Presentation element not found.");
         }
@@ -96,13 +96,13 @@ export const getAgentPresentation = async (id, online) => {
           phoneButton.removeAttribute('disabled');
         } else {
           phoneElement.innerHTML=`
-          <span class="tag rounded-full bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80" data-translation="general.offline" >${getTranslationValue("right_side.badge")}</span>`
+          <span class="tag rounded-full bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80" data-translation="right_side.badge" >${getTranslationValue("right_side.badge")}</span>`
         }
       
         if (agentData?.contact_mail?.length>0) {
           emailButton.removeAttribute('disabled');
         }else {
-        emailElement.innerHTML=`          <span class="tag rounded-full bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80" data-translation="general.offline" >${getTranslationValue("right_side.badge")}</span>
+        emailElement.innerHTML=`          <span class="tag rounded-full bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80" data-translation="right_side.badge" >${getTranslationValue("right_side.badge")}</span>
 
         `
         } 
@@ -111,7 +111,7 @@ export const getAgentPresentation = async (id, online) => {
           websiteButton.removeAttribute('disabled');
         }else {
           websiteElement.innerHTML=`
-          <span class="tag rounded-full bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80" data-translation="general.offline" >${getTranslationValue("right_side.badge")}</span>`
+          <span class="tag rounded-full bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80" data-translation="right_side.badge" >${getTranslationValue("right_side.badge")}</span>`
         } 
         
         // if (!clicked) {

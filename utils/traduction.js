@@ -1,3 +1,5 @@
+import { newData } from "../main.js";
+
 export let traduction = {};
 
 export let lan;
@@ -89,26 +91,27 @@ let buyTool = document.getElementById("buyMessagesTool");
 let modeTool=document.getElementById("modeTool")
 let toggleDrawerTool=document.getElementById("toggleDrawerButton")
 // conversationTool.setAttribute('x-tooltip.placement.bottom.light', getTranslationValue("tooltips.conversationSideBar"));
-if(lan.substring(0, 2).toLowerCase()==="en"){
+if (lan.substring(0, 2).toLowerCase() === "en") {
   conversationTool.setAttribute('x-tooltip.placement.bottom.light', "'Conversation side bar'");
   buyTool.setAttribute('x-tooltip.placement.bottom.light', "'Buy messages'");
   modeTool.setAttribute('x-tooltip.placement.bottom.light', "'Dark Mode'");
-  toggleDrawerTool.setAttribute('x-tooltip.placement.bottom.light', "'Expert SideBar")
-}else {
+  toggleDrawerTool.setAttribute('x-tooltip.placement.bottom.light', "'Expert SideBar'");
+} else {
   conversationTool.setAttribute('x-tooltip.placement.bottom.light', "'Conversations Barre latérale'");
   buyTool.setAttribute('x-tooltip.placement.bottom.light', "'Acheter des messages'");
   modeTool.setAttribute('x-tooltip.placement.bottom.light', "'Mode sombre'");
-  toggleDrawerTool.setAttribute('x-tooltip.placement.bottom.light', "'Barre latérale d'experts")
+  toggleDrawerTool.setAttribute('x-tooltip.placement.bottom.light', "'Barre latérale experte'");
 
 }
-
 
 // Select the button element by its ID
 
 // Update the x-tooltip attribute to change the content
+if(newData){
+  document.querySelector("#clientId").textContent =
+    getTranslationValue("header.profile_id") + " " + `#${newData?.contact}`;
+}
 
-  // document.querySelector("#clientId").textContent =
-  //   getTranslationValue("traduction.header.profile_id") + " " + `#${newData?.contact}`;
 }
 
 window.translateValue = getTranslationValue;

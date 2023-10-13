@@ -4,7 +4,8 @@ export const socketLib = new Event();
 export let agentClicked = "";
 export let PhoneNumberValidation = false;
 // let userCountry;
-
+export let newData =
+  getCookie("myData") !== undefined ? JSON.parse(getCookie("myData")) : null;
   const currentDate = new Date();
 const hours = currentDate.getHours();
 const minutes = currentDate.getMinutes();
@@ -18,7 +19,7 @@ import {
 export let allConversation = [];
 export let totalBalance;
 
-import { getTranslationValue, lan, traduc } from "./utils/traduction.js";
+import { getTranslationValue, lan } from "./utils/traduction.js";
 import { getCookie } from "./utils/getCookie.js";
 import { getExperts } from "./general/getConnectedAgents.js";
 import { selectExpert } from "./general/selectExpert.js";
@@ -27,8 +28,7 @@ import { notifyMe } from "./utils/notificationSound.js";
 import { showEmoji } from "./conversationActions/showEmoji.js";
 import { getPlans } from "./general/getPlans.js";
 import { showSpinner } from "./components/spinner.js";
-export let newData =
-  getCookie("myData") !== undefined ? JSON.parse(getCookie("myData")) : null;
+
 // Components
 // The message input is where the user types their message
 const messageInput = document.querySelector("#message-input");

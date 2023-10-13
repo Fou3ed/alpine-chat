@@ -1,6 +1,8 @@
 import { accountId } from "../env.js";
 import { conversationId, newData, socketLib } from "../main.js";
+import { playNotificationSound } from "../utils/notificationSound.js";
 
+let messagesContainer = document.getElementById("big-container-message");
 
 const conversationContainer = document.getElementById("conversation-container");
 

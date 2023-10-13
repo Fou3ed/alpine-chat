@@ -1,3 +1,4 @@
+
 {
     "general": {
         "offline": "offline",
@@ -43,6 +44,7 @@
         "reply" : "reply",
         "delete" : "delete",
         "write_message" : "write your message",
+        "balance_message":"You need to buy a new plan to start chatting again",
         "no_credits_message" : "",
         "length" : "Message length : ",
         "send" : "Send your message",
@@ -52,7 +54,7 @@
             "required" : "This field is required.",
             "valid" : "Please fill in the fields correctly.",
             "phone" : "Please enter a valid number.",
-            "date" : "Please enter a valid date (YYYY-MM-DD).",
+            "date" : "Please enter a valid date (MM-DD-YYYY).",
             "email" : "Please enter a valid email address.",
             "error" : "saving form data went wrong,Try again"
 
@@ -129,5 +131,9 @@
     },
     "tooltips": {
         "conversationsSideBar": "conversations SideBar"
+    },
+    "date_format":{
+                "date_form":"MM/DD/YYYY "
     }
 }
+

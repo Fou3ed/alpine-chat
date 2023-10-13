@@ -19,6 +19,7 @@ export function displayMessages(messages) {
     if (!messages || !messages.messages) {
       return;
     }
+
     showEmptyConversation(false);
   
     // Loop through the messages
@@ -98,7 +99,8 @@ export function displayMessages(messages) {
     <ul class="pricing-feature-list">
       <li class="pricing-feature">${plan.billing_volume} Messages</li>
     </ul>
-    <button class="pricing-action">Buy Plan</button>
+    <button class="pricing-action" id="buyButton">Buy Plan<span class="loaderBuyButton"></span></button>
+  
   </div>  
             `;
           });
@@ -175,6 +177,8 @@ export function displayMessages(messages) {
               let type = "";
               switch (+field?.field_type) {
                 case 1:
+                case 10: //first name
+                  case 11: //last name
                   type = "text";
                   break;
                 case 2:
@@ -201,7 +205,7 @@ export function displayMessages(messages) {
                   type = "textarea";
                   break;
               }
-              if (field?.field_name?.toLowerCase() === "country") {
+              if (field?.field_type === 8) {
                 const countryOptions = generateCountryOptions(
                   countries,
                   field?.field_value ?? userCountry
@@ -228,7 +232,7 @@ export function displayMessages(messages) {
                             ${countryOptions}
                         </select>
                     </label>`;
-              } else if (field.field_name?.toLowerCase() === "phone") {
+              } else if (field.field_type === 7) {
                 return `
               <label class="relative">
               <span>${field.field_name}</span>
@@ -264,7 +268,7 @@ export function displayMessages(messages) {
                       ? `<input
                         id="floating_field_${messageId}"
                         class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
-                        placeholder="Enter Date"
+                        placeholder=${getTranslationValue("date_format.date_form")}
                         name="${field?.field_name?.replace(" ", "")}"
                         data-field-id="${field?.field_id}"
                         value="${field?.field_value ?? ""}"
@@ -301,9 +305,7 @@ export function displayMessages(messages) {
                     } card-form" style="position: relative;">
                         <div class=" w-full max-w-xl p-4 sm:p-5">
                             <div class="mb-4">
-                                <h3 class="text-2xl font-semibold">${
-                                  myContent.friendly_name
-                                }</h3>
+                                <h3 class="text-2xl font-semibold"></h3>
                                 <h5 class="text-sm">${
                                   myContent.introduction
                                     ? myContent.introduction
@@ -329,8 +331,8 @@ export function displayMessages(messages) {
                                     ${
                                       myContent.status !== 1
                                         ? `
-                                        <button class="btn1 min-w-[7rem] bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-                                            id="submit-form-${message._id}" data-content='${message.message}'
+                                        <button class="btn1 min-w-[7rem] bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90" type="button"
+                                            id="submit-form-${message._id}" 
                                         >
                                             <span class="spinner hidden absolute inset-0 flex justify-center items-center">
                                             </span>
@@ -550,11 +552,22 @@ export function displayMessages(messages) {
         }
         //lénna mta3 l plan message
         function sendPlanClickNotification(data, messageId) {
-          successButton.setAttribute("data-plan", data.dataset.planId);
-          successButton.setAttribute("message-id", messageId);
           const name = data.getAttribute("name");
-          successButton.setAttribute("name", name);
-     
+          // Select the div element by its id
+          const planDiv = document.getElementById(`plan-${messageId}`);
+        
+          // // Select the button element within the div
+          // let buyButton = planDiv.querySelector("button.pricing-action");
+        
+          // // Select the loader element within the button
+          // let loader = buyButton.querySelector(".loaderBuyButton");
+        
+          // // Display the loader and hide the button text
+          // loader.style.display = "block";
+          // buyButton.innerText = '';
+        
+        
+          // You can remove or comment out this socketLib.addSale call for your specific implementation
           socketLib.addSale({
             contact: newData.contact,
             user: newData.user,
@@ -567,6 +580,8 @@ export function displayMessages(messages) {
             sale_status: 0,
           });
         }
+        
+        
         
         function sendClickingNotification(data) {
           socketLib.linkClick(data.id.replace("linked-msg-", ""));

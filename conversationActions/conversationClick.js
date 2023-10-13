@@ -13,7 +13,7 @@ export async function handleConversationClick() {
     updateExpert($(this).parent().parent().data("user-id"))
   
     messagesContainer.innerHTML = "";
-
+    
     const conversationActive = document.querySelectorAll(
       "div.conversation-click"
     );

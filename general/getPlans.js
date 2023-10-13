@@ -39,8 +39,12 @@ export async function getPlans() {
                       <ul class='pricing-feature-list'>
                         <li class='pricing-feature'>${plan.billing_volume} Messages</li>
                       </ul>
-                      <button id="startChatButton" class='plan-btn pricing-action' data-plan="${plan.id}" name="${plan.name}">Start chatting</button>
-                      </div>         
+                      <button id="startChatButton" class='plan-btn pricing-action' data-plan="${plan.id}" name="${plan.name}">
+                      <span class="button-text">Start chatting</span>
+                      <div class="spinner-container" style="display: none;">
+                        <div class="d-flex align-items-center" style="height: 20px;"><span class="loader2"></span></div>
+                      </div>
+                    </button>                      </div>         
         `
           );
         });
@@ -52,10 +56,10 @@ export async function getPlans() {
           buyButton.addEventListener("click", function () {
             const selectedPlan = this.getAttribute("data-plan");
             const planName = this.getAttribute("name");
-  
             const msgId = this.getAttribute("message-id");
             // balanceSpinner.classList.remove("hidden");
-  
+            this.querySelector('.button-text').style.display = 'none';
+            this.querySelector('.spinner-container').style.display = 'block';
             socketLib.addSale({
               contact: newData.contact,
               user: newData.user,
@@ -67,7 +71,11 @@ export async function getPlans() {
               planName: planName,
               sale_status: 0,
             });
+            setTimeout(() => {
+              this.textContent = 'Start chatting';
+            }, 2000)
           });
+    
         });
       }
     } catch (error) {

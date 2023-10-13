@@ -31,8 +31,9 @@ export function getTotalBalance(balance, role) {
         }
         if (balance === 0) {
           // Disable input and button if balance is 0
+          messageInput.dataset.translation="container.balance_message"
           messageInput.placeholder =
-            "You need to buy a new plan to start chatting again";
+            getTranslationValue("container.balance_message");
           messageInput.disabled = true;
           sendButton.disabled = true;
           balanceNumber.style.color = "";
@@ -52,7 +53,8 @@ export function getTotalBalance(balance, role) {
   
   export function updateUserBalance() {
     if (totalBalance) {
-      totalBalance = Number(totalBalance) - 1;
+      updateTotalBalance(Number(totalBalance) - 1)
+      
       const balanceDiv = document.querySelector(".ballance-card");
       const balanceNumber = document.querySelector(".balance-value");
       const buyCreditsButton = document.querySelector("#btnPlansContainer");
@@ -82,8 +84,8 @@ export function getTotalBalance(balance, role) {
             <h2 class="text-2xl text-slate-700 dark:text-navy-100">
               Alert !
             </h2>
-            <p class="mt-2">
-             You need to buy more Credits to keep chatting!!
+            <p class="mt-2" data-translation="container.balance_message">
+             ${getTranslationValue("container.balance_message")}
             </p>
             <button @click="showModal = false" class="modal-button btn mt-6 bg-success font-medium text-white hover:bg-success-focus focus:bg-success-focus active:bg-success-focus/90" id="confirmButton">
               Close
@@ -98,12 +100,12 @@ export function getTotalBalance(balance, role) {
         const confirmButton = modalDiv.querySelector("#confirmButton");
   
         confirmButton.addEventListener("click", () => {
-          buyCreditsButton.click();
+          confirmButton.click();
           modalDiv.style.display = "none";
         });
-  
+        messageInput.dataset.translation="container.balance_message"
         messageInput.placeholder =
-          "You need to buy a new plan to start chatting again";
+          getTranslationValue("container.balance_message");
         document.body.appendChild(modalDiv);
         messageInput.disabled = true;
         sendButton.disabled = true;

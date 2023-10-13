@@ -103,7 +103,6 @@ export default class event {
   };
   onConnectedError=function(){
     this.socket.on('connection-error',(data)=>{
-
       const modalDiv = document.createElement("div");
       modalDiv.innerHTML = `
       <div class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5">
@@ -112,7 +111,6 @@ export default class event {
           <svg xmlns="http://www.w3.org/2000/svg" class="inline h-28 w-28 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
-  
           <div class="mt-4">
               <h2 class="text-2xl text-red-700 dark:text-navy-100">
                   Error Occurred
@@ -133,8 +131,6 @@ export default class event {
         document.body.removeChild(modalDiv);
       });
       document.body.appendChild(modalDiv);
-  
-
 
     })
   }
@@ -1122,12 +1118,17 @@ const number = match ? match[1] : null;
   linkClicked = () => {
     this.socket.on('linkClicked', (data, error) => {
       const msg = messagesContainer.querySelector(`#message-content-${data._id}`);
+    
       if (msg) {
-        const eyeIcon = document.createElement('i');
-        eyeIcon.className = 'fas fa-eye text-blue-500 ml-1';
-        msg.appendChild(eyeIcon);
+        const existingEyeIcon = msg.querySelector('.fas.fa-eye.text-blue-500.ml-1');
+        if (!existingEyeIcon) {
+          const eyeIcon = document.createElement('i');
+          eyeIcon.className = 'fas fa-eye text-blue-500 ml-1';
+          msg.appendChild(eyeIcon);
+        }
       }
     });
+    
   };
   
   getUserPresntations=(accountId)=>{
