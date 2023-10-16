@@ -134,7 +134,58 @@ export default class event {
 
     })
   }
-
+  onConnectedUserError = function () {
+    this.socket.on('user-connection-error', (data) => {
+      const modalDiv = document.createElement("div");
+      modalDiv.innerHTML = `
+        <div class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5">
+          <div class="absolute inset-0 bg-red transition-opacity duration-300"></div>
+          <div class="relative max-w-lg rounded-lg bg-white px-4 py-10 text-center transition-opacity duration-300 dark:bg-navy-700 sm:px-5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="inline h-28 w-28 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div class="mt-4">
+              <h2 class="text-2xl text-red-700 dark:text-navy-100">
+                Error Occurred
+              </h2>
+              <p class="mt-2">
+                An error occurred. Please try again.
+              </p>
+              <button id="createNewAccount" class="btn mt-6 bg-error font-medium text-white hover:bg-error-focus focus:bg-error-focus active:bg-error-focus/90">
+                Create New Account
+              </button>
+              <button id="tryAgain" class="btn mt-6 bg-error font-medium text-white hover:bg-error-focus focus:bg-error-focus active:bg-error-focus/90">
+                Try Again
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+  
+      const closeButton = modalDiv.querySelector("#tryAgain");
+      const createNewAccountButton = modalDiv.querySelector("#createNewAccount");
+  
+      closeButton.addEventListener("click", () => {
+        // Reload the page
+        location.reload();
+      });
+  
+      createNewAccountButton.addEventListener("click", () => {
+        // Delete browser cookies
+        document.cookie.split(";").forEach(function (c) {
+          document.cookie = c
+            .replace(/^ +/, "")
+            .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+        });
+  
+        // Reload the page
+        location.reload();
+      });
+  
+      document.body.appendChild(modalDiv);
+    });
+  };
+  
 
   //receive user connection (other user)
 
@@ -157,9 +208,10 @@ export default class event {
           if(connectUsers){
             removeConnectUser(user._id)
           }
+          checkForExpertMessages();
+          userDisconnection(user);
       }
-      checkForExpertMessages();
-      userDisconnection(user);
+ 
     });
   };
   

@@ -14,6 +14,7 @@ import { sendFocusNotification, sendTypingNotification } from "../formActions.js
 import { addLogs } from "../utils/addLogs.js";
 import { showEmptyConversation } from "../conversationActions/conversationClick.js";
 import { getTranslationValue } from "../utils/traduction.js";
+import { getTime } from "../utils/getTime.js";
 export function displayMessages(messages) {
     document.getElementById("big-container-message").style.display = "block";
     if (!messages || !messages.messages) {
@@ -28,46 +29,7 @@ export function displayMessages(messages) {
       let message = convMessages[i];
       const messageId = convMessages[i]._id;
       const messageContainer = document.getElementById(`message-${messageId}`);
-      const timestamp = message.created_at;
-      const messageDate = new Date(timestamp);
-      const currentDate = new Date();
-      const currentDay = currentDate.getDate();
-      const currentMonth = currentDate.getMonth();
-      const currentYear = currentDate.getFullYear();
-      const messageDay = messageDate.getDate();
-      const messageMonth = messageDate.getMonth();
-      const messageYear = messageDate.getFullYear();
-      let time;
-      if (
-        currentDay === messageDay &&
-        currentMonth === messageMonth &&
-        currentYear === messageYear
-      ) {
-        const hour = messageDate.getHours();
-        const minute = messageDate.getMinutes().toString().padStart(2, "0");
-        time = `${hour}:${minute}`;
-      } else {
-        const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        const dayOfWeek = daysOfWeek[messageDate.getDay()];
-        const hour = messageDate.getHours();
-        const minute = messageDate.getMinutes().toString().padStart(2, "0");
-  
-        if (currentYear === messageYear) {
-          if (currentMonth === messageMonth && currentDay - messageDay <= 7) {
-            time = `${dayOfWeek}, ${hour}:${minute}`;
-          } else {
-            const formattedDate = `${messageDay}/${
-              messageMonth + 1
-            }/${messageYear}`;
-            time = `${formattedDate}, ${hour}:${minute}`;
-          }
-        } else {
-          const formattedDate = `${messageDay}/${
-            messageMonth + 1
-          }/${messageYear}`;
-          time = `${formattedDate}, ${hour}:${minute}`;
-        }
-      }
+        const time=getTime(message.created_at)
       const myContent =
         message.type === "plan" ||
         message.type === "form" ||
@@ -142,7 +104,7 @@ export function displayMessages(messages) {
               </div>
           </div>
           </div>
-          <p class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300">${time} </p>
+          <p class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300" data-time="${message.created_at}">${time} </p>
       </div>
           </div>`;
           messagesContainer.insertAdjacentElement("afterbegin", messageDiv);
@@ -213,7 +175,7 @@ export function displayMessages(messages) {
   
                 return `
                     <label class="relative">
-                        <span>${field.field_name}</span>
+                        <span>${field?.field_name ?? ''}</span>
                         <select 
                             id="floating_field_${messageId}"
                             data-country
@@ -232,14 +194,14 @@ export function displayMessages(messages) {
                             ${countryOptions}
                         </select>
                     </label>`;
-              } else if (field.field_type === 7) {
+              } else if (field?.field_type === 7) {
                 return `
               <label class="relative">
-              <span>${field.field_name}</span>
+              <span>${field.field_name ?? ""}</span>
               <input 
                   id="floating_field_${messageId}"
                   class="form-input phoneInput field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900" 
-                  placeholder="${field.field_name}" 
+                  placeholder="${field.field_name ?? "" }" 
                   name="${field.field_name.replace(" ", "")}" 
                   data-field-id="${field.field_id}"
                   value="${field?.field_value ?? ""}"
@@ -252,13 +214,13 @@ export function displayMessages(messages) {
               } else {
                 return `
                 <label class="relative">
-                  <span>${field.field_name}</span>
+                  <span>${field.field_name ?? ""}</span>
                   ${
                     type === "textarea"
                       ? `<textarea
                         id="floating_field_${messageId}"
                         class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
-                        placeholder="${field.field_name}"
+                        placeholder="${field.field_name ?? ""}"
                         name="${field.field_name.replace(" ", "")}"
                         data-field-id="${field.field_id}"
                         ${field?.field_value ? "style='pointer-events:none'" : ""}
@@ -268,7 +230,8 @@ export function displayMessages(messages) {
                       ? `<input
                         id="floating_field_${messageId}"
                         class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
-                        placeholder=${getTranslationValue("date_format.date_form")}
+                        data-translation="date_format.date_form"
+                        placeholder=${getTranslationValue("date_format.date_form") ?? ""}
                         name="${field?.field_name?.replace(" ", "")}"
                         data-field-id="${field?.field_id}"
                         value="${field?.field_value ?? ""}"
@@ -284,7 +247,7 @@ export function displayMessages(messages) {
                       : `<input
                         id="floating_field_${messageId}"
                         class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
-                        placeholder="${field?.field_name}"
+                        placeholder="${field?.field_name ?? ""}"
                         name="${field?.field_name?.replace(" ", "")}"
                         data-field-id="${field?.field_id}"
                         value="${field?.field_value ?? ""}"

@@ -1,3 +1,4 @@
+import { checkForExpertMessages } from "../general/getConnectedAgents.js";
 import { connectUsers, timeString } from "../main.js";
 import { getTranslationValue } from "./traduction.js";
 const leftConversationContainer = document.getElementById("left-conversation");
@@ -16,6 +17,7 @@ export function displayLeftConversation(data) {
     const minute = date.getMinutes().toString().padStart(2, "0");
     const time = `${hour}:${minute}`;
     if (!isNotNewConversation) {
+
       const newConvDiv = document.createElement("div");
       const newminiconDiv = document.createElement("div");
   
@@ -171,7 +173,7 @@ export function displayLeftConversation(data) {
                       </div>
                     </div>
       `;
-  
+  checkForExpertMessages()
       const existingElement = document.querySelector(
         `#left-mini-conversation-${data.conversation}`
       );

@@ -937,8 +937,9 @@ padding: 5em 0 8.885em 0;
 }
 
 .active-tab {
-  background-color:#FAF0E6;
-  /* color: #DAFFFB; */
+  background: #ebf3ff;
+  border-top: 3px solid #91b0df;
+  border-bottom: 0;
 }
 
 .balance-value {

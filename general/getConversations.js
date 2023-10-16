@@ -4,8 +4,11 @@ const leftConversationContainer = document.getElementById("left-conversation");
 import { accountId,MY_API_ADDRESS } from "../env.js";
 import {  connectUsers, conversationId, displayedUsers, newData, updateAllConversations, updateConversationId } from "../main.js";
 import { formatDate, formatFullDate, formatWeekdayDate } from "../utils/dateConfig.js";
+import { getTime } from "../utils/getTime.js";
 import { getTranslationValue } from "../utils/traduction.js";
 import { truncateMessage } from "../utils/truncateMessage.js";
+import { checkForExpertMessages } from "./getConnectedAgents.js";
+
 export async function getAllConversations() {
     // latestConversationId = null;
     leftConversationContainer.innerHTML = "";
@@ -29,30 +32,9 @@ export async function getAllConversations() {
   
         //   const timestamp = conversation.updated_at;
         //   const now = new Date();
-        const messageDate = new Date(conversation.updated_at);
-
-        function formatTime(date) {
-          const hours = date.getHours();
-          const minutes = date.getMinutes();
-          const timeString =
-            hours.toString().padStart(2, "0") + ":" + minutes.toString().padStart(2, "0");
-          return timeString;
-        }
-        
-        let time;
-        
-        if (new Date().toDateString() === messageDate.toDateString()) {
-          time = formatTime(messageDate);
-        } else if (
-          new Date().getFullYear() === messageDate.getFullYear() &&
-          new Date().getMonth() === messageDate.getMonth() &&
-          new Date().getDate() - messageDate.getDate() <= 6
-        ) {
-          time = formatWeekdayDate(messageDate);
-        } else {
-          time = formatFullDate(messageDate);
-        }
-        
+        // const messageDate = new Date(conversation.updated_at);
+          const time= getTime(conversation.updated_at)
+      
           let isActive = false;
           for (let i = 0; i < connectUsers.length; i++) {
             if (
@@ -77,8 +59,9 @@ export async function getAllConversations() {
             if (!agentDisco) {
               displayedUsers.add(bot[0]._id);
               const html = `<div id="${bot[0]._id}" data-name=${bot[0].full_name} class="swiper-slide flex w-11 shrink-0 flex-col items-center justify-center"><div class="h-11 w-11 rounded-full bg-gradient-to-r from-purple-500 to-orange-600 p-0.5"><img class="h-full w-full rounded-full border-2 border-white object-cover dark:border-slate-700" src=images/avatar/avatar-0.jpg alt="avatar" /></div><p class="mt-1 w-14 break-words text-center text-xs text-slate-600 dark:text-navy-100">${bot[0].full_name}</p></div>`;
-  
+             
               $(".swiper-wrapper").append(html);
+              checkForExpertMessages()
             }
           }
           let userLog = "";
@@ -165,7 +148,7 @@ export async function getAllConversations() {
                 } data-conversation-name class="text-xs+ font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
                   ${agentFullNames}
                 </p>
-                <span class="text-tiny+ text-slate-400 dark:text-navy-300">${time}</span>
+                <span class="text-tiny+ text-slate-400 dark:text-navy-300" data-time="${conversation.updated_at}" >${time}</span>
               </div>
               <div class="mt-1 flex items-center justify-between space-x-1 conversationLeftTyping">
                 <div>

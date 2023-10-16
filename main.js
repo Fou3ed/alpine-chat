@@ -21,7 +21,7 @@ export let totalBalance;
 
 import { getTranslationValue, lan } from "./utils/traduction.js";
 import { getCookie } from "./utils/getCookie.js";
-import { getExperts } from "./general/getConnectedAgents.js";
+import { checkForExpertMessages, getExperts } from "./general/getConnectedAgents.js";
 import { selectExpert } from "./general/selectExpert.js";
 import { handleConversationClick } from "./conversationActions/conversationClick.js";
 import { notifyMe } from "./utils/notificationSound.js";
@@ -88,6 +88,12 @@ export function updateNewData(data){
   newData=data
 }
 
+// main.js
+
+export function loadNewData() {
+  return getCookie("myData") !== undefined ? JSON.parse(getCookie("myData")) : null;
+}
+
 
 
 export const displayedUsers = new Set();
@@ -111,6 +117,7 @@ $(document).ready(async function () {
   getPlans();
 
   socketLib.connect(() => {
+    console.log("params",params)
     if (
       !newData ||
       (params?.source == "gocc" &&
@@ -239,7 +246,7 @@ $(document).ready(async function () {
         </svg>
         <div class="mt-4" style="344px">
           <h2 class="text-2xl text-slate-700 dark:text-navy-100">
-            Error
+          ${getTranslationValue("modal.error")}
           </h2>
           <p class="mt-2">
           ${getTranslationValue("modal.fail")}
@@ -324,6 +331,7 @@ window.history.replaceState({}, document.title, newURL);
   socketLib.onGetUserPresntations();
   socketLib.onCheckConversation();
   socketLib.saleAdded();
+  socketLib.onConnectedUserError()
   document
     .querySelector("emoji-picker")
     .addEventListener("emoji-click", (event) => {
@@ -335,12 +343,10 @@ window.history.replaceState({}, document.title, newURL);
   // socketLib.displayRobotAvatar();
   socketLib.getMessages();
   await getExperts();
+  checkForExpertMessages()
+
   socketLib.displayAgentsMessage();
   $(document).on("click", ".conversation-click", handleConversationClick);
   $(document).on("click", ".mini-conversation-click", handleConversationClick);
   $(document).on("click", "#emoji-button", showEmoji);
-
-
-
-  
 });

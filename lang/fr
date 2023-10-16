@@ -127,7 +127,8 @@
         "sure":"Êtes-vous sûr ?",
         "buy":"Acheter le plan",
         "deleteMsg":"supprimer le message",
-        "deleteBtn":"supprimer"
+        "deleteBtn":"supprimer",
+        "error":"erreur"
     },
     "tooltips": {
         "conversationsSideBar": "conversations Barre latérale"

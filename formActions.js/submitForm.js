@@ -1,5 +1,5 @@
 import { newData, socketLib,conversationId, updateNewData } from "../main.js";
-import { lan } from "../utils/traduction.js";
+import { getTranslationValue, lan } from "../utils/traduction.js";
 
 export let formElement = "";
 

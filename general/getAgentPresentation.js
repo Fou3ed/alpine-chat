@@ -14,17 +14,18 @@ export const getAgentPresentation = async (id, online) => {
           },
         }
       );
+      console.log("response",response)
       if (response?.status === 200) {
         const agentData = response.data.data[0];
         // Update skills
         const skillsContainer = document.querySelector(".skills");
         skillsContainer.innerHTML = "";
-        if (Array.isArray(agentData.skills)) {
-          agentData.skills.forEach((skill) => {
+        if (Array.isArray(agentData?.skills)) {
+          agentData?.skills.forEach((skill) => {
             const skillTag = `<span class="tag rounded-full bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80">${skill ? skill : ""}</span>`;
             skillsContainer.insertAdjacentHTML("beforeend", skillTag);
           });
-        } else if (typeof agentData.skills === "string") {
+        } else if (typeof agentData?.skills === "string") {
           const skillTag = `<span class="tag rounded-full bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80">${agentData?.skills ? agentData.skills : ""} </span>`;
           skillsContainer.insertAdjacentHTML("beforeend", skillTag);
         }
@@ -54,7 +55,7 @@ export const getAgentPresentation = async (id, online) => {
           img.alt = "flag";
           countryElement.parentElement.insertBefore(img, countryElement);
         }
-        if (agentData.country) {
+        if (agentData?.country) {
           countryElement.textContent = Countries.getName(
             agentData.country.toUpperCase()
           );
@@ -71,48 +72,44 @@ export const getAgentPresentation = async (id, online) => {
         // Update languages
         const languagesElement = document.querySelector(".languages");
         languagesElement.textContent = Languages.getName(
-          agentData.languages.toLowerCase()
+         agentData?.languages ? agentData.languages.toLowerCase() : ""
         );
   
         // Update contact phone
         const phoneElement = document.querySelector(".phone");
-        phoneElement.textContent = agentData.contact_phone;
+        phoneElement.textContent = agentData?.contact_phone;
   
         // Update contact email
         const emailElement = document.querySelector(".email");
-        emailElement.href = `mailto:${agentData.contact_mail}`;
-        emailElement.textContent = agentData.contact_mail;
+        emailElement.href = `mailto:${agentData?.contact_mail}`;
+        emailElement.textContent = agentData?.contact_mail ? agentData.contact_mail :"";
   
         // Update website
         const websiteElement = document.querySelector(".website");
-        websiteElement.href = agentData.website;
-        websiteElement.textContent = agentData.website;
+        websiteElement.href = agentData?.website;
+        websiteElement.textContent = agentData?.website;
 
      
         const phoneButton = document.querySelector('.btnPhone');
         const emailButton = document.querySelector('.btnemail');
         const websiteButton = document.querySelector('.btnwebsite');
-        if (agentData?.contact_phone?.length>0) {
+        if (agentData?.contact_phone?.length > 0) {
           phoneButton.removeAttribute('disabled');
         } else {
-          phoneElement.innerHTML=`
-          <span class="tag rounded-full bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80" data-translation="right_side.badge" >${getTranslationValue("right_side.badge")}</span>`
+          phoneElement.innerHTML = '<img src="../images/empty-folder.png" alt="Phone Icon">';
         }
       
-        if (agentData?.contact_mail?.length>0) {
+        if (agentData?.contact_mail?.length > 0) {
           emailButton.removeAttribute('disabled');
-        }else {
-        emailElement.innerHTML=`          <span class="tag rounded-full bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80" data-translation="right_side.badge" >${getTranslationValue("right_side.badge")}</span>
-
-        `
-        } 
-      
-        if (agentData?.website?.length>0) {
+        } else {
+          emailElement.innerHTML = '<img src="../images/empty-folder.png" alt="Email Icon">';
+        }
+        if (agentData?.website?.length > 0) {
           websiteButton.removeAttribute('disabled');
-        }else {
-          websiteElement.innerHTML=`
-          <span class="tag rounded-full bg-slate-150 text-slate-800 hover:bg-slate-200 focus:bg-slate-200 active:bg-slate-200/80" data-translation="right_side.badge" >${getTranslationValue("right_side.badge")}</span>`
-        } 
+        } else {
+          websiteElement.innerHTML = '<img src="../images/empty-folder.png" alt="Website Icon">';
+        }
+        
         
         // if (!clicked) {
         //   let toggleButton = document.getElementById("toggleDrawerButton");

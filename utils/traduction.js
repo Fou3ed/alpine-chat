@@ -1,4 +1,8 @@
-import { newData } from "../main.js";
+import { loadNewData } from "../main.js";
+import { getTime } from "./getTime.js";
+
+const newData = loadNewData();
+
 
 export let traduction = {};
 
@@ -63,7 +67,9 @@ for (const locale of locales) {
 
 export function getTranslationValue(key) {
   const translationValue = eval(`traduction.${key}`);
-  
+  if(Array.isArray(translationValue)){
+    return translationValue
+  }
   if (translationValue) {
     const firstLetter = translationValue.charAt(0).toUpperCase();
     const restOfString = translationValue.slice(1);
@@ -103,6 +109,10 @@ if (lan.substring(0, 2).toLowerCase() === "en") {
   toggleDrawerTool.setAttribute('x-tooltip.placement.bottom.light', "'Barre latérale experte'");
 
 }
+
+document.querySelectorAll("[data-time]").forEach((element) => {
+  element.textContent = getTime(element.dataset.time);
+});
 
 // Select the button element by its ID
 

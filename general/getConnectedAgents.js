@@ -10,16 +10,18 @@ export async function getExperts() {
     if (response.data.message === "success") {
     //   connectUsers = response.data.data;
         updateConnectUsers(response.data.data)
-      if (response.data.data.length > 0 && !expertAppended) {
-        const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_on"  >${getTranslationValue("left_side.experts_on")}</span>`;
-        $("#expert-msg").empty().append(html);
-        expertAppended = true;
-      } else {
-        offline = true;
-        const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_off" >${getTranslationValue("left_side.experts_off")} </span>`;
-        $("#expert-msg").empty().append(html);
-        expertAppended = true;
-      }
+      //   console.log("response data",response.data.data.length)
+      // if (response.data.data.length > 0 && !expertAppended) {
+      //   const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_on"  >${getTranslationValue("left_side.experts_on")}</span>`;
+      //   $("#expert-msg").empty().append(html);
+      //   expertAppended = true;
+      // } else {
+      //   offline = true;
+      //   const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_off" >${getTranslationValue("left_side.experts_off")} </span>`;
+      //   $("#expert-msg").empty().append(html);
+      //   expertAppended = true;
+      // }
+
       response.data.data.forEach((user) => {
         displayExpert(user);
       });
@@ -27,20 +29,7 @@ export async function getExperts() {
   }
 
 
-  export function checkForExpertMessages() {
-    const swiper = document.querySelector(".swiper");
-    const swiperWrapper = swiper.querySelector(".swiper-wrapper");
-    const divsInsideSwiper = Array.from(
-      swiperWrapper.querySelectorAll("div.swiper-slide")
-    );
-    if (divsInsideSwiper.length > 0) {
-      const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_on">${getTranslationValue("left_side.experts_on")}</span>`;
-      $("#expert-msg").empty().append(html);
-    } else {
-      const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_off" >${getTranslationValue("left_side.experts_off")} </span>`;
-      $("#expert-msg").empty().append(html);
-    }
-  }
+
   
   export function displayExpert(user) {
     const agentDisco = document.getElementById(`${user._id}`);
@@ -58,6 +47,7 @@ export async function getExperts() {
       </div>
       `;
       $(".swiper-wrapper").append(html);
+
     }
   }
   
@@ -65,5 +55,30 @@ export async function getExperts() {
     const agentDisco = document.getElementById(`${userId}`);
     if (agentDisco) {
       agentDisco.remove();
+    }
+  }
+
+
+
+  export function checkForExpertMessages() {
+    const swiper = document.querySelector(".swiper");
+    const swiperWrapper = swiper.querySelector(".swiper-wrapper");
+    const divsInsideSwiper = Array.from(
+      swiperWrapper.querySelectorAll("div.swiper-slide")
+    );
+    console.log("divsINSIDE swiper",divsInsideSwiper)
+    if (divsInsideSwiper.length > 0) {
+      const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_on">${getTranslationValue("left_side.experts_on")}</span>`;
+      $("#expert-msg").empty().append(html);
+      expertAppended = true;
+
+    } else {
+    offline = true;
+
+
+      const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_off" >${getTranslationValue("left_side.experts_off")} </span>`;
+      $("#expert-msg").empty().append(html);
+      expertAppended = true;
+
     }
   }
