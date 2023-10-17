@@ -18,9 +18,9 @@ export function changeHeaderPicture(cnv, agent, status) {
       if (activeUserHeader) {
         activeUserHeader.classList.remove("bg-slate-300", "bg-success");
   
-        if (status === 0) {
+        if (status == 0) {
           activeUserHeader?.classList?.add("bg-slate-300");
-        } else if (status === 1) {
+        } else if (status == 1) {
           activeUserHeader?.classList?.add("bg-success");
         }
       }

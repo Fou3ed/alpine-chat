@@ -48,10 +48,11 @@ export function displayAgents(agents) {
   export function createAgentCard(agent) {
     const agentCard = document.createElement("div");
     agentCard.className = "card w-72 shrink-0 space-y-2 rounded-xl p-4 sm:px-5";
-  
+    // <div class="flex items-center space-x-3">
+
     agentCard.innerHTML = `
       <div class="flex items-center justify-between space-x-2">
-        <div class="flex items-center space-x-3">
+        <div class="grid grid-cols-3">
           <div class="avatar">
             <img class="mask is-squircle" src="images/avatar/avatar-${agent.UserID || ''}.jpg" alt="image">
           </div>

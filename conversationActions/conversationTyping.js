@@ -47,7 +47,7 @@ function onStartTyping() {
   let typingBlock = document.getElementById("typing-block-message");
   export function startTyping(data) {
     typingBlock = document.getElementById("typing-block-message");
-    if (data.metaData.conversation === conversationId) {
+    if (data.metaData.conversation == conversationId) {
       if (!typingBlock) {
         typingBlock = document.createElement("div");
         typingBlock.className = "w-100 p-3 d-flex";

@@ -15,7 +15,7 @@ export function getTotalBalance(balance, role) {
       // Hide spinner
       balanceSpinner.classList.add("hidden");
   
-      if (balance == null && role === "GUEST") {
+      if (balance == null && role == "GUEST") {
         balanceNumber.dataset.translation = "header.free";
         balanceNumber.textContent = getTranslationValue("header.free");
       } else {
@@ -29,7 +29,7 @@ export function getTotalBalance(balance, role) {
           balanceNumber.style.color = "";
           balanceNumber.style.color = "#C70039";
         }
-        if (balance === 0) {
+        if (balance == 0) {
           // Disable input and button if balance is 0
           messageInput.dataset.translation="container.balance_message"
           messageInput.placeholder =

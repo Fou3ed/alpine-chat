@@ -26,7 +26,7 @@ export async function handleConversationClick() {
   
     const name = this.dataset.name;
     let exist = allConversation.find(
-      (conversation) => conversation._id === conversationId
+      (conversation) => conversation._id == conversationId
     );
     if (!exist && conversation_id) {
       //get conversation_id  details with member_details
@@ -50,7 +50,7 @@ export async function handleConversationClick() {
   
     $(this).addClass("bg-slate-150");
     let agentContactId = exist.member_details
-      .filter((member) => member.role === "AGENT" || member.role === "BOT")
+      .filter((member) => member.role == "AGENT" || member.role == "BOT")
       .map((agent) => agent.id);
     if (exist?.status == 1) {
       conversationHeaderStatus.dataset.translation = "general.online";

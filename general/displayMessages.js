@@ -31,14 +31,14 @@ export function displayMessages(messages) {
       const messageContainer = document.getElementById(`message-${messageId}`);
         const time=getTime(message.created_at)
       const myContent =
-        message.type === "plan" ||
-        message.type === "form" ||
-        message.type === "link"
+        message.type == "plan" ||
+        message.type == "form" ||
+        message.type == "link"
           ? JSON.parse(message.message)
           : {};
       if (!messageContainer) {
         let tableRows = "";
-        if (Object.keys(myContent).length !== 0 && message.type === "plan") {
+        if (Object.keys(myContent).length !== 0 && message.type == "plan") {
           tableRows = myContent.plans.map((plan) => {
             return `
     <div class="pricing pricing-palden">
@@ -66,7 +66,7 @@ export function displayMessages(messages) {
   </div>  
             `;
           });
-        } else if (message.type === "bloc") {
+        } else if (message.type == "bloc") {
           const messageDiv = document.createElement("div");
           messageDiv.innerHTML = `<div class="flex flex-col items-start space-y-3.5">
           <div class="mr-1">
@@ -131,12 +131,14 @@ export function displayMessages(messages) {
             { once: true }
           );
           continue;
-        } else if (message.type === "form") {
+        } else if (message.type == "form") {
           let inputForms = "";
           if (myContent.fields) {
             myContent.fields.sort(compareFields);
             inputForms = myContent.fields.map((field) => {
               let type = "";
+              console.log("fields",field)
+
               switch (+field?.field_type) {
                 case 1:
                 case 10: //first name
@@ -167,7 +169,7 @@ export function displayMessages(messages) {
                   type = "textarea";
                   break;
               }
-              if (field?.field_type === 8) {
+              if (field?.field_type == 8) {
                 const countryOptions = generateCountryOptions(
                   countries,
                   field?.field_value ?? userCountry
@@ -188,13 +190,13 @@ export function displayMessages(messages) {
                                 ? "style='pointer-events:none'"
                                 : ""
                             }
-                            ${myContent.status === 1 ? "disabled" : ""}
+                            ${myContent.status == 1 ? "disabled" : ""}
                         >
                             <option value="">Select a country</option>
                             ${countryOptions}
                         </select>
                     </label>`;
-              } else if (field?.field_type === 7) {
+              } else if (field?.field_type == 7) {
                 return `
               <label class="relative">
               <span>${field.field_name ?? ""}</span>
@@ -207,7 +209,7 @@ export function displayMessages(messages) {
                   value="${field?.field_value ?? ""}"
                   type="tel"
                   ${field?.field_value ? "style='pointer-events:none'" : ""}
-                  ${myContent.status === 1 ? "disabled" : ""}
+                  ${myContent.status == 1 ? "disabled" : ""}
               />
           </label>
           `;
@@ -216,7 +218,7 @@ export function displayMessages(messages) {
                 <label class="relative">
                   <span>${field.field_name ?? ""}</span>
                   ${
-                    type === "textarea"
+                    type == "textarea"
                       ? `<textarea
                         id="floating_field_${messageId}"
                         class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
@@ -224,9 +226,9 @@ export function displayMessages(messages) {
                         name="${field.field_name.replace(" ", "")}"
                         data-field-id="${field.field_id}"
                         ${field?.field_value ? "style='pointer-events:none'" : ""}
-                        ${myContent.status === 1 ? "disabled" : ""}
+                        ${myContent.status == 1 ? "disabled" : ""}
                       >${field?.field_value ?? ""}</textarea>`
-                      : type === "date"
+                      : type == "date"
                       ? `<input
                         id="floating_field_${messageId}"
                         class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
@@ -237,7 +239,7 @@ export function displayMessages(messages) {
                         value="${field?.field_value ?? ""}"
                         type="text"
                         ${field?.field_value ? "style='pointer-events:none'" : ""}
-                        ${myContent.status === 1 ? "disabled" : ""}
+                        ${myContent.status == 1 ? "disabled" : ""}
                         x-input-mask='{
                           date: true,
                           delimiter: "-",
@@ -253,7 +255,7 @@ export function displayMessages(messages) {
                         value="${field?.field_value ?? ""}"
                         type="${type}"
                         ${field?.field_value ? "style='pointer-events:none'" : ""}
-                        ${myContent.status === 1 ? "disabled" : ""}
+                        ${myContent.status == 1 ? "disabled" : ""}
                       />`
                   }
                 </label>
@@ -299,7 +301,7 @@ export function displayMessages(messages) {
                                         >
                                             <span class="spinner hidden absolute inset-0 flex justify-center items-center">
                                             </span>
-                                            Save
+                                          ${myContent.button}
                                         </button>
                                     `
                                         : ""
@@ -313,7 +315,7 @@ export function displayMessages(messages) {
             `;
           }
         }
-        if (message.type === "log") {
+        if (message.type == "log") {
           const log = JSON.parse(message.message);
           let userLog = "";
           switch (log.action) {
@@ -351,53 +353,53 @@ export function displayMessages(messages) {
           );
         } else {
           let direction =
-            message.user === newData.user ? "justify-end" : "justify-start";
+            message.user == newData.user ? "justify-end" : "justify-start";
           const msgStyle =
-            message.user === newData.user && !message.paid
+            message.user == newData.user && !message.paid
               ? `rounded-2xl break-words  rounded-tl-none bg-msg p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
               : `rounded-2xl break-words  relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
           messagesContainer.insertAdjacentHTML(
             "afterbegin",
             `<div id="message-${messageId}" class="flex items-start ${direction} space-x-1.5 ${
-              message.type === "plan" ? "plans-container" : ""
+              message.type == "plan" ? "plans-container" : ""
             }">
                 <div class="flex flex-col   ${
                   message.user !== newData.user ? "items-start" : "items-end"
                 }  space-y-3.5">
-                ${message.type === "MSG" ? `<div class="flex flex-row">` : ""}
+                ${message.type == "MSG" ? `<div class="flex flex-row">` : ""}
                   ${
-                    message.type === "MSG" &&
-                    direction === "justify-end" &&
+                    message.type == "MSG" &&
+                    direction == "justify-end" &&
                     message.status !== 0
-                      ? msgButt(messageId, direction, message.pinned === 1)
+                      ? msgButt(messageId, direction, message.pinned == 1)
                       : ""
                   }
                   <div class="ml-2 max-w-lg sm:ml-5">
                     ${
-                      message.type === "MSG" || message.type === "link"
+                      message.type == "MSG" || message.type == "link"
                         ? `
                         <div class="${
-                          message.type === "link"
+                          message.type == "link"
                             ? "rounded-2xl break-words relative rounded-tr-none bg-violet-300 p-3 text-slate-700 shadow-sm dark:bg-violet-500 dark:text-white"
                             : msgStyle
                         }" id="message-content-${messageId}">
                           ${
-                            message.status === 0
+                            message.status == 0
                               ? `${
                                   direction === "justify-start"
                                     ? message.user_data.full_name
                                     : "You"
                                 } unsent a message`
-                              : message.type === "link"
+                              : message.type == "link"
                               ? `<a class="link-msg" id="linked-msg-${messageId}" data-link-id="${myContent.userLink.id}" href="${myContent.userLink?.url}" target="_blank">${myContent.userLink?.url}</a>`
-                              : message.type === "plan"
+                              : message.type == "plan"
                               ? tableRows.join("")
-                              : message.type === "form"
+                              : message.type == "form"
                               ? tableRows
                               : message.message
                           }
                         <div id="pin-div" class="${
-                          message.pinned === 0 || message.status === 0
+                          message.pinned == 0 || message.status == 0
                             ? "hidden"
                             : "flex"
                         } ${
@@ -407,7 +409,7 @@ export function displayMessages(messages) {
                           } justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
                           ${
                             direction === "justify-start" &&
-                            myContent.userLink?.status === "1"
+                            myContent.userLink?.status == "1"
                               ? '<i class="fas fa-eye text-blue-500 ml-1"></i>'
                               : ""
                           }
@@ -416,20 +418,20 @@ export function displayMessages(messages) {
                         <div id="message-content-${messageId}">
                         <div class="ml-2 max-w-lg sm:ml-5">
                           ${
-                            message.status === 0
+                            message.status == 0
                               ? `${
                                   direction === "justify-start"
                                     ? message.user_data.full_name
                                     : "You"
                                 } unsent a message`
-                              : message.type === "plan"
+                              : message.type == "plan"
                               ? tableRows.join("")
-                              : message.type === "form"
+                              : message.type == "form"
                               ? tableRows
                               : message.message
                           }
                           <div id="pin-div" class="${
-                            message.pinned === 0 || message.status === 0
+                            message.pinned == 0 || message.status == 0
                               ? "hidden"
                               : "flex"
                           } ${
@@ -444,7 +446,7 @@ export function displayMessages(messages) {
                     ${message.type === "MSG" ? `</div>` : ""}
                     <p id="date_msg" data-direction="${direction}" class="mt-1 ${
               message.user !== newData.user ? "" : "ml-auto"
-            }  text-xs text-slate-400 dark:text-navy-300">
+            }  text-xs text-slate-400 dark:text-navy-300" data-time="${message.created_at}">
                       ${
                         message.status === 2
                           ? "(updated) " + time

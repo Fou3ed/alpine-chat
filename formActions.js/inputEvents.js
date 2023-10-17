@@ -77,7 +77,7 @@ export function sendTypingNotification(input) {
           );
           break;
         }
-        if (input.type === "number" && isNaN(Number(input.value))) {
+        if (input.type == "number" && isNaN(Number(input.value))) {
           isValid = false;
           showValidationError(
             input,
@@ -90,7 +90,7 @@ export function sendTypingNotification(input) {
           showValidationError(input, getTranslationValue("container.forms.date"));
           break;
         }
-        if (input.type === "country" && !isValidCountry(input.value)) {
+        if (input.type == "country" && !isValidCountry(input.value)) {
           isValid = false;
           showValidationError(
             input,
@@ -100,7 +100,7 @@ export function sendTypingNotification(input) {
         }
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   
-        if (input.type === "email" && !emailRegex.test(input.value)) {
+        if (input.type == "email" && !emailRegex.test(input.value)) {
           isValid = false;
           showValidationError(
             input,
@@ -109,7 +109,7 @@ export function sendTypingNotification(input) {
           break;
         }
   
-        if (input.type === "tel" && !PhoneNumberValidation) {
+        if (input.type == "tel" && !PhoneNumberValidation) {
           isValid = false;
           showValidationError(
             input,

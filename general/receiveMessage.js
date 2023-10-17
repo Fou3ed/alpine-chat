@@ -145,7 +145,7 @@ export async function receiveMessage(data) {
                 type = "textarea";
                 break;
             }
-            if (field?.field_type ===8) {
+            if (field?.field_type ==8) {
               const countryOptions = generateCountryOptions(
                 countries,
                 field?.field_value ?? userCountry
@@ -171,7 +171,7 @@ export async function receiveMessage(data) {
                             ${countryOptions}
                         </select>
                     </label>`;
-            } else if (field.field_type === 7) {
+            } else if (field?.field_type == 7) {
               return `
               <label class="relative">
               <span>${field.field_name}</span>
@@ -275,7 +275,8 @@ export async function receiveMessage(data) {
                                         >
                                             <span class="spinner hidden absolute inset-0 flex justify-center items-center">
                                             </span>
-                                            Save
+                                            ${myContent.button}
+
                                         </button>
                                     `
                                         : ""
