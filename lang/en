@@ -135,6 +135,13 @@
     },
     "date_format":{
                 "date_form":"MM/DD/YYYY "
+    },
+    "bloc_message":{
+        "title":"Form successfully submitted",
+        "text":"To start your private and confidential consultation, please select the type of contact below",
+        "relation_direct":"Direct contact" ,
+        "relation_manuel":"Choose an expert"
+
     }
 }
 

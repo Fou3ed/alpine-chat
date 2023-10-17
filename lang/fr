@@ -135,5 +135,12 @@
     },
     "date_format":{
                 "date_form":"JJ-MM-AAAA"
+    },
+    "bloc_message":{
+        "title":"Formulaire soumis avec succès",
+        "text":"Afin de démarrer votre consultation privée totalement confidentielle, veuillez choisir ci-dessous le type souhaité de mise en relation",
+        "relation_direct":"Mise en relation directe" ,
+        "relation_manuel":"Choisir un Expert"
+
     }
 }

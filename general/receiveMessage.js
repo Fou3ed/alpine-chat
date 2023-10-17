@@ -14,6 +14,7 @@ import { compareFields } from "../utils/compareFields.js";
 import { userCountry } from "../utils/getUserCountry.js";
 import { phoneList } from "../utils/getPhoneList.js";
 import { addLogs } from "../utils/addLogs.js";
+import { getTranslationValue } from "../utils/traduction.js";
 const conversationContainer = document.getElementById("conversation-container");
 
 export async function receiveMessage(data) {
@@ -300,14 +301,14 @@ export async function receiveMessage(data) {
                               <div class="ml-2 sm:ml-5">
                                   <div class="sm:mr-10">
                                       <div class="pt-2">
-                                          <p>Formulaire soumis avec succès
+                                          <p data-translation="bloc_message.title">${getTranslationValue("bloc_message.title")}
                                           </p>
-                                          <p>Afin de démarrer votre consultation privée totalement confidentielle, veuillez choisir ci-dessous le type souhaité de mise en relation</p>
+                                          <p data-translation="bloc_message.text">${getTranslationValue("bloc_message.text")}</p>
                                       </div>
                                       <div class="flex" style="width: 500px;">
                                           <div class="flex h-20 w-full items-center rounded-lg dark:bg-navy-500">
                                               <button id="AvailableAgent" class="btn  space-x-2 bg-primary font-medium text-white shadow-lg shadow-primary/50 hover:bg-warning-focus focus:bg-primary-focus active:bg-warning-focus/90" style="min-height: 50px;width: 225px;">
-                                                  <span>Mise en relation directe</span>
+                                                  <span data-translation="bloc_message.relation_direct">${getTranslationValue("bloc_message.relation_direct")}</span>
                                               </button>
                                           </div>
                                           <div class="mx-4 flex items-center space-y-3">
@@ -315,7 +316,7 @@ export async function receiveMessage(data) {
                                           </div>
                                           <div class="flex h-20 w-full items-center rounded-lg dark:bg-navy-500">
                                               <button id="selectAgent" class="btn space-x-2 bg-primary font-medium text-white shadow-lg shadow-primary/50 hover:bg-warning-focus focus:bg-primary-focus active:bg-warning-focus/90" style="min-height: 50px;width: 220px;">
-                                                  <span>Choisir un Expert</span>
+                                                  <span data-translation="bloc_message.relation_manuel">${getTranslationValue("bloc_message.relation_manuel")}</span>
                                               </button>
                                           </div>
                                       </div>
