@@ -32,6 +32,7 @@ export function displayAgents(agents) {
                 conversationId: conversationId,
                 userId: newData.user,
                 agentId: agent.user_id,
+                source:newData.contactId
               });
             },
             { once: true }

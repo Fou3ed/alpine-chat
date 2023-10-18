@@ -66,7 +66,6 @@ export async function getExperts() {
     const divsInsideSwiper = Array.from(
       swiperWrapper.querySelectorAll("div.swiper-slide")
     );
-    console.log("divsINSIDE swiper",divsInsideSwiper)
     if (divsInsideSwiper.length > 0) {
       const html = `<span class="text-xs+ font-medium uppercase" data-translation="left_side.experts_on">${getTranslationValue("left_side.experts_on")}</span>`;
       $("#expert-msg").empty().append(html);

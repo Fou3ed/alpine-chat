@@ -118,6 +118,8 @@ export function displayMessages(messages) {
                 accountId: newData.accountId,
                 conversationId: conversationId,
                 userId: newData.user,
+                source:newData.contactId
+
               });
             },
             { once: true }
@@ -138,7 +140,6 @@ export function displayMessages(messages) {
             myContent.fields.sort(compareFields);
             inputForms = myContent.fields.map((field) => {
               let type = "";
-              console.log("fields",field)
 
               switch (+field?.field_type) {
                 case 1:
@@ -267,7 +268,7 @@ export function displayMessages(messages) {
           <div class="mr-4 max-w-lg sm:mr-10">
                 <form name="form1" class="box" onsubmit="">
                     <div class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 ${
-                      newData.goccContactId || newData.goccLeadId ? "gocc" : ""
+                      newData.contactId || newData.leadId ? "gocc" : ""
                     } card-form" style="position: relative;">
                         <div class=" w-full max-w-xl p-4 sm:p-5">
                             <div class="mb-4">

@@ -14,7 +14,6 @@ export const getAgentPresentation = async (id, online) => {
           },
         }
       );
-      console.log("response",response)
       if (response?.status === 200) {
         const agentData = response.data.data[0];
         // Update skills

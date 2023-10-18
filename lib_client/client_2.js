@@ -45,6 +45,7 @@ import { getTotalBalance, updateUserBalance } from "../general/balance.js";
 import { onCheckConversation, selectAgent } from "../general/selectAgent.js";
 import { changeHeaderPicture } from "../conversationActions/changeHeaderPic.js";
 import { ableInputArea } from "../utils/messageInputArea.js";
+import { login } from "../general/login.js";
 export let role = ""
 
 export default class event {
@@ -233,12 +234,10 @@ export default class event {
    */
   reconnect = (data) => {
     this.socket.io.on("reconnect", () => {
-      console.log("socket reconnected", data)
     });
   }
   onReconnected = () => {
     this.socket.on("onReconnected", (data, error) => {
-      console.log("recon")
     })
   }
 
@@ -264,7 +263,6 @@ export default class event {
    */
   createConversation = (data) => {
     this.socket.emit('onConversationStart', data, error => {
-      console.log("onConversationStart", data)
     })
   }
 
@@ -529,7 +527,6 @@ const number = match ? match[1] : null;
   }
   onConversationMemberRequest = () => {
     this.socket.on("onConversationMemberRequest", (data, error) => {
-      console.log("onConversationMemberRequest", data)
     })
   }
 
@@ -1007,7 +1004,6 @@ const number = match ? match[1] : null;
   }
   onConversationTransferAccept = async () => {
     await this.socket.on('onConversationTransferAccept', (conversationId, error) => {
-      console.log("conversation Transfer", conversationId)
       this.socket.emit('onConversationTransferAccepted', conversationId)
     })
   }
@@ -1073,8 +1069,9 @@ const number = match ? match[1] : null;
     })
   }
   onUserLogin = (data) => {
-    this.socket.on('onUserLogin', (data, error) => {
+    this.socket.on('login-user', (data, error) => {
 
+      login(data)
     })
   }
 

@@ -80,7 +80,6 @@ export function getTranslationValue(key) {
 }
 
 export function traduc() {
-  
 
   document.querySelectorAll("[data-translation]").forEach((element) => {
     element.textContent = getTranslationValue(element.dataset.translation);

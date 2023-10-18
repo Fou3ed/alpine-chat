@@ -9,8 +9,8 @@ export async function guestCreated(data) {
       contact: data.contact,
       accountId: data.accountId,
       status: 0,
-      ...(data.goccContactId && { goccContactId: data.goccContactId }),
-      ...(data.goccLeadId && { goccLeadId: data.goccLeadId }),
+      ...(data?.contactId && { contactId: data.contactId,source:"gocc" }),
+      ...(data.leadId && { leadId: data.leadId ,source:"gocc" }),
     };
 
     updateNewData(newUser)

@@ -113,18 +113,35 @@ $(document).ready(async function () {
   let params = Object.fromEntries(
     new URLSearchParams(window.location.search).entries()
   );
+  console.log("params",params)
   showSpinner();
   getPlans();
 
   socketLib.connect(() => {
-    console.log("params",params)
+    if(params.action=="login"){
+      socketLib.socket.emit(
+        "login",
+        {
+          language:lan,
+          browser: navigator.userAgent,
+          platform: navigator.platform,
+          accountId: params.account_id,
+          username:params.username,
+          profile_id:params.profile_id,
+          contact_id:params.contact_id,
+          action:params.action
+        },
+        (error) => {}
+      );
+      return;
+    }
     if (
       !newData ||
       (params?.source == "gocc" &&
         (params?.contact || params?.lead) &&
         (params?.contact
-          ? params?.contact != newData.goccContactId
-          : params?.lead != newData.goccLeadId))
+          ? params?.contact != newData.contactId
+          : params?.lead != newData.leadId))
     ) {
       socketLib.socket.emit(
         "createGuest",
@@ -134,9 +151,9 @@ $(document).ready(async function () {
           platform: navigator.platform,
           accountId: accountId,
           ...(params.contact
-            ? { source: "gocc", gocc_contact_id: params.contact }
+            ? { source: "gocc", contact_id: params.contact }
             : {}),
-          ...(params.lead ? { source: "gocc", gocc_lead_id: params.lead } : {}),
+          ...(params.lead ? { source: "gocc", lead_id: params.lead } : {}),
         },
         (error) => {}
       );
@@ -275,6 +292,8 @@ $(document).ready(async function () {
       //add log
     });
   }
+
+
     // Get the current URL
 
 let url = new URL(window.location.href);
@@ -332,6 +351,7 @@ window.history.replaceState({}, document.title, newURL);
   socketLib.onCheckConversation();
   socketLib.saleAdded();
   socketLib.onConnectedUserError()
+  socketLib.onUserLogin()
   document
     .querySelector("emoji-picker")
     .addEventListener("emoji-click", (event) => {

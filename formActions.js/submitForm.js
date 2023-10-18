@@ -95,7 +95,6 @@ export function submitFormStatus(status, text_capture) {
       }
   
       formContent.style.opacity = 0.7;
-          console.log("text_capture",text_capture)
       // Update the status message for success
       statusMessage.textContent = "";
       statusMessage.innerText = text_capture;
