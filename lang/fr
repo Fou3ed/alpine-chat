@@ -54,7 +54,7 @@
             "required" : "Ce champ est requis.",
             "valid" : "Veuillez remplir correctement les champs.",
             "phone" : "Veuillez entrer un numéro valide.",
-            "date" : "Veuillez entrer une date valide (MM-JJ-AAAA).",
+            "date" : "Veuillez entrer une date valide (JJ-MM-AAAA).",
             "email" : "Veuillez entrer une adresse e-mail valide.",
             "error" : "Une erreur s'est produite lors de la sauvegarde des données du formulaire. Réessayez."
 
@@ -142,5 +142,11 @@
         "relation_direct":"Mise en relation directe" ,
         "relation_manuel":"Choisir un Expert"
 
-    }
+    }, 
+    "chat_plans":{
+        "title":"plans de discussion" ,
+        "description" :"Si vous souhaitez augmenter votre solde, achetez votre pack de messages approprié.",
+        "button":"commencer à discuter"
+
+     }
 }

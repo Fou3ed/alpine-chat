@@ -1,5 +1,6 @@
 import { API_KEY, SQL_API } from "../env.js";
 import { conversationId, newData, socketLib } from "../main.js";
+import { getTranslationValue } from "../utils/traduction.js";
 
 export async function getPlans() {
     try {
@@ -10,6 +11,7 @@ export async function getPlans() {
       });
       if (response) {
         response.data.data.forEach((plan) => {
+          console.log("plan",plan)
           document.getElementById("plans").insertAdjacentHTML(
             "afterbegin",
             `
@@ -40,7 +42,7 @@ export async function getPlans() {
                         <li class='pricing-feature'>${plan.billing_volume} Messages</li>
                       </ul>
                       <button id="startChatButton" class='plan-btn pricing-action' data-plan="${plan.id}" name="${plan.name}">
-                      <span class="button-text">Start chatting</span>
+                      <span class="button-text" data-translation="chat_plans.button">${getTranslationValue("chat_plans.button")}</span>
                       <div class="spinner-container" style="display: none;">
                         <div class="d-flex align-items-center" style="height: 20px;"><span class="loader2"></span></div>
                       </div>
@@ -72,7 +74,7 @@ export async function getPlans() {
               sale_status: 0,
             });
             setTimeout(() => {
-              this.textContent = 'Start chatting';
+              this.textContent = getTranslationValue("chat_plans.button");
             }, 2000)
           });
     

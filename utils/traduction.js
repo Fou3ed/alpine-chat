@@ -1,3 +1,4 @@
+import { Countries } from "../countries.js";
 import { loadNewData } from "../main.js";
 import { getTime } from "./getTime.js";
 
@@ -90,6 +91,10 @@ export function traduc() {
   document.querySelector("#search-chat").placeholder = getTranslationValue(
     "left_side.tab_1.search"
   );
+  document.querySelectorAll("[data-country]" ).forEach((element) => {
+    element.dispatchEvent(new Event('change'))
+
+  });
 
 let conversationTool = document.getElementById("cnvSideBarTool");
 let buyTool = document.getElementById("buyMessagesTool");

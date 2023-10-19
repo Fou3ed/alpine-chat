@@ -4,7 +4,7 @@ export function generateCountryOptions(countries, value) {
         ([countryCode, country]) =>
           `<option value="${countryCode}" ${
             countryCode === value ? "selected" : ""
-          }>${country.name}</option>`
+          }>${country}</option>`
       )
       .join("");
   }

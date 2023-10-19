@@ -1,13 +1,12 @@
-import {  updateNotifyNumber } from "../main.js";
+import {  notifyNumber, updateNotifyNumber } from "../main.js";
 
 export function changeTitle(number) {
-    if (number === 0) {
-      // remove the notification number
-      document.title = document.title.replace(/^\(\d+\)\s/, "");
-      updateNotifyNumber(0)
-      // notifyNumber = 0;
-    } else if (number === 1) {
-      document.title = `(${number}) ` + document.title;
-    } else document.title = document.title.replace(/^\(\d+\)\s/, `(${number}) `);
+  if (number === 0) {
+    // Remove the notification number
+    document.title = document.title.replace(/^\(\d+\)\s/, "");
+    updateNotifyNumber(0);
+  } else {
+    // Update the notification number in the title
+    document.title = `(${number}) ` + document.title.replace(/^\(\d+\)\s/, "");
   }
-  
+}

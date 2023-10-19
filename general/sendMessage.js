@@ -53,7 +53,7 @@ export async function sentMessage(data) {
     } else {
       let userLog = "";
       const convMessage = isNotNewConversation.querySelector("#last-message");
-      if (data.type === "log") {
+      if (data.type == "log") {
         const log = JSON.parse(data.content);
         if (log.action === "purchase completed") {
           switch (log.action) {

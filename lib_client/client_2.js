@@ -198,6 +198,7 @@ export default class event {
             connectUsers.push(user)
           }
         }
+        
         userConnection(user)
     })
   }

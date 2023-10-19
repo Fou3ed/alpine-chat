@@ -28,6 +28,8 @@ import { notifyMe } from "./utils/notificationSound.js";
 import { showEmoji } from "./conversationActions/showEmoji.js";
 import { getPlans } from "./general/getPlans.js";
 import { showSpinner } from "./components/spinner.js";
+import { loadChatInformation } from "./utils/appInfo.js";
+import { changeTitle } from "./utils/changeTitle.js";
 
 // Components
 // The message input is where the user types their message
@@ -39,7 +41,7 @@ export const conversationHeaderStatus = document
   .parentNode.querySelector(".text-xs");
 const modal = document.getElementById("ModalPlan");
 
-export const { data: countries } = await axios.get("countries.json");
+  
 
 window.connected = () => {};
 
@@ -52,6 +54,7 @@ export let notifyNumber = 0;
 /**state management  */
 export function updateConversationId(conversation){
   conversationId=conversation
+
 }
 export function updateConnectUsers(users){
   connectUsers=users
@@ -64,11 +67,13 @@ export function updateTotalBalance(newBalance){
   totalBalance=newBalance
 
 }
-
 export function updateNotifyNumber(number){
-  notifyNumber=notifyNumber += number
-
+  if (number !== 0) {
+    notifyNumber = notifyNumber + number;
+  }
 }
+
+
 export function updatePhNValidation (bool){
   PhoneNumberValidation =bool
 }
@@ -109,7 +114,7 @@ export const displayedUsers = new Set();
 
 
 $(document).ready(async function () {
-  
+  loadChatInformation()
   let params = Object.fromEntries(
     new URLSearchParams(window.location.search).entries()
   );
@@ -196,6 +201,23 @@ $(document).ready(async function () {
   
     checkConversationId();
   }
+
+
+   // Function to toggle the visibility of the profileInfo element
+  function toggleProfileInfo() {
+    const profileInfo = document.getElementById("profileInfo");
+    if (window.innerWidth > 550) {
+      profileInfo.style.display = "block";
+    } else {
+      profileInfo.style.display = "none";
+    }
+  }
+
+  // Attach an event listener to the window's resize event
+  window.addEventListener("resize", toggleProfileInfo);
+
+  // Initial call to set the element's visibility based on the initial window width
+  toggleProfileInfo();
   
   if(params.response && window.opener){
     window.opener.location=window.location
@@ -292,7 +314,14 @@ $(document).ready(async function () {
       //add log
     });
   }
+  $(document).on('visibilitychange', function() {
+    if (document.visibilityState === "visible") {
+      changeTitle(0);
+    }
+  });
+  
 
+  
 
     // Get the current URL
 

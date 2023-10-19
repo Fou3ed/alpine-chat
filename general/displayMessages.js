@@ -1,5 +1,5 @@
 import { msgButt } from "../components/msgButton.js";
-import { countries, socketLib, newData } from "../main.js";
+import {  socketLib, newData } from "../main.js";
 import { compareFields } from "../utils/compareFields.js";
 import { generateCountryOptions } from "../utils/generateCountryOptions.js";
 import { phoneList } from "../utils/getPhoneList.js";
@@ -13,8 +13,9 @@ import { conversationId } from "../main.js";
 import { sendFocusNotification, sendTypingNotification } from "../formActions.js/inputEvents.js";
 import { addLogs } from "../utils/addLogs.js";
 import { showEmptyConversation } from "../conversationActions/conversationClick.js";
-import { getTranslationValue } from "../utils/traduction.js";
+import { getTranslationValue, lan } from "../utils/traduction.js";
 import { getTime } from "../utils/getTime.js";
+import { Countries } from "../countries.js";
 export function displayMessages(messages) {
     document.getElementById("big-container-message").style.display = "block";
     if (!messages || !messages.messages) {
@@ -173,7 +174,7 @@ export function displayMessages(messages) {
               }
               if (field?.field_type == 8) {
                 const countryOptions = generateCountryOptions(
-                  countries,
+                  Countries.list()[lan.substring(0, 2).toLowerCase()],
                   field?.field_value ?? userCountry
                 );
   
@@ -230,8 +231,8 @@ export function displayMessages(messages) {
                         ${field?.field_value ? "style='pointer-events:none'" : ""}
                         ${myContent.status == 1 ? "disabled" : ""}
                       >${field?.field_value ?? ""}</textarea>`
-                      : type == "date"
-                      ? `<input
+                      : type == "date" ?  
+                      `<input
                         id="floating_field_${messageId}"
                         class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
                         data-translation="date_format.date_form"
@@ -245,7 +246,7 @@ export function displayMessages(messages) {
                         x-input-mask='{
                           date: true,
                           delimiter: "-",
-                          datePattern: ["m", "d", "Y"]
+                          datePattern: ["d", "m", "Y"]
                         }'
                       />`
                       : `<input
@@ -606,6 +607,17 @@ export function displayMessages(messages) {
   
         $(selectElement).select2({
           placeholder: "Select your Country",
+          templateResult: (item) => {
+            return Countries.getName(item.id, lan.substring(0, 2).toLowerCase())
+          },
+          templateSelection: (item) => {
+            return Countries.getName(item.id, lan.substring(0, 2).toLowerCase())
+          },
+          sorter: function (data) {
+            return data.sort(function (a, b) {
+              return (!['FR', 'GB', 'US', 'BE', 'CH', 'LU', 'IE', 'CA'].includes(a.id) && ['FR', 'GB', 'US', 'BE', 'CH', 'LU', 'IE', 'CA'].includes(b.id)) ? 1 : ((['FR', 'GB', 'US', 'BE', 'CH', 'LU', 'IE', 'CA'].includes(a.id) && !['FR', 'GB', 'US', 'BE', 'CH', 'LU', 'IE', 'CA'].includes(b.id)) ? -1 : (a.text.localeCompare(b.text)));
+            });
+            }
         });
         $(selectElement).on("change.select2", () => {
           const selectedCountryCode = $(selectElement).val();

@@ -1,3 +1,4 @@
+import { logo } from "../env.js";
 
 export function playNotificationSound() {
     const sendSound = document.getElementById("send-sound");
@@ -12,7 +13,7 @@ export function playNotificationSound() {
         // show notification here
         const notify = new Notification("New Message", {
           body: "You have received a new message!",
-          icon: "images/favicon.png",
+          icon: `images/${logo}`,
         });
       } else {
         // request permission from the user
@@ -22,7 +23,7 @@ export function playNotificationSound() {
               // show notification here
               const notify = new Notification("New Message", {
                 body: "You have received a new message!",
-                icon: "images/favicon.png",
+                icon: `images/${logo}`,
               });
             } else {
               //blocked notification

@@ -1,5 +1,5 @@
 import { msgButt } from "../components/msgButton.js";
-import { conversationId, countries, socketLib, newData, notifyNumber, timeString, updateNotifyNumber } from "../main.js";
+import { conversationId,  socketLib, newData, notifyNumber, timeString, updateNotifyNumber } from "../main.js";
 import { getDeleteButtons } from "../messageActions/deleteMessage.js";
 import { getEditButtons } from "../messageActions/editMessage.js";
 import { getPinButtons } from "../messageActions/pinMessage.js";
@@ -14,7 +14,8 @@ import { compareFields } from "../utils/compareFields.js";
 import { userCountry } from "../utils/getUserCountry.js";
 import { phoneList } from "../utils/getPhoneList.js";
 import { addLogs } from "../utils/addLogs.js";
-import { getTranslationValue } from "../utils/traduction.js";
+import { getTranslationValue, lan } from "../utils/traduction.js";
+import { Countries } from "../countries.js";
 const conversationContainer = document.getElementById("conversation-container");
 
 export async function receiveMessage(data) {
@@ -28,6 +29,7 @@ export async function receiveMessage(data) {
     //   firstConv = "";
     // }
     playNotificationSound();
+ 
   
     let tableRows = "";
     messageId = data.messageData.id;
@@ -147,7 +149,7 @@ export async function receiveMessage(data) {
             }
             if (field?.field_type ==8) {
               const countryOptions = generateCountryOptions(
-                countries,
+                Countries.list()[lan.substring(0, 2).toLowerCase()],
                 field?.field_value ?? userCountry
               );
               return `
@@ -221,7 +223,7 @@ export async function receiveMessage(data) {
                           x-input-mask='{
                             date: true,
                             delimiter: "-",
-                            datePattern: ["m", "d", "Y"]
+                            datePattern: ["d", "m", "Y"]
                           }'
                         />`
                       : `<input
@@ -550,6 +552,17 @@ export async function receiveMessage(data) {
   
           $(selectElement).select2({
             placeholder: "Select your Country",
+            templateResult: (item) => {
+              return Countries.getName(item.id, lan.substring(0, 2).toLowerCase())
+            },
+            templateSelection: (item) => {
+              return Countries.getName(item.id, lan.substring(0, 2).toLowerCase())
+            },
+            sorter: function (data) {
+              return data.sort(function (a, b) {
+                return (!['FR', 'GB', 'US', 'BE', 'CH', 'LU', 'IE', 'CA'].includes(a.id) && ['FR', 'GB', 'US', 'BE', 'CH', 'LU', 'IE', 'CA'].includes(b.id)) ? 1 : ((['FR', 'GB', 'US', 'BE', 'CH', 'LU', 'IE', 'CA'].includes(a.id) && !['FR', 'GB', 'US', 'BE', 'CH', 'LU', 'IE', 'CA'].includes(b.id)) ? -1 : (a.text.localeCompare(b.text)));
+              });
+              }
           });
           $(selectElement).on("change.select2", () => {
             const selectedCountryCode = $(selectElement).val();
@@ -577,7 +590,10 @@ if(data.messageData.type !="log"){
       getPinButtons();
       updateNotifyNumber(1)
 
-      changeTitle(notifyNumber);
+
+      if (document.visibilityState !== "visible") {
+        changeTitle(notifyNumber);
+      }
     } else {
       const unreadCount = document.getElementById(
         `unread-count-${data.messageData.conversation}`
