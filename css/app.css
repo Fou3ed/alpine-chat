@@ -982,3 +982,47 @@ padding: 5em 0 8.885em 0;
 }
 
 
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.form-wrapper {
+  max-width: 100%;
+  padding: 10px;
+}
+
+
+@media (max-width: 768px) {
+  h3 {
+    font-size: 1.5rem;
+  }
+  .text-2xl {
+    font-size: 1.2rem;
+  }
+}
+
+input, select, textarea {
+  width: 100%;
+}
+
+
+@media (max-width: 639px) {
+  #conversation-user-container {
+    order: 1;
+  }
+  #balance-container {
+    order: 3;
+  }
+  #profileInfo {
+    order: 2;
+  }
+
+  #header-container {
+    flex-direction: unset;
+    flex-wrap: wrap;
+  }
+
+}

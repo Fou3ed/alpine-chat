@@ -1,13 +1,11 @@
-import { applicationName,logo } from "../env.js";
+import { applicationName,favicon,logo } from "../env.js";
 
 export function loadChatInformation() {
-    // Update the title
     document.title = `${applicationName}`;
   
-    // Update the favicon (assuming you have a favicon link in the HTML)
     const linkElement = document.getElementById('iconLink');
     if (linkElement) {
-      linkElement.href = `images/${logo}`;
+      linkElement.href = `images/${favicon}`;
       linkElement.type = 'image/png';
     }
 

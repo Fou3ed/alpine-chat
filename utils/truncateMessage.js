@@ -4,3 +4,9 @@ export function truncateMessage(message, maxLength) {
     }
     return message;
   }
+
+  export function insertLineBreaks(text) {
+    const chunkSize = 30; 
+    const chunks = text.match(new RegExp(`.{1,${chunkSize}}`, 'g'));
+    return chunks.join('<br/>');
+  }

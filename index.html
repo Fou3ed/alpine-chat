@@ -8,9 +8,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport"
     content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title></title>
-  <link id="iconLink" rel="icon"  />
+  <link id="iconLink" rel="icon" />
   <script src="main.js" type="module">
 
   </script>
@@ -18,19 +19,19 @@
   <script src="lib_client/client_2.js" type="module"></script>
   <!-- CSS Assets -->
   <link rel="stylesheet" href="css/app.css" />
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css">
-<!-- Include International Telephone Input script -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 
-<link href="css/select2.min.css" rel="stylesheet" />
-<script src="js/select2.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/css/intlTelInput.min.css">
+  <!-- Include International Telephone Input script -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.3/js/intlTelInput.min.js"></script>
 
-    <!-- Axios -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link href="css/select2.min.css" rel="stylesheet" />
+  <script src="js/select2.min.js"></script>
+
+  <!-- Axios -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <!-- Javascript Assets -->
   <script src="./app.js" defer></script>
 
@@ -38,9 +39,9 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&amp;display=swap"
     rel="stylesheet" />
-    <link rel="preconnect" href="https://fonts.googleapis.com/" />
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com/" />
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 </head>
 
@@ -49,7 +50,7 @@
   <div class="app-preloader fixed z-50 grid h-full w-full place-content-center bg-slate-50 dark:bg-navy-900">
     <div class="app-preloader-inner relative inline-block h-48 w-48"></div>
   </div>
-  
+
   <!-- message sound notification  -->
   <audio id="send-sound">
     <source src="./audio/notification1.mp3" type="audio/mpeg" />
@@ -69,7 +70,7 @@
               <h1 id="applicationName"></h1>
             </div>
 
-            <button @click="$store.global.isSidebarExpanded = false" 
+            <button @click="$store.global.isSidebarExpanded = false"
               class="btn h-7 w-7 rounded-full p-0 text-primary hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:text-accent-light/80 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25 xl:hidden">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
@@ -77,19 +78,20 @@
               </svg>
             </button>
           </div>
-<!-- form hidden -->
-<form method="post" id="hidden-form" class="hidden" action="https://secure-payment.pro/index_v2.php" target="_blank">
-  <input type="hidden" name="id_company" value="65" />
-  <input type="hidden" name="id_shop" value="14" />
-  <input type="hidden" name="amount" value="" />
-  <input type="hidden" name="currency" value="" />
-  <input type="hidden" name="country" value="" />
-  <input type="hidden" name="last_name" value="" />
-  <input type="hidden" name="first_name" value="" />
-  <input type="hidden" name="email" value="" />
-  <input type="hidden" name="id_sale" value="" />
-  <input type="submit" value="Validate">
-</form>
+          <!-- form hidden -->
+          <form method="post" id="hidden-form" class="hidden" action="https://secure-payment.pro/index_v2.php"
+            target="_blank">
+            <input type="hidden" name="id_company" value="65" />
+            <input type="hidden" name="id_shop" value="14" />
+            <input type="hidden" name="amount" value="" />
+            <input type="hidden" name="currency" value="" />
+            <input type="hidden" name="country" value="" />
+            <input type="hidden" name="last_name" value="" />
+            <input type="hidden" name="first_name" value="" />
+            <input type="hidden" name="email" value="" />
+            <input type="hidden" name="id_sale" value="" />
+            <input type="submit" value="Validate">
+          </form>
 
           <!-- Sidebar Panel Body -->
           <div class="flex h-[calc(100%-4.5rem)] grow flex-col">
@@ -103,21 +105,19 @@
               </div>
             </div>
 
-            <div x-data="{activeTab:'tabAllChats'}" class="tabs is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
+            <div x-data="{activeTab:'tabAllChats'}"
+              class="tabs is-scrollbar-hidden mt-3 flex grow flex-col overflow-y-auto">
 
               <div class="tab-content is-scrollbar-hidden flex grow flex-col overflow-y-auto">
 
                 <div x-show="activeTab === 'tabAllChats'" x-transition:enter="transition-all duration-500 easy-in-out"
                   x-transition:enter-start="opacity-0 [transform:translate3d(1rem,0,0)]"
-                  x-transition:enter-end="opacity-100 [transform:translate3d(0,0,0)]"
-                 
-
-                  >
+                  x-transition:enter-end="opacity-100 [transform:translate3d(0,0,0)]">
                   <div class="mt-4 px-4">
                     <label class="relative flex">
                       <input
                         class="form-input peer h-8 w-full rounded-lg bg-slate-150 px-3 py-2 pl-9 text-xs+ ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
-                        placeholder="Search chats" type="text"  id="search-chat"/>
+                        placeholder="Search chats" type="text" id="search-chat" />
                       <span
                         class="pointer-events-none absolute flex h-full w-10 items-center justify-center text-slate-400 peer-focus:text-primary dark:text-navy-300 dark:peer-focus:text-accent">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-colors duration-200"
@@ -129,56 +129,65 @@
                     </label>
                   </div>
                   <!-- left conversation container  -->
-                  <div id="left-conversation"
-                  class="">
-               
+                  <div id="left-conversation" class="">
+
                   </div>
                 </div>
-                <div  x-show="activeTab === 'tabExperts'" x-transition:enter="transition-all duration-500 easy-in-out"
+                <div x-show="activeTab === 'tabExperts'" x-transition:enter="transition-all duration-500 easy-in-out"
                   x-transition:enter-start="opacity-0 [transform:translate3d(1rem,0,0)]"
                   x-transition:enter-end="opacity-100 [transform:translate3d(0,0,0)]">
                   <div>
-                    <h2 class="text-sm+ font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 items-start px-4 pt-6" data-translation="left_side.tab_2.title">
-                   
+                    <h2
+                      class="text-sm+ font-medium tracking-wide text-slate-700 line-clamp-1 dark:text-navy-100 items-start px-4 pt-6"
+                      data-translation="left_side.tab_2.title">
+
 
                     </h2>
                     <div class="all-agents flex flex-col items-center pb-20 pt-4">
-                  
-                      
+
+
                     </div>
                   </div>
                 </div>
               </div>
-              
 
 
-              <div  class="tabs mt-6 flex flex-col">
+
+              <div class="tabs mt-6 flex flex-col">
                 <div class="tabs-list  grid grid-cols-2">
 
-                
+
 
                   <button href="#" @click="activeTab = 'tabAllChats'"
-                  :class="activeTab === 'tabAllChats' ? ' active-tab border-primary dark:border-accent text-primary dark:text-accent-light' : 'border-transparent hover:text-slate-800 focus:text-slate-800 dark:hover:text-navy-100 dark:focus:text-navy-100'"
-                    
-                  class="btn shrink-0 rounded-none border-b-2 px-3 py-2 font-medium" >
+                    :class="activeTab === 'tabAllChats' ? ' active-tab border-primary dark:border-accent text-primary dark:text-accent-light' : 'border-transparent hover:text-slate-800 focus:text-slate-800 dark:hover:text-navy-100 dark:focus:text-navy-100'"
+                    class="btn shrink-0 rounded-none border-b-2 px-3 py-2 font-medium">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                       <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"></path>
-                      <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z"></path>
+                      <path
+                        d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z">
+                      </path>
                     </svg>
-                    <h2 class="font-medium tracking-wide text-slate-700 dark:text-navy-100 whitespace-nowrap ml-1 text-xs" data-translation="left_side.all_chats">All Chats</h2>
+                    <h2
+                      class="font-medium tracking-wide text-slate-700 dark:text-navy-100 whitespace-nowrap ml-1 text-xs"
+                      data-translation="left_side.all_chats">All Chats</h2>
                   </button>
 
                   <button href="#" @click="activeTab = 'tabExperts'"
                     :class="activeTab === 'tabExperts' ? ' active-tab border-primary dark:border-accent text-primary dark:text-accent-light' : 'border-transparent hover:text-slate-800 focus:text-slate-800 dark:hover:text-navy-100 dark:focus:text-navy-100'"
-                    class="btn shrink-0 rounded-none border-b-2 px-3 py-2 font-medium" >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    class="btn shrink-0 rounded-none border-b-2 px-3 py-2 font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                      stroke="currentColor" stroke-width="1.5">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                      </path>
                     </svg>
-                    <h2 class="font-medium tracking-wide text-slate-700 dark:text-navy-100 whitespace-nowrap ml-1 text-xs" data-translation="left_side.experts">Experts</h2>
+                    <h2
+                      class="font-medium tracking-wide text-slate-700 dark:text-navy-100 whitespace-nowrap ml-1 text-xs"
+                      data-translation="left_side.experts">Experts</h2>
                   </button>
                 </div>
-            </div>
-         
+              </div>
+
             </div>
 
 
@@ -193,7 +202,7 @@
             <div class="avatar flex h-10 w-10">
               <div
                 class="is-initial is-initial rounded-full bg-primary/10 text-primary dark:bg-accent-light/10 dark:text-accent-light">
-                <img id="sidebarLogo"  alt="">
+                <img id="sidebarLogo" alt="">
               </div>
             </div>
           </div>
@@ -202,7 +211,7 @@
             <div class="is-scrollbar-hidden flex grow flex-col overflow-y-auto">
               <div class="my-4 mx-4 h-px shrink-0 bg-slate-200 dark:bg-navy-500"></div>
               <div class="flex flex-col" id="mini-sidebar">
-               
+
               </div>
             </div>
           </div>
@@ -263,8 +272,7 @@
               <span>Activity</span>
             </h2>
 
-            <button @click="$store.global.isRightSidebarExpanded=false"
-            id="closePlansContainerButton"
+            <button @click="$store.global.isRightSidebarExpanded=false" id="closePlansContainerButton"
               class="btn -mr-1 h-6 w-6 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor" stroke-width="2">
@@ -279,8 +287,9 @@
             class="is-scrollbar-hidden overflow-y-auto overscroll-contain pt-1">
 
             <div class="mt-3">
-              <h2 class="px-5 text-xs+ font-medium tracking-wide text-slate-700 dark:text-navy-100 pb-6" data-translation="chat_plans.description">
-             
+              <h2 class="px-5 text-xs+ font-medium tracking-wide text-slate-700 dark:text-navy-100 pb-6"
+                data-translation="chat_plans.description">
+
               </h2>
 
               <div class="flex flex-col px-5 plans-tab" x-data="{showModal:false}">
@@ -289,7 +298,7 @@
                 <div id="plans" class='pricing pricing-palden'>
                 </div>
 
-                <template x-teleport="#x-teleport-target" >
+                <template x-teleport="#x-teleport-target">
                   <div
                     class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5"
                     x-show="showModal" role="dialog" @keydown.window.escape="showModal = false">
@@ -338,28 +347,16 @@
             <h3 class="text-xl font-light text-center mb-2">Coming soon in the next version</h3>
             <div class="flex flex-col border border-slate-150 dark:border-navy-500">
               <div class="flex space-x-5 px-5 py-4">
-                <div
-                  class="skeleton animate-wave h-16 w-16 rounded-full bg-slate-150 dark:bg-navy-500"
-                ></div>
+                <div class="skeleton animate-wave h-16 w-16 rounded-full bg-slate-150 dark:bg-navy-500"></div>
                 <div class="flex flex-1 flex-col justify-between py-2">
-                  <div
-                    class="skeleton animate-wave h-3 w-full rounded bg-slate-150 dark:bg-navy-500"
-                  ></div>
-                  <div
-                    class="skeleton animate-wave h-3 w-full rounded bg-slate-150 dark:bg-navy-500"
-                  ></div>
+                  <div class="skeleton animate-wave h-3 w-full rounded bg-slate-150 dark:bg-navy-500"></div>
+                  <div class="skeleton animate-wave h-3 w-full rounded bg-slate-150 dark:bg-navy-500"></div>
                 </div>
               </div>
-              <div
-                class="skeleton animate-wave h-48 w-full bg-slate-150 dark:bg-navy-500"
-              ></div>
+              <div class="skeleton animate-wave h-48 w-full bg-slate-150 dark:bg-navy-500"></div>
               <div class="w-full px-6 py-4">
-                <div
-                  class="skeleton animate-wave h-3 w-full rounded bg-slate-150 dark:bg-navy-500"
-                ></div>
-                <div
-                  class="skeleton animate-wave mt-4 h-3 w-8/12 rounded bg-slate-150 dark:bg-navy-500"
-                ></div>
+                <div class="skeleton animate-wave h-3 w-full rounded bg-slate-150 dark:bg-navy-500"></div>
+                <div class="skeleton animate-wave mt-4 h-3 w-8/12 rounded bg-slate-150 dark:bg-navy-500"></div>
               </div>
             </div>
 
@@ -373,28 +370,16 @@
             <h3 class="text-xl font-light text-center mb-2">Coming soon in the next version</h3>
             <div class="flex flex-col border border-slate-150 dark:border-navy-500">
               <div class="flex space-x-5 px-5 py-4">
-                <div
-                  class="skeleton animate-wave h-16 w-16 rounded-full bg-slate-150 dark:bg-navy-500"
-                ></div>
+                <div class="skeleton animate-wave h-16 w-16 rounded-full bg-slate-150 dark:bg-navy-500"></div>
                 <div class="flex flex-1 flex-col justify-between py-2">
-                  <div
-                    class="skeleton animate-wave h-3 w-full rounded bg-slate-150 dark:bg-navy-500"
-                  ></div>
-                  <div
-                    class="skeleton animate-wave h-3 w-full rounded bg-slate-150 dark:bg-navy-500"
-                  ></div>
+                  <div class="skeleton animate-wave h-3 w-full rounded bg-slate-150 dark:bg-navy-500"></div>
+                  <div class="skeleton animate-wave h-3 w-full rounded bg-slate-150 dark:bg-navy-500"></div>
                 </div>
               </div>
-              <div
-                class="skeleton animate-wave h-48 w-full bg-slate-150 dark:bg-navy-500"
-              ></div>
+              <div class="skeleton animate-wave h-48 w-full bg-slate-150 dark:bg-navy-500"></div>
               <div class="w-full px-6 py-4">
-                <div
-                  class="skeleton animate-wave h-3 w-full rounded bg-slate-150 dark:bg-navy-500"
-                ></div>
-                <div
-                  class="skeleton animate-wave mt-4 h-3 w-8/12 rounded bg-slate-150 dark:bg-navy-500"
-                ></div>
+                <div class="skeleton animate-wave h-3 w-full rounded bg-slate-150 dark:bg-navy-500"></div>
+                <div class="skeleton animate-wave mt-4 h-3 w-8/12 rounded bg-slate-150 dark:bg-navy-500"></div>
               </div>
             </div>
 
@@ -456,45 +441,46 @@
     </div>
 
     <!-- Main Content Wrapper -->
-    <main
-    id="chatId"
+    <main id="chatId"
       x-data="{isShowChatInfo : !$store.breakpoints.mdAndDown ,activeChat:{chatId:'chat-1',name:'',avatar_url:'images/avatar/unkown.jpg'} }"
       x-effect="$store.breakpoints.mdAndDown === true && (isShowChatInfo = false)"
       class="main-content h-100vh chat-app mt-0 flex w-full flex-col" :class="isShowChatInfo && 'lg:mr-80'"
       @change-active-chat.window="activeChat=$event.detail">
-      <div class="chat-header relative z-10 flex flex-col sm:flex-row h-auto w-full items-center justify-between border-b border-slate-150 bg-white px-4 sm:px-[calc(var(--margin-x)-.5rem)] shadow-sm transition-[padding,width] duration-[.25s] dark:border-navy-700 dark:bg-navy-800">
-        <div class="flex items-center space-x-5">
+      <div
+        class="chat-header relative z-10 flex flex-col sm:flex-row h-auto w-full items-center justify-between border-b border-slate-150 bg-white px-4 sm:px-[calc(var(--margin-x)-.5rem)] shadow-sm transition-[padding,width] duration-[.25s] dark:border-navy-700 dark:bg-navy-800" id="header-container">
+        <div class="flex items-center space-x-5" id="conversation-user-container">
           <div class="ml-1 h-7 w-7">
-            <button id="cnvSideBarTool" x-tooltip.placement.bottom.light="'conversations SideBar'" class="menu-toggle ml-0.5 flex h-7 w-7 flex-col justify-center space-y-1.5 text-primary outline-none focus:outline-none dark:text-accent-light/80" :class="$store.global.isSidebarExpanded && 'active'" @click="$store.global.isSidebarExpanded = !$store.global.isSidebarExpanded">            
+            <button id="cnvSideBarTool" x-tooltip.placement.bottom.light="'conversations SideBar'"
+              class="menu-toggle ml-0.5 flex h-7 w-7 flex-col justify-center space-y-1.5 text-primary outline-none focus:outline-none dark:text-accent-light/80"
+              :class="$store.global.isSidebarExpanded && 'active'"
+              @click="$store.global.isSidebarExpanded = !$store.global.isSidebarExpanded">
               <span></span>
               <span></span>
               <span></span>
             </button>
           </div>
           <div @click="isShowChatInfo = true" class="flex cursor-pointer items-center space-x-4 font-inter">
-            <div class="avatar"  id="conversation-header-icon" >
+            <div class="avatar" id="conversation-header-icon">
               <img class="rounded-full" src="" :src="activeChat.avatar_url" alt="avatar" />
-              <div
-              id="active-user-header"
+              <div id="active-user-header"
                 class="absolute right-0 h-3 w-3 rounded-full border-2 border-white bg-slate-300  dark:border-navy-700">
               </div>
             </div>
-             
+
             <div>
-              <p class="font-medium text-slate-700 line-clamp-1 dark:text-navy-100" id="conversation-name" x-text="activeChat.name"></p>
+              <p class="font-medium text-slate-700 line-clamp-1 dark:text-navy-100" id="conversation-name"
+                x-text="activeChat.name"></p>
               <p class="mt-0.5 text-xs"></p>
             </div>
           </div>
         </div>
-        <div class="-mr-1 flex items-center">
-
-
-
+        <div class="mr-0 ml-auto flex items-center" id="balance-container">
           <div class="balance-card p-3 dark:bg-navy-700">
             <div class="flex justify-between space-x-1">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"></path>
-                <path d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z">
+                <path
+                  d="M15 7v2a4 4 0 01-4 4H9.828l-1.766 1.767c.28.149.599.233.938.233h2l3 3v-3h2a2 2 0 002-2V9a2 2 0 00-2-2h-1z">
                 </path>
               </svg>
               <p class="balance-value text-xl font-semibold text-slate-700 dark:text-navy-100"></p>
@@ -502,23 +488,24 @@
                 <!-- You can add your spinner design here -->
               </div>
             </div>
-            
+
           </div>
-          
           <!-- <button @click="$store.global.isRightSidebarExpanded = true"
           id="btnPlansContainer"
             class="btn bg-gradient-to-r from-sky-400 to-blue-600 font-medium text-white py-1 px-4 mr-4 gradient-text" data-translation="header.buy_credits">
             Buy credits
           </button> -->
-          <button id="buyMessagesTool" x-tooltip.placement.bottom.light="''" @click="$store.global.isRightSidebarExpanded = true" id="btnPlansContainer" class="btn h-9 justify-between bg-gradient-to-r from-purple-500 to-indigo-600 text-white gradient-text mr-4">
+          <button id="buyMessagesTool" x-tooltip.placement.bottom.light="''"
+            @click="$store.global.isRightSidebarExpanded = true" id="btnPlansContainer"
+            class="btn h-9 justify-between bg-gradient-to-r from-purple-500 to-indigo-600 text-white gradient-text mr-4">
             <span data-translation="header.buy_credits"></span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" stroke-width="2"></path>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+                stroke-width="2"></path>
             </svg>
           </button>
-          
-        
-
           <button id="modeTool" @click="$store.global.isDarkModeEnabled = !$store.global.isDarkModeEnabled"
             x-tooltip.placement.bottom.light="'Dark Mode'"
             class="btn h-9 w-9 rounded-full p-0 text-slate-500 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:text-navy-200 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
@@ -538,23 +525,18 @@
                 clip-rule="evenodd" />
             </svg>
           </button>
-
           <div class="dropdown ml-1" tab-index="0">
             <button id="dropdown-btn"></button>
             <ul class="dropdown-content" id="dropdown-content"></ul>
           </div>
-
-
-          <button id="toggleDrawerButton" @click="isShowChatInfo = !isShowChatInfo" x-tooltip.placement.bottom.light="''"
+          <button id="toggleDrawerButton" @click="isShowChatInfo = !isShowChatInfo"
+            x-tooltip.placement.bottom.light="''"
             :class="isShowChatInfo ? 'text-primary dark:text-accent-light' : 'text-slate-500 dark:text-navy-200'"
             class="btn  h-9 w-9 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25 sm:flex">
             <i class="fa fa-chevron-right"></i>
           </button>
-
-
-
-          <!-- Bottom Links -->
-          <div  id="profileInfo" class="flex flex-col items-center space-y-3 py-3 ml-1">
+        </div>
+        <div id="profileInfo" class="flex flex-col items-center space-y-3 py-3 ml-1">
             <!-- Profile -->
             <div x-data="usePopper({placement:'right-end',offset:12})"
               @click.outside="isShowPopper && (isShowPopper = false)" class="flex">
@@ -566,17 +548,16 @@
                       class="absolute right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-success dark:border-navy-700"></span>
                   </div>
                   <div class="text-left whitespace-nowrap">
-                    <a href="#"  id="userName" 
-                      class="text-medium font-medium text-slate-700 hover:text-primary focus:text-primary dark:text-navy-100 dark:hover:text-accent-light dark:focus:text-accent-light" >
+                    <a href="#" id="userName"
+                      class="text-medium font-medium text-slate-700 hover:text-primary focus:text-primary dark:text-navy-100 dark:hover:text-accent-light dark:focus:text-accent-light">
                     </a>
-                    <p id="clientId" class="text-xs text-slate-400 dark:text-navy-300" data-translation="header.profile_id"
-                    ></p>
+                    <p id="clientId" class="text-xs text-slate-400 dark:text-navy-300"
+                      data-translation="header.profile_id"></p>
                   </div>
                 </div>
               </button>
             </div>
           </div>
-        </div>
       </div>
 
 
@@ -584,67 +565,55 @@
       <div id="myModal" class="modal hidden">
         <!-- Modal content -->
         <div class="modal-content bg-slate-50 dark:bg-navy-900">
-          <div
-            class="modal-header flex p-5 justify-between border-bottom border-slate-150 dark:border-navy-500"
-          >
+          <div class="modal-header flex p-5 justify-between border-bottom border-slate-150 dark:border-navy-500">
             <h3 class="text-primary" data-translation="modal.deleteMsg"></h3>
             <span class="close">&times;</span>
           </div>
           <div class="modal-body p-5">
             <p class="text-slate-400 dark:text-white" data-translation="modal.sure"></p>
           </div>
-          <div
-            class="modal-footer flex pb-5 justify-end border-slate-150 dark:border-navy-500"
-          >
-            <button
-              id="closeModal"
+          <div class="modal-footer flex pb-5 justify-end border-slate-150 dark:border-navy-500">
+            <button id="closeModal"
               class="btn mt-5 mr-3 bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-            data-translation="modal.close">
-              
+              data-translation="modal.close">
+
             </button>
-            <button
-              id="deleteButton"
+            <button id="deleteButton"
               class="btn mt-5 mr-3 bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-           data-translation="modal.deleteBtn" >
-              
+              data-translation="modal.deleteBtn">
+
             </button>
           </div>
         </div>
       </div>
-        
+
       <div id="ModalPlan" class="modal hidden">
         <!-- Modal content -->
         <div class="modal-content bg-slate-50 dark:bg-navy-900">
-          <div
-            class="modal-header flex p-5 justify-between border-bottom border-slate-150 dark:border-navy-500"
-          >
+          <div class="modal-header flex p-5 justify-between border-bottom border-slate-150 dark:border-navy-500">
             <h3 class="text-primary" data-translation="modal.buy"></h3>
             <span class="close">&times;</span>
           </div>
           <div class="modal-body p-5">
             <p class="text-slate-400 dark:text-white" data-translation="modal.sure"></p>
           </div>
-          <div
-            class="modal-footer flex pb-5 justify-end border-slate-150 dark:border-navy-500"
-          >
-            <button
-              id="closeModalPlan"
+          <div class="modal-footer flex pb-5 justify-end border-slate-150 dark:border-navy-500">
+            <button id="closeModalPlan"
               class="btn mt-5 mr-3 bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-            data-translation="modal.failBtn">
-              
+              data-translation="modal.failBtn">
+
             </button>
-            
-            <button
-              id="buyPlanBtn"
+
+            <button id="buyPlanBtn"
               class="btn mt-5 mr-3 bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
-            data-translation="modal.successBtn">
-              
+              data-translation="modal.successBtn">
+
             </button>
           </div>
         </div>
       </div>
 
-      
+
 
 
 
@@ -653,65 +622,46 @@
       </div>
 
 
-      
 
-      <div :class="$store.breakpoints.smAndUp && 'scrollbar-sm'"
-      id="conversation-container"
 
+      <div :class="$store.breakpoints.smAndUp && 'scrollbar-sm'" id="conversation-container"
         class="grow overflow-y-auto px-[calc(var(--margin-x)-.5rem)] py-5 transition-all duration-[.25s]">
         <div x-show="activeChat.chatId === 'chat-1'" x-transition:enter="transition-all duration-500 easy-in-out"
           x-transition:enter-start="opacity-0 [transform:translate3d(0,1rem,0)]"
           x-transition:enter-end="opacity-100 [transform:translate3d(0,0,0)]" class="space-y-5"
-          id="big-container-message"
-          >             
-                <div class="flex  items-center justify-center w-full">
-        <span class="loader " id="page-one-spinner"></span>
-      </div>
+          id="big-container-message">
+          <div class="flex  items-center justify-center w-full">
+            <span class="loader " id="page-one-spinner"></span>
+          </div>
           <div class="flex items-start space-x-2.5 sm:space-x-5 plans-container">
           </div>
         </div>
-   
+
       </div>
 
       <div
         class="chat-footer relative flex h-18 w-full shrink-0 items-center justify-between border-t border-slate-150 bg-white px-[calc(var(--margin-x)-.25rem)] transition-[padding,width] duration-[.25s] dark:border-navy-600 dark:bg-navy-800">
         <div class="-ml-1.5 flex flex-1 space-x-2">
-   
 
-          <input type="text" class="form-input h-9 w-full bg-transparent placeholder:text-slate-400/70" 
-            placeholder="Write your message" 
-            id="message-input"
-            data-translation="container.write_message"
-            />
+
+          <input type="text" class="form-input h-9 w-full bg-transparent placeholder:text-slate-400/70"
+            placeholder="Write your message" id="message-input" data-translation="container.write_message" />
         </div>
         <emoji-picker id="emoji" class="light hidden"></emoji-picker>
         <div class="-mr-1.5 flex">
-            <div  class="text-xs text-gray-900 dark:text-white"  id="message-counter" >
-              <span data-translation="container.length"></span>   <span   id="max-length-value"> </span>
+          <div class="text-xs text-gray-900 dark:text-white" id="message-counter">
+            <span ></span> <span id="max-length-value"> </span>
 
-            </div>
-          <button
-            id="emoji-button"
-            class="btn h-9 w-9 shrink-0 rounded-full p-0 text-slate-500 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:text-navy-200 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-5.5 w-5.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="1.5"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
+          </div>
+          <button id="emoji-button"
+            class="btn h-9 w-9 shrink-0 rounded-full p-0 text-slate-500 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:text-navy-200 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5.5 w-5.5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </button>
-          <button
-          id="send-message"
-          class="button-sendMsg"
+          <button id="send-message" class="button-sendMsg"
             class="btn h-9 w-9 shrink-0 rounded-full p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:text-accent-light dark:hover:bg-accent-light/20 dark:focus:bg-accent-light/20 dark:active:bg-accent-light/25">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5.5 w-5.5" fill="none" viewBox="0 0 24 24"
               stroke="currentColor" stroke-width="1.5">
@@ -722,7 +672,7 @@
         </div>
       </div>
 
-      <template x-teleport="#x-teleport-target"  >
+      <template x-teleport="#x-teleport-target">
         <div class="agent-details" x-data="{
             get showDrawer() {return $data.isShowChatInfo;},
             set showDrawer(val) {$data.isShowChatInfo = val;},
@@ -758,8 +708,9 @@
                 </div>
                 <h3 x-text="activeChat.name" class="mt-2 text-lg font-medium text-slate-700 dark:text-navy-100"></h3>
                 <div class="mt-0 mb-2 flex space-x-2">
-                  <h3 class="text-medium font-medium text-slate-600 dark:text-navy-100" data-translation="right_side.expert_card" >
-                    
+                  <h3 class="text-medium font-medium text-slate-600 dark:text-navy-100"
+                    data-translation="right_side.expert_card">
+
                   </h3>
                 </div>
                 <div class="skills my-2">
@@ -771,7 +722,7 @@
 
                 <div class="my-2 px-4">
                   <p class="presentation mt-2 text-xs+ text-center">
-              
+
                   </p>
                 </div>
                 <div class="my-2 w-full px-6">
@@ -782,7 +733,7 @@
                       </p>
                       <div class="flex items-center space-x-2">
                         <p class="country font-medium text-slate-700 dark:text-navy-100 text-xs">
-                
+
                         </p>
                       </div>
                     </div>
@@ -791,7 +742,7 @@
                         Languages
                       </p>
                       <p class="languages text-xs font-medium text-slate-700 dark:text-navy-100">
-                      
+
                       </p>
                     </div>
                   </div>
@@ -802,17 +753,20 @@
                   <div class="tabs-list  grid grid-cols-3">
                     <button @click="activeTab = 'tabContact'"
                       :class="activeTab === 'tabContact' ? 'border-primary dark:border-accent text-primary dark:text-accent-light' : 'border-transparent hover:text-slate-800 focus:text-slate-800 dark:hover:text-navy-100 dark:focus:text-navy-100'"
-                      class="btn shrink-0 rounded-none border-b-2 px-3 py-2 font-medium" data-translation="right_side.contact_info">
+                      class="btn shrink-0 rounded-none border-b-2 px-3 py-2 font-medium"
+                      data-translation="right_side.contact_info">
                       Contact info
                     </button>
                     <button @click="activeTab = 'tabFiles'"
                       :class="activeTab === 'tabFiles' ? 'border-primary dark:border-accent text-primary dark:text-accent-light' : 'border-transparent hover:text-slate-800 focus:text-slate-800 dark:hover:text-navy-100 dark:focus:text-navy-100'"
-                      class="btn shrink-0 rounded-none border-b-2 px-3 py-2 font-medium" data-translation="right_side.files">
+                      class="btn shrink-0 rounded-none border-b-2 px-3 py-2 font-medium"
+                      data-translation="right_side.files">
                       Files
                     </button>
                     <button @click="activeTab = 'tabPlanning'"
                       :class="activeTab === 'tabPlanning' ? 'border-primary dark:border-accent text-primary dark:text-accent-light' : 'border-transparent hover:text-slate-800 focus:text-slate-800 dark:hover:text-navy-100 dark:focus:text-navy-100'"
-                      class="btn shrink-0 rounded-none border-b-2 px-3 py-2 font-medium" data-translation="right_side.planning">
+                      class="btn shrink-0 rounded-none border-b-2 px-3 py-2 font-medium"
+                      data-translation="right_side.planning">
                       Planning
                     </button>
                   </div>
@@ -826,49 +780,49 @@
                         <div class="flex items-center justify-between space-x-2">
                           <div class="flex items-center space-x-2">
                             <div>
-                              <a href="#"
-                                class="phone font-medium text-slate-600 line-clamp-1 dark:text-navy-100"></a>
+                              <a href="#" class="phone font-medium text-slate-600 line-clamp-1 dark:text-navy-100"></a>
                               <p class="text-xs text-slate-400 dark:text-navy-300" data-translation="right_side.phone">
                                 Phone number
                               </p>
                             </div>
                           </div>
                           <button
-                            class="btnPhone h-7 w-7 rounded-full bg-success/10 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25" disabled>
-                            <i class="fa-solid fa-phone text-xs" ></i>
+                            class="btnPhone h-7 w-7 rounded-full bg-success/10 p-0 text-success hover:bg-success/20 focus:bg-success/20 active:bg-success/25"
+                            disabled>
+                            <i class="fa-solid fa-phone text-xs"></i>
                           </button>
                         </div>
                         <div class="flex items-center justify-between space-x-2">
                           <div class="flex items-center space-x-2">
                             <div>
-                              <a href="#"
-                                class="email font-medium text-slate-600 line-clamp-1 dark:text-navy-100"></a>
+                              <a href="#" class="email font-medium text-slate-600 line-clamp-1 dark:text-navy-100"></a>
                               <p class="text-xs text-slate-400 dark:text-navy-300" data-translation="right_side.email">
                                 E-mail
                               </p>
                             </div>
                           </div>
                           <button
-                          class="btnemail h-7 w-7 rounded-full bg-info/10 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25"
-                          disabled
-                        >
-                          <i class="fa-regular fa-envelope text-xs"></i>
-                        </button>
-                        
+                            class="btnemail h-7 w-7 rounded-full bg-info/10 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25"
+                            disabled>
+                            <i class="fa-regular fa-envelope text-xs"></i>
+                          </button>
+
                         </div>
                         <div class="flex items-center justify-between space-x-2">
                           <div class="flex items-center space-x-2">
                             <div>
                               <a href="#"
                                 class="website font-medium text-slate-600 line-clamp-1 dark:text-navy-100"></a>
-                              <p class="text-xs text-slate-400 dark:text-navy-300" data-translation="right_side.website">
+                              <p class="text-xs text-slate-400 dark:text-navy-300"
+                                data-translation="right_side.website">
                                 Website
                               </p>
                             </div>
                           </div>
                           <button
-                            class="btnwebsite h-7 w-7 rounded-full bg-info/10 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25" disabled>
-                            <i class="fa fa-external-link-alt text-xs" ></i>
+                            class="btnwebsite h-7 w-7 rounded-full bg-info/10 p-0 text-info hover:bg-info/20 focus:bg-info/20 active:bg-info/25"
+                            disabled>
+                            <i class="fa fa-external-link-alt text-xs"></i>
                           </button>
                         </div>
                       </div>
@@ -876,29 +830,6 @@
                   </div>
 
                   <div x-show="activeTab === 'tabFiles'" x-transition:enter="transition-all duration-500 easy-in-out"
-                    x-transition:enter-start="opacity-0 [transform:translate3d(1rem,0,0)]"
-                    x-transition:enter-end="opacity-100 [transform:translate3d(0,0,0)]">
-
-                      <div class="flex flex-col border border-slate-150 dark:border-navy-500">
-                      <div class="flex space-x-5 px-5 py-4">
-                        <div class="skeleton animate-wave h-16 w-16 rounded-full bg-slate-150 dark:bg-navy-500"></div>
-                        <div class="flex flex-1 flex-col justify-between py-2">
-                          <div class="skeleton animate-wave h-3 w-full rounded bg-slate-150 dark:bg-navy-500"></div>
-                          <div class="skeleton animate-wave h-3 w-full rounded bg-slate-150 dark:bg-navy-500"></div>
-                        </div>
-                      </div>
-                      <div class="skeleton animate-wave h-48 w-full bg-slate-150 dark:bg-navy-500"></div>
-                      <div class="w-full px-6 py-4">
-                        <div class="skeleton animate-wave h-3 w-full rounded bg-slate-150 dark:bg-navy-500"></div>
-                        <div class="skeleton animate-wave mt-4 h-3 w-8/12 rounded bg-slate-150 dark:bg-navy-500"></div>
-                      </div>
-                    </div>
-                   
-                    
-                    </div>
-                  </div>
-
-                  <div x-show="activeTab === 'tabPlanning'" x-transition:enter="transition-all duration-500 easy-in-out"
                     x-transition:enter-start="opacity-0 [transform:translate3d(1rem,0,0)]"
                     x-transition:enter-end="opacity-100 [transform:translate3d(0,0,0)]">
 
@@ -917,41 +848,48 @@
                       </div>
                     </div>
 
+
                   </div>
+                </div>
+
+                <div x-show="activeTab === 'tabPlanning'" x-transition:enter="transition-all duration-500 easy-in-out"
+                  x-transition:enter-start="opacity-0 [transform:translate3d(1rem,0,0)]"
+                  x-transition:enter-end="opacity-100 [transform:translate3d(0,0,0)]">
+
+                  <div class="flex flex-col border border-slate-150 dark:border-navy-500">
+                    <div class="flex space-x-5 px-5 py-4">
+                      <div class="skeleton animate-wave h-16 w-16 rounded-full bg-slate-150 dark:bg-navy-500"></div>
+                      <div class="flex flex-1 flex-col justify-between py-2">
+                        <div class="skeleton animate-wave h-3 w-full rounded bg-slate-150 dark:bg-navy-500"></div>
+                        <div class="skeleton animate-wave h-3 w-full rounded bg-slate-150 dark:bg-navy-500"></div>
+                      </div>
+                    </div>
+                    <div class="skeleton animate-wave h-48 w-full bg-slate-150 dark:bg-navy-500"></div>
+                    <div class="w-full px-6 py-4">
+                      <div class="skeleton animate-wave h-3 w-full rounded bg-slate-150 dark:bg-navy-500"></div>
+                      <div class="skeleton animate-wave mt-4 h-3 w-8/12 rounded bg-slate-150 dark:bg-navy-500"></div>
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </template>
+  </div>
+  </template>
 
 
-    </main>
+  </main>
   </div>
   <div id="x-teleport-target"></div>
-  <script
-  type="module"
-  src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"
-></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
   <script>
     window.addEventListener("load", () => {
       Alpine.start();
     });
-    
+
   </script>
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-    

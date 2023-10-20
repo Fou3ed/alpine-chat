@@ -16,6 +16,7 @@ export async function selectAgent(agentId, agentName, UserID) {
         userId: newData.user,
         agentId: agentId,
         accountId: newData.accountId,
+        source:newData?.source
       });
   
       conversationHeaderStatus.textContent = connectUsers.find(

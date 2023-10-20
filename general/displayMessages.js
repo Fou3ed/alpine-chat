@@ -16,6 +16,7 @@ import { showEmptyConversation } from "../conversationActions/conversationClick.
 import { getTranslationValue, lan } from "../utils/traduction.js";
 import { getTime } from "../utils/getTime.js";
 import { Countries } from "../countries.js";
+import { insertLineBreaks, truncateMessage } from "../utils/truncateMessage.js";
 export function displayMessages(messages) {
     document.getElementById("big-container-message").style.display = "block";
     if (!messages || !messages.messages) {
@@ -42,73 +43,86 @@ export function displayMessages(messages) {
         if (Object.keys(myContent).length !== 0 && message.type == "plan") {
           tableRows = myContent.plans.map((plan) => {
             return `
-    <div class="pricing pricing-palden">
-    <div class="pricing-item" id="plan-${messageId}" data-plan-id="${plan.id}" name="${plan.name}">
-    <div class="pricing-deco">
-      <svg class="pricing-deco-img" enable-background="new 0 0 300 100" height="100px" id="Layer_1" preserveAspectRatio="none" version="1.1" viewBox="0 0 300 100" width="300px" x="0px" xml:space="preserve" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" y="0px">
-        <path class="deco-layer deco-layer--1" d="M30.913,43.944c0,0,42.911-34.464,87.51-14.191c77.31,35.14,113.304-1.952,146.638-4.729
-  c48.654-4.056,69.94,16.218,69.94,16.218v54.396H30.913V43.944z" fill="#FFFFFF" opacity="0.6"></path>
-        <path class="deco-layer deco-layer--2" d="M-35.667,44.628c0,0,42.91-34.463,87.51-14.191c77.31,35.141,113.304-1.952,146.639-4.729
-  c48.653-4.055,69.939,16.218,69.939,16.218v54.396H-35.667V44.628z" fill="#FFFFFF" opacity="0.6"></path>
-        <path class="deco-layer deco-layer--3" d="M43.415,98.342c0,0,48.283-68.927,109.133-68.927c65.886,0,97.983,67.914,97.983,67.914v3.716
-  H42.401L43.415,98.342z" fill="#FFFFFF" opacity="0.7"></path>
-        <path class="deco-layer deco-layer--4" d="M-34.667,62.998c0,0,56-45.667,120.316-27.839C167.484,57.842,197,41.332,232.286,30.428
-  c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.998z" fill="#FFFFFF"></path>
-      </svg>
-      <div class="pricing-price"><span class="pricing-currency"> ${plan.currency} </span>${plan.tariff}
-      </div>
-      <h3 class="pricing-title">${plan.name}</h3>
-    </div>
-    <ul class="pricing-feature-list">
-      <li class="pricing-feature">${plan.billing_volume} Messages</li>
-    </ul>
-    <button class="pricing-action" id="buyButton">Buy Plan<span class="loaderBuyButton"></span></button>
-  
-  </div>  
+            <div class="pricing pricing-palden">
+            <div class="pricing-item" id="plan-${messageId}" data-plan-id="${plan.id}" name="${plan.name}">
+                <div class="pricing-deco">
+                    <svg class="pricing-deco-img" enable-background="new 0 0 300 100" height="100px" viewBox="0 0 300 100" width="300px" xmlns="http://www.w3.org/2000/svg">
+                        <path class="deco-layer deco-layer--1" d="M30.913,43.944c0,0,42.911-34.464,87.51-14.191c77.31,35.14,113.304-1.952,146.638-4.729
+                          c48.654-4.056,69.94,16.218,69.94,16.218v54.396H30.913V43.944z" fill="#FFFFFF" opacity="0.6"></path>
+                        <path class="deco-layer deco-layer--2" d="M-35.667,44.628c0,0,42.91-34.463,87.51-14.191c77.31,35.141,113.304-1.952,146.639-4.729
+                          c48.653-4.055,69.939,16.218,69.939,16.218v54.396H-35.667V44.628z" fill="#FFFFFF" opacity="0.6"></path>
+                        <path class="deco-layer deco-layer--3" d="M43.415,98.342c0,0,48.283-68.927,109.133-68.927c65.886,0,97.983,67.914,97.983,67.914v3.716
+                          H42.401L43.415,98.342z" fill="#FFFFFF" opacity="0.7"></path>
+                        <path class="deco-layer deco-layer--4" d="M-34.667,62.998c0,0,56-45.667,120.316-27.839C167.484,57.842,197,41.332,232.286,30.428
+                          c53.07-16.399,104.047,36.903,104.047,36.903l1.333,36.667l-372-2.954L-34.667,62.998z" fill="#FFFFFF"></path>
+                    </svg>
+                    <div class="pricing-price">
+                        <span class="pricing-currency text-2xl">${plan.currency}</span>
+                        <span class="text-4xl">${plan.tariff}</span>
+                    </div>
+                    <h3 class="pricing-title text-xl">${plan.name}</h3>
+                </div>
+                <ul class="pricing-feature-list">
+                    <li class="pricing-feature text-lg">${plan.billing_volume} Messages</li>
+                </ul>
+                <button class="pricing-action text-lg" id="buyButton">Buy Plan<span class="loaderBuyButton"></span></button>
+            </div>
+        </div>
+        
             `;
           });
         } else if (message.type == "bloc") {
           const messageDiv = document.createElement("div");
           messageDiv.innerHTML = `<div class="flex flex-col items-start space-y-3.5">
           <div class="mr-1">
-          <div class="rounded-2xl break-words  relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white">
-          <div class="space-y-3.5">
+              <div class="rounded-2xl break-words relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white">
+                  <div class="space-y-3.5">
                       <div class="ml-2 sm:ml-5">
                           <div id="message-content-${messageId}">
                               <div class="ml-2 sm:ml-5">
                                   <div class="sm:mr-10">
                                       <div class="pt-2">
-                                          <p data-translation="bloc_message.title">${getTranslationValue("bloc_message.title")}
+                                          <p data-translation="bloc_message.title" class="text-lg sm:text-xl font-semibold">
+                                              ${getTranslationValue("bloc_message.title")}
                                           </p>
-                                          <p data-translation="bloc_message.text">${getTranslationValue("bloc_message.text")}</p>
+                                          <p data-translation="bloc_message.text" class="text-sm sm:text-base">
+                                              ${getTranslationValue("bloc_message.text")}
+                                          </p>
                                       </div>
-                                      <div class="flex" style="width: 500px;">
-                                          <div class="flex h-20 w-full items-center rounded-lg dark:bg-navy-500">
-                                              <button id="AvailableAgent" class="btn  space-x-2 bg-primary font-medium text-white shadow-lg shadow-primary/50 hover:bg-warning-focus focus:bg-primary-focus active:bg-warning-focus/90" style="min-height: 50px;width: 225px;">
-                                                  <span data-translation="bloc_message.relation_direct">${getTranslationValue("bloc_message.relation_direct")}</span>
+                                      <div class="flex flex-col sm:flex-row items-center sm:space-x-4 sm:w-full pt-4">
+                                          <div class="flex h-20 w-full items-center rounded-lg dark:bg-navy-500 sm:w-auto sm:flex-1">
+                                              <button id="AvailableAgent" class="btn space-x-2 bg-primary font-medium text-white shadow-lg shadow-primary/50 hover:bg-warning-focus focus:bg-primary-focus active:bg-warning-focus/90 w-full">
+                                                  <span data-translation="bloc_message.relation_direct">
+                                                      ${getTranslationValue("bloc_message.relation_direct")}
+                                                  </span>
                                               </button>
                                           </div>
                                           <div class="mx-4 flex items-center space-y-3">
                                               <p>ou</p>
                                           </div>
-                                          <div class="flex h-20 w-full items-center rounded-lg dark:bg-navy-500">
-                                              <button id="selectAgent" class="btn space-x-2 bg-primary font-medium text-white shadow-lg shadow-primary/50 hover:bg-warning-focus focus:bg-primary-focus active:bg-warning-focus/90" style="min-height: 50px;width: 220px;">
-                                                  <span data-translation="bloc_message.relation_manuel">${getTranslationValue("bloc_message.relation_manuel")}</span>
+                                          <div class="flex h-20 w-full items-center rounded-lg dark:bg-navy-500 sm:w-auto sm:flex-1">
+                                              <button id="selectAgent" class="btn space-x-2 bg-primary font-medium text-white shadow-lg shadow-primary/50 hover-bg-warning-focus focus-bg-primary-focus active-bg-warning-focus/90 w-full">
+                                                  <span data-translation="bloc_message.relation_manuel">
+                                                      ${getTranslationValue("bloc_message.relation_manuel")}
+                                                  </span>
                                               </button>
                                           </div>
                                       </div>
                                   </div>
-                                  <div id="pin-div" class="hidden pin-div-sender justify-center items-center me-2"><i class="fas fa-thumbtack"></i></div>
+                                  <div id="pin-div" class="hidden pin-div-sender justify-center items-center me-2">
+                                      <i class="fas fa-thumbtack"></i>
+                                  </div>
                               </div>
                           </div>
                       </div>
                   </div>
               </div>
           </div>
-          </div>
-          <p class="mt-1 ml-auto text-left text-xs text-slate-400 dark:text-navy-300" data-time="${message.created_at}">${time} </p>
+          <p class="mt-1 ml-inherit text-left  text-xs text-slate-400 dark:text-navy-300" data-time="${message.created_at}">
+              ${time}
+          </p>
       </div>
-          </div>`;
+      `;
           messagesContainer.insertAdjacentElement("afterbegin", messageDiv);
           const btnAvailableAgent = messageDiv.querySelector("#AvailableAgent");
   
@@ -119,7 +133,7 @@ export function displayMessages(messages) {
                 accountId: newData.accountId,
                 conversationId: conversationId,
                 userId: newData.user,
-                source:newData.contactId
+                source:newData.source
 
               });
             },
@@ -269,7 +283,7 @@ export function displayMessages(messages) {
           <div class="mr-4 max-w-lg sm:mr-10">
                 <form name="form1" class="box" onsubmit="">
                     <div class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 ${
-                      newData.contactId || newData.leadId ? "gocc" : ""
+                      newData?.source ? "gocc" : ""
                     } card-form" style="position: relative;">
                         <div class=" w-full max-w-xl p-4 sm:p-5">
                             <div class="mb-4">
@@ -359,8 +373,8 @@ export function displayMessages(messages) {
             message.user == newData.user ? "justify-end" : "justify-start";
           const msgStyle =
             message.user == newData.user && !message.paid
-              ? `rounded-2xl break-words  rounded-tl-none bg-msg p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
-              : `rounded-2xl break-words  relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
+              ? ` rounded-2xl break-words  rounded-tl-none bg-msg p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
+              : ` rounded-2xl break-words  relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
           messagesContainer.insertAdjacentHTML(
             "afterbegin",
             `<div id="message-${messageId}" class="flex items-start ${direction} space-x-1.5 ${
@@ -381,11 +395,11 @@ export function displayMessages(messages) {
                     ${
                       message.type == "MSG" || message.type == "link"
                         ? `
-                        <div class="${
+                        <div class="  ${
                           message.type == "link"
-                            ? "rounded-2xl break-words relative rounded-tr-none bg-violet-300 p-3 text-slate-700 shadow-sm dark:bg-violet-500 dark:text-white"
+                            ? " message-content rounded-2xl break-words relative rounded-tr-none bg-violet-300 p-3 text-slate-700 shadow-sm dark:bg-violet-500 dark:text-white"
                             : msgStyle
-                        }" id="message-content-${messageId}">
+                        }" id="message-content-${messageId}" >
                           ${
                             message.status == 0
                               ? `${
@@ -399,7 +413,7 @@ export function displayMessages(messages) {
                               ? tableRows.join("")
                               : message.type == "form"
                               ? tableRows
-                              : message.message
+                              :  (window.innerWidth > 550 ? message.message : insertLineBreaks(message.message))
                           }
                         <div id="pin-div" class="${
                           message.pinned == 0 || message.status == 0
@@ -431,7 +445,7 @@ export function displayMessages(messages) {
                               ? tableRows.join("")
                               : message.type == "form"
                               ? tableRows
-                              : message.message
+                              :message.message
                           }
                           <div id="pin-div" class="${
                             message.pinned == 0 || message.status == 0

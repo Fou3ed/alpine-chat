@@ -203,21 +203,10 @@ $(document).ready(async function () {
   }
 
 
-   // Function to toggle the visibility of the profileInfo element
-  function toggleProfileInfo() {
-    const profileInfo = document.getElementById("profileInfo");
-    if (window.innerWidth > 550) {
-      profileInfo.style.display = "block";
-    } else {
-      profileInfo.style.display = "none";
-    }
-  }
 
-  // Attach an event listener to the window's resize event
-  window.addEventListener("resize", toggleProfileInfo);
 
-  // Initial call to set the element's visibility based on the initial window width
-  toggleProfileInfo();
+
+
   
   if(params.response && window.opener){
     window.opener.location=window.location

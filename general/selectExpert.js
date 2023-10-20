@@ -34,6 +34,7 @@ export async function selectExpert() {
             userId: newData.user,
             agentId: agent,
             accountId: newData.accountId,
+            source:newData?.source
           });
           conversationHeaderStatus.dataset.translation = connectUsers.find(
             (user) => user._id === agent
