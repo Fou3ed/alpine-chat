@@ -100,18 +100,7 @@ export function loadNewData() {
 }
 
 
-
 export const displayedUsers = new Set();
-
-
-
-
-
-
-
-
-
-
 
 $(document).ready(async function () {
   loadChatInformation()
@@ -144,9 +133,9 @@ $(document).ready(async function () {
       !newData ||
       (params?.source == "gocc" &&
         (params?.contact || params?.lead) &&
-        (params?.contact
-          ? params?.contact != newData.contactId
-          : params?.lead != newData.leadId))
+        (params?.source
+          ? params?.contact != newData.sourceId
+          : params?.lead != newData.sourceId))
     ) {
       socketLib.socket.emit(
         "createGuest",
@@ -201,13 +190,7 @@ $(document).ready(async function () {
   
     checkConversationId();
   }
-
-
-
-
-
-
-  
+ 
   if(params.response && window.opener){
     window.opener.location=window.location
     window.close()
@@ -284,7 +267,7 @@ $(document).ready(async function () {
           </button>
         </div>
       `;
-  
+        
         // Append the elements to the modal container
         modalContainer.appendChild(backgroundOverlay);
         modalContainer.appendChild(modalContent);

@@ -54,10 +54,10 @@ export function userConnection(data) {
     });
     const leftConversationId = conversationCard.getAttribute('data-conversation-id');
     if(conversationId==leftConversationId){
-      
-      conversationHeaderStatus.textContent=getTranslationValue("general.offline")
-  
       conversationHeaderStatus.dataset.translation = "general.offline";
+
+      conversationHeaderStatus.textContent=getTranslationValue("general.offline")
+
     }
     
     const agentCard = document.getElementById(`${data?._id}`);
@@ -65,8 +65,8 @@ export function userConnection(data) {
       agentCard.remove();
     }
     if (agentClicked == data._id) {
-      conversationHeaderStatus.dataset.translation = "lastSeen";
-      conversationHeaderStatus.textContent = getTranslationValue("header.lastseen");
+      conversationHeaderStatus.dataset.translation = "general.offline";
+      conversationHeaderStatus.textContent = getTranslationValue("general.offline");
     }
   }
 

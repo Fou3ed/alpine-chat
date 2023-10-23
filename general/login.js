@@ -1,8 +1,7 @@
 import { accountId } from "../env.js";
-import { newData, socketLib, updateNewData } from "../main.js";
+import { socketLib, updateNewData } from "../main.js";
 
 export function login(data){
-    
     socketLib.socket.emit("user-connected", {
         app_id: accountId,
         user: data.id,
@@ -20,19 +19,16 @@ export function login(data){
           userAgent: navigator.userAgent,
         },
       });
-
+      
       const newUser = {
         user: data._id,
         contact: data.id,
         accountId: accountId,
-        status: 0,
-        
+        status: data.status,
       };
       updateNewData(newUser)
       document.cookie =
         "myData=" +
         JSON.stringify(newUser) +
         "; expires=Tue, 31 Dec 9999 23:59:59 GMT; path=/";
-    
-  
 }
