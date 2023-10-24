@@ -46,7 +46,7 @@ export async function getAllAgents(response) {
             </div>
           </div>
         </div>
-        <div class="flex justify-between space-x-2">
+        <div class="grid grid-cols-3">
           <div>
             <p class="text-tiny">Country</p>
             <p class="text-xs font-medium text-slate-700 dark:text-navy-100">

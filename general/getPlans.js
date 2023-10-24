@@ -11,7 +11,6 @@ export async function getPlans() {
       });
       if (response) {
         response.data.data.forEach((plan) => {
-          console.log("plan",plan)
           document.getElementById("plans").insertAdjacentHTML(
             "afterbegin",
             `

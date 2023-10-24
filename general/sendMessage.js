@@ -51,43 +51,8 @@ export async function sentMessage(data) {
           element.classList.remove("bg-slate-150");
       });
     } else {
-      let userLog = "";
       const convMessage = isNotNewConversation.querySelector("#last-message");
-      if (data.type == "log") {
-        const log = JSON.parse(data.content);
-        if (log.action === "purchase completed") {
-          switch (log.action) {
-            case "fill":
-              userLog = `You filled on the form.`;
-              break;
-            case "focus":
-              userLog = `You  focus on the form.`;
-              break;
-            case "purchase":
-              userLog = `You  purchased the <b> ${log.plan_name} </b>plan.`;
-              break;
-            case "start form":
-              userLog = `You  start submit the form.`;
-              break;
-            case "end form":
-              userLog = `You  end submit the form.`;
-              break;
-            case "start purchase":
-              userLog = `You  start purchase a plan.`;
-              break;
-            case "link click":
-              userLog = `You click to link.`;
-              break;
-            case "purchase completed":
-              userLog = `${getTranslationValue("bought.purchase")}`;
-              break;
-            case "purchase went wrong":
-              userLog = `Purchase went  wrong.`;
-              break;
-          }
-          convMessage.textContent = userLog;
-        }
-      } else convMessage.textContent = truncateMessage(data.content, 20);
+
     }
     if (data.conversation === conv) {
       const messageId = data.id;
@@ -96,37 +61,10 @@ export async function sentMessage(data) {
       if (!messageContainer) {
         if (data.type === "log") {
           const log = JSON.parse(data.content);
-          if (log.action === "purchase completed") {
-            let userLog = "";
-            switch (log.action) {
-              case "fill":
-                userLog = `You filled on the form.`;
-                break;
-              case "focus":
-                userLog = `You focus on the form.`;
-                break;
-              case "purchase":
-                userLog = `You purchased the <b> ${log.plan_name} </b>plan.`;
-                break;
-              case "start form":
-                userLog = `You start submit the form.`;
-                break;
-              case "end form":
-                userLog = `You end submit the form.`;
-                break;
-              case "start purchase":
-                userLog = `You start purchase a plan.`;
-                break;
-              case "link click":
-                userLog = `You click to link.`;
-                break;
-              case "purchase completed":
-                userLog = `${getTranslationValue("bought.purchase")}`;
-                break;
-              case "purchase went wrong":
-                userLog = `Purchase went wrong.`;
-                break;
-            }
+          if (log.element ==3) {
+            
+           let  userLog = `${getTranslationValue("bought.purchase")}`;
+        
             const newDivMsg = document.createElement("div");
             newDivMsg.innerHTML = ` <div
           class="flex justify-center items-center w-100 m-2"

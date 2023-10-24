@@ -78,6 +78,7 @@ export async function receiveMessage(data) {
     }
   
     if (data.messageData.conversation === conv) {
+      
       if (Object.keys(myContent).length !== 0 && data.messageData.type === "plan")
         tableRows = myContent.plans.map((plan) => {
           return `
@@ -371,23 +372,45 @@ export async function receiveMessage(data) {
           },
           { once: true }
         );
+      }else if(data.messageData.type === "log"){
+      
+          const log = JSON.parse(data.messageData.content);
+          if (log.element ==3) {
+              console.log("herereerrere")
+           let  userLog = `${getTranslationValue("bought.purchase")}`;
+        
+            const newDivMsg = document.createElement("div");
+            newDivMsg.innerHTML = ` <div
+          class="flex justify-center items-center w-100 m-2"
+          id="msg-${data._id}"
+          >
+          <span class="logs-notification">
+          ${userLog}
+          </span>
+          </div>`;
+            let typingBlock = document.getElementById("typing-block-message");
+            messagesContainer.insertBefore(newDivMsg, typingBlock);
+          
+        } 
+        return;
       }
-  
       if (data.messageData.type !== "bloc") {
         const messageContainer = document.getElementById(`message-${messageId}`);
         if (!messageContainer) {
-          let direction =
+          let direction = 
             data.direction == "in" ? "justify-end" : "justify-start";
+
+            data.userId===newData.user ? direction="justify-end" : ""
           const msgStyle =
-            data.messageData.user === newData.user && !data.message.paid
-              ? `rounded-2xl break-words  rounded-tl-none bg-white p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
+            data.userId === newData.user && !data.messageData.paid
+              ? `rounded-2xl break-words  rounded-tl-none bg-msg p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
               : `rounded-2xl break-words  relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
           const messageContent = `
         <div id="message-${messageId}" class="flex items-start ${direction} space-x-1.5 ${
             data.messageData.type === "plan" ? "plans-container" : ""
           }">     
                 <div class="flex flex-col   ${
-                  data.messageData.user !== newData.user
+                  data.userId !== newData.user
                     ? "items-start"
                     : "items-end"
                 }  space-y-3.5">
@@ -480,7 +503,7 @@ export async function receiveMessage(data) {
                   }    
                     ${data.messageData.type === "MSG" ? `</div>` : ""}  
                     <p id="date_msg" data-direction="${direction}" class="mt-1 ${
-            data.messageData.user !== newData.user ? "" : "ml-auto"
+            data.userId !== newData.user ? "" : "ml-auto"
           }  text-xs text-slate-400 dark:text-navy-300">
                       ${timeString}
                     </p>

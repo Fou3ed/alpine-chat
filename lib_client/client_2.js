@@ -83,7 +83,7 @@ export default class event {
     const loader = document.querySelector(".app-preloader");
 
     this.socket.on("onConnected", (userData, balance) => {
-      role = userData.status == 0 ? "GUEST" : "CLIENT";
+      role = userData?.balance  ? "CLIENT" : "GUEST";
       last_seen_at=userData.last_seen_at
 
       const usernameLink = document.getElementById("userName");
