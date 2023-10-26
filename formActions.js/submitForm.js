@@ -1,10 +1,9 @@
 import { newData, socketLib,conversationId, updateNewData } from "../main.js";
 import { getTranslationValue, lan } from "../utils/traduction.js";
 
-export let formElement = "";
 
 export function submitForm(element) {
-  formElement = element;
+
   let messageContent = element.closest('[id^="message-content-"]');
   let messageId = messageContent?.id?.replace("message-content-", "");
   const form = JSON.parse(element._form_data);
@@ -58,6 +57,8 @@ export function submitForm(element) {
       form,
       conversationId,
       language:lan,
+      messageId:messageId,
+      formElement:element
     })
   );
 
@@ -74,8 +75,8 @@ export function submitForm(element) {
 }
 
 
-export function submitFormStatus(status, text_capture) {
-  
+export function submitFormStatus(status, text_capture,messageId,element) {
+      const formElement=document.getElementById(`submit-form-${messageId}`)
     const formContact = formElement.parentNode;
   
     const formContent = formContact.parentNode;
@@ -87,13 +88,29 @@ export function submitFormStatus(status, text_capture) {
       formContent.appendChild(statusMessage);
     }
   
-    const formInputs = formContact.querySelectorAll("input");
   
+
+
     if (status) {
       if (newData.status == "0") {
         updateStatusInCookie();
       }
   
+
+
+      const formContact = formElement.closest("form");
+      const formContent = formContact.parentNode;
+      const formInputs = formContact.querySelectorAll("input, select,textarea");
+    
+      formElement.innerHTML = `<div class="d-flex align-items-center" style="height: 20px;" ><span class="loader2"></span></div>`;
+      formInputs.forEach(inp => {
+        const formInput = element.forms.find(a=>a.fieldId ==inp.dataset.fieldId);
+        if(formInput){
+          inp.value=formInput.value
+        }
+        
+      });
+
       formContent.style.opacity = 0.7;
       // Update the status message for success
       statusMessage.textContent = "";

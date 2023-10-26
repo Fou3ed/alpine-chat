@@ -1145,9 +1145,8 @@ const number = match ? match[1] : null;
         }
 
         const parsedData = JSON.parse(dataForm);
-
-
-        submitFormStatus("1",parsedData.form.text_capture);
+        console.log(dataForm)
+        submitFormStatus("1",parsedData.form.text_capture,parsedData.messageId,parsedData);
       } else {
         submitFormStatus();
       }
