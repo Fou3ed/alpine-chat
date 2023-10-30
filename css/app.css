@@ -731,11 +731,13 @@ div#message-options {
   margin-top: 0.2rem !important;
 }
 
-.chat-header .avatar {width: auto;}
+.chat-header .avatar {}
 p#date_msg i {
   padding-left: 5px;
 }
-
+/* .balance-card{
+  padding-left:0
+} */
 .pricing {
 display: -webkit-flex;
 display: flex;
@@ -1023,6 +1025,25 @@ input, select, textarea {
   #header-container {
     flex-direction: unset;
     flex-wrap: wrap;
+    margin: 0 !important
   }
-
+  #buyMessagesTool{
+    width: 40%;
+    height:1.75rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    
+  }
+  #buyCreditsText{
+    font-size: 10px;
+    line-height: 1.3;
+  }
+  .balance-value {
+  font: 16px;
+  }
+  #dropdown-content{
+    right: 20px;
+    width: 130px;
+    height: 40px;
+  }
 }

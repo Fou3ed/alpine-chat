@@ -98,7 +98,8 @@ export function updateNewData(data){
 export function loadNewData() {
   return getCookie("myData") !== undefined ? JSON.parse(getCookie("myData")) : null;
 }
-
+export function clickBuyButton() {
+console.log("clicked")}
 
 export const displayedUsers = new Set();
 
@@ -213,6 +214,7 @@ $(document).ready(async function () {
         conversationId: conversationId,
         userId: newData.user,
         accountId: newData.accountId,
+        messageId:params.message_id
       });
     });
   } else if (params.response === "ko") {

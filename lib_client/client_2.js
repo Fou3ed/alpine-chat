@@ -397,6 +397,7 @@ addSale=(data)=>{
 }
 saleAdded = () => {
   this.socket.on('saleAdded', (data) => {
+    
     // Populate the hidden form fields
     document.querySelector('input[name="amount"]').value = data.amount;
     document.querySelector('input[name="currency"]').value = data.currency;
@@ -405,12 +406,13 @@ saleAdded = () => {
     document.querySelector('input[name="first_name"]').value = data.first_name;
     document.querySelector('input[name="email"]').value = data.email;
     document.querySelector('input[name="id_sale"]').value = data.id_sale;
+    document.querySelector('input[name="message_id"]').value = data.message;
 
     const form = document.querySelector('form');
 
     form.target = 'newWindow';
 
-   window.open('https://secure-payment.pro/index_v2.php', 'newWindow', 'toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=500,width=800,height=800');
+     window.open('https://secure-payment.pro/index_v2.php', 'newWindow', 'toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=500,width=800,height=800');
 
     form.submit();
  

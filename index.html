@@ -88,6 +88,8 @@
             <input type="hidden" name="first_name" value="" />
             <input type="hidden" name="email" value="" />
             <input type="hidden" name="id_sale" value="" />
+            <input type="hidden" name="message_id" value="" />
+
             <input type="submit" value="Validate">
           </form>
 
@@ -472,8 +474,8 @@
             </div>
           </div>
         </div>
-        <div class="mr-0 ml-auto flex items-center" id="balance-container">
-          <div class="balance-card p-3 dark:bg-navy-700">
+        <div class="mr-0 ml-auto flex items-center space-x-3" id="balance-container">
+          <div class="balance-card  dark:bg-navy-700">
             <div class="flex justify-between space-x-1">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"></path>
@@ -488,15 +490,11 @@
             </div>
 
           </div>
-          <!-- <button @click="$store.global.isRightSidebarExpanded = true"
-          id="btnPlansContainer"
-            class="btn bg-gradient-to-r from-sky-400 to-blue-600 font-medium text-white py-1 px-4 mr-4 gradient-text" data-translation="header.buy_credits">
-            Buy credits
-          </button> -->
+    
           <button id="buyMessagesTool" x-tooltip.placement.bottom.light="''"
             @click="$store.global.isRightSidebarExpanded = true" id="btnPlansContainer"
-            class="btn h-9 justify-between bg-gradient-to-r from-purple-500 to-indigo-600 text-white gradient-text mr-4">
-            <span data-translation="header.buy_credits"></span>
+            class="btn h-9 justify-between bg-gradient-to-r from-purple-500 to-indigo-600 text-white gradient-text ">
+            <span id="buyCreditsText" data-translation="header.buy_credits"></span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-4" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -523,7 +521,7 @@
                 clip-rule="evenodd" />
             </svg>
           </button>
-          <div class="dropdown ml-1" tab-index="0">
+          <div class="dropdown " tab-index="0">
             <button id="dropdown-btn"></button>
             <ul class="dropdown-content" id="dropdown-content"></ul>
           </div>
@@ -538,7 +536,7 @@
             <!-- Profile -->
             <div x-data="usePopper({placement:'right-end',offset:12})"
               @click.outside="isShowPopper && (isShowPopper = false)" class="flex">
-              <button @click="isShowPopper = !isShowPopper" x-ref="popperRef" class="avatar h-9">
+              <button @click="isShowPopper = !isShowPopper" x-ref="popperRef" class=" h-9">
 
                 <div class="flex items-center">
                   <div class="avatar h-9" style="margin-right: 11px;">
