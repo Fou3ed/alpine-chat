@@ -126,7 +126,7 @@ export default class event {
       </div>
   </div>
   
-      `;  
+    `;  
       const closeButton = modalDiv.querySelector("button");
       closeButton.addEventListener("click", () => {
         document.body.removeChild(modalDiv);
