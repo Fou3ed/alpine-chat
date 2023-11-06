@@ -1,8 +1,8 @@
 import { msgButt } from "../components/msgButton.js";
 import { showEmptyConversation } from "../conversationActions/conversationClick.js";
-import { max_length_message } from "../env.js";
+import { accountId, max_length_message } from "../env.js";
 import { role } from "../lib_client/client_2.js";
-import { conversationId, expert, newData, senderName,  socketLib,  totalBalance,  updateConversationId } from "../main.js";
+import { conversationId, expert, newData, senderName,  socketLib,  totalBalance,  totalFreeBalance,  updateConversationId } from "../main.js";
 import { getDeleteButtons } from "../messageActions/deleteMessage.js";
 import { getEditButtons } from "../messageActions/editMessage.js";
 import { getPinButtons } from "../messageActions/pinMessage.js";
@@ -80,7 +80,7 @@ export async function sentMessage(data) {
         } else {
           let direction = data.direction == "in" ? "justify-end" : "";
           const msgStyle =
-            role === "GUEST"
+            !data.paid
               ? `rounded-2xl break-words  rounded-tl-none bg-msg p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
               : `rounded-2xl break-words  rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
           messagesContainer.style.display = "block";
@@ -215,7 +215,7 @@ export async function sentMessage(data) {
       if (conversationId == "") {
         try {
           socketLib.createConversation({
-            app: "638dc76312488c6bf67e8fc0",
+            app: accountId,
             user: newData.user,
             action: "conversation.create",
             metaData: {
@@ -237,9 +237,9 @@ export async function sentMessage(data) {
         }
       } else {
         try {
-          if (role === "GUEST" || totalBalance > 0) {
+          if (totalBalance > 0  || totalFreeBalance > 0) {
             socketLib.onCreateMessage({
-              app: "638dc76312488c6bf67e8fc0",
+              app: accountId,
               user: newData.user,
               action: "message.create",
               metaData: {
@@ -251,7 +251,9 @@ export async function sentMessage(data) {
                 origin: "web",
               },
               to: expert,
-              balance: totalBalance?.balance,
+              // balance: totalBalance?.balance,
+              // freeBalance:totalFreeBalance
+
             });
           }
           messageInput.value = "";

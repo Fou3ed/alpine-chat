@@ -1,25 +1,22 @@
 export function compareFields(a, b) {
-    switch (a.field_name.toLowerCase()) {
-      case "first name":
-        return -1;
-      case "last name":
-        return b.field_name.toLowerCase() === "first name" ? 1 : -1;
-      case "country":
-        return ["first name", "last name"].includes(b.field_name.toLowerCase())
-          ? 1
-          : -1;
-      case "phone":
-        return ["first name", "last name", "country"].includes(
-          b.field_name.toLowerCase()
-        )
-          ? 1
-          : -1;
-      default:
-        return ["first name", "last name", "country", "phone"].includes(
-          b.field_name.toLowerCase()
-        )
-          ? 1
-          : 0;
-    }
+  const aFieldType = getValue(a.field_type.toString())
+  const bFieldType = getValue(b.field_type.toString())
+
+return aFieldType < bFieldType ? -1 : (aFieldType > bFieldType ? 1 : 0)
+
+}
+
+function getValue(a){
+  switch(parseInt(a)){
+
+    case 13 : return 1
+    case 10 : return 2 
+    case 11 : return 3 
+    case 8 : return 4
+    case 7 : return 5
+    case 6 : return 6
+    default : return 7
+
   }
-  
+
+}

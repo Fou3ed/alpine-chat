@@ -1,3 +1,4 @@
+import { accountId } from "../env.js";
 import { conversationId, expert, newData, socketLib } from "../main.js";
 
 export async function addLogs(log, aux = {}) {
@@ -14,7 +15,7 @@ export async function addLogs(log, aux = {}) {
     }
   
     socketLib.onCreateMessage({
-      app: "638dc76312488c6bf67e8fc0",
+      app: accountId,
       user: newData.user,
       action: "message.create",
       metaData: {

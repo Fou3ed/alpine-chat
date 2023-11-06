@@ -1010,7 +1010,6 @@ input, select, textarea {
   width: 100%;
 }
 
-
 @media (max-width: 639px) {
   #conversation-user-container {
     order: 1;
@@ -1021,29 +1020,35 @@ input, select, textarea {
   #profileInfo {
     order: 2;
   }
-
   #header-container {
     flex-direction: unset;
     flex-wrap: wrap;
-    margin: 0 !important
+    margin: 0 !important;
   }
-  #buyMessagesTool{
+  #buyMessagesTool {
     width: 40%;
-    height:1.75rem;
+    height: 1.75rem;
     padding-left: 0.75rem;
     padding-right: 0.75rem;
-    
   }
-  #buyCreditsText{
+  #buyCreditsText {
     font-size: 10px;
     line-height: 1.3;
   }
   .balance-value {
-  font: 16px;
+    font-size: 16px;
   }
-  #dropdown-content{
+  #dropdown-content {
     right: 20px;
     width: 130px;
     height: 40px;
   }
+
+
+}
+
+
+
+.d-none{
+  display: none!important;
 }

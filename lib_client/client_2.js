@@ -48,6 +48,10 @@ import { ableInputArea } from "../utils/messageInputArea.js";
 import { login } from "../general/login.js";
 export let role = ""
 
+function isMobile() {
+  const regex = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+  return regex.test(navigator.userAgent);
+}
 export default class event {
 
  constructor(){
@@ -94,9 +98,9 @@ export default class event {
           clientIdElement.textContent = getTranslationValue("header.profile_id")  + " " + `#${userData.id}`;
      
       }
-
         getAllConversations()
-        getTotalBalance(balance,role);
+        console.log("userData",userData,balance)
+        getTotalBalance(balance,userData.free_balance,role);
         
         loader.style.display = "none";
 
@@ -192,14 +196,15 @@ export default class event {
 
   userConnection = () => {
     this.socket.on("user-connection", (user) => {
+      console.log("user connected ",user)
         if (user?.role === "AGENT") {
           displayExpert(user)
           if(connectUsers){
             connectUsers.push(user)
           }
-        }
-        
+        }      
         userConnection(user)
+        getTotalBalance(user?.balance,user?.free_balance,"GUEST")
     })
   }
   onDisconnected = () => {
@@ -397,7 +402,6 @@ addSale=(data)=>{
 }
 saleAdded = () => {
   this.socket.on('saleAdded', (data) => {
-    
     // Populate the hidden form fields
     document.querySelector('input[name="amount"]').value = data.amount;
     document.querySelector('input[name="currency"]').value = data.currency;
@@ -488,7 +492,7 @@ const number = match ? match[1] : null;
       });
   
       document.body.appendChild(modalDiv);
-      getTotalBalance(newBalance,1);
+      getTotalBalance(newBalance);
       ableInputArea();
     });
   };
@@ -1127,7 +1131,7 @@ const number = match ? match[1] : null;
       });
       guestCreated(data)
       // loader.style.display = "none";
-       getTotalBalance(undefined,"GUEST")
+        // getTotalBalance(0,"GUEST")
     })
   }
 
@@ -1141,6 +1145,7 @@ const number = match ? match[1] : null;
     savedFormData = () => {
     this.socket.on('formSaved', (bool,userDetails,dataForm) => {
       if (bool) {
+        console.log(userDetails.full_name)
         const usernameLink = document.getElementById("userName");
         if (usernameLink) {
           usernameLink.textContent = userDetails?.full_name;

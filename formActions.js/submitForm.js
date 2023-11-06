@@ -33,7 +33,7 @@ export function submitForm(element) {
       }
       return {
         fieldId: field.dataset.fieldId,
-        value: field.value,
+        value: field.classList.contains('phoneInput') ? intlTelInputGlobals.getInstance(field).getNumber(intlTelInputUtils.numberFormat.E164) : field.value,
       };
     }
   );

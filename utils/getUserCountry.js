@@ -1,4 +1,3 @@
-export let userCountry;
 
 function getUserCountry() {
     return new Promise((resolve, reject) => {
@@ -21,3 +20,4 @@ function getUserCountry() {
   .catch((error) => {
     console.error("Error:", error);
   });
+  export let userCountry;

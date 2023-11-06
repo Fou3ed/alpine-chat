@@ -69,7 +69,7 @@ export async function receiveMessage(data) {
     );
     if (isNotNewConversation === null) {
       displayLeftConversation({
-        conversationId: data.messageData.conversation,
+        conversationId: data.conversation,
         senderName: data.senderName,
         agentId: data.messageData.from,
         contactAgentId: data.contactAgentId,
@@ -122,11 +122,13 @@ export async function receiveMessage(data) {
               case 1:
                 case 10: //first name
                   case 11: //last name:
+                    case 15:
                 type = "text";
                 break;
               case 2:
                 type = "number";
               case 3:
+                case 14:
                 type = "date";
                 break;
               case 4:
@@ -142,11 +144,16 @@ export async function receiveMessage(data) {
                 type = "tel";
                 break;
               case 8:
-                type = "select";
+                type = "country";
                 break;
               case 9:
                 type = "textarea";
                 break;
+                case 12:
+                  type="select"
+                  break;
+                  case 13:
+                  type="gender"
             }
             if (field?.field_type ==8) {
               const countryOptions = generateCountryOptions(
@@ -191,7 +198,49 @@ export async function receiveMessage(data) {
               />
           </label>
           `;
-            } else {
+            } else if (type == "gender"){
+              
+              return `
+              <label class="relative">
+              <span>${field?.field_name ?? ''}</span>
+              <select 
+                  id="floating_field_${messageId}"
+                  data-gender
+                  class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900" 
+                  name="${field.field_name.replace(" ", "")}" 
+                  data-field-id="${field.field_id}"
+                  required
+                  
+              >
+                   <option value=""> ${field.field_name}
+                   </option>
+
+                   <option value="0" data-translation="gender.male">${getTranslationValue("gender.male")}</option><option value="1" data-translation="gender.female" >${getTranslationValue("gender.female")}</option>
+                   
+                    </select>
+          </label>
+          
+          `;
+            }else if(type == "select"){
+              return `
+              <label class="relative">
+              <span>${field?.field_name ?? ''}</span>
+              <select 
+                  id="floating_field_${messageId}"
+                  data-gender
+                  class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900" 
+                  name="${field.field_name.replace(" ", "")}" 
+                  data-field-id="${field.field_id}"
+                  required
+                  
+                  ${myContent.status == 1 ? "disabled" : ""}
+              >
+              ${Object.entries(field?.field_default_value).map(([key, value]) => `<option value="${value}">${value}</option>`).join('') }
+              </select>
+          </label>
+           
+          `;}
+          else {
               return `
                 <label class="relative">
                   <span>${field.field_name}</span>
@@ -279,7 +328,7 @@ export async function receiveMessage(data) {
                                       myContent.status !== 1
                                         ? `
                                         <button class="btn1 min-w-[7rem] bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90" type="button"
-                                            id="submit-form-${message._id}" 
+                                            id="submit-form-${messageId}" 
                                         >
                                             <span class="spinner hidden absolute inset-0 flex justify-center items-center">
                                             </span>
@@ -471,7 +520,7 @@ export async function receiveMessage(data) {
                          
                         `
                       : `
-                        <div id="message-content-${messageId}">
+                        <div id="message-content-${messageId}" >
                         <div class="ml-2 max-w-lg sm:ml-5">
   
                           ${
@@ -588,6 +637,8 @@ export async function receiveMessage(data) {
   
           $(selectElement).select2({
             placeholder: "Select your Country",
+            width: '100%',
+
             templateResult: (item) => {
               return Countries.getName(item.id, lan.substring(0, 2).toLowerCase())
             },

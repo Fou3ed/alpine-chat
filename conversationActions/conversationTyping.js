@@ -1,3 +1,4 @@
+import { accountId } from "../env.js";
 import { conversationId, newData, socketLib } from "../main.js";
 const messageInput = document.querySelector("#message-input");
 let messagesContainer = document.getElementById("big-container-message");
@@ -20,7 +21,7 @@ if (messageInput) {
   
 function onStartTyping() {
     const onTypingStart = {
-      app: "1",
+      app: accountId,
       user: newData.user,
       action: "typing.start",
       metaData: {
@@ -32,7 +33,7 @@ function onStartTyping() {
   
   export function onStopTyping() {
     const onTypingStop = {
-      app: "ID",
+      app: accountId,
       user: newData?.user,
       action: "typing.stop",
       metaData: {

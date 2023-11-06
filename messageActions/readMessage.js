@@ -1,3 +1,4 @@
+import { accountId } from "../env.js";
 import { socketLib,  newData } from "../main.js";
 import { getTheLastMsg } from "../utils/getLastMsg.js";
 let messagesContainer = document.getElementById("big-container-message");
@@ -7,7 +8,7 @@ export async function markMessageAsSeen(conversationId) {
       getTheLastMsg(conversationId).then((res) => {
         if (res.user !== newData.user && !res.read) {
           socketLib.markMessageAsRead({
-            app: "638dc76312488c6bf67e8fc0",
+            app: accountId,
             user: newData.user,
             action: "message.read",
             metaData: {

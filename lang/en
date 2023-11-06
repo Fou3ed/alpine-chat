@@ -13,6 +13,8 @@
     },
     "header": {
         "free": "free",
+        "balance":"balance",
+
         "buy_credits": "buy credits",
         "dark_mode": "dark mode",
         "expert_card": "expert card",
@@ -134,7 +136,7 @@
         "conversationsSideBar": "conversations SideBar"
     },
     "date_format":{
-                "date_form":"DD/MM/YYYY "
+                "date_form":"DD-MM-YYYY "
     },
     "bloc_message":{
         "title":"Form successfully submitted",
@@ -147,6 +149,10 @@
        "title":"chat plans" ,
        "description" :"Do you want to increase your balance, purchase your appropriate message pack",
        "button":"start chatting"
+    },
+    "gender":{
+        "male":"male",
+        "female":"female"
     }
 }
 

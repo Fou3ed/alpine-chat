@@ -155,16 +155,17 @@ export function displayMessages(messages) {
             myContent.fields.sort(compareFields);
             inputForms = myContent.fields.map((field) => {
               let type = "";
-
               switch (+field?.field_type) {
                 case 1:
                 case 10: //first name
                   case 11: //last name
+                  case 15: 
                   type = "text";
                   break;
                 case 2:
                   type = "number";
                 case 3:
+                  case 14:
                   type = "date";
                   break;
                 case 4:
@@ -180,11 +181,16 @@ export function displayMessages(messages) {
                   type = "tel";
                   break;
                 case 8:
-                  type = "select";
+                  type = "country";
                   break;
                 case 9:
                   type = "textarea";
                   break;
+                  case 12:
+                    type="select"
+                    break;
+                    case 13:
+                      type="gender"
               }
               if (field?.field_type == 8) {
                 const countryOptions = generateCountryOptions(
@@ -230,7 +236,44 @@ export function displayMessages(messages) {
               />
           </label>
           `;
-              } else {
+              }else if(type == "gender"){
+                return `
+                <label class="relative">
+                <span>${field?.field_name ?? ''}</span>
+                <select 
+                    id="floating_field_${messageId}"
+                    data-gender
+                    class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900" 
+                    name="${field.field_name.replace(" ", "")}" 
+                    data-field-id="${field.field_id}"
+                    required
+                    
+                    ${myContent.status == 1 ? "disabled" : ""}
+                >
+                     ${myContent.status == 0 ? `<option value="0" data-translation="gender.male">${getTranslationValue("gender.male")}</option><option value="1" data-translation="gender.female" >${getTranslationValue("gender.female")}</option>` : `<option value="${field.field_value}" data-translation="${field.field_value==0?  "gender.male" : "gender.female"}" > ${field.field_value==0?  getTranslationValue("gender.male") : getTranslationValue("gender.female")} </option>`}
+                </select>
+            </label>
+             
+            `;
+              } else if(type == "select"){
+                return `
+                <label class="relative">
+                <span>${field?.field_name ?? ''}</span>
+                <select 
+                    id="floating_field_${messageId}"
+                    data-gender
+                    class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900" 
+                    name="${field.field_name.replace(" ", "")}" 
+                    data-field-id="${field.field_id}"
+                    required
+                    
+                    ${myContent.status == 1 ? "disabled" : ""}
+                > 
+                     ${myContent.status == 0 ? Object.entries(field?.field_default_value).map(([key, value]) => `<option value="${value}">${value}</option>`).join('') :  `<option value="${field.field_value}">${field.field_value}</option>`}
+                </select>
+            </label>
+             
+            `;} else {
                 return `
                 <label class="relative">
                   <span>${field.field_name ?? ""}</span>
@@ -399,7 +442,7 @@ export function displayMessages(messages) {
                           message.type == "link"
                             ? " message-content rounded-2xl break-words relative rounded-tr-none bg-violet-300 p-3 text-slate-700 shadow-sm dark:bg-violet-500 dark:text-white"
                             : msgStyle
-                        }" id="message-content-${messageId}" >
+                        }" id="message-content-${messageId}">
                           ${
                             message.status == 0
                               ? `${
@@ -432,7 +475,7 @@ export function displayMessages(messages) {
                           }
                         </div></div>`
                         : `
-                        <div id="message-content-${messageId}">
+                        <div id="message-content-${messageId}" >
                         <div class="ml-2 max-w-lg sm:ml-5">
                           ${
                             message.status == 0
@@ -621,6 +664,7 @@ export function displayMessages(messages) {
   
         $(selectElement).select2({
           placeholder: "Select your Country",
+          width: '100%',
           templateResult: (item) => {
             return Countries.getName(item.id, lan.substring(0, 2).toLowerCase())
           },

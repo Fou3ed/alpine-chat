@@ -42,7 +42,7 @@ export async function getPlans() {
                       </ul>
                       <button id="startChatButton" class='plan-btn pricing-action' data-plan="${plan.id}" name="${plan.name}">
                       <span class="button-text" data-translation="chat_plans.button">${getTranslationValue("chat_plans.button")}</span>
-                      <div class="spinner-container" style="display: none;">
+                      <div class="spinner-container d-none">
                         <div class="d-flex align-items-center" style="height: 20px;"><span class="loader2"></span></div>
                       </div>
                     </button>                      </div>         
@@ -55,25 +55,25 @@ export async function getPlans() {
   
         buyButtons.forEach((buyButton) => {
           buyButton.addEventListener("click", function () {
+            console.log("here")
             const selectedPlan = this.getAttribute("data-plan");
             const planName = this.getAttribute("name");
-            const msgId = this.getAttribute("message-id");
             // balanceSpinner.classList.remove("hidden");
-            this.querySelector('.button-text').style.display = 'none';
-            this.querySelector('.spinner-container').style.display = 'block';
+            this.querySelector('.button-text').classList.add('d-none');
+            this.querySelector('.spinner-container').classList.remove('d-none');
             socketLib.addSale({
               contact: newData.contact,
               user: newData.user,
               plan: selectedPlan,
               payment_method: "1",
               provider_id: "1",
-              messageId: msgId,
               conversationId: conversationId,
               planName: planName,
               sale_status: 0,
             });
             setTimeout(() => {
-              this.textContent = getTranslationValue("chat_plans.button");
+              this.querySelector('.button-text').classList.remove('d-none');
+              this.querySelector('.spinner-container').classList.add('d-none');
             }, 2000)
           });
     

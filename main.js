@@ -14,10 +14,11 @@ export const timeString =
 
 // Save user information in local storage
 import {
-  accountId,
+  accountId, message_limit,
 } from "./env.js";
 export let allConversation = [];
 export let totalBalance;
+export let totalFreeBalance
 
 import { getTranslationValue, lan } from "./utils/traduction.js";
 import { getCookie } from "./utils/getCookie.js";
@@ -67,6 +68,10 @@ export function updateTotalBalance(newBalance){
   totalBalance=newBalance
 
 }
+export function updateTotalFreeBalance(newBalance){
+  totalFreeBalance=newBalance
+
+}
 export function updateNotifyNumber(number){
   if (number !== 0) {
     notifyNumber = notifyNumber + number;
@@ -107,7 +112,6 @@ $(document).ready(async function () {
   let params = Object.fromEntries(
     new URLSearchParams(window.location.search).entries()
   );
-  console.log("params",params)
   showSpinner();
   getPlans();
 
@@ -133,9 +137,7 @@ $(document).ready(async function () {
       !newData ||
       (params?.source == "gocc" &&
         (params?.contact || params?.lead) &&
-        (params?.source
-          ? params?.contact != newData.sourceId
-          : params?.lead != newData.sourceId))
+        (params?.contact || params?.lead) != newData.sourceId)
     ) {
       socketLib.socket.emit(
         "createGuest",
@@ -144,6 +146,7 @@ $(document).ready(async function () {
           browser: navigator.userAgent,
           platform: navigator.platform,
           accountId: accountId,
+          free_balance:message_limit,
           ...(params.contact
             ? { source: "gocc", contact_id: params.contact }
             : {}),

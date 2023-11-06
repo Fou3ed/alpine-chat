@@ -12,6 +12,7 @@
     },
     "header": {
         "free": "gratuit",
+        "balance":"crédits",
         "buy_credits": "acheter des crédits",
         "dark_mode": "mode sombre",
         "expert_card": "carte d'expert",
@@ -148,5 +149,10 @@
         "description" :"Si vous souhaitez augmenter votre solde, achetez votre pack de messages approprié.",
         "button":"commencer à discuter"
 
-     }
+     },
+     "gender":{
+        "male":"male",
+        "female":"femelle"
+    }
+
 }

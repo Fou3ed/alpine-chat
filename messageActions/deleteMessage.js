@@ -1,3 +1,4 @@
+import { accountId } from "../env.js";
 import { conversationId, newData, socketLib } from "../main.js";
 
 export async function getDeleteButtons() {
@@ -32,7 +33,7 @@ export async function deleteMessage(button) {
     deleteButton.onclick = function () {
       let messageId = button.dataset.messageId;
       const onMessageDelete = {
-        app: "638dc76312488c6bf67e8fc0",
+        app: accountId,
         user: newData.user,
         action: "message.delete",
         metaData: {

@@ -5,6 +5,7 @@ const leftConversationContainer = document.getElementById("left-conversation");
 const minimizedSideBar = document.getElementById("mini-sidebar");
 
 export function displayLeftConversation(data) {
+  console.log("data 1",data)
     const isNotNewConversation = document.querySelector(
       `#left-conversation-${data.conversationId}`
     );
@@ -166,7 +167,7 @@ export function displayLeftConversation(data) {
                           data.contactAgentId
                         }.jpg alt="image">
                         <div id="active-user" class="absolute right-0 h-3 w-3 rounded-full border-2 border-white ${
-                          agentContactId?.is_active
+                          agentContactId?.is_active || data.contactAgentId=="0"
                             ? "bg-success"
                             : "bg-slate-300"
                         }  dark:border-navy-700"></div>

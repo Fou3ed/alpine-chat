@@ -1,3 +1,4 @@
+import { accountId } from "../env.js";
 import { conversationId, newData, socketLib } from "../main.js";
 
 export async function getEditButtons() {
@@ -37,7 +38,7 @@ export async function getEditButtons() {
       if (event.keyCode === 13) {
         const newContent = this.value.trim();
         const onMessageUpdate = {
-          app: "638dc76312488c6bf67e8fc0",
+          app: accountId,
           user: newData.user,
           action: "message.update",
           metaData: {

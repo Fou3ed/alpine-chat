@@ -1,3 +1,4 @@
+import { accountId } from "../env.js";
 import { conversationId, newData, socketLib } from "../main.js";
 import { playNotificationSound } from "../utils/notificationSound.js";
 
@@ -34,7 +35,7 @@ export async function getPinButtons() {
     let pinned = button;
     let messageId = pinned.dataset.messageId;
     const onMessageUnpin = {
-      app: "ID",
+      app: accountId,
       user: newData.user,
       action: "message.unpin",
       metaData: {
@@ -66,7 +67,7 @@ export async function getPinButtons() {
     let messageId = pinned.dataset.messageId;
   
     const onMessagePin = {
-      app: "ID",
+      app: accountId,
       user: newData.user,
       action: "message.pin",
       metaData: {
