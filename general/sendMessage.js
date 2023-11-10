@@ -212,30 +212,7 @@ export async function sentMessage(data) {
       isSendingMessage = true; // Set the sending state to true
   
       if (!emoji.classList.contains("hidden")) emoji.classList.add("hidden");
-      if (conversationId == "") {
-        try {
-          socketLib.createConversation({
-            app: accountId,
-            user: newData.user,
-            action: "conversation.create",
-            metaData: {
-              name: senderName,
-              channel_url: "socketLib/test",
-              conversation_type: "1",
-              description: "private chat",
-              owner_id: newData.accountId,
-              members: [newData.user, expert],
-              permissions: {},
-              members_count: 2,
-              status: "0",
-              max_length_message: max_length_message,
-            },
-          });
-        } catch (error) {
-          console.log(error);
-          isSendingMessage = false;
-        }
-      } else {
+      if (conversationId) {
         try {
           if (totalBalance > 0  || totalFreeBalance > 0) {
             socketLib.onCreateMessage({
@@ -262,6 +239,6 @@ export async function sentMessage(data) {
           isSendingMessage = false;
           throw new Error("Failed to send message");
         }
-      }
+      } 
     }
   }

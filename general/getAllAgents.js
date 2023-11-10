@@ -1,5 +1,5 @@
 import { MY_API_ADDRESS, applicationName } from "../env.js";
-import { newData } from "../main.js";
+import { newData}from "../main.js";
 import { getTranslationValue } from "../utils/traduction.js";
 import { truncateMessage } from "../utils/truncateMessage.js";
 import { getAgentPresentation } from "./getAgentPresentation.js";
@@ -12,7 +12,7 @@ export async function getAllAgents(response) {
   
       $(".all-agents").empty();
       agents.forEach((agent) => {
-        const html = ` <div  id="agent-${agent.user_id}" class="card w-72 shrink-0 space-y-4 rounded-xl p-4 sm:px-5 rounded-lg bg-info/10 dark:bg-navy-800 mb-2">
+        const html = ` <div  id="agent-${agent._id}" class="card w-72 shrink-0 space-y-4 rounded-xl p-4 sm:px-5 rounded-lg bg-info/10 dark:bg-navy-800 mb-2">
         <div class="flex items-center justify-between space-x-2">
           <div class="flex items-center space-x-3">
             <div class="avatar">
@@ -31,7 +31,7 @@ export async function getAllAgents(response) {
           </div>
           <div class="flex space-x-2">
             <div class="relative cursor-pointer">
-              <button  id="left-agent-${agent.user_id}" class="btn h-7 w-7 bg-primary/10 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:bg-accent-light/10 dark:text-accent-light dark:hover:bg-accent-light/20 dark:focus:bg-accent-light/20 dark:active:bg-accent-light/25">
+              <button  id="left-agent-${agent._id}" class="btn h-7 w-7 bg-primary/10 p-0 text-primary hover:bg-primary/20 focus:bg-primary/20 active:bg-primary/25 dark:bg-accent-light/10 dark:text-accent-light dark:hover:bg-accent-light/20 dark:focus:bg-accent-light/20 dark:active:bg-accent-light/25">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                 </svg>
@@ -74,28 +74,29 @@ export async function getAllAgents(response) {
       </div>`;
   
         $(".all-agents").append(html);
-        $(`#left-agent-${agent.user_id}`).on("click", async () => {
-          clickedAgent(agent.user_id, agent.UserID);
+        $(`#left-agent-${agent._id}`).on("click", async () => {
+          clickedAgent(agent._id, agent.nickname,agent.UserID);
         });
       });
     }
   }
-  async function clickedAgent(agentId, agentContactId) {
+  async function clickedAgent(agentId,nickname, agentContactId) {
     if (newData.status == 1) {
       messagesContainer.innerHTML = "";
   
-      const mongoAgent = await axios.get(`${MY_API_ADDRESS}/users/${agentId}`);
-  
       selectAgent(
-        mongoAgent.data.data[0]._id,
-        mongoAgent.data.data[0].full_name,
+        agentId,
+        nickname,
         agentContactId
+    
       );
-      if (mongoAgent.data.data[0].is_active) {
-        getAgentPresentation(agentId, true);
-      } else {
-        getAgentPresentation(agentId, false);
-      }
+      // if (mongoAgent.data.data[0].is_active) {
+      //   getAgentPresentation(agentId, true);
+      // } else {
+      //   getAgentPresentation(agentId, false);
+      // }
+     getAgentPresentation(agentId, true);
+
     } else {
       const modalDiv = document.createElement("div");
       modalDiv.innerHTML = `

@@ -14,7 +14,7 @@ import {
 
   // mergeConversation,
 
-  connectUsers,
+  connectUsers, newData,
   
   
   
@@ -22,9 +22,9 @@ import {
 } from "../main.js";
 let messagesContainer = document.getElementById("big-container-message");
 export let last_seen_at;
-import { socketAddress } from "../env.js";
+import { accountId, applicationName, loginLink, socketAddress } from "../env.js";
 import { getAllConversations } from "../general/getConversations.js";
-import { getTranslationValue } from "../utils/traduction.js";
+import { getTranslationValue, lan } from "../utils/traduction.js";
 import { pinMessage, unpinMessage } from "../messageActions/pinMessage.js";
 import { sentMessage } from "../general/sendMessage.js";
 import { receiveMessage } from "../general/receiveMessage.js";
@@ -46,6 +46,7 @@ import { onCheckConversation, selectAgent } from "../general/selectAgent.js";
 import { changeHeaderPicture } from "../conversationActions/changeHeaderPic.js";
 import { ableInputArea } from "../utils/messageInputArea.js";
 import { login } from "../general/login.js";
+import { accountExist } from "../components/accountExist.js";
 export let role = ""
 
 function isMobile() {
@@ -1109,7 +1110,81 @@ const number = match ? match[1] : null;
     })
   }
 
+  
+accountExist = () => {
+  
+  this.socket.on('accountExist', (data) => {
+    console.log("data",data.firstname + " " +data.lastname)
+    this.socket.emit(
+      "login",
+      {
+        language:lan,
+        browser: navigator.userAgent,
+        platform: navigator.platform,
+        accountId: accountId,
+        username:data.firstname + " " + data.lastname,
+        profile_id:data.id,
+        contact_id:data.contact_id,
+        action:"login"
+      },
+      (error) => {}
+    );
+    return;
+    // socketLib.socket.emit("user-connected", {
+    //   app_id: accountId,
+    //   user: newData.contact,
+    //   contact: newData.contact,
+    //   action: "user-connected",
+    //   metaData: {
+    //     app_id: accountId,
+    //     api_token: "123456789123456",
+    //     user_id: newData?.user,
+    //   },
+    //   device: {
+    //     ip: "123.213.121",
+    //     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    //     platform: navigator.platform,
+    //     userAgent: navigator.userAgent,
+    //   },
+    // });
+    // const modalDiv = document.createElement("div");
+    // modalDiv.innerHTML = `
+    //   <div class="account-exist fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5">
+    //     <div class="absolute inset-0 bg-red transition-opacity duration-300"></div>
+    //     <div class="relative max-w-lg rounded-lg bg-white px-4 py-10 text-center transition-opacity duration-300 dark:bg-navy-700 sm:px-5">
+    //       <svg xmlns="http://www.w3.org/2000/svg" class="inline h-28 w-28 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    //         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    //       </svg>
+    //       <div class="mt-4">
+    //         <h2 class="text-2xl text-red-700 dark:text-navy-100">
+    //          you already have an account 
+    //         </h2>
+    //         <p class="mt-2">
+    //           Please check your email for you login credentials :
+    //         </p>
+    //         <button id="redirection-login" class="btn mt-6 bg-error font-medium text-white hover:bg-error-focus focus:bg-error-focus active:bg-error-focus/90">
+    //           Login
+    //         </button>
+
+    //       </div>
+    //     </div>
+    //   </div>
+    // `;
+
+    // const redirectLogin = modalDiv.querySelector("#redirection-login");
+
+
+
+    // redirectLogin.addEventListener("click", () => {
+    //   window.open('https://hatem.local.itwise.pro/private-chat-app/public/Dellastrod/');
+
+    // });
+
+    // document.body.appendChild(modalDiv);
+  });
+};
   onGuestCreated = (data) => {
+    console.log("data",data)
     this.socket.on('guestCreated', (data) => {
       role="GUEST"
       this.socket.emit("user-connected", {
@@ -1137,22 +1212,37 @@ const number = match ? match[1] : null;
 
 
   saveFormData = (data) => {
-    this.socket.emit('saveForm', data, error => {
+    this.socket.emit('saveForm', data,applicationName, error => {
 
     })
   }
+verifyEmail=(data)=>{
+  this.socket.emit("verifyEmail",data,applicationName,error=>{
+
+  })
+}
+
 
     savedFormData = () => {
+
     this.socket.on('formSaved', (bool,userDetails,dataForm) => {
       if (bool) {
-        console.log(userDetails.full_name)
+        document.querySelector(".form-spinner").remove()
+          
+        const modalActivation = document.querySelector(".modal-activation");
+        if(modalActivation){
+          modalActivation.parentElement.remove()
+        }
+      
         const usernameLink = document.getElementById("userName");
         if (usernameLink) {
           usernameLink.textContent = userDetails?.full_name;
         }
 
         const parsedData = JSON.parse(dataForm);
-        console.log(dataForm)
+
+      
+        
         submitFormStatus("1",parsedData.form.text_capture,parsedData.messageId,parsedData);
       } else {
         submitFormStatus();
@@ -1209,6 +1299,9 @@ const number = match ? match[1] : null;
       displayAgents(data)
     })
   }
+
+
+
 // The failGuest function
 failGuest = () => {
   const modalOverlay = document.createElement('div');
@@ -1385,4 +1478,103 @@ if(!document.querySelector(`.conversation-click[data-conversation-id] [data-conv
 }
   });
 };
+verifyGeneratedCode = (data) => {
+  this.socket.emit('verifyGeneratedCode', data, (error) => {
+    if (error) {
+      setError(error)
+    }
+  })
+}
+
+wrongCode = () => {
+  this.socket.on("wrongCode", (data,limitCode) => {
+    document.querySelector(".form-spinner").remove()
+    const verificationCodeInput = document.getElementById("verification-code-input");
+  
+    // Check if the error message element already exists
+    const errorMessage = document.getElementById("code-verification-error");
+
+    // If it exists, update the text content and add fade-out and fade-in effects; otherwise, create a new element
+    if (errorMessage) {
+      errorMessage.textContent = "Wrong verification code!";
+      errorMessage.style.opacity = 0; // Start with opacity 0
+      setTimeout(() => {
+        errorMessage.style.opacity = 1; // Fade in after 0.5 seconds
+      }, 500);
+    } else {
+      // Create the error message element
+      const newErrorMessage = document.createElement("div");
+      newErrorMessage.id = "code-verification-error";
+      newErrorMessage.textContent = "Wrong verification code!";
+      newErrorMessage.className = "text-red-600 mt-2";
+
+      // Append the error message below the input field
+      verificationCodeInput.parentNode.appendChild(newErrorMessage);
+
+      // Add fade-in effect
+      newErrorMessage.style.opacity = 0;
+      setTimeout(() => {
+        newErrorMessage.style.opacity = 1;
+      }, 0);
+    }
+    if(limitCode ===0){
+      const verificationCodeInput = document.getElementById("verification-code-input");
+      const errorMessage = document.getElementById("code-verification-error");
+        if(errorMessage){
+          errorMessage.textContent = "you reached maximum number verification code attempts verify you wrote your email correctly then try again ";
+          errorMessage.className = "text-red-600 mt-2";
+          verificationCodeInput.parentNode.appendChild(errorMessage);
+        }
+
+    }
+
+  });
+};
+
+failedEmail=()=>{
+  this.socket.on("SendingMailFail",(data)=>{
+    if(data=="READY_VRIFYIED"){
+
+      document.querySelector(".modal-activation").remove()
+      const modalDiv = document.createElement("div");
+
+      modalDiv.innerHTML = `
+      <div class="account-exist fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5">
+        <div class="absolute inset-0 bg-red transition-opacity duration-300"></div>
+        <div class="relative max-w-lg rounded-lg bg-white px-4 py-10 text-center transition-opacity duration-300 dark:bg-navy-700 sm:px-5">
+          <svg xmlns="http://www.w3.org/2000/svg" class="inline h-28 w-28 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <div class="mt-4">
+            <h2 class="text-2xl text-red-700 dark:text-navy-100">
+             ${getTranslationValue("modal.account_exist_title")} 
+            </h2>
+            <p class="mt-2">
+            ${getTranslationValue("modal.account_exist_description")} 
+
+            </p>
+            <button id="redirection-login" class="btn mt-6 bg-error font-medium text-white hover:bg-error-focus focus:bg-error-focus active:bg-error-focus/90">
+            ${getTranslationValue("modal.account_exist_button")} 
+
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const redirectLogin = modalDiv.querySelector("#redirection-login");
+
+
+
+    redirectLogin.addEventListener("click", () => {
+      window.open(loginLink);
+
+    });
+
+    document.body.appendChild(modalDiv);
+    }
+
+  })
+}
+
 }

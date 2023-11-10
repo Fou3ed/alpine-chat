@@ -4,6 +4,7 @@ import { inputLEngth } from "../utils/resetCnvMaxLength.js";
 const leftConversationContainer = document.getElementById("left-conversation");
 
 export async function guestCreated(data) {
+  console.log("guestCreated",data)
     const newUser = {
       user: data.user,
       contact: data.contact,
@@ -28,5 +29,4 @@ export async function guestCreated(data) {
     updateExpert(data.availableAgent)
     updateConversationId(data.conversationId)
    
-    
   }

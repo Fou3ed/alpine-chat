@@ -26,6 +26,7 @@ export function login(data){
         accountId: accountId,
         status: data.status,
       };
+      
       updateNewData(newUser)
       document.cookie =
         "myData=" +

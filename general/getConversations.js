@@ -15,13 +15,13 @@ export async function getAllConversations() {
     let userConversation = "";
   
     const conversationsResponse = await axios.get(
-      `${MY_API_ADDRESS}/conversation/${accountId}/?user_id=${newData.contact}`
+      `${MY_API_ADDRESS}/conversation/${accountId}/?user_id=${newData.user}`
     );
   
     if (conversationsResponse.data.data.length > 0) {
       const conversations = conversationsResponse.data.data;
-  updateAllConversations(conversations)
-      updateConversationId(conversations[0]?._id)
+        updateAllConversations(conversations)
+        updateConversationId(conversations[0]?._id)
       const conversationPromises = conversations.map(
         async (conversation, index) => {
           conversation.members.forEach((user) => {

@@ -17,11 +17,12 @@ export function displayAgents(agents) {
         "is-scrollbar-hidden col-span-12 flex space-x-4 overflow-x-auto px-[var(--margin-x)] transition-all duration-[.25s] lg:col-span-9 lg:pl-0";
   
       agents.forEach(async (agent) => {
+
         const agentCard = await createAgentCard(agent);
         agentContainer.appendChild(agentCard);
         conversationContainer.scrollTop = conversationContainer.scrollHeight;
   
-        const button = document.getElementById(`right-agent-${agent.user_id}`);
+        const button = document.getElementById(`right-agent-${agent._id}`);
         if (button) {
           button.addEventListener(
             "click",
@@ -31,7 +32,7 @@ export function displayAgents(agents) {
                 accountId: newData.accountId,
                 conversationId: conversationId,
                 userId: newData.user,
-                agentId: agent.user_id,
+                agentId: agent._id,
                 source:newData?.source
               });
             },
@@ -55,7 +56,7 @@ export function displayAgents(agents) {
       <div class="flex items-center justify-between space-x-2">
         <div class="grid grid-cols-3">
           <div class="avatar">
-            <img class="mask is-squircle" src="images/avatar/avatar-${agent.UserID || ''}.jpg" alt="image">
+            <img class="mask is-squircle" src="images/avatar/avatar-${agent.id || ''}.jpg" alt="image">
           </div>
           <div>
             <p class="font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
@@ -97,7 +98,7 @@ export function displayAgents(agents) {
         </p>
       </div>
       
-      <button id="right-agent-${agent.user_id || ''}" class="btn h-9 w-full justify-between bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
+      <button id="right-agent-${agent._id || ''}" class="btn h-9 w-full justify-between bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
         <span>Chatter</span>
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>

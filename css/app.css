@@ -1046,9 +1046,22 @@ input, select, textarea {
 
 
 }
-
-
-
+.input-maxW{
+  max-width: 30%;
+}
+.modal-activation{
+ background-color: #414b53c4
+}
+#re-send{
+  margin-top: 5%;
+  
+}
+.account-exist{
+  background-color: #414b53c4
+ }
+.crc-color{
+  color: #4187f3;
+}
 .d-none{
   display: none!important;
 }

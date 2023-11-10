@@ -51,7 +51,7 @@ export let conversationId;
 export let senderName;
 export let expert;
 export let notifyNumber = 0;
-
+export let limitCode=3
 /**state management  */
 export function updateConversationId(conversation){
   conversationId=conversation
@@ -103,6 +103,10 @@ export function updateNewData(data){
 export function loadNewData() {
   return getCookie("myData") !== undefined ? JSON.parse(getCookie("myData")) : null;
 }
+export function updateCodeLimit(data) {
+limitCode=data-1
+}
+
 
 
 export const displayedUsers = new Set();
@@ -336,6 +340,7 @@ window.history.replaceState({}, document.title, newURL);
   //receive pin message
   socketLib.onPinnedMsg();
   socketLib.onUnPinnedMsg();
+  socketLib.accountExist()
   //unPin message
   socketLib.onUnPinnedMsg();
   //on Read message
@@ -357,6 +362,8 @@ window.history.replaceState({}, document.title, newURL);
   socketLib.saleAdded();
   socketLib.onConnectedUserError()
   socketLib.onUserLogin()
+  socketLib.wrongCode()
+  socketLib.failedEmail()
   document
     .querySelector("emoji-picker")
     .addEventListener("emoji-click", (event) => {

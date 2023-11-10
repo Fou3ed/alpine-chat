@@ -31,7 +31,7 @@ export async function handleConversationClick() {
     if (!exist && conversation_id) {
       //get conversation_id  details with member_details
       const conversationsResponse = await axios.get(
-        `${MY_API_ADDRESS}/conversation/${accountId}/?user_id=${newData.contact}`
+        `${MY_API_ADDRESS}/conversation/${accountId}/?user_id=${newData.user}`
       );
   
       if (conversationsResponse.data.data.length > 0) {
