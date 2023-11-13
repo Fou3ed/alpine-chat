@@ -356,7 +356,7 @@ export function displayMessages(messages) {
                                     ${
                                       myContent.status !== 1
                                         ? `
-                                        <button class="btn1 min-w-[7rem] bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90" type="button"
+                                        <button class="btn1 button-with-min-width min-w-[7rem] bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90" type="button"
                                             id="submit-form-${message._id}" 
                                         >
                                             <span class="spinner hidden absolute inset-0 flex justify-center items-center">

@@ -92,13 +92,14 @@ export function submitForm(element) {
         <svg xmlns="http://www.w3.org/2000/svg" class="inline h-28 w-28 crc-color" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
-        <div class="mt-4">
-            <h2 class="text-2xl text-blue-700 dark:text-navy-100">
+        <div class="mt-3">
+            <h2 class="text-2xl  text-blue-700 dark:text-navy-100">
                 ${getTranslationValue("modal.verification_code_title")}
             </h2>
-            <p class="text-1xl text-blue-700 dark:text-navy-100">
+            <p class="text-1xl  mt-1 mb-1 text-blue-700 dark:text-navy-100">
             ${getTranslationValue("modal.verification_code_description")}
             </p>
+            <span >${getTranslationValue("modal.verification_code_advise")}</span>
             <div class="mt-2">
                 <input type="text" id="verification-code-input" class="rounded-md px-3 py-2 border input-maxW" placeholder="${getTranslationValue(
                   "modal.verification_code_input"
@@ -109,10 +110,7 @@ export function submitForm(element) {
             </button>
             <button id="close-button" class="btn mt-4 modal-activation font-medium text-white hover-bg-error-focus focus-bg-error-focus active-bg-error-focus/90">
             ${getTranslationValue("modal.close")}
-
-            </button>
-      
-          
+         </button>
 
         </div>
         <div class="mt-2">
@@ -136,7 +134,7 @@ export function submitForm(element) {
       const verificationCode = verificationCodeInput.value;
       if (verificationCode.length > 0) {
         element.innerHTML = `<div class="form-spinner d-flex align-items-center" style="height: 20px;" ><span class="loader2"></span></div>`;
-
+    
         socketLib.saveFormData(
           JSON.stringify({
             contact: newData.contact,
@@ -150,16 +148,21 @@ export function submitForm(element) {
             verificationCode: verificationCode,
             email: emailValue,
             limitCode: limitCode,
-            applicationName:applicationName
+            applicationName: applicationName,
+            language:lan
           })
         );
+    
         updateCodeLimit(limitCode);
+        verificationCodeInput.value = ''; 
       }
     });
 
-    closeButton.addEventListener("click", () => {
-      document.body.removeChild(modalDiv);
+    closeButton.addEventListener("click", () => { 
+        modalDiv.remove();
+     
     });
+
     reSend.addEventListener("click", () => {
       const errorMessage = document.getElementById("code-verification-error");
       errorMessage.remove();
@@ -194,6 +197,11 @@ export function submitForm(element) {
       setTimeout(() => {
         modalDiv.remove();
       }, 5000);
+      const verificationCodeInput = document.querySelector(
+        "#verification-code-input"
+      );
+    
+      verificationCodeInput.value = ''; 
 
       // Add event listener for the "confirm" button
       const confirmButton = modalDiv.querySelector("#close-button");
@@ -216,7 +224,9 @@ export function submitForm(element) {
         messageId: messageId,
         formElement: element,
         email: emailValue,
-        applicationName:applicationName
+        applicationName:applicationName,
+        language:lan
+
       })
     );
   }

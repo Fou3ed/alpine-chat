@@ -1065,3 +1065,6 @@ input, select, textarea {
 .d-none{
   display: none!important;
 }
+.button-with-min-width {
+  min-width: 100px;
+}

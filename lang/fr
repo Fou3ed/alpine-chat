@@ -134,10 +134,12 @@
         "account_exist_description":" Veuillez vérifier votre courrier électronique pour obtenir vos identifiants de connexion :",
         "account_exist_button":"login",
         "verification_code_title":"Verification Code",
-        "verification_code_description":"veuillez renseigner le code de sécurité reçu à l'adresse email renseignée",
+        "verification_code_description":"veuillez renseigner le code de sécurité reçu à l'adresse email renseignée.",
         "verification_code_save_button":"soumettre",
         "verification_code_resend":"Renvoyer le code de vérification",
-        "verification_code_input":"code"
+        "verification_code_input":"code",
+        "verification_code_advise":"si vous n'avez pas reçu d'email,pensez à vérifier vos spams"
+
 
     },
     "tooltips": {

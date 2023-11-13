@@ -40,12 +40,14 @@ export async function getPlans() {
                       <ul class='pricing-feature-list'>
                         <li class='pricing-feature'>${plan.billing_volume} Messages</li>
                       </ul>
-                      <button id="startChatButton" class='plan-btn pricing-action' data-plan="${plan.id}" name="${plan.name}">
+                      <button id="startChatButton" class='plan-btn pricing-action button-with-min-width' data-plan="${plan.id}" name="${plan.name}">
                       <span class="button-text" data-translation="chat_plans.button">${getTranslationValue("chat_plans.button")}</span>
                       <div class="spinner-container d-none">
                         <div class="d-flex align-items-center" style="height: 20px;"><span class="loader2"></span></div>
                       </div>
-                    </button>                      </div>         
+                    </button>
+                    
+                    </div>         
         `
           );
         });

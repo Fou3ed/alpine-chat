@@ -1217,7 +1217,7 @@ accountExist = () => {
     })
   }
 verifyEmail=(data)=>{
-  this.socket.emit("verifyEmail",data,applicationName,error=>{
+  this.socket.emit("verifyEmail",data,applicationName,lan,error=>{
 
   })
 }

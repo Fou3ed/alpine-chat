@@ -135,10 +135,11 @@
         "account_exist_description":" Please check you email for you login credentials :",
         "account_exist_button":"login",
         "verification_code_title":"Verification Code",
-        "verification_code_description":"Thanks to capture the security code received into your email address",
+        "verification_code_description":"Thanks to capture the security code received into your email address.",
         "verification_code_save_button":"submit",
         "verification_code_resend":"resend verification code",
-        "verification_code_input":"code"
+        "verification_code_input":"code",
+        "verification_code_advise":"Check your spam box if you have not received the code."
     },
     "tooltips": {
         "conversationsSideBar": "conversations SideBar"
