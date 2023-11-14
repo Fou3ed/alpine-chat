@@ -60,7 +60,6 @@ export function sendTypingNotification(input) {
 
 
   conversationContainer.addEventListener("click", (event) => {
-    console.log("herere")
     let target = event.target.closest("button.btn1");
     if (target) {
       const form = event.target.closest("form");
@@ -126,8 +125,6 @@ export function sendTypingNotification(input) {
       }
     }
   });
-
-
 
   
 conversationContainer.oninput = (event) => {

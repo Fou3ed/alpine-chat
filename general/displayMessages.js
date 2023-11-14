@@ -247,14 +247,14 @@ export function displayMessages(messages) {
                     name="${field.field_name.replace(" ", "")}" 
                     data-field-id="${field.field_id}"
                     required
-                    
                     ${myContent.status == 1 ? "disabled" : ""}
                 >
-                     ${myContent.status == 0 ? `<option value="0" data-translation="gender.male">${getTranslationValue("gender.male")}</option><option value="1" data-translation="gender.female" >${getTranslationValue("gender.female")}</option>` : `<option value="${field.field_value}" data-translation="${field.field_value==0?  "gender.male" : "gender.female"}" > ${field.field_value==0?  getTranslationValue("gender.male") : getTranslationValue("gender.female")} </option>`}
+                    ${myContent.status == 0 ? `<option value="" data-translation="gender.empty"></option><option value="0" data-translation="gender.male">${getTranslationValue("gender.male")}</option><option value="1" data-translation="gender.female">${getTranslationValue("gender.female")}</option>` : `<option value="${field.field_value}" data-translation="${field.field_value==0?  "gender.male" : "gender.female"}" > ${field.field_value==0?  getTranslationValue("gender.male") : getTranslationValue("gender.female")} </option>`}
                 </select>
-            </label>
-             
+                </label>
             `;
+            
+            
               } else if(type == "select"){
                 return `
                 <label class="relative">
@@ -266,14 +266,14 @@ export function displayMessages(messages) {
                     name="${field.field_name.replace(" ", "")}" 
                     data-field-id="${field.field_id}"
                     required
-                    
                     ${myContent.status == 1 ? "disabled" : ""}
                 > 
-                     ${myContent.status == 0 ? Object.entries(field?.field_default_value).map(([key, value]) => `<option value="${value}">${value}</option>`).join('') :  `<option value="${field.field_value}">${field.field_value}</option>`}
+                    ${myContent.status == 0 ? `<option value="" data-translation="select.empty"></option>` + Object.entries(field?.field_default_value).map(([key, value]) => `<option value="${value}">${value}</option>`).join('') : `<option value="${field.field_value}">${field.field_value}</option>`}
                 </select>
-            </label>
-             
-            `;} else {
+                </label>
+            `;
+            }
+             else {
                 return `
                 <label class="relative">
                   <span>${field.field_name ?? ""}</span>
@@ -356,13 +356,13 @@ export function displayMessages(messages) {
                                     ${
                                       myContent.status !== 1
                                         ? `
-                                        <button class="btn1 button-with-min-width min-w-[7rem] bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90" type="button"
-                                            id="submit-form-${message._id}" 
-                                        >
-                                            <span class="spinner hidden absolute inset-0 flex justify-center items-center">
-                                            </span>
-                                          ${myContent.button}
-                                        </button>
+                                        <button class="btn1 button-with-min-width min-w-[7rem] min-h-[2rem] bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90" 
+                                        type="button" 
+                                        id="submit-form-${message._id}">
+                                    <span id="form-spinner" class="spinner hidden    justify-center items-center"></span>
+                                    ${myContent.button}
+                                </button>
+                                
                                     `
                                         : ""
                                     }

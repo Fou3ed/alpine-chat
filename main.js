@@ -364,6 +364,7 @@ window.history.replaceState({}, document.title, newURL);
   socketLib.onUserLogin()
   socketLib.wrongCode()
   socketLib.failedEmail()
+  socketLib.successMail()
   document
     .querySelector("emoji-picker")
     .addEventListener("emoji-click", (event) => {

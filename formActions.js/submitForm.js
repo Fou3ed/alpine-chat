@@ -10,7 +10,6 @@ import {
 import { getTranslationValue, lan } from "../utils/traduction.js";
 
 export let formData = {};
-
 export function submitForm(element) {
   let messageContent = element.closest('[id^="message-content-"]');
   let messageId = messageContent?.id?.replace("message-content-", "");
@@ -78,138 +77,23 @@ export function submitForm(element) {
   if (form.form_type == 1) {
     const emailField = form.fields.find((field) => field.field_type == 6);
 
-    if (emailField) {
+   if (emailField) {
       emailValue = emailField.field_value;
 
-      socketLib.verifyEmail(emailValue);
+      socketLib.verifyEmail({
+        contact: newData.contact,
+        forms,
+        messageId,
+        form,
+        conversationId,
+        language: lan,
+        messageId: messageId,
+        formElement: element,
+        email:emailValue
+      });
     }
 
-    const modalDiv = document.createElement("div");
-    modalDiv.innerHTML = `
-  <div class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5">
-    <div class="modal-activation absolute  inset-0 bg-blue-500 transition-opacity duration-300"></div>
-    <div class="modal-activation-relative relative max-w-lg rounded-lg bg-white px-4 py-10 text-center transition-opacity duration-300 dark:bg-navy-700 sm:px-5">
-        <svg xmlns="http://www.w3.org/2000/svg" class="inline h-28 w-28 crc-color" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-        <div class="mt-3">
-            <h2 class="text-2xl  text-blue-700 dark:text-navy-100">
-                ${getTranslationValue("modal.verification_code_title")}
-            </h2>
-            <p class="text-1xl  mt-1 mb-1 text-blue-700 dark:text-navy-100">
-            ${getTranslationValue("modal.verification_code_description")}
-            </p>
-            <span >${getTranslationValue("modal.verification_code_advise")}</span>
-            <div class="mt-2">
-                <input type="text" id="verification-code-input" class="rounded-md px-3 py-2 border input-maxW" placeholder="${getTranslationValue(
-                  "modal.verification_code_input"
-                )}">
-            </div>
-            <button id="submit-button" class="btn mt-4 modal-activation font-medium text-white hover-bg-error-focus focus-bg-error-focus active-bg-error-focus/90">
-               ${getTranslationValue("modal.verification_code_save_button")}
-            </button>
-            <button id="close-button" class="btn mt-4 modal-activation font-medium text-white hover-bg-error-focus focus-bg-error-focus active-bg-error-focus/90">
-            ${getTranslationValue("modal.close")}
-         </button>
 
-        </div>
-        <div class="mt-2">
-        <a  href="javascript:" id="re-send" class=" font-xs text-gray ">
-        ${getTranslationValue("modal.verification_code_resend")}
-    
-        </a></div>
-     
-    </div>
- 
-  </div>
-  `;
-
-    const submitButton = modalDiv.querySelector("#submit-button");
-    const closeButton = modalDiv.querySelector("#close-button");
-    const verificationCodeInput = modalDiv.querySelector(
-      "#verification-code-input"
-    );
-    const reSend = modalDiv.querySelector("#re-send");
-    submitButton.addEventListener("click", () => {
-      const verificationCode = verificationCodeInput.value;
-      if (verificationCode.length > 0) {
-        element.innerHTML = `<div class="form-spinner d-flex align-items-center" style="height: 20px;" ><span class="loader2"></span></div>`;
-    
-        socketLib.saveFormData(
-          JSON.stringify({
-            contact: newData.contact,
-            forms,
-            messageId,
-            form,
-            conversationId,
-            language: lan,
-            messageId: messageId,
-            formElement: element,
-            verificationCode: verificationCode,
-            email: emailValue,
-            limitCode: limitCode,
-            applicationName: applicationName,
-            language:lan
-          })
-        );
-    
-        updateCodeLimit(limitCode);
-        verificationCodeInput.value = ''; 
-      }
-    });
-
-    closeButton.addEventListener("click", () => { 
-        modalDiv.remove();
-     
-    });
-
-    reSend.addEventListener("click", () => {
-      const errorMessage = document.getElementById("code-verification-error");
-      errorMessage.remove();
-      updateCodeLimit(4);
-      socketLib.verifyEmail(emailValue);
-      const modalDiv = document.createElement("div");
-      modalDiv.innerHTML = `<div class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5">
-        <div class="modal-activation absolute  inset-0 bg-blue-500 transition-opacity duration-300"></div>
-        <div class="modal-activation-relative relative max-w-lg rounded-lg bg-white px-4 py-10 text-center transition-opacity duration-300 dark:bg-navy-700 sm:px-5">
-            <svg xmlns="http://www.w3.org/2000/svg" class="inline h-28 w-28 crc-color" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <div class="mt-4">
-                <h2 class="text-2xl text-blue-700 dark:text-navy-100">
-                ${getTranslationValue("mail_modal.mail_sent")}
-                </h2>
-                <p class="text-1xl text-blue-700 dark:text-navy-100">
-                Check your email for the verification code 
-                </p>
-               
-                <button id="close-button" class="btn mt-4 modal-activation font-medium text-white hover-bg-error-focus focus-bg-error-focus active-bg-error-focus/90">
-                ${getTranslationValue("mail_modal.confirm")}
-
-                </button>
-            </div>
-        </div>
-    </div>`;
-
-      document.body.appendChild(modalDiv);
-
-      // Automatically close the modal after 5 seconds
-      setTimeout(() => {
-        modalDiv.remove();
-      }, 5000);
-      const verificationCodeInput = document.querySelector(
-        "#verification-code-input"
-      );
-    
-      verificationCodeInput.value = ''; 
-
-      // Add event listener for the "confirm" button
-      const confirmButton = modalDiv.querySelector("#close-button");
-      confirmButton.addEventListener("click", () => {
-        modalDiv.remove();
-      });
-    });
-    document.body.appendChild(modalDiv);
   } else {
     element.innerHTML = `<div class="form-spinner d-flex align-items-center" style="height: 20px;" ><span class="loader2"></span></div>`;
 
@@ -239,6 +123,148 @@ export function submitForm(element) {
     successMessage?.classList.add("hidden");
   }, 3000);
 }
+
+
+export function openModalActivation(data){
+  // document.querySelector(".spinner").classList.remove()
+  const modalDiv = document.createElement("div");
+  modalDiv.innerHTML = `
+    <div class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5">
+      <div class="modal-activation absolute  inset-0 bg-blue-500 transition-opacity duration-300"></div>
+      <div class="modal-activation-relative relative max-w-lg rounded-lg bg-white px-4 py-10 text-center transition-opacity duration-300 dark:bg-navy-700 sm:px-5">
+          <div class="absolute top-4 right-4 cursor-pointer" id="close-modal">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-700 dark:text-navy-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" class="inline h-28 w-28 crc-color" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <div class="mt-3">
+              <h2 class="text-2xl  text-blue-700 dark:text-navy-100">
+                  ${getTranslationValue("modal.verification_code_title")}
+              </h2>
+              <p class="text-1xl  mt-1 mb-1 text-blue-700 dark:text-navy-100">
+                  ${getTranslationValue("modal.verification_code_description")}
+              </p>
+              <span>${getTranslationValue("modal.verification_code_advise")}</span>
+              <div class="mt-2">
+                  <input type="text" id="verification-code-input" class="rounded-md px-3 py-2 border input-maxW" placeholder="${getTranslationValue("modal.verification_code_input")}">
+              </div>
+              <div class="mt-2">
+              <a href="javascript:" id="re-send" class="text-sm font-light text-gray-500">
+                  ${getTranslationValue("modal.verification_code_resend")}
+              </a>
+          </div>
+              <button id="submit-button" class="btn mt-4 modal-activation font-medium text-white hover-bg-error-focus focus-bg-error-focus active-bg-error-focus/90">
+                 ${getTranslationValue("modal.verification_code_save_button")}
+              </button>
+          </div>
+          
+      </div>
+    </div>
+  `;
+  
+      
+      // Add an event listener to the close icon
+      const closeModalIcon = modalDiv.querySelector("#close-modal");
+      closeModalIcon.addEventListener("click", () => {
+        modalDiv.remove();
+  
+      });
+      
+      
+  
+      const submitButton = modalDiv.querySelector("#submit-button");
+      const verificationCodeInput = modalDiv.querySelector(
+        "#verification-code-input"
+      );
+      const reSend = modalDiv.querySelector("#re-send");
+
+      submitButton.addEventListener("click", () => {
+        const verificationCode = verificationCodeInput.value;
+        if (verificationCode.length > 0) {
+        const  forms=data.forms
+        const form=data.form
+        const messageId=data.messageId
+        const formElement=data.element
+
+          socketLib.saveFormData(
+            JSON.stringify({
+              contact: newData.contact,
+              forms,
+              messageId,
+              form,
+              conversationId,
+              language: lan,
+              messageId: data.messageId,
+              formElement: data.element,
+              verificationCode: verificationCode,
+              email: data.email,
+              limitCode: limitCode,
+              applicationName: applicationName,
+              language:lan
+            })
+          );
+      
+          updateCodeLimit(limitCode);
+          verificationCodeInput.value = ''; 
+        }
+      });
+  
+     
+  
+      reSend.addEventListener("click", () => {
+        const errorMessage = document.getElementById("code-verification-error");
+        if(errorMessage){
+          errorMessage.remove();
+        }
+        updateCodeLimit(4);
+        socketLib.verifyEmail(emailValue);
+        const modalDiv = document.createElement("div");
+        modalDiv.innerHTML = `<div class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5">
+          <div class="modal-activation absolute  inset-0 bg-blue-500 transition-opacity duration-300"></div>
+          <div class="modal-activation-relative relative max-w-lg rounded-lg bg-white px-4 py-10 text-center transition-opacity duration-300 dark:bg-navy-700 sm:px-5">
+              <svg xmlns="http://www.w3.org/2000/svg" class="inline h-28 w-28 crc-color" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div class="mt-4">
+                  <h2 class="text-2xl text-blue-700 dark:text-navy-100">
+                  ${getTranslationValue("mail_modal.mail_sent")}
+                  </h2>
+                  <p class="text-1xl text-blue-700 dark:text-navy-100">
+                  Check your email for the verification code 
+                  </p>
+                 
+                  <button id="close-button" class="btn mt-4 modal-activation font-medium text-white hover-bg-error-focus focus-bg-error-focus active-bg-error-focus/90">
+                  ${getTranslationValue("mail_modal.confirm")}
+  
+                  </button>
+              </div>
+          </div>
+      </div>`;
+  
+        document.body.appendChild(modalDiv);
+  
+        // Automatically close the modal after 5 seconds
+        setTimeout(() => {
+          modalDiv.remove();
+        }, 5000);
+        const verificationCodeInput = document.querySelector(
+          "#verification-code-input"
+        );
+      
+        verificationCodeInput.value = ''; 
+  
+        // Add event listener for the "confirm" button
+        const confirmButton = modalDiv.querySelector("#close-button");
+        confirmButton.addEventListener("click", () => {
+          modalDiv.remove();
+        });
+      });
+      document.body.appendChild(modalDiv);
+}
+
 
 export function submitFormStatus(status, text_capture, messageId, element) {
   const formElement = document.getElementById(`submit-form-${messageId}`);
