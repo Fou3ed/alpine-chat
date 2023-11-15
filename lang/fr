@@ -133,7 +133,7 @@
         "account_exist_title":"vous avez déjà un compte",
         "account_exist_description":" Veuillez vérifier votre courrier électronique pour obtenir vos identifiants de connexion :",
         "account_exist_button":"login",
-        "verification_code_title":"Verification Code",
+        "verification_code_title":"Vérification du compte",
         "verification_code_description":"veuillez renseigner le code de sécurité reçu à l'adresse email renseignée .",
         "verification_code_save_button":"valider",
         "verification_code_resend":"Renvoyer le code de vérification",

@@ -8,6 +8,7 @@ import {
   limitCode,
 } from "../main.js";
 import { getTranslationValue, lan } from "../utils/traduction.js";
+let emailValue;
 
 export let formData = {};
 export function submitForm(element) {
@@ -73,29 +74,36 @@ export function submitForm(element) {
     formElement: element,
   });
 
-  let emailValue;
   if (form.form_type == 1) {
     const emailField = form.fields.find((field) => field.field_type == 6);
 
-   if (emailField) {
-      emailValue = emailField.field_value;
+if (emailField) {
 
-      socketLib.verifyEmail({
-        contact: newData.contact,
-        forms,
-        messageId,
-        form,
-        conversationId,
-        language: lan,
-        messageId: messageId,
-        formElement: element,
-        email:emailValue
-      });
-    }
+  element.innerHTML = `<div class="form-spinner d-flex align-items-center" style="height: 20px; width:40px" ><span class="loader2"></span></div>`;
+
+  emailValue = emailField.field_value;
+
+  socketLib.verifyEmail({
+    contact: newData.contact,
+    forms,
+    messageId,
+    form,
+    conversationId,
+    language: lan,
+    messageId: messageId,
+    formElement: element,
+    email: emailValue
+  });
+
+}
+
+
+
+  
 
 
   } else {
-    element.innerHTML = `<div class="form-spinner d-flex align-items-center" style="height: 20px;" ><span class="loader2"></span></div>`;
+    // element.innerHTML = `<div class="form-spinner d-flex align-items-center" style="height: 20px;" ><span class="loader2"></span></div>`;
 
     socketLib.saveFormData(
       JSON.stringify({
@@ -126,17 +134,21 @@ export function submitForm(element) {
 
 
 export function openModalActivation(data){
-  // document.querySelector(".spinner").classList.remove()
+
+
+   document.querySelector(".form-spinner").remove()
+   const oldSubmitButton = document.getElementById(`submit-form-${data.messageId}`);
+          oldSubmitButton.textContent=data.form.button
   const modalDiv = document.createElement("div");
   modalDiv.innerHTML = `
     <div class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5">
       <div class="modal-activation absolute  inset-0 bg-blue-500 transition-opacity duration-300"></div>
       <div class="modal-activation-relative relative max-w-lg rounded-lg bg-white px-4 py-10 text-center transition-opacity duration-300 dark:bg-navy-700 sm:px-5">
-          <div class="absolute top-4 right-4 cursor-pointer" id="close-modal">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-700 dark:text-navy-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-          </div>
+      <div class="absolute top-4 right-4 cursor-pointer" id="close-modal" style="right: 3px; top: 5px;">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-700 dark:text-navy-100" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+  </div>
           <svg xmlns="http://www.w3.org/2000/svg" class="inline h-28 w-28 crc-color" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
@@ -182,12 +194,17 @@ export function openModalActivation(data){
       const reSend = modalDiv.querySelector("#re-send");
 
       submitButton.addEventListener("click", () => {
+        const formElement=data.element
+
         const verificationCode = verificationCodeInput.value;
+
+  
         if (verificationCode.length > 0) {
+          submitButton.innerHTML = `<div class="form-spinner d-flex align-items-center" style="height: 20px; width:40px" ><span class="loader2"></span></div>`;
+  
         const  forms=data.forms
         const form=data.form
         const messageId=data.messageId
-        const formElement=data.element
 
           socketLib.saveFormData(
             JSON.stringify({
@@ -213,8 +230,10 @@ export function openModalActivation(data){
       });
   
      
-  
+      let canClick=true;
       reSend.addEventListener("click", () => {
+        if(canClick){     
+          canClick=false
         const errorMessage = document.getElementById("code-verification-error");
         if(errorMessage){
           errorMessage.remove();
@@ -261,8 +280,20 @@ export function openModalActivation(data){
         confirmButton.addEventListener("click", () => {
           modalDiv.remove();
         });
+
+
+
+        setTimeout(() => {
+          canClick = true;
+      }, 60000); // 1 minute in milliseconds
+    }else {
+      console.log("wait for 1 mi")
+    }
       });
       document.body.appendChild(modalDiv);
+
+
+  
 }
 
 

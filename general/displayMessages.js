@@ -359,9 +359,8 @@ export function displayMessages(messages) {
                                         <button class="btn1 button-with-min-width min-w-[7rem] min-h-[2rem] bg-primary font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90" 
                                         type="button" 
                                         id="submit-form-${message._id}">
-                                    <span id="form-spinner" class="spinner hidden    justify-center items-center"></span>
-                                    ${myContent.button}
-                                </button>
+                                            ${myContent.button}
+                                        </button>
                                 
                                     `
                                         : ""

@@ -1161,7 +1161,7 @@ export default class event {
   savedFormData = () => {
     this.socket.on("formSaved", (bool, userDetails, dataForm) => {
       if (bool) {
-        document.querySelector(".form-spinner").remove();
+        // document.querySelector(".form-spinner").remove();
 
         const modalActivation = document.querySelector(".modal-activation");
         if (modalActivation) {
@@ -1432,7 +1432,7 @@ export default class event {
 
   wrongCode = () => {
     this.socket.on("wrongCode", (data, limitCode) => {
-      document.querySelector(".form-spinner").remove();
+      // document.querySelector(".form-spinner").remove();
       const submitButton = document.querySelector("#submit-button");
       submitButton.textContent = getTranslationValue(
         "modal.verification_code_save_button"
@@ -1444,40 +1444,33 @@ export default class event {
       // Check if the error message element already exists
       const errorMessage = document.getElementById("code-verification-error");
 
-      // If it exists, update the text content and add fade-out and fade-in effects; otherwise, create a new element
       if (errorMessage) {
         const icon = document.createElement("i");
         icon.className = "fas fa-exclamation-circle";
 
         errorMessage.textContent = "Wrong verification code!";
-        errorMessage.style.opacity = 0; // Start with opacity 0
+        errorMessage.style.opacity = 0; 
 
         errorMessage.appendChild(icon);
         setTimeout(() => {
-          errorMessage.style.opacity = 1; // Fade in after 0.5 seconds
+          errorMessage.style.opacity = 1; 
         }, 500);
       } else {
-        // Create the error message element
         const newErrorMessage = document.createElement("div");
         newErrorMessage.id = "code-verification-error";
-        newErrorMessage.className = "text-red-600 mt-2";
+        newErrorMessage.className = "text-red-600 mt-1 text-xs+";
 
-        // Create an icon element for the alert
         const icon = document.createElement("i");
         icon.className = "fas fa-exclamation-circle";
 
-        // Append the icon and error message below the input field
         newErrorMessage.appendChild(icon);
         newErrorMessage.innerHTML += " Wrong verification code!";
   
 
-        // Change the input border color to red
         verificationCodeInput.style.border = "1px solid red";
 
-        // Append the error message below the input field
         verificationCodeInput.parentNode.appendChild(newErrorMessage);
 
-        // Add fade-in effect
         newErrorMessage.style.opacity = 0;
         newErrorMessage.style.color = "red";
         setTimeout(() => {
@@ -1486,7 +1479,6 @@ export default class event {
       }
 
       if (limitCode === 0) {
-        // Reset the input border color to its default value
         verificationCodeInput.style.border = "";
 
         const errorMessage = document.getElementById("code-verification-error");
