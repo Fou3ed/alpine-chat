@@ -13,10 +13,14 @@ if (messageInput) {
         isFirstKeyPress = false;
       }
     };
-  
-    // messageInput.onblur = function () {
-    //   onStopTyping();
-    // };
+
+    
+    messageInput.onblur = function () {
+      if(!isFirstKeyPress){
+        onStopTyping();
+
+      }
+    };
   }
   
 function onStartTyping() {
