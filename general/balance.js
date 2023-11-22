@@ -9,7 +9,6 @@ export function getTotalBalance(balance,free_balance,role) {
     const balanceSpinner = document.querySelector(".balance-spinner");
     const messageInput = document.querySelector("#message-input");
     const sendButton = document.querySelector("#send-message");
-    console.log("total free balance",free_balance)
     // Show spinner
     balanceSpinner.classList.remove("hidden");
     if(free_balance > 0){

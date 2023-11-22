@@ -168,6 +168,18 @@
     "mail_modal":{
         "mail_sent":"courrier envoyé",
         "confirm":"confirmé"
-    }
-
+    },
+    "form_password":{
+        "title":"paramètres",
+        "description":"changer votre mot de passe ",
+        "old_password":"Ancien mot de passe",
+        "new_password":"nouveau mot de passe",
+        "confirm_password":"confirmer le mot de passe",
+        "button_password":"sauvegarder",
+        "message_error_fill":"Merci de remplir tous les champs",
+        "message_error_char":"Le nouveau mot de passe doit comporter au moins 8 caractères",
+        "message_error_match":"Vos mots de passe ne correspondent pas",
+        "message_success":"Le mot de passe a été modifié avec succès",
+        "message_error_verify":"Vérifiez votre ancien mot de passe"
+}
 }

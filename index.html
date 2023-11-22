@@ -222,6 +222,167 @@
       </div>
     </div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- password sidebar  -->
+   <div x-show="$store.global.isRightSidebarExpandedPassword"
+   @keydown.window.escape="$store.global.isRightSidebarExpandedPassword = false">
+   <div class="fixed inset-0 z-[150] bg-slate-900/60 transition-opacity duration-200"
+     @click="$store.global.isRightSidebarExpandedPassword = false" x-show="$store.global.isRightSidebarExpandedPassword"
+     x-transition:enter="ease-out" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+     x-transition:leave="ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
+   <div class="fixed right-0 top-0 z-[151] h-full w-full sm:w-80">
+     <div x-data="{activeTab:'tabHome'}"
+       class="relative flex h-full w-full transform-gpu flex-col bg-white transition-transform duration-200 dark:bg-navy-750"
+       x-show="$store.global.isRightSidebarExpandedPassword" x-transition:enter="ease-out"
+       x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
+       x-transition:leave="ease-in" x-transition:leave-start="translate-x-0"
+       x-transition:leave-end="translate-x-full">
+       <div class="flex items-center justify-between py-2 px-4">
+
+         <h2 x-show="activeTab === 'tabHome'"
+           class="flex shrink-0 items-center space-x-1.5 text-lg font-medium text-slate-700 dark:text-navy-100 my-3">
+           <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+             stroke="currentColor" stroke-width="1.5">
+             <path
+               d="M5 8H19V16C19 17.8856 19 18.8284 18.4142 19.4142C17.8284 20 16.8856 20 15 20H9C7.11438 20 6.17157 20 5.58579 19.4142C5 18.8284 5 17.8856 5 16V8Z"
+               fill="currentColor" fill-opacity="0.3"></path>
+             <path
+               d="M12 8L11.7608 5.84709C11.6123 4.51089 10.4672 3.5 9.12282 3.5V3.5C7.68381 3.5 6.5 4.66655 6.5 6.10555V6.10555C6.5 6.97673 6.93539 7.79026 7.66025 8.2735L9.5 9.5"
+               stroke="currentColor" stroke-linecap="round"></path>
+             <path
+               d="M12 8L12.2392 5.84709C12.3877 4.51089 13.5328 3.5 14.8772 3.5V3.5C16.3162 3.5 17.5 4.66655 17.5 6.10555V6.10555C17.5 6.97673 17.0646 7.79026 16.3397 8.2735L14.5 9.5"
+               stroke="currentColor" stroke-linecap="round"></path>
+             <rect x="4" y="8" width="16" height="3" rx="1" fill="currentColor"></rect>
+             <path d="M12 11V15" stroke="currentColor" stroke-linecap="round"></path>
+           </svg>
+           <span data-translation="form_password.title"></span>
+         </h2>
+
+         <h2 x-show="activeTab === 'tabProjects'"
+           class="flex shrink-0 items-center space-x-1.5 text-lg font-medium text-slate-700 dark:text-navy-100 my-3">
+           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor" stroke-width="1.5">
+             <path stroke-linecap="round" stroke-linejoin="round"
+               d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+           </svg>
+           <span>Invoices</span>
+         </h2>
+         <h2 x-show="activeTab === 'tabActivity'"
+           class="flex shrink-0 items-center space-x-1.5 text-lg font-medium text-slate-700 dark:text-navy-100 my-3">
+           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor" stroke-width="1.5">
+             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+           </svg>
+           <span>Activity</span>
+         </h2>
+
+         <button @click="$store.global.isRightSidebarExpandedPassword=false" id=""
+           class="btn -mr-1 h-6 w-6 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
+           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor" stroke-width="2">
+             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+           </svg>
+         </button>
+       </div>
+
+       <div x-show="activeTab === 'tabHome'" x-transition:enter="transition-all duration-500 easy-in-out"
+         x-transition:enter-start="opacity-0 [transform:translate3d(0,1rem,0)]"
+         x-transition:enter-end="opacity-100 [transform:translate3d(0,0,0)]"
+         class="is-scrollbar-hidden overflow-y-auto overscroll-contain pt-1">
+
+         <div class="mt-3">
+           <h2 class="px-5 text-xs+ font-medium tracking-wide text-slate-700 dark:text-navy-100 pb-6"
+             data-translation="form_password.description">
+
+           </h2>
+
+           <div class="flex flex-col px-5 plans-tab" x-data="{showModal:false}">
+
+
+    
+
+
+<div>
+  <label class="block">
+    <span data-translation="form_password.old_password"></span>
+    <input
+      class="form-input mt-1.5 w-full rounded-lg border bg-transparent px-3 py-2 placeholder:text-slate-400/70"
+      placeholder="Old password"
+      type="password"
+      class="border-slate-300 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+      id="old_password_input"
+    />
+  </label>
+</div>
+
+<div>
+  <label class="block">
+    <span data-translation="form_password.new_password"></span>
+    <input
+      class="form-input mt-1.5 w-full rounded-lg border bg-transparent px-3 py-2 placeholder:text-slate-400/70"
+      placeholder="New password"
+      type="password"
+      class="border-slate-300 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+      id="new_password_input"
+    />
+  </label>
+</div>
+
+<div>
+  <label class="block">
+    <span data-translation="form_password.confirm_password"></span>
+    <input
+      class="form-input mt-1.5 w-full rounded-lg border bg-transparent px-3 py-2 placeholder:text-slate-400/70"
+      placeholder="Confirm Password"
+      type="password"
+      class="border-slate-300 hover:border-slate-400 focus:border-primary dark:border-navy-450 dark:hover:border-navy-400 dark:focus:border-accent"
+      id="confirm_password_input"
+    />
+  </label>
+</div>
+        
+<span id="passwordChangeMessage" class="text-red-500 mt-2"></span>
+<button
+
+  id="button_password"
+  class="btn bg-primary mt-6 font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90"
+>
+  <span id="buttonText" class="" data-translation="form_password.button_password"></span>
+  <span id="spinner" class="hidden animate-spin">&#x21BB;</span>
+</button>
+
+           </div>
+         </div>
+
+       </div>
+
+       
+
+
+      
+     </div>
+   </div>
+ </div>
+
+
+
+
+
+
+
+
+
     <!-- Right Sidebar -->
     <div x-show="$store.global.isRightSidebarExpanded"
       @keydown.window.escape="$store.global.isRightSidebarExpanded = false">
@@ -537,7 +698,8 @@
         <div id="profileInfo" class="flex flex-col items-center space-y-3 py-3 ml-1">
             <!-- Profile -->
             <div x-data="usePopper({placement:'right-end',offset:12})"
-              @click.outside="isShowPopper && (isShowPopper = false)" class="flex">
+              @click.outside="isShowPopper && (isShowPopper = false)" class="flex"
+              @click="$store.global.isRightSidebarExpandedPassword = true" id="">
               <button @click="isShowPopper = !isShowPopper" x-ref="popperRef" class=" h-9">
 
                 <div class="flex items-center">

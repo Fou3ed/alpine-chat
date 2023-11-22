@@ -1,6 +1,14 @@
 import { getTranslationValue } from "../utils/traduction.js";
+const messageInput = document.querySelector("#message-input");
 
 export const freeBalance = (balance) => {
+    if(balance==0){
+        messageInput.dataset.translation="container.balance_message"
+        messageInput.placeholder =
+          getTranslationValue("container.balance_message");
+        messageInput.disabled = true;
+        sendButton.disabled = true;
+    }
     const balanceCard = document.querySelector(".balance-card");
     const freeBalanceCard = document.querySelector(".free-balance-card"); // Change the selector here to match the correct element
 

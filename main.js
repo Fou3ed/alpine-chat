@@ -31,6 +31,7 @@ import { getPlans } from "./general/getPlans.js";
 import { showSpinner } from "./components/spinner.js";
 import { loadChatInformation } from "./utils/appInfo.js";
 import { changeTitle } from "./utils/changeTitle.js";
+import { verifyPassword } from "./utils/changePassword.js";
 
 // Components
 // The message input is where the user types their message
@@ -301,6 +302,8 @@ $(document).ready(async function () {
   });
   
 
+
+
   
 
     // Get the current URL
@@ -379,7 +382,13 @@ window.history.replaceState({}, document.title, newURL);
   checkForExpertMessages()
 
   socketLib.displayAgentsMessage();
+  socketLib.passwordResult()
   $(document).on("click", ".conversation-click", handleConversationClick);
   $(document).on("click", ".mini-conversation-click", handleConversationClick);
   $(document).on("click", "#emoji-button", showEmoji);
+  $(document).on("click",'#button_password',verifyPassword)
+
+
+ 
+ 
 });

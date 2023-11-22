@@ -49,6 +49,7 @@ import { changeHeaderPicture } from "../conversationActions/changeHeaderPic.js";
 import { ableInputArea } from "../utils/messageInputArea.js";
 import { login } from "../general/login.js";
 import { accountExist } from "../components/accountExist.js";
+import { changePassword } from "../utils/changePassword.js";
 export let role = "";
 
 function isMobile() {
@@ -108,6 +109,7 @@ export default class event {
       loader.style.display = "none";
     });
   };
+
   onConnectedError = function () {
     this.socket.on("connection-error", (data) => {
       const modalDiv = document.createElement("div");
@@ -140,6 +142,7 @@ export default class event {
       document.body.appendChild(modalDiv);
     });
   };
+
   onConnectedUserError = function () {
     this.socket.on("user-connection-error", (data) => {
       const modalDiv = document.createElement("div");
@@ -195,6 +198,7 @@ export default class event {
       document.body.appendChild(modalDiv);
     });
   };
+  
 
   //receive user connection (other user)
 
@@ -1544,4 +1548,18 @@ export default class event {
       }
     });
   };
+
+
+  changePassword=(data)=>{
+    this.socket.emit("changePassword",data,(error)=>{
+      console.error('failed sending changePassword event')
+    })
+  }
+
+  passwordResult=(data)=>{
+    this.socket.on('password-result',(data)=>{
+    changePassword(data)
+
+    })
+  }
 }

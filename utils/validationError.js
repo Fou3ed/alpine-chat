@@ -1,12 +1,15 @@
+import { getTranslationValue } from "./traduction.js";
+
 export function showValidationError(inputElement, message) {
+  
     // Add a class to the input element to change its border color to red
     inputElement.classList.add("invalid-input");
     // Show the validation error message to the user
     const errorMessageElement = document.createElement("div");
     errorMessageElement.className = "error-message";
     errorMessageElement.style.color = "red";
-    errorMessageElement.innerText = message;
-  
+    errorMessageElement.innerText = getTranslationValue(message);
+    errorMessageElement.dataset.translation=message
     // Check if an error message is already displayed and remove it if so
     inputElement.closest("label").querySelector(".error-message")?.remove();
     if (

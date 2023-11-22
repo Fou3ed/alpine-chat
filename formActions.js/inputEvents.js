@@ -73,7 +73,7 @@ export function sendTypingNotification(input) {
           isValid = false;
           showValidationError(
             input,
-            getTranslationValue("container.forms.required")
+           "container.forms.required"
           );
           break;
         }
@@ -81,13 +81,13 @@ export function sendTypingNotification(input) {
           isValid = false;
           showValidationError(
             input,
-            getTranslationValue("container.forms.phone")
+            "container.forms.phone"
           );
           break;
         }
         if (input.type === "date" && !isValidDate(input.value)) {
           isValid = false;
-          showValidationError(input, getTranslationValue("container.forms.date"));
+          showValidationError(input, "container.forms.date");
           break;
         }
         if (input.type == "country" && !isValidCountry(input.value)) {
@@ -104,7 +104,7 @@ export function sendTypingNotification(input) {
           isValid = false;
           showValidationError(
             input,
-            getTranslationValue("container.forms.email")
+          "container.forms.email"
           );
           break;
         }
@@ -113,7 +113,7 @@ export function sendTypingNotification(input) {
           isValid = false;
           showValidationError(
             input,
-            getTranslationValue("container.forms.phone")
+            "container.forms.phone"
           );
           break;
         }
