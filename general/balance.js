@@ -13,7 +13,15 @@ export function getTotalBalance(balance,free_balance,role) {
     balanceSpinner.classList.remove("hidden");
     if(free_balance > 0){
       freeBalance(free_balance)
-    }else{
+    }else if(balance== null || balance ==0 ){
+      messageInput.dataset.translation = "container.balance_message";
+      messageInput.placeholder = getTranslationValue(
+        "container.balance_message"
+      );
+
+      messageInput.disabled = true;
+      sendButton.disabled = true;
+    }else {
       messageInput.dataset.translation = "container.write_message";
       messageInput.placeholder = getTranslationValue(
         "container.write_message"
@@ -112,7 +120,6 @@ export function getTotalBalance(balance,free_balance,role) {
           BuyButton.click()
         
         });
-        console.log(totalBalance)
           if(totalBalance === 0 || !totalBalance ) {
             messageInput.dataset.translation="container.balance_message"
             messageInput.placeholder =

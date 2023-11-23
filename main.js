@@ -32,6 +32,7 @@ import { showSpinner } from "./components/spinner.js";
 import { loadChatInformation } from "./utils/appInfo.js";
 import { changeTitle } from "./utils/changeTitle.js";
 import { verifyPassword } from "./utils/changePassword.js";
+import { logOut } from "./utils/logOut.js";
 
 // Components
 // The message input is where the user types their message
@@ -387,8 +388,10 @@ window.history.replaceState({}, document.title, newURL);
   $(document).on("click", ".mini-conversation-click", handleConversationClick);
   $(document).on("click", "#emoji-button", showEmoji);
   $(document).on("click",'#button_password',verifyPassword)
+  $(document).on("click",'#logOutButton',logOut)
 
 
- 
- 
+
+  
+
 });

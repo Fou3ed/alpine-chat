@@ -1,4 +1,4 @@
-import { API_KEY, SQL_API } from "../env.js";
+import { API_KEY, SQL_API, accountId } from "../env.js";
 import { conversationId, newData, socketLib } from "../main.js";
 import { getTranslationValue } from "../utils/traduction.js";
 
@@ -72,6 +72,7 @@ export async function getPlans() {
               conversationId: conversationId,
               planName: planName,
               sale_status: 0,
+              accountId:accountId
             });
             setTimeout(() => {
               this.querySelector('.button-text').classList.remove('d-none');

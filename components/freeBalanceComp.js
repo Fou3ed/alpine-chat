@@ -3,6 +3,7 @@ const messageInput = document.querySelector("#message-input");
 
 export const freeBalance = (balance) => {
     if(balance==0){
+        console.log("lénna")
         messageInput.dataset.translation="container.balance_message"
         messageInput.placeholder =
           getTranslationValue("container.balance_message");

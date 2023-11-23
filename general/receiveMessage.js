@@ -17,6 +17,7 @@ import { addLogs } from "../utils/addLogs.js";
 import { getTranslationValue, lan } from "../utils/traduction.js";
 import { Countries } from "../countries.js";
 import { insertLineBreaks } from "../utils/truncateMessage.js";
+import { accountId } from "../env.js";
 const conversationContainer = document.getElementById("conversation-container");
 
 export async function receiveMessage(data) {
@@ -722,6 +723,7 @@ if(data.messageData.type !="log"){
         conversationId: conversationId,
         planName: name,
         sale_status: 0,
+        accountId:accountId
       });
     }
   

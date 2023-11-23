@@ -17,6 +17,7 @@ import { getTranslationValue, lan } from "../utils/traduction.js";
 import { getTime } from "../utils/getTime.js";
 import { Countries } from "../countries.js";
 import { insertLineBreaks, truncateMessage } from "../utils/truncateMessage.js";
+import { accountId } from "../env.js";
 export function displayMessages(messages) {
     document.getElementById("big-container-message").style.display = "block";
     if (!messages || !messages.messages) {
@@ -602,6 +603,7 @@ export function displayMessages(messages) {
             conversationId: conversationId,
             planName: name,
             sale_status: 0,
+            accountId:accountId
           });
         }
         

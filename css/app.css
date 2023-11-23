@@ -960,6 +960,9 @@ padding: 5em 0 8.885em 0;
 .bg-msg{
   background-color: #ededed;
 }
+.bg-zinc-600{
+  background-color: rgb(82 82 91);
+}
 .error-message {
   color: red;
   padding-top: 5px; 

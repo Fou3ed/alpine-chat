@@ -92,9 +92,6 @@ export function traduc() {
     "left_side.tab_1.search"
   );
 
-   document.querySelector("#old_password_input").placeholder=getTranslationValue("form_password.old_password") 
-   document.querySelector("#new_password_input").placeholder=getTranslationValue("form_password.new_password") 
-   document.querySelector("#confirm_password_input").placeholder=getTranslationValue("form_password.confirm_password") 
 
   document.querySelectorAll("[data-country]" ).forEach((element) => {
     element.dispatchEvent(new Event('change'))

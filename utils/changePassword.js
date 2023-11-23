@@ -2,9 +2,12 @@ import { accountId } from "../env.js";
 import { newData, socketLib } from "../main.js";
 import { getTranslationValue } from "./traduction.js";
 
+
+
+
+
 export function verifyPassword(){
     // Retrieve the values from the input fields
-    let oldPassword = $("#old_password_input").val();
     let newPassword = $("#new_password_input").val();
     let confirmPassword = $("#confirm_password_input").val();
   
@@ -13,9 +16,10 @@ export function verifyPassword(){
     const spinner = document.getElementById("spinner");
   
     // Verify if any of the input fields is empty
-    if (!oldPassword || !newPassword || !confirmPassword) {
+    if ( !newPassword || !confirmPassword) {
       messageElement.textContent = getTranslationValue("form_password.message_error_fill");
       messageElement.style.color = "red";
+    
       return;
     }
   
@@ -33,7 +37,7 @@ export function verifyPassword(){
       spinner.classList.remove("hidden");
   
       // Call the changePassword function with the data
-      socketLib.changePassword({ old_password: oldPassword, new_password: newPassword, account_id: accountId, id: newData.contact });
+      socketLib.changePassword({new_password: newPassword, account_id: accountId, id: newData.contact });
     } else {
       messageElement.textContent = getTranslationValue("form_password.message_error_match");;
       messageElement.style.color = "red";
@@ -43,7 +47,6 @@ export function verifyPassword(){
 
 export function changePassword(data) {
     const messageElement = document.getElementById("passwordChangeMessage");
-    const oldPasswordInput = document.getElementById("old_password_input");
     const newPasswordInput = document.getElementById("new_password_input");
     const confirmPasswordInput = document.getElementById("confirm_password_input");
     const buttonText = document.getElementById("buttonText");
