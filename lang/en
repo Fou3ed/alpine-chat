@@ -58,7 +58,8 @@
             "phone" : "Please enter a valid number.",
             "date" : "Please enter a valid date (DD-MM-YYYY).",
             "email" : "Please enter a valid email address.",
-            "error" : "saving form data went wrong,Try again"
+            "error" : "saving form data went wrong,Try again",
+            "country":"Please enter a valid country code (2 characters)."
 
         },
         "experts_selector" : {
@@ -179,6 +180,21 @@
         "message_error_match":"Your passwords do not match",
         "message_success":"Password changed successfully",
         "message_error_verify":"Verify your old password"
+    },
+    "popper":{
+        "authentication":"Authentication",
+        "profile":"profile",
+        "logout":"logout"
+
+    },
+    "form":{
+        "lastName":"Last name",
+        "email":"E-mail",
+        "country":"Country",
+        "phone":"phone number",
+        "button":"Submit",
+        "firstName":"first name"
+
     }
 }
 

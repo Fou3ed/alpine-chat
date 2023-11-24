@@ -181,5 +181,21 @@
         "message_error_match":"Vos mots de passe ne correspondent pas",
         "message_success":"Le mot de passe a été modifié avec succès",
         "message_error_verify":"Vérifiez votre ancien mot de passe"
-}
+},
+"popper":{
+    "authentication":"authentification",
+    "profile":"profil",
+    "logout":"déconnexion"
+
+},
+    "form":{
+        "lastName":"nom",
+        "email":"E-mail",
+        "country":"pays",
+        "phone":"numéro de téléphone",
+        "button":"Sauvgarder",
+        "firstName":"prénom"
+
+
+    }
 }

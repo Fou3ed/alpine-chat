@@ -48,8 +48,9 @@ import { onCheckConversation, selectAgent } from "../general/selectAgent.js";
 import { changeHeaderPicture } from "../conversationActions/changeHeaderPic.js";
 import { ableInputArea } from "../utils/messageInputArea.js";
 import { login } from "../general/login.js";
-import { accountExist } from "../components/accountExist.js";
 import { changePassword } from "../utils/changePassword.js";
+import { userCountry } from "../utils/getUserCountry.js";
+import { replaceCountryInput, replacePhoneInput } from "../utils/sideBarFrom.js";
 export let role = "";
 
 function isMobile() {
@@ -105,6 +106,10 @@ export default class event {
       getAllConversations();
       console.log("userData", userData, balance);
       getTotalBalance(balance, userData.free_balance, role);
+if(userCountry){
+  replaceCountryInput();
+  replacePhoneInput();
+}
 
       loader.style.display = "none";
     });

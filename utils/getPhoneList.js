@@ -18,8 +18,7 @@ export function phoneList(input) {
         if (phoneNumber.startsWith("+" + selectedCountryData.dialCode)) {
           showValidationError(
             input,
-            getTranslationValue("container.forms.phone") +
-              selectedCountryData.name
+            "container.forms.phone"
           );
           return;
         }
@@ -33,7 +32,7 @@ export function phoneList(input) {
        
         showValidationError(
           input,
-          getTranslationValue("container.forms.phone") 
+          "container.forms.phone"
         );
       } else {
       }
@@ -51,7 +50,7 @@ export function phoneList(input) {
         if (!valid) {
           showValidationError(
             input,
-            getTranslationValue("container.forms.phone")
+          "container.forms.phone"
           );
         }
       },

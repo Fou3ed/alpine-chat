@@ -33,6 +33,9 @@ import { loadChatInformation } from "./utils/appInfo.js";
 import { changeTitle } from "./utils/changeTitle.js";
 import { verifyPassword } from "./utils/changePassword.js";
 import { logOut } from "./utils/logOut.js";
+import { getContactInfo  } from "./utils/sideBarFrom.js";
+import { userCountry } from "./utils/getUserCountry.js";
+import { verifyFormProfile } from "./utils/verifyFormProfile.js";
 
 // Components
 // The message input is where the user types their message
@@ -389,7 +392,11 @@ window.history.replaceState({}, document.title, newURL);
   $(document).on("click", "#emoji-button", showEmoji);
   $(document).on("click",'#button_password',verifyPassword)
   $(document).on("click",'#logOutButton',logOut)
+  $(document).on("click",'#profileButton',verifyFormProfile)
 
+if(newData){
+  getContactInfo()
+}
 
 
   

@@ -16,17 +16,18 @@ export function verifyPassword(){
     const spinner = document.getElementById("spinner");
   
     // Verify if any of the input fields is empty
-    if ( !newPassword || !confirmPassword) {
+    if (!newPassword || !confirmPassword) {
       messageElement.textContent = getTranslationValue("form_password.message_error_fill");
       messageElement.style.color = "red";
-    
       return;
     }
+    
   
     // Verify if newPassword has at least 8 characters
     if (newPassword.length < 8) {
       messageElement.textContent = getTranslationValue("form_password.message_error_char");
       messageElement.style.color = "red";
+
       return;
     }
   

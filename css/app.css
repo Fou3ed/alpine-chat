@@ -1021,7 +1021,9 @@ padding: 5em 0 8.885em 0;
   100% { transform: rotate(360deg); }
 }
 
-
+#passwordChangeMessage{
+  margin-bottom: 1rem;
+}
 .container {
   display: flex;
   justify-content: center;

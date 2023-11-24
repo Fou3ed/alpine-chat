@@ -16,7 +16,7 @@ import { showEmptyConversation } from "../conversationActions/conversationClick.
 import { getTranslationValue, lan } from "../utils/traduction.js";
 import { getTime } from "../utils/getTime.js";
 import { Countries } from "../countries.js";
-import { insertLineBreaks, truncateMessage } from "../utils/truncateMessage.js";
+import { insertLineBreaks } from "../utils/truncateMessage.js";
 import { accountId } from "../env.js";
 export function displayMessages(messages) {
     document.getElementById("big-container-message").style.display = "block";
@@ -221,6 +221,7 @@ export function displayMessages(messages) {
                         </select>
                     </label>`;
               } else if (field?.field_type == 7) {
+                console.log(field.field_value)
                 return `
               <label class="relative">
               <span>${field.field_name ?? ""}</span>

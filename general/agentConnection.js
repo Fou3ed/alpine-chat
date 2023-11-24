@@ -29,6 +29,7 @@ export function userConnection(data) {
         }
       });
     }
+    
   }
   //when an agent disconnect remove the card in the online agents block
   export function userDisconnection(data) {
