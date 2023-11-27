@@ -377,6 +377,7 @@ window.history.replaceState({}, document.title, newURL);
     .addEventListener("emoji-click", (event) => {
       messageInput.value = messageInput.value + event.detail.unicode;
     });
+    
   socketLib.savedFormData();
   socketLib.failGuest();
   socketLib.mergeConversation();
@@ -397,6 +398,8 @@ socketLib.formProfileResult()
 if(newData){
   getContactInfo()
 }
+
+
 
 
   

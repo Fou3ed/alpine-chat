@@ -225,8 +225,9 @@
 
 
     <!-- Right Sidebar -->
+    
     <div x-show="$store.global.isRightSidebarExpanded"
-      @keydown.window.escape="$store.global.isRightSidebarExpanded = false">
+      @keydown.window.escape="$store.global.isRightSidebarExpanded = false" style="z-index:10000;">
       <div class="fixed inset-0 z-[150] bg-slate-900/60 transition-opacity duration-200"
         @click="$store.global.isRightSidebarExpanded = false" x-show="$store.global.isRightSidebarExpanded"
         x-transition:enter="ease-out" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
@@ -466,7 +467,7 @@
               <span></span>
             </button>
           </div>
-          <div @click="isShowChatInfo = true" class="flex cursor-pointer items-center space-x-4 font-inter">
+          <div @click="isShowChatInfo = true " class="flex cursor-pointer items-center space-x-4 font-inter">
             <div class="avatar" id="conversation-header-icon">
               <img class="rounded-full" src="" :src="activeChat.avatar_url" alt="avatar" />
               <div id="active-user-header"
@@ -511,6 +512,8 @@
                 stroke-width="2"></path>
             </svg>
           </button>
+
+
           <button id="modeTool" @click="$store.global.isDarkModeEnabled = !$store.global.isDarkModeEnabled"
             x-tooltip.placement.bottom.light="'Dark Mode'"
             class="btn h-9 w-9 rounded-full p-0 text-slate-500 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:text-navy-200 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
@@ -534,7 +537,7 @@
             <button id="dropdown-btn"></button>
             <ul class="dropdown-content" id="dropdown-content"></ul>
           </div>
-          <button id="toggleDrawerButton" @click="isShowChatInfo = !isShowChatInfo"
+          <button id="toggleDrawerButton" @click="isShowChatInfo = !isShowChatInfo ;isShowPasswordSetting= false;isShowProfile = false"
             x-tooltip.placement.bottom.light="''"
             :class="isShowChatInfo ? 'text-primary dark:text-accent-light' : 'text-slate-500 dark:text-navy-200'"
             class="btn  h-9 w-9 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25 sm:flex">
@@ -544,7 +547,7 @@
 
 
         <div id="profileInfo" x-data="{ isShowPopper: false }" x-data="usePopper({placement:'right-end', offset:12})"
-          @click.outside="isShowPopper = false" class="flex flex-col items-center space-y-3 py-3 ml-1">
+          @click.outside="isShowPopper = false"   class="flex flex-col items-center space-y-3 py-3 ml-1">
 
 
           <!-- Profile -->
@@ -572,11 +575,12 @@
           ">
 
               <div
+              id="myPopperBox"
                 class="popper-box w-64 rounded-lg border border-slate-150 bg-white shadow-soft dark:border-navy-600 dark:bg-navy-700">
 
                 <div class="flex flex-col pt-2 pb-5">
 
-                  <a href="#" id="toggleDrawerButtonProfile" @click="isShowProfile = !isShowProfile"
+                  <a href="#" id="toggleDrawerButtonProfile" @click="isShowProfile = !isShowProfile ;isShowPasswordSetting= false;isShowChatInfo = false ;isShowPopper = false"
                     class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600">
                     <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-600  text-white">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24"
@@ -595,7 +599,7 @@
                     </div>
                   </a>
 
-                  <a href="#" id="toggleDrawerButtonPassword" @click="isShowPasswordSetting = !isShowPasswordSetting"
+                  <a href="#" id="toggleDrawerButtonPassword" @click="isShowPasswordSetting = !isShowPasswordSetting ;isShowProfile= false;isShowProfile = false;isShowPopper = false"  
                     class="group flex items-center space-x-3 py-2 px-4 tracking-wide outline-none transition-all hover:bg-slate-100 focus:bg-slate-100 dark:hover:bg-navy-600 dark:focus:bg-navy-600">
                     <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-600	 text-white ">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24"
@@ -631,6 +635,7 @@
                   </div>
                 </div>
               </div>
+
             </div>
 
 

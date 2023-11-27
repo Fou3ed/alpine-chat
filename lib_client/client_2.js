@@ -447,6 +447,12 @@ if(userCountry){
   // }
   planBought = () => {
     this.socket.on("planBought", (data, newBalance) => {
+      const existingModalBlock = document.getElementById("modal-bought-block");
+
+      if (existingModalBlock && existingModalBlock.parentNode) {
+          existingModalBlock.parentNode.removeChild(existingModalBlock);
+      }
+      
       const modalDiv = document.createElement("div");
       modalDiv.innerHTML = `
       <div class="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5">
