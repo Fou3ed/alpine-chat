@@ -193,7 +193,9 @@
         "country":"Country",
         "phone":"phone number",
         "button":"Submit",
-        "firstName":"first name"
+        "firstName":"first name",
+        "success":"form saved successfully ",
+        "birth_date":"birth date "
 
     }
 }

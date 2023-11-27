@@ -448,7 +448,7 @@ export function displayMessages(messages) {
                             message.status == 0
                               ? `${
                                   direction === "justify-start"
-                                    ? message.user_data.full_name
+                                    ? message.user_data.nickname
                                     : "You"
                                 } unsent a message`
                               : message.type == "link"
@@ -482,7 +482,7 @@ export function displayMessages(messages) {
                             message.status == 0
                               ? `${
                                   direction === "justify-start"
-                                    ? message.user_data.full_name
+                                    ? message.user_data.nickname
                                     : "You"
                                 } unsent a message`
                               : message.type == "plan"

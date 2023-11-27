@@ -1,7 +1,6 @@
 import { Countries } from "../countries.js";
 import { API_KEY, SQL_API } from "../env.js";
 import { Languages } from "../languages.js";
-import { getTranslationValue } from "../utils/traduction.js";
 export const getAgentPresentation = async (id, online) => {
     try {
       const response = await axios.post(

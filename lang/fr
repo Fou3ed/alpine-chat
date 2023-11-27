@@ -194,7 +194,10 @@
         "country":"pays",
         "phone":"numéro de téléphone",
         "button":"Sauvgarder",
-        "firstName":"prénom"
+        "firstName":"prénom",
+        "success":"formulaire sauvegardé avec succès",
+        "birth_date":"date de naissance"
+
 
 
     }

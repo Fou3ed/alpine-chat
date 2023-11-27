@@ -4,7 +4,6 @@ export const accountExist = (data) => {
     const modalOverlay = document.createElement('div');
     modalOverlay.classList.add('modal-overlay');
 
-    console.log("account Exist", data);
     // loader.style.display = "none";
 
     const modalContent = document.createElement('div');

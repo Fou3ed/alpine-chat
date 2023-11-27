@@ -12,6 +12,7 @@ import {
   accountId,
   applicationName,
   loginLink,
+  robotId,
   socketAddress,
 } from "../env.js";
 import { getAllConversations } from "../general/getConversations.js";
@@ -51,6 +52,8 @@ import { login } from "../general/login.js";
 import { changePassword } from "../utils/changePassword.js";
 import { userCountry } from "../utils/getUserCountry.js";
 import { replaceCountryInput, replacePhoneInput } from "../utils/sideBarFrom.js";
+import { formProfileResult } from "../utils/verifyFormProfile.js";
+import { displayBuyModal } from "../utils/displayBuyModal.js";
 export let role = "";
 
 function isMobile() {
@@ -102,6 +105,10 @@ export default class event {
             : userData.full_name;
         clientIdElement.textContent =
           getTranslationValue("header.profile_id") + " " + `#${userData.id}`;
+      }
+
+      if(balance==0 || balance==null && userData.free_balance ==0 || userData.free_balance == null ){
+        displayBuyModal()
       }
       getAllConversations();
       console.log("userData", userData, balance);
@@ -1300,9 +1307,9 @@ if(userCountry){
   };
   getAvailableAgent = () => {
     this.socket.on("availableAgent", (data, conversationId) => {
-      selectAgent(data._id, data.full_name, data.id);
+      selectAgent(data._id, data.nickname, data.id);
       if (conversationId) {
-        removeExpert("64d0b5dae5965b534fc5997d");
+        removeExpert(robotId);
       }
       const leftConversation = document.querySelector(
         `.conversation-click[data-conversation-id="${conversationId}"]`
@@ -1374,7 +1381,7 @@ if(userCountry){
         `left-mini-conversation-${conversation._id}`
       );
       if (minimizedConversationContainer) {
-        minimizedConversationContainer.dataset.name = agent[0]?.full_name;
+        minimizedConversationContainer.dataset.name = agent[0]?.nickname;
         const activeUserDiv =
           minimizedConversationContainer.querySelector("#active-user");
         activeUserDiv.classList.remove("bg-slate-300", "bg-success");
@@ -1410,9 +1417,9 @@ if(userCountry){
 
         changeHeaderPicture(conversation._id, agent[0], status);
 
-        leftConversation.setAttribute("data-name", agent[0].full_name);
+        leftConversation.setAttribute("data-name", agent[0].nickname);
         leftConversation.querySelector("[data-conversation-name]").textContent =
-          agent[0].full_name;
+          agent[0].nickname;
         if (
           leftConversation.querySelector("[data-conversation-name][data-robot]")
         ) {
@@ -1565,6 +1572,19 @@ if(userCountry){
     this.socket.on('password-result',(data)=>{
     changePassword(data)
 
+    })
+  }
+
+
+  saveFormProfile=(data)=>{
+    this.socket.emit("saveFormProfile",data,(error)=>{
+      console.error('failed sending changePassword event')
+    })
+  }
+
+  formProfileResult=()=>{
+    this.socket.on("formProfileResult",(data)=>{
+      formProfileResult(data)
     })
   }
 }

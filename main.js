@@ -384,7 +384,7 @@ window.history.replaceState({}, document.title, newURL);
   socketLib.getMessages();
   await getExperts();
   checkForExpertMessages()
-
+socketLib.formProfileResult()
   socketLib.displayAgentsMessage();
   socketLib.passwordResult()
   $(document).on("click", ".conversation-click", handleConversationClick);

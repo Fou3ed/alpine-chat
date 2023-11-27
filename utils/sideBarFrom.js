@@ -4,7 +4,7 @@ import { newData } from "../main.js";
 import { generateCountryOptions } from "./generateCountryOptions.js";
 import { phoneList } from "./getPhoneList.js";
 import { userCountry } from "./getUserCountry.js";
-import { lan } from "./traduction.js";
+import { getTranslationValue, lan } from "./traduction.js";
 let phoneNumber;
 export async function getContactInfo() {
 
@@ -13,7 +13,6 @@ export async function getContactInfo() {
       key: `${API_KEY}`,
     },
   });
-  console.log("response : ",response.data.data[0])
 
 phoneNumber=response.data.data[0].phone
   // Assuming you have the response data available
@@ -39,7 +38,14 @@ if (response.data.data[0].country) {
 if (response.data.data[0].phone) {
   document.getElementById('floating_field_${messageId}').value = response.data.data[0].phone;
 }
+if(response.data.data[0].gender){
+  document.getElementById('gender_input').value=response.data.data[0].gender
+}
+if(response.data.data[0].date_birth){
+  document.getElementById('birth_date_input').value=response.data.data[0].date_birth
+}
 
+document.getElementById("birth_date_input").placeholder=getTranslationValue("date_format.date_form")
 
 }
 
@@ -62,7 +68,7 @@ export function replaceCountryInput() {
           id="country_input"
           data-country
           class="form-input  mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900" 
-          name="Country" 
+          name="country" 
           required
           
         >
@@ -77,7 +83,6 @@ export function replaceCountryInput() {
   
 
   export function replacePhoneInput( ) {
-    console.log("houni",phoneNumber)
     const phoneInput = document.getElementById('floating_field_${messageId}');
   
     const inputContainer = document.createElement('div');
@@ -87,7 +92,8 @@ export function replaceCountryInput() {
         <span></span>
         <input 
           class="form-input phoneInput  mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900" 
-          type="tel"
+          type="tel",
+          name="phone"
 
         />
       </label>
@@ -97,5 +103,5 @@ export function replaceCountryInput() {
     phoneList(phoneInput);
   }
   
-  
+
  

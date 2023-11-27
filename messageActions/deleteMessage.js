@@ -51,7 +51,7 @@ export async function deleteMessage(button) {
     const messageDeleted = document.getElementById(
       `message-content-${data.result._id}`
     );
-    messageDeleted.innerHTML = `${data.userData.full_name} unsent a message`;
+    messageDeleted.innerHTML = `${data.userData.nickname} unsent a message`;
     messageDeleted.classList.add(
       "bg-transparent",
       "border-2",
@@ -63,7 +63,7 @@ export async function deleteMessage(button) {
       `[data-conversation-id="${data.result.conversation_id}"]`
     );
     const pElement = leftConversation.querySelector(".conversationLeftMsg p");
-    pElement.textContent = `${data.userData.full_name} unsent a message`;
+    pElement.textContent = `${data.userData.nickname} unsent a message`;
   
     const direction = messageDeleted.parentNode.querySelector("p").dataset.direction;
   
@@ -71,7 +71,7 @@ export async function deleteMessage(button) {
       messageDeleted.classList.remove("bg-info/10", "dark:bg-accent");
       messageDeleted.innerHTML = `You unsent a message`;
     } else {
-      messageDeleted.innerHTML = `${data.userData.full_name} unsent a message`;
+      messageDeleted.innerHTML = `${data.userData.nickname} unsent a message`;
       messageDeleted.classList.remove("bg-white", "dark:bg-navy-700");
     }
   

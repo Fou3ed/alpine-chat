@@ -1,10 +1,6 @@
-import { max_length_message } from "../env.js";
-import { timeString, updateConversationId, updateExpert, updateNewData } from "../main.js";
-import { inputLEngth } from "../utils/resetCnvMaxLength.js";
-const leftConversationContainer = document.getElementById("left-conversation");
+import {  updateConversationId, updateExpert, updateNewData } from "../main.js";
 
 export async function guestCreated(data) {
-  console.log("guestCreated",data)
     const newUser = {
       user: data.user,
       contact: data.contact,

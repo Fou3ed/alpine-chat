@@ -13,3 +13,4 @@ export const TOKEN="eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2OTExNjc5MDQ
 export const max_length_message="256"
 export const message_limit=3
 export const loginLink="https://hatem.local.itwise.pro/private-chat-app/public/Dellastrod/"
+export const robotId="64d0b5dae5965b534fc5997d"

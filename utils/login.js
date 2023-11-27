@@ -9,7 +9,6 @@ const conversationDb = new conversationActions();
 const userDb = new userActions();
 export async function login(data,socket) {
   const userInfo = await checkLoginUser(data);
-  console.log("useRInfo ",userInfo)
   if(userInfo.length>0){
     socket.emit('login-user',userInfo[0])
   }else {
@@ -36,7 +35,7 @@ export async function login(data,socket) {
     user: guestInfo._id,
     action: "conversation.create",
     metaData: {
-      name: robotDetails.full_name,
+      name: robotDetails.nickname,
       channel_url: "",
       conversation_type: "4",
       description: "private chat",
@@ -54,7 +53,7 @@ export async function login(data,socket) {
     contact: guestInfo.id,
     availableAgent: robotDetails._id.toString(),
     accountId: data.accountId,
-    senderName: robotDetails.full_name,
+    senderName: robotDetails.nickname,
     conversationId: conversationDetails._id,
     role: robotDetails.role,
   })
@@ -108,7 +107,7 @@ export async function login(data,socket) {
             isSender: false,
             direction: "out",
             userId: data.user,
-            senderName: robotDetails.full_name,
+            senderName: robotDetails.nickname,
           });
           if (conversationDetails.status == 0) {
             let eventName = "onMessageReceived";
@@ -127,7 +126,7 @@ export async function login(data,socket) {
                 isSender: false,
                 direction: "out",
                 userId: data.user,
-                senderName: robotDetails.full_name,
+                senderName: robotDetails.nickname,
               },
             ];
             try {

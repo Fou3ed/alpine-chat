@@ -6,7 +6,8 @@ export function changeHeaderPicture(cnv, agent, status) {
       const activeUserHeader = document.querySelector("#active-user-header");
   
       const conversationName = document.getElementById("conversation-name");
-      conversationName.textContent = agent.full_name;
+      //changed
+      conversationName.textContent = agent.nickname;
   
       if (headerIconDiv) {
         const imgElement = headerIconDiv.querySelector("img");

@@ -5,7 +5,6 @@ const leftConversationContainer = document.getElementById("left-conversation");
 const minimizedSideBar = document.getElementById("mini-sidebar");
 
 export function displayLeftConversation(data) {
-  console.log("data",data)
   const isNotNewConversation = document.querySelector(
       `#left-conversation-${data.conversationId}`
     );

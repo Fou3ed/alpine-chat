@@ -60,7 +60,7 @@ export function displayAgents(agents) {
           </div>
           <div>
             <p class="font-medium text-slate-700 line-clamp-1 dark:text-navy-100">
-              ${agent.firstname || ''} ${agent.lastname || ''}
+              ${agent.nickname}
             </p>
             <div class="badge bg-primary/10 text-primary dark:bg-accent-light/15 dark:text-accent-light text-tiny px-2 py-1">
               ${agent.skills || ''}

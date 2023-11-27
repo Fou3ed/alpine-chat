@@ -402,7 +402,6 @@ export async function receiveMessage(data) {
         btnAvailableAgent.addEventListener(
           "click",
           function () {
-            console.log("newDat",newData)
             socketLib.availableAgent({
               accountId: newData.accountId,
               conversationId: conversationId,
@@ -426,7 +425,6 @@ export async function receiveMessage(data) {
       
           const log = JSON.parse(data.messageData.content);
           if (log.element ==3) {
-              console.log("herereerrere")
            let  userLog = `${getTranslationValue("bought.purchase")}`;
         
             const newDivMsg = document.createElement("div");
@@ -494,7 +492,7 @@ export async function receiveMessage(data) {
                           data.messageData.status === 0
                             ? `${
                                 direction === "justify-start"
-                                  ? data.messageData.user_data.full_name
+                                  ? data.messageData.user_data.nickname
                                   : "You"
                               } unsent a message`
                             : data.messageData.type === "link"
@@ -528,7 +526,7 @@ export async function receiveMessage(data) {
                             data.messageData.status === 0
                               ? `${
                                   direction === "justify-start"
-                                    ? data.messageData.user_data.full_name
+                                    ? data.messageData.user_data.nickname
                                     : "You"
                                 } unsent a message`
                               : data.messageData.type === "plan"

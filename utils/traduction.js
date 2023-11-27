@@ -92,6 +92,12 @@ export function traduc() {
     "left_side.tab_1.search"
   );
 
+  const birth_date_input=  document.getElementById("birth_date_input")
+
+  if(birth_date_input){
+    birth_date_input.placeholder=getTranslationValue("date_format.date_form")
+
+  }
 
   document.querySelectorAll("[data-country]" ).forEach((element) => {
     element.dispatchEvent(new Event('change'))
