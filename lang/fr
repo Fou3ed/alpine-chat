@@ -48,6 +48,7 @@
         "length" : "Longueur du message : ",
         "send" : "Envoyer votre message",
         "balance_message":"Vous devez acheter un nouveau plan pour recommencer à chatter.",
+        
 
         "pinned" : "épinglé",
         "edited" : "modifié",
@@ -100,9 +101,9 @@
             "button" : ""
         },
         "balance_end" : {
-            "title" : "",
-            "content" : "",
-            "button" : ""
+            "title" : "Renouveler votre accès au chat",
+            "content" : "Vous devez acheter un nouveau plan pour recommencer à chatter",
+            "button" : "acheter"
         },
         "error" : {
             "title" : "",
@@ -170,7 +171,7 @@
         "confirm":"confirmé"
     },
     "form_password":{
-        "title":"paramètres",
+        "title":"Modifier votre mot de passe",
         "description":"changer votre mot de passe ",
         "old_password":"Ancien mot de passe",
         "new_password":"nouveau mot de passe",
@@ -193,10 +194,12 @@
         "email":"E-mail",
         "country":"pays",
         "phone":"numéro de téléphone",
-        "button":"Sauvgarder",
+        "button":"mettre à jour",
         "firstName":"prénom",
         "success":"formulaire sauvegardé avec succès",
-        "birth_date":"date de naissance"
+        "birth_date":"date de naissance",
+        "title":"profile"
+
 
 
 

@@ -653,7 +653,8 @@ if(userCountry){
   onMessageSent = async () => {
     this.socket.on("onMessageSent", async (data, online, error) => {
       await sentMessage(data);
-      if (data?.type === "MSG") {
+      console.log(data)
+      if (data?.type === "MSG" && data?.conversationType !=4) {
         updateUserBalance();
       }
     });

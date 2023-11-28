@@ -104,21 +104,20 @@ export function traduc() {
 
   });
 
-let conversationTool = document.getElementById("cnvSideBarTool");
-let buyTool = document.getElementById("buyMessagesTool");
-let modeTool=document.getElementById("modeTool")
-let toggleDrawerTool=document.getElementById("toggleDrawerButton")
+
 // conversationTool.setAttribute('x-tooltip.placement.bottom.light', getTranslationValue("tooltips.conversationSideBar"));
 if (lan.substring(0, 2).toLowerCase() === "en") {
-  conversationTool.setAttribute('x-tooltip.placement.bottom.light', "'Conversation side bar'");
-  buyTool.setAttribute('x-tooltip.placement.bottom.light', "'Buy messages'");
-  modeTool.setAttribute('x-tooltip.placement.bottom.light', "'Dark Mode'");
-  toggleDrawerTool.setAttribute('x-tooltip.placement.bottom.light', "'Expert SideBar'");
+  document.getElementById("cnvSideBarTool").setAttribute('x-tooltip.placement.bottom.light', "'Conversation side bar'");
+  document.getElementById("buyMessagesTool").setAttribute('x-tooltip.placement.bottom.light', "'Buy messages'");
+  document.getElementById("modeTool").setAttribute('x-tooltip.placement.bottom.light', "'Dark Mode'");
+  document.getElementById("toggleDrawerButton").setAttribute('x-tooltip.placement.bottom.light', "'Expert SideBar'");
+  document.getElementById("profile_header").setAttribute('x-tooltip.placement.bottom.light', "'Settings'")
 } else {
-  conversationTool.setAttribute('x-tooltip.placement.bottom.light', "'Conversations Barre latérale'");
-  buyTool.setAttribute('x-tooltip.placement.bottom.light', "'Acheter des messages'");
-  modeTool.setAttribute('x-tooltip.placement.bottom.light', "'Mode sombre'");
-  toggleDrawerTool.setAttribute('x-tooltip.placement.bottom.light', "'Barre latérale experte'");
+  document.getElementById("cnvSideBarTool").setAttribute('x-tooltip.placement.bottom.light', "'Conversations Barre latérale'");
+  document.getElementById("buyMessagesTool").setAttribute('x-tooltip.placement.bottom.light', "'Acheter des messages'");
+  document.getElementById("modeTool").setAttribute('x-tooltip.placement.bottom.light', "'Mode sombre'");
+  document.getElementById("toggleDrawerButton").setAttribute('x-tooltip.placement.bottom.light', "'Barre latérale experte'");
+  document.getElementById("profile_header").setAttribute('x-tooltip.placement.bottom.light', "'paramètres'")
 
 }
 

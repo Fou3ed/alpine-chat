@@ -1,11 +1,12 @@
 import { Countries } from "../countries.js";
 import { API_KEY, SQL_API } from "../env.js";
-import { newData } from "../main.js";
+import { newData, updatePhNValidation } from "../main.js";
 import { generateCountryOptions } from "./generateCountryOptions.js";
-import { phoneList } from "./getPhoneList.js";
 import { userCountry } from "./getUserCountry.js";
 import { getTranslationValue, lan } from "./traduction.js";
+import { showValidationError } from "./validationError.js";
 let phoneNumber;
+let iti;
 export async function getContactInfo() {
 
   const response = await axios.get(`${SQL_API}/getcontact/${newData.contact}`, {
@@ -15,7 +16,6 @@ export async function getContactInfo() {
   });
 
 phoneNumber=response.data.data[0].phone
-  // Assuming you have the response data available
 
 
 // Update the input values based on the response data
@@ -98,10 +98,77 @@ export function replaceCountryInput() {
         />
       </label>
     `;
+  phoneInput.addEventListener('input', function () {
+    this.value = this.value.replace(/[^0-9]/g, '');
+  });
+     iti = window.intlTelInput(phoneInput, {
+      utilsScript:
+        "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+      initialCountry: userCountry.toLowerCase(),
+      separateDialCode:true,
   
-   
-    phoneList(phoneInput);
+    });
+    
   }
-  
 
+  
+//   let form = phoneInput.closest("form");
+//   iti = window.intlTelInput(phoneInput, {
+//    utilsScript:
+//      "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
+//    initialCountry: userCountry.toLowerCase(),
+//    separateDialCode:true,
+
+//  });
+//  let selectedCountryData = iti.getSelectedCountryData();
  
+
+
+   // phoneInput.addEventListener("phoneInput", validatePhoneNumber);
+  
+    // phoneInput.addEventListener("blur", validatePhoneNumber);
+  
+    // form.addEventListener(
+    //   "submit",
+    //   function (e) {
+    //     e.preventDefault();
+    //     let valid = iti.isValidNumber(phoneInput.value);
+    //     if (!valid) {
+    //       showValidationError(
+    //         phoneInput,
+    //       "container.forms.phone"
+    //       );
+    //     }
+    //   },
+    //   false
+    // );
+
+  export function validatePhoneNumber(input) {
+    let phoneNumber = input.value;
+    if (phoneNumber.startsWith("+")) {
+      if (phoneNumber.startsWith("+" + selectedCountryData.dialCode)) {
+        showValidationError(
+          input,
+          "container.forms.phone"
+        );
+        return;
+      }
+    } else {
+      input.value = phoneNumber;
+    }
+    let valid = iti.isValidNumber(phoneNumber);
+    updatePhNValidation(true)
+    if (!valid) {
+      updatePhNValidation(false)
+     
+      showValidationError(
+        input,
+        "container.forms.phone"
+      );
+      return false
+    } else {
+      return true
+    }
+  }
+
+  

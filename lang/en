@@ -101,9 +101,9 @@
             "button" : ""
         },
         "balance_end" : {
-            "title" : "",
-            "content" : "",
-            "button" : ""
+            "title" : "Renew Your Chat Access",
+            "content" : "You need to buy a new plan to start chatting again",
+            "button" : "Buy"
         },
         "error" : {
             "title" : "",
@@ -169,7 +169,7 @@
         "confirm":"confirm"
     },
     "form_password":{
-        "title":"settings",
+        "title":"Change your Password",
         "description":"change Password",
         "old_password":"Current Password",
         "new_password":"New Password",
@@ -192,10 +192,11 @@
         "email":"E-mail",
         "country":"Country",
         "phone":"phone number",
-        "button":"Submit",
+        "button":"Update",
         "firstName":"first name",
         "success":"form saved successfully ",
-        "birth_date":"birth date "
+        "birth_date":"birth date ",
+        "title":"profile"
 
     }
 }

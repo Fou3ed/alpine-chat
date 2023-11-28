@@ -206,10 +206,10 @@ export async function sentMessage(data) {
   let isSendingMessage = false;
 
   export async function sendMessage() {
-    if (isSendingMessage) return; // If a message is already being sent, ignore the function call
+    if (isSendingMessage) return; 
   
     if (messageInput.value.trim() !== "") {
-      isSendingMessage = true; // Set the sending state to true
+      isSendingMessage = true; 
   
       if (!emoji.classList.contains("hidden")) emoji.classList.add("hidden");
       if (conversationId) {
@@ -230,7 +230,6 @@ export async function sentMessage(data) {
               to: expert,
               // balance: totalBalance?.balance,
               // freeBalance:totalFreeBalance
-
             });
           }
           messageInput.value = "";

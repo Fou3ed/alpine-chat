@@ -551,7 +551,7 @@
 
 
           <!-- Profile -->
-          <div class="flex" id="">
+          <div class="flex" id="profile_header" x-tooltip.placement.bottom.light="'Settings'" >
             <button @click="isShowPopper = !isShowPopper" x-ref="popperRef" class="h-9">
 
               <div class="flex items-center">
@@ -988,17 +988,18 @@
           x-transition:enter-end="translate-x-0" x-transition:leave="ease-in transform-gpu"
           x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full">
           <div class="flex h-[60px] items-center justify-between p-4">
-            <div class="-mr-1.5 flex space-x-1">
-              <button @click="showDrawer=false"
-                class="btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                  stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
+            <div class="flex items-center">
+                <span class="text-lg font-medium text-slate-700 dark:text-navy-100 my-3" data-translation="form_password.title">Change your Password</span>
             </div>
-          </div>
-          <div class="mb-4 text-lg ml-4 font-bold">Change your Password</div>
+        
+            <button @click="showDrawer=false"
+                    class="btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
 
           <form class="flex flex-col px-5 plans-tab" @submit.prevent>
 
@@ -1055,22 +1056,49 @@
           x-transition:enter-end="translate-x-0" x-transition:leave="ease-in transform-gpu"
           x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full">
           <div class="flex h-[60px] items-center justify-between p-4">
+
+            <div class="flex items-center">
+              <span class="text-lg font-medium text-slate-700 dark:text-navy-100 my-3" data-translation="form.title">Profile</span>
+          </div>
+
             <div class="-mr-1.5 flex space-x-1">
               <button @click="showDrawer=false"
-                class="btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                  stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
+              class="btn h-8 w-8 rounded-full p-0 hover:bg-slate-300/20 focus:bg-slate-300/20 active:bg-slate-300/25 dark:hover:bg-navy-300/20 dark:focus:bg-navy-300/20 dark:active:bg-navy-300/25">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+      </button> 
             </div>
           </div>
 
 
+          
 
-          <div class="mb-4 text-lg ml-4 font-bold">Profile</div>
+
+
 
           <form id="profileForm" class="flex flex-col px-5 plans-tab" @submit.prevent>
+
+
+            <!-- gender -->
+<div>
+  <label class="block  mb-2">
+    <span>Gender </span>
+    <select 
+      id="gender_input"
+      data-gender
+      class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900" 
+      name="gender"
+    >
+      <option value=""></option>
+      <option value="0" data-translation="gender.male">Male</option>
+      <option value="1" data-translation="gender.female">Female</option>
+
+    </select>
+  </label>
+</div>
+
+
             <!-- first name -->
             <div>
               <label class="block mb-2">
@@ -1090,6 +1118,28 @@
               </label>
             </div>
 
+
+            <!-- birth-data  -->
+<div>
+  <label lass="block  mb-2" >
+    <span data-translation="form.birth_date"> Birth date</span>
+    <input
+    id="birth_date_input"
+    class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
+    name="date_birth"
+    type="text"
+    x-input-mask='{
+      date: true,
+      delimiter: "-",
+      datePattern: ["d", "m", "Y"]
+    }'
+  />
+  
+  
+  </label>
+  
+  </div>
+  
 
             <!-- email -->
             <div>
@@ -1122,50 +1172,14 @@
               </label>
             </div>
 
-<!-- gender -->
-<div>
-  <label class="block  mb-2">
-    <span>Gender </span>
-    <select 
-      id="gender_input"
-      data-gender
-      class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900" 
-      name="gender"
-    >
-      <option value=""></option>
-      <option value="0" data-translation="gender.male">Male</option>
-      <option value="1" data-translation="gender.female">Female</option>
-
-    </select>
-  </label>
-</div>
-
-<!-- birth-data  -->
-<div>
-<label lass="block  mb-2" >
-  <span data-translation="form.birth_date"> Birth date</span>
-  <input
-  id="birth_date_input"
-  class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
-  name="date_birth"
-  type="text"
-  x-input-mask='{
-    date: true,
-    delimiter: "-",
-    datePattern: ["d", "m", "Y"]
-  }'
-/>
 
 
-</label>
-
-</div>
 
 
             <span id="ProfileSideBarForm" class="text-red-500 "></span>
             <button type="submit" id="profileButton"
               class="btn   bg-primary mt-5 font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90">
-              <span id="buttonTextProfile" class="" data-translation="form.button">Submit</span>
+              <span id="buttonTextProfile" class="" data-translation="form.button">Update</span>
               <span id="spinnerForm" class="hidden animate-spin">&#x21BB;</span>
             </button>
 

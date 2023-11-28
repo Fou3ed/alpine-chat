@@ -1,6 +1,5 @@
 import { updatePhNValidation } from "../main.js";
 import { userCountry } from "./getUserCountry.js";
-import { getTranslationValue } from "./traduction.js";
 import { showValidationError } from "./validationError.js";
 export function phoneList(input) {
     let form = input.closest("form");
@@ -40,7 +39,7 @@ export function phoneList(input) {
   
     input.addEventListener("input", validatePhoneNumber);
   
-    input.addEventListener("blur", validatePhoneNumber);
+    // input.addEventListener("blur", validatePhoneNumber);
   
     form.addEventListener(
       "submit",
