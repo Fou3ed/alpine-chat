@@ -1,4 +1,4 @@
-import {  notifyNumber, updateNotifyNumber } from "../main.js";
+import {  updateNotifyNumber } from "../main.js";
 
 export function changeTitle(number) {
   if (number === 0) {

@@ -269,7 +269,7 @@ export function displayMessages(messages) {
                     required
                     ${myContent.status == 1 ? "disabled" : ""}
                 > 
-                    ${myContent.status == 0 ? `<option value="" data-translation="select.empty"></option>` + Object.entries(field?.field_default_value).map(([key, value]) => `<option value="${value}">${value}</option>`).join('') : `<option value="${field.field_value}">${field.field_value}</option>`}
+                    ${myContent.status == 0 ? `<option value=""></option>` + Object.entries(field?.field_default_value).map(([key, value]) => `<option value="${value}">${value}</option>`).join('') : `<option value="${field.field_value}">${field.field_value}</option>`}
                 </select>
                 </label>
             `;
@@ -447,7 +447,7 @@ export function displayMessages(messages) {
                             message.status == 0
                               ? `${
                                   direction === "justify-start"
-                                    ? message.user_data.nickname
+                                    ? message.user_data?.nickname
                                     : "You"
                                 } unsent a message`
                               : message.type == "link"

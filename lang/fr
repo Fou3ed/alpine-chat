@@ -198,7 +198,9 @@
         "firstName":"prénom",
         "success":"formulaire sauvegardé avec succès",
         "birth_date":"date de naissance",
-        "title":"profile"
+        "title":"profile",
+        "error_change":"vous devez changer quelque chose"
+
 
 
 

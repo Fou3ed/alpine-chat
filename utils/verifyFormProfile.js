@@ -12,7 +12,7 @@ let isChanged=false
   for (let i = 0; i < inputs.length; i++) {
     const input = inputs[i];
     formData[input.name] = input.value || null;
-    
+        console.log(initialFormData[input.name] ," and ", formData[input.name])
     if (initialFormData[input.name] === formData[input.name] || 
       (initialFormData[input.name] && initialFormData[input.name]?.trim() === formData[input.name]?.trim())) {
     continue;
@@ -46,8 +46,7 @@ let isChanged=false
     
   
   }
-
-  if (isValid && isChanged) {
+  if (initialFormData.country  && isValid && isChanged) {
     const spinner = document.getElementById("spinnerForm");
     const buttonText = document.getElementById("buttonTextProfile");
     buttonText.classList.add("hidden");
@@ -65,10 +64,10 @@ let isChanged=false
       date_birth: formData?.date_birth || null
     });
   }else {
-    const messageElement = document.getElementById("ProfileSideBarForm");
-
-    messageElement.textContent = "you need to make some change";
+        const messageElement = document.getElementById("ProfileSideBarForm");
+        messageElement.textContent = getTranslationValue("form.error_change");
         messageElement.style.color = "red";
+        
   }
 }
 
@@ -77,10 +76,8 @@ export function formProfileResult(response){
   const messageElement = document.getElementById("ProfileSideBarForm");
   const spinner = document.getElementById("spinnerForm");
   const buttonText = document.getElementById("buttonTextProfile");
-
       if(response.success){
         const usernameLink = document.getElementById("userName");
-        console.log(response.data)
         if(response.data.firstname !==null){
           usernameLink.textContent = response.data.firstname + " " + response.data.lastname;
         }
@@ -88,12 +85,11 @@ export function formProfileResult(response){
          spinner.classList.add("hidden");
          messageElement.textContent = getTranslationValue("form.success");
          messageElement.style.color = "green";
-          updateFormData(response.data)
+         updateFormData(response.data)
       }else {
         spinner.classList.add("hidden");
         buttonText.classList.remove("hidden")
         messageElement.textContent = getTranslationValue("container.forms.error");
         messageElement.style.color = "red";
-
       }
 }

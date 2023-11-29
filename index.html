@@ -1089,15 +1089,15 @@
               <label class="block mb-2">
                 <span>Gender </span>
                 <select id="gender_input" data-gender
-                        class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
-                        name="gender">
+                  class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
+                  name="gender">
                   <option value=""></option>
                   <option value="0" data-translation="gender.male">Male</option>
                   <option value="1" data-translation="gender.female">Female</option>
                 </select>
               </label>
             </div>
-          
+
             <!-- first name -->
             <div>
               <label class="block mb-2">
@@ -1107,9 +1107,9 @@
                   type="text" id="first_name_input" name="first_name" />
               </label>
             </div>
-          
+
             <!-- other input fields with consistent spacing -->
-          
+
             <!-- last name  -->
             <div>
               <label class="block mb-2">
@@ -1119,21 +1119,21 @@
                   type="text" id="last_name_input" name="last_name" />
               </label>
             </div>
-          
+
             <!-- birth-date  -->
             <div>
               <label class="block mb-2">
                 <span data-translation="form.birth_date"> Birth date</span>
                 <input id="birth_date_input"
-                       class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
-                       name="date_birth" type="text" x-input-mask='{
+                  class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
+                  name="date_birth" type="text" x-input-mask='{
                 date: true,
                 delimiter: "-",
                 datePattern: ["d", "m", "Y"]
               }' />
               </label>
             </div>
-          
+
             <!-- email -->
             <div>
               <label class="block mb-2">
@@ -1143,7 +1143,7 @@
                   type="email" id="email_input" name="email" />
               </label>
             </div>
-          
+
             <!-- country -->
             <div>
               <label class="block mb-2">
@@ -1154,26 +1154,26 @@
                 </select>
               </label>
             </div>
-          
+
             <!-- phone number -->
             <div>
               <label class="block mb-2">
                 <span data-translation="form.phone">Phone number</span>
                 <input id="floating_field_${messageId}"
-                       class="form-input phoneInput field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
-                       type="tel" name="phone" />
+                  class="form-input phoneInput field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
+                  type="tel" name="phone" />
               </label>
             </div>
-          
+
             <span id="ProfileSideBarForm" class="text-red-500 "></span>
             <button type="submit" id="profileButton"
-                    class="btn   bg-primary mt-5 font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90">
+              class="btn   bg-primary mt-5 font-medium text-white hover:bg-primary-focus focus:bg-primary-focus active:bg-primary-focus/90 dark:bg-accent dark:hover:bg-accent-focus dark:focus:bg-accent-focus dark:active:bg-accent/90">
               <span id="buttonTextProfile" class="" data-translation="form.button">Update</span>
               <span id="spinnerForm" class="hidden animate-spin">&#x21BB;</span>
             </button>
-          
+
           </form>
-          
+
 
 
 
@@ -1195,7 +1195,6 @@
     window.addEventListener("load", () => {
       Alpine.start();
     });
-
   </script>
 </body>
 

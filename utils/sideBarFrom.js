@@ -17,7 +17,7 @@ export async function getContactInfo() {
     },
   });
 
-phoneNumber=response.data.data[0].phone
+phoneNumber=response.data.data[0]?.phone
 
  // Store initial values
  initialFormData.first_name = response.data.data[0].firstname || null;
@@ -42,6 +42,7 @@ if (response.data.data[0].email) {
 }
 
 if (response.data.data[0].country) {
+  console.log(response.data.data[0].country)
   document.getElementById('country_input').value = response.data.data[0].country;
 }
 
@@ -87,7 +88,7 @@ export function replaceCountryInput() {
         </select>
       </label>
     `;
-  
+      
     countryInput.parentNode.replaceChild(selectContainer.firstElementChild, countryInput);
   }
   
