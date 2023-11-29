@@ -57,6 +57,8 @@ export let senderName;
 export let expert;
 export let notifyNumber = 0;
 export let limitCode=3
+export let initialFormData = {};
+
 /**state management  */
 export function updateConversationId(conversation){
   conversationId=conversation
@@ -101,6 +103,16 @@ export function updateAgentName(agentName){
 
 export function updateNewData(data){
   newData=data
+}
+export function updateFormData(data){
+  initialFormData.first_name = data.firstname || null;
+  initialFormData.last_name = data.lastname || null;
+  initialFormData.email = data.email || null;
+  initialFormData.country = data.country || null;
+  initialFormData.phone = data.phone || null;
+  initialFormData.gender = data.gender || null;
+  initialFormData.date_birth = data.date_birth || null ;
+  
 }
 
 // main.js

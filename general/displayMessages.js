@@ -221,7 +221,6 @@ export function displayMessages(messages) {
                         </select>
                     </label>`;
               } else if (field?.field_type == 7) {
-                console.log(field.field_value)
                 return `
               <label class="relative">
               <span>${field.field_name ?? ""}</span>

@@ -1,12 +1,14 @@
 import { Countries } from "../countries.js";
 import { API_KEY, SQL_API } from "../env.js";
-import { newData, updatePhNValidation } from "../main.js";
+import { initialFormData, newData, updatePhNValidation } from "../main.js";
 import { generateCountryOptions } from "./generateCountryOptions.js";
 import { userCountry } from "./getUserCountry.js";
 import { getTranslationValue, lan } from "./traduction.js";
 import { showValidationError } from "./validationError.js";
 let phoneNumber;
 let iti;
+
+
 export async function getContactInfo() {
 
   const response = await axios.get(`${SQL_API}/getcontact/${newData.contact}`, {
@@ -17,6 +19,14 @@ export async function getContactInfo() {
 
 phoneNumber=response.data.data[0].phone
 
+ // Store initial values
+ initialFormData.first_name = response.data.data[0].firstname || null;
+ initialFormData.last_name = response.data.data[0].lastname || null;
+ initialFormData.email = response.data.data[0].email || null;
+ initialFormData.country = response.data.data[0].country || null;
+ initialFormData.phone = response.data.data[0].phone || null;
+ initialFormData.gender = response.data.data[0].gender || null;
+ initialFormData.date_birth = response.data.data[0].date_birth || null ;
 
 // Update the input values based on the response data
 if (response.data.data[0].firstname) {
@@ -111,37 +121,6 @@ export function replaceCountryInput() {
     
   }
 
-  
-//   let form = phoneInput.closest("form");
-//   iti = window.intlTelInput(phoneInput, {
-//    utilsScript:
-//      "https://cdn.jsdelivr.net/npm/intl-tel-input@18.2.1/build/js/utils.js",
-//    initialCountry: userCountry.toLowerCase(),
-//    separateDialCode:true,
-
-//  });
-//  let selectedCountryData = iti.getSelectedCountryData();
- 
-
-
-   // phoneInput.addEventListener("phoneInput", validatePhoneNumber);
-  
-    // phoneInput.addEventListener("blur", validatePhoneNumber);
-  
-    // form.addEventListener(
-    //   "submit",
-    //   function (e) {
-    //     e.preventDefault();
-    //     let valid = iti.isValidNumber(phoneInput.value);
-    //     if (!valid) {
-    //       showValidationError(
-    //         phoneInput,
-    //       "container.forms.phone"
-    //       );
-    //     }
-    //   },
-    //   false
-    // );
 
   export function validatePhoneNumber(input) {
     let phoneNumber = input.value;

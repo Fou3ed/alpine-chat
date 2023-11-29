@@ -20,7 +20,7 @@ export function displayBuyModal() {
         <p class="mt-2" data-translation="container.balance_message">
           ${getTranslationValue("container.balance_message")}
         </p>
-        <button class="modal-button btn mt-6 bg-success font-medium text-white hover:bg-success-focus focus:bg-success-focus active:bg-success-focus/90" id="buyButtonBalance">
+        <button class="modal-button btn h-9 mt-4 justify-between bg-gradient-to-r from-purple-500 to-indigo-600 text-white gradient-text " style="min-width: 30%;justify-content: center;" id="buyButtonBalance">
           ${getTranslationValue("modals.balance_end.button")}
         </button>
       </div>
