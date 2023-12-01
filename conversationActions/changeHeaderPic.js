@@ -6,7 +6,6 @@ export function changeHeaderPicture(cnv, agent, status) {
       const activeUserHeader = document.querySelector("#active-user-header");
   
       const conversationName = document.getElementById("conversation-name");
-      //changed
       conversationName.textContent = agent.nickname;
   
       if (headerIconDiv) {
@@ -18,11 +17,11 @@ export function changeHeaderPicture(cnv, agent, status) {
       }
       if (activeUserHeader) {
         activeUserHeader.classList.remove("bg-slate-300", "bg-success");
-       if (status == 1) {
+  
+        if (status == 0) {
+          activeUserHeader?.classList?.add("bg-slate-300");
+        } else if (status == 1) {
           activeUserHeader?.classList?.add("bg-success");
-        }else {
-            activeUserHeader?.classList?.add("bg-slate-300");
-          
         }
       }
     }

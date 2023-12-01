@@ -59,7 +59,7 @@ export async function getAllConversations() {
             if (!agentDisco) {
               displayedUsers.add(bot[0]._id);
               const html = `<div id="${bot[0]._id}" data-name=${bot[0].nickname} class="swiper-slide flex w-11 shrink-0 flex-col items-center justify-center"><div class="h-11 w-11 rounded-full bg-gradient-to-r from-purple-500 to-orange-600 p-0.5"><img class="h-full w-full rounded-full border-2 border-white object-cover dark:border-slate-700" src=images/avatar/avatar-0.jpg alt="avatar" /></div><p class="mt-1 w-14 break-words text-center text-xs text-slate-600 dark:text-navy-100">${bot[0].nickname}</p></div>`;
-             
+
               $(".swiper-wrapper").append(html);
               checkForExpertMessages()
             }

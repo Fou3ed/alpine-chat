@@ -286,14 +286,12 @@ export function openModalActivation(data){
         setTimeout(() => {
           canClick = true;
       }, 60000); // 1 minute in milliseconds
-    }else {
-      console.log("wait for 1 mi")
     }
       });
       document.body.appendChild(modalDiv);
 
 
-  
+      
 }
 
 

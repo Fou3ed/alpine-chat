@@ -66,7 +66,7 @@ export async function receiveMessage(data) {
       time = `${day}:${hour}:${minute}`;
     }
     const isNotNewConversation = document.querySelector(
-      `#left-conversation-${data.messageData.conversation}`
+      `#left-conversation-${data.conversation}`
     );
     if (isNotNewConversation === null) {
       displayLeftConversation({
@@ -78,7 +78,7 @@ export async function receiveMessage(data) {
       });
     }
   
-    if (data.messageData.conversation === conv) {
+    if (data.conversation === conv) {
       
       if (Object.keys(myContent).length !== 0 && data.messageData.type === "plan")
         tableRows = myContent.plans.map((plan) => {
@@ -216,7 +216,7 @@ export async function receiveMessage(data) {
                    <option value=""> ${field.field_name}
                    </option>
 
-                   <option value="0" data-translation="gender.male">${getTranslationValue("gender.male")}</option><option value="1" data-translation="gender.female" >${getTranslationValue("gender.female")}</option>
+                   <option value="1" data-translation="gender.female" >${getTranslationValue("gender.female")}</option><option value="0" data-translation="gender.male">${getTranslationValue("gender.male")}</option>
                    
                     </select>
           </label>
@@ -402,6 +402,7 @@ export async function receiveMessage(data) {
         btnAvailableAgent.addEventListener(
           "click",
           function () {
+            console.log("newDat",newData)
             socketLib.availableAgent({
               accountId: newData.accountId,
               conversationId: conversationId,

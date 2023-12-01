@@ -47,8 +47,7 @@
         "no_credits_message" : "",
         "length" : "Longueur du message : ",
         "send" : "Envoyer votre message",
-        "balance_message":"Vous devez acheter un nouveau plan pour recommencer à chatter.",
-        
+        "balance_message":"Vous devez acheter un forfait pour continuer à poser des questions<br>Cependant vous pouvez recevoir une réponse de l'Expert",
 
         "pinned" : "épinglé",
         "edited" : "modifié",
@@ -139,7 +138,7 @@
         "verification_code_save_button":"valider",
         "verification_code_resend":"Renvoyer le code de vérification",
         "verification_code_input":"code",
-        "verification_code_advise":"si vous n'avez pas reçu d'email,pensez à vérifier vos spams"
+        "verification_code_advise":"si vous n'avez pas reçu d'email, pensez à vérifier vos spams"
 
 
     },
@@ -163,8 +162,8 @@
 
      },
      "gender":{
-        "male":"male",
-        "female":"femelle"
+        "female":"Femme",
+        "male":"Homme"
     },
     "mail_modal":{
         "mail_sent":"courrier envoyé",

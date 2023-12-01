@@ -1,4 +1,3 @@
-import { onStopTyping } from "../conversationActions/conversationTyping.js";
 
 const messageInput = document.querySelector("#message-input");
 

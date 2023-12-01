@@ -12,7 +12,7 @@ export async function getPlans() {
       if (response) {
         response.data.data.forEach((plan) => {
           document.getElementById("plans").insertAdjacentHTML(
-            "afterbegin",
+            "beforeend",
             `
           <div class='pricing-item  '>
                       <div  class='pricing-deco' id="balance-plan-${plan.id}">

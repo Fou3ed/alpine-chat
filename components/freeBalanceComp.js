@@ -8,13 +8,13 @@ export const freeBalance = (balance) => {
           getTranslationValue("container.balance_message");
         messageInput.disabled = true;
         sendButton.disabled = true;
-    }
+    }    
     const balanceCard = document.querySelector(".balance-card");
     const freeBalanceCard = document.querySelector(".free-balance-card"); // Change the selector here to match the correct element
 
     if (freeBalanceCard === null) {
         balanceCard.insertAdjacentHTML("beforebegin", `
-        <div class="free-balance-card dark:bg-navy-700">
+        <div class="free-balance-card ">
         <div class="flex justify-between space-x-1">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"></path>

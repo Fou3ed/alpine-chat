@@ -42,15 +42,19 @@ if (response.data.data[0].email) {
 }
 
 if (response.data.data[0].country) {
-  console.log(response.data.data[0].country)
   document.getElementById('country_input').value = response.data.data[0].country;
 }
 
 if (response.data.data[0].phone) {
   document.getElementById('floating_field_${messageId}').value = response.data.data[0].phone;
 }
-if(response.data.data[0].gender){
-  document.getElementById('gender_input').value=response.data.data[0].gender
+if (response.data.data[0].gender) {
+    console.log(document.getElementById('gender_input'))
+  response.data.data[0].gender == "M"
+    ? (document.getElementById('gender_input').value = "M")
+    : response.data.data[0].gender == "W"
+    ? (document.getElementById('gender_input').value = "W")
+    : "";
 }
 if(response.data.data[0].date_birth){
   document.getElementById('birth_date_input').value=response.data.data[0].date_birth
@@ -105,7 +109,6 @@ export function replaceCountryInput() {
           class="form-input phoneInput  mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900" 
           type="tel",
           name="phone"
-
         />
       </label>
     `;

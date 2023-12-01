@@ -12,9 +12,7 @@ let isChanged=false
   for (let i = 0; i < inputs.length; i++) {
     const input = inputs[i];
     formData[input.name] = input.value || null;
-        console.log(initialFormData[input.name] ," and ", formData[input.name])
-    if (initialFormData[input.name] === formData[input.name] || 
-      (initialFormData[input.name] && initialFormData[input.name]?.trim() === formData[input.name]?.trim())) {
+    if (initialFormData[input.name] === formData[input.name] ) {
     continue;
   }
   
@@ -46,6 +44,7 @@ let isChanged=false
     
   
   }
+
   if (initialFormData.country  && isValid && isChanged) {
     const spinner = document.getElementById("spinnerForm");
     const buttonText = document.getElementById("buttonTextProfile");

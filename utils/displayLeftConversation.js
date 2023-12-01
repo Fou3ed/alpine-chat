@@ -5,7 +5,7 @@ const leftConversationContainer = document.getElementById("left-conversation");
 const minimizedSideBar = document.getElementById("mini-sidebar");
 
 export function displayLeftConversation(data) {
-  const isNotNewConversation = document.querySelector(
+    const isNotNewConversation = document.querySelector(
       `#left-conversation-${data.conversationId}`
     );
     const timestamp = data.date;

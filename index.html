@@ -483,7 +483,7 @@
           </div>
         </div>
         <div class="mr-0 ml-auto flex items-center space-x-3" id="balance-container">
-          <div class="balance-card dark:bg-navy-700">
+          <div class="balance-card ">
             <div class="flex justify-between space-x-1">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M2 5a2 2 0 012-2h7a2 2 0 012 2v4a2 2 0 01-2 2H9l-3 3v-3H4a2 2 0 01-2-2V5z"></path>
@@ -494,9 +494,11 @@
               <div class="flex items-center flex-col">
                 <span class="text-slate-700 dark:text-navy-100" data-translation="header.balance"
                   style="margin-left: 5px;"></span>
-                <p class="balance-value text-xl font-semibold text-slate-700 dark:text-navy-100"></p>
+                <p class="balance-value text-xl font-semibold text-slate-700 dark:text-navy-100">
+                  <div class="balance-spinner animate-spin hidden"></div>
+
+                </p>
               </div>
-              <div class="balance-spinner animate-spin hidden"></div>
             </div>
           </div>
 
@@ -1092,8 +1094,8 @@
                   class="form-input field-${messageId} mt-1.5 w-full rounded-lg bg-slate-150 px-3 py-2 ring-primary/50 placeholder:text-slate-400 hover:bg-slate-200 focus:ring dark:bg-navy-900/90 dark:ring-accent/50 dark:placeholder:text-navy-300 dark:hover:bg-navy-900 dark:focus:bg-navy-900"
                   name="gender">
                   <option value=""></option>
-                  <option value="0" data-translation="gender.male">Male</option>
-                  <option value="1" data-translation="gender.female">Female</option>
+                  <option value="M" data-translation="gender.male">Male</option>
+                  <option value="W" data-translation="gender.female">Female</option>
                 </select>
               </label>
             </div>

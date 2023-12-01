@@ -82,8 +82,40 @@ export default class event {
     });
 
     this.socket.on("connect", () => {
+      const connSpinner = document.querySelector("#connection-spinner");
+      if (connSpinner) {
+        connSpinner.parentElement.remove();
+
+      }
       if (typeof callback === "function") {
         callback();
+      }
+    });
+    this.socket.on("disconnect", () => {
+      if (!document.querySelector("#connection-spinner")) {
+        const modalContainer = document.createElement("div");
+        modalContainer.innerHTML = `
+          <div id="connection-spinner" class="spinner-container">
+            <div class="spinner is-grow relative h-24 w-24">
+              <span class="absolute inline-block h-full w-full rounded-full bg-primary opacity-75 dark:bg-accent"></span>
+              <span class="absolute inline-block h-full w-full rounded-full bg-primary opacity-75 dark:bg-accent"></span>
+            </div>
+          </div>
+        `;
+    
+        modalContainer.style.display = "flex";
+        modalContainer.style.alignItems = "center";
+        modalContainer.style.justifyContent = "center";
+        modalContainer.style.position = "fixed";
+        modalContainer.style.top = "0";
+        modalContainer.style.left = "0";
+        modalContainer.style.width = "100%";
+        modalContainer.style.height = "100%";
+        modalContainer.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+    
+        modalContainer.style.zIndex = "9999";
+    
+        document.body.appendChild(modalContainer);
       }
     });
   };
@@ -107,16 +139,15 @@ export default class event {
           getTranslationValue("header.profile_id") + " " + `#${userData.id}`;
       }
 
-      if(balance==0 || balance==null && userData.free_balance ==0 || userData.free_balance == null ){
-        displayBuyModal()
+      if ((balance == 0 || balance == null) && (userData.free_balance == 0 || userData.free_balance == null)) {
+        displayBuyModal();
       }
       getAllConversations();
-      console.log("userData", userData, balance);
       getTotalBalance(balance, userData.free_balance, role);
-if(userCountry){
-  replaceCountryInput();
-  replacePhoneInput();
-}
+      if(userCountry){
+        replaceCountryInput();
+        replacePhoneInput();
+      }
 
       loader.style.display = "none";
     });
@@ -210,7 +241,7 @@ if(userCountry){
       document.body.appendChild(modalDiv);
     });
   };
-  
+
 
   //receive user connection (other user)
 
@@ -653,7 +684,6 @@ if(userCountry){
   onMessageSent = async () => {
     this.socket.on("onMessageSent", async (data, online, error) => {
       await sentMessage(data);
-      console.log(data)
       if (data?.type === "MSG" && data?.conversationType !=4) {
         updateUserBalance();
       }
@@ -723,8 +753,10 @@ if(userCountry){
   onMessageUpdated = (data) => {
     this.socket.on("onMessageUpdated", (data, error) => {
       updateMessage(data);
-      updateUserBalance();
-    });
+      if(data.conversationType !=4){
+        updateUserBalance();
+
+      }    });
   };
   /**
    *
@@ -1080,7 +1112,6 @@ if(userCountry){
 
   accountExist = () => {
     this.socket.on("accountExist", (data) => {
-      console.log("data", data.firstname + " " + data.lastname);
       this.socket.emit(
         "login",
         {
@@ -1096,59 +1127,10 @@ if(userCountry){
         (error) => {}
       );
       return;
-      // socketLib.socket.emit("user-connected", {
-      //   app_id: accountId,
-      //   user: newData.contact,
-      //   contact: newData.contact,
-      //   action: "user-connected",
-      //   metaData: {
-      //     app_id: accountId,
-      //     api_token: "123456789123456",
-      //     user_id: newData?.user,
-      //   },
-      //   device: {
-      //     ip: "123.213.121",
-      //     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      //     platform: navigator.platform,
-      //     userAgent: navigator.userAgent,
-      //   },
-      // });
-      // const modalDiv = document.createElement("div");
-      // modalDiv.innerHTML = `
-      //   <div class="account-exist fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden px-4 py-6 sm:px-5">
-      //     <div class="absolute inset-0 bg-red transition-opacity duration-300"></div>
-      //     <div class="relative max-w-lg rounded-lg bg-white px-4 py-10 text-center transition-opacity duration-300 dark:bg-navy-700 sm:px-5">
-      //       <svg xmlns="http://www.w3.org/2000/svg" class="inline h-28 w-28 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      //         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-      //       </svg>
-      //       <div class="mt-4">
-      //         <h2 class="text-2xl text-red-700 dark:text-navy-100">
-      //          you already have an account
-      //         </h2>
-      //         <p class="mt-2">
-      //           Please check your email for you login credentials :
-      //         </p>
-      //         <button id="redirection-login" class="btn mt-6 bg-error font-medium text-white hover:bg-error-focus focus:bg-error-focus active:bg-error-focus/90">
-      //           Login
-      //         </button>
-
-      //       </div>
-      //     </div>
-      //   </div>
-      // `;
-
-      // const redirectLogin = modalDiv.querySelector("#redirection-login");
-
-      // redirectLogin.addEventListener("click", () => {
-      //   window.open('https://hatem.local.itwise.pro/private-chat-app/public/Dellastrod/');
-
-      // });
-
-      // document.body.appendChild(modalDiv);
+      
     });
   };
   onGuestCreated = (data) => {
-    console.log("data", data);
     this.socket.on("guestCreated", (data) => {
       role = "GUEST";
       this.socket.emit("user-connected", {
@@ -1568,7 +1550,7 @@ if(userCountry){
     });
   };
 
-
+  
   changePassword=(data)=>{
     this.socket.emit("changePassword",data,(error)=>{
       console.error('failed sending changePassword event')

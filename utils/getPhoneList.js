@@ -1,5 +1,6 @@
 import { updatePhNValidation } from "../main.js";
 import { userCountry } from "./getUserCountry.js";
+import { getTranslationValue } from "./traduction.js";
 import { showValidationError } from "./validationError.js";
 export function phoneList(input) {
     let form = input.closest("form");
@@ -17,7 +18,8 @@ export function phoneList(input) {
         if (phoneNumber.startsWith("+" + selectedCountryData.dialCode)) {
           showValidationError(
             input,
-            "container.forms.phone"
+            getTranslationValue("container.forms.phone") +
+              selectedCountryData.name
           );
           return;
         }
@@ -31,7 +33,7 @@ export function phoneList(input) {
        
         showValidationError(
           input,
-          "container.forms.phone"
+          getTranslationValue("container.forms.phone") 
         );
       } else {
       }
@@ -39,7 +41,7 @@ export function phoneList(input) {
   
     input.addEventListener("input", validatePhoneNumber);
   
-    // input.addEventListener("blur", validatePhoneNumber);
+    input.addEventListener("blur", validatePhoneNumber);
   
     form.addEventListener(
       "submit",
@@ -49,7 +51,7 @@ export function phoneList(input) {
         if (!valid) {
           showValidationError(
             input,
-          "container.forms.phone"
+            getTranslationValue("container.forms.phone")
           );
         }
       },

@@ -1,6 +1,7 @@
 import { connectUsers, socketLib, newData, updateAgentClicked, updateAgentName, updateExpert } from "../main.js";
 import { getTranslationValue } from "../utils/traduction.js";
 import { getAgentPresentation } from "./getAgentPresentation.js";
+import { applicationName } from "../env.js";
 let messagesContainer = document.getElementById("big-container-message");
 const conversationHeaderStatus = document
   .getElementById("conversation-name")
@@ -100,7 +101,7 @@ export async function selectExpert() {
   
           <div class="mt-4" style="width:344px" >
             <h2 class="text-2xl text-slate-700 dark:text-navy-100">
-              Welcome to Dellastro
+              Welcome to ${applicationName}
             </h2>
             <p class="mt-2">
               Please feel free to fill the form .

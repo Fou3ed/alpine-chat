@@ -318,9 +318,9 @@ $(document).ready(async function () {
   });
   
 
-
-
   
+
+
 
     // Get the current URL
 
@@ -397,7 +397,7 @@ window.history.replaceState({}, document.title, newURL);
   socketLib.getMessages();
   await getExperts();
   checkForExpertMessages()
-socketLib.formProfileResult()
+  socketLib.formProfileResult()
   socketLib.displayAgentsMessage();
   socketLib.passwordResult()
   $(document).on("click", ".conversation-click", handleConversationClick);
@@ -406,7 +406,6 @@ socketLib.formProfileResult()
   $(document).on("click",'#button_password',verifyPassword)
   $(document).on("click",'#logOutButton',logOut)
   $(document).on("click",'#profileButton',verifyFormProfile)
-
 if(newData){
   getContactInfo()
 }

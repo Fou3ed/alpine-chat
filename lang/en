@@ -46,7 +46,7 @@
         "reply" : "reply",
         "delete" : "delete",
         "write_message" : "write your message",
-        "balance_message":"You need to buy a new plan to start chatting again",
+        "balance_message":"You need to buy a plan to continue asking questions.<br>However you can receive reply from the expert",
         "no_credits_message" : "",
         "length" : "Message length : ",
         "send" : "Send your message",
@@ -161,8 +161,8 @@
        "button":"start chatting"
     },
     "gender":{
-        "male":"male",
-        "female":"female"
+        "female":"Women",
+        "male":"Man"
     },
     "mail_modal":{
         "mail_sent":"mail sent",

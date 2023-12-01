@@ -1,4 +1,3 @@
-import { Countries } from "../countries.js";
 import { loadNewData } from "../main.js";
 import { getTime } from "./getTime.js";
 

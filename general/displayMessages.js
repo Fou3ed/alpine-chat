@@ -221,6 +221,7 @@ export function displayMessages(messages) {
                         </select>
                     </label>`;
               } else if (field?.field_type == 7) {
+                console.log(field.field_value)
                 return `
               <label class="relative">
               <span>${field.field_name ?? ""}</span>
@@ -250,7 +251,8 @@ export function displayMessages(messages) {
                     required
                     ${myContent.status == 1 ? "disabled" : ""}
                 >
-                    ${myContent.status == 0 ? `<option value="" ></option><option value="0" data-translation="gender.male">${getTranslationValue("gender.male")}</option><option value="1" data-translation="gender.female">${getTranslationValue("gender.female")}</option>` : `<option value="${field.field_value}" data-translation="${field.field_value==0?  "gender.male" : "gender.female"}" > ${field.field_value==0?  getTranslationValue("gender.male") : getTranslationValue("gender.female")} </option>`}
+                    ${myContent.status == 0 ? `<option value="" data-translation="gender.empty"></option><option value="1" data-translation="gender.female">${getTranslationValue("gender.female")}</option><option value="0" data-translation="gender.male">${getTranslationValue("gender.male")}</option>` : 
+                    `<option value="${field.field_value}" data-translation="${field.field_value==0?  "gender.male" : "gender.female"}" > ${field.field_value==0?  getTranslationValue("gender.male") : getTranslationValue("gender.female")} </option>`}
                 </select>
                 </label>
             `;
@@ -269,7 +271,7 @@ export function displayMessages(messages) {
                     required
                     ${myContent.status == 1 ? "disabled" : ""}
                 > 
-                    ${myContent.status == 0 ? `<option value=""></option>` + Object.entries(field?.field_default_value).map(([key, value]) => `<option value="${value}">${value}</option>`).join('') : `<option value="${field.field_value}">${field.field_value}</option>`}
+                    ${myContent.status == 0 ? `<option value="" data-translation="select.empty"></option>` + Object.entries(field?.field_default_value).map(([key, value]) => `<option value="${value}">${value}</option>`).join('') : `<option value="${field.field_value}">${field.field_value}</option>`}
                 </select>
                 </label>
             `;
@@ -447,7 +449,7 @@ export function displayMessages(messages) {
                             message.status == 0
                               ? `${
                                   direction === "justify-start"
-                                    ? message.user_data?.nickname
+                                    ? message.user_data.nickname
                                     : "You"
                                 } unsent a message`
                               : message.type == "link"

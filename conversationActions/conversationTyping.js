@@ -13,7 +13,7 @@ if (messageInput) {
         isFirstKeyPress = false;
       }
     };
-
+  
     
     messageInput.onblur = function () {
       if(!isFirstKeyPress){

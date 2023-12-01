@@ -56,6 +56,9 @@ export function sendTypingNotification(input) {
 
 
 
+
+
+
   conversationContainer.addEventListener("click", (event) => {
     let target = event.target.closest("button.btn1");
     if (target) {
@@ -117,8 +120,6 @@ export function sendTypingNotification(input) {
       }
       if (isValid) {
         submitForm(target);
-      } else {
-        console.log("Please fill in all fields correctly.");
       }
     }
   });

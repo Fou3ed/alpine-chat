@@ -16,7 +16,7 @@ function getUserCountry() {
   getUserCountry()
   .then((countryCode) => {
     userCountry = countryCode;
-
+    
   })
   .catch((error) => {
     console.error("Error:", error);

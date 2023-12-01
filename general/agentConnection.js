@@ -29,7 +29,6 @@ export function userConnection(data) {
         }
       });
     }
-    
   }
   //when an agent disconnect remove the card in the online agents block
   export function userDisconnection(data) {
@@ -56,8 +55,10 @@ export function userConnection(data) {
     const leftConversationId = conversationCard.getAttribute('data-conversation-id');
     console.log(`leftConversationId: ${leftConversationId} , conversationId : ${conversationId}`)
 
+    console.log("conversation header status : ",conversationHeaderStatus)
 
     if(conversationId==leftConversationId){
+      console.log("here")
 
       conversationHeaderStatus.dataset.translation = "general.offline";
 
