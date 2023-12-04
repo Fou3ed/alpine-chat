@@ -79,7 +79,7 @@ export function submitForm(element) {
 
 if (emailField) {
 
-  element.innerHTML = `<div class="form-spinner d-flex align-items-center" style="height: 20px; width:40px" ><span class="loader2"></span></div>`;
+  // element.innerHTML = `<div class="form-spinner d-flex align-items-center" style="height: 20px; width:40px" ><span class="loader2"></span></div>`;
 
   emailValue = emailField.field_value;
 
@@ -136,7 +136,7 @@ if (emailField) {
 export function openModalActivation(data){
 
 
-   document.querySelector(".form-spinner").remove()
+  //  document.querySelector(".form-spinner").remove()
    const oldSubmitButton = document.getElementById(`submit-form-${data.messageId}`);
           oldSubmitButton.textContent=data.form.button
   const modalDiv = document.createElement("div");
@@ -168,8 +168,10 @@ export function openModalActivation(data){
                   ${getTranslationValue("modal.verification_code_resend")}
               </a>
           </div>
-              <button id="submit-button" class="btn mt-4 modal-activation font-medium text-white hover-bg-error-focus focus-bg-error-focus active-bg-error-focus/90">
-                 ${getTranslationValue("modal.verification_code_save_button")}
+              <button id="submit-button" class="btn mt-4  modal-activation font-medium text-white hover-bg-error-focus focus-bg-error-focus active-bg-error-focus/90 "  >
+                <span id="submit-button-text" class=""> ${getTranslationValue("modal.verification_code_save_button")}</span>
+                <span id="spinnerFormSubmit" class="hidden spinner h-5 w-5 animate-spin rounded-full border-[3px] border-primary/30 border-r-primary dark:border-accent/30 dark:border-r-accent"></span>                                        </button>
+
               </button>
           </div>
           
@@ -200,7 +202,13 @@ export function openModalActivation(data){
 
   
         if (verificationCode.length > 0) {
-          submitButton.innerHTML = `<div class="form-spinner d-flex align-items-center" style="height: 20px; width:40px" ><span class="loader2"></span></div>`;
+          const buttonSpinner=document.querySelector("#spinnerFormSubmit")
+          const buttonText=document.querySelector("#submit-button-text")
+          if(buttonText && buttonSpinner){
+            buttonText.classList.add("hidden")
+            buttonSpinner.classList.remove("hidden")
+          }
+     
   
         const  forms=data.forms
         const form=data.form
@@ -300,8 +308,15 @@ export function submitFormStatus(status, text_capture, messageId, element) {
   const formContact = formElement.parentNode;
 
   const formContent = formContact.parentNode;
+  const buttonSpinner=document.querySelector("#spinnerFormSubmit")
+  const buttonText=document.querySelector("#submit-button-text")
+  if(buttonText && buttonSpinner){
+    buttonText.classList.remove("hidden")
+    buttonSpinner.classList.add("hidden")
+  }
 
   let statusMessage = formContent.querySelector("p");
+
 
   if (!statusMessage) {
     statusMessage = document.createElement("p");
@@ -317,7 +332,7 @@ export function submitFormStatus(status, text_capture, messageId, element) {
     const formContent = formContact.parentNode;
     const formInputs = formContact.querySelectorAll("input, select,textarea");
 
-    formElement.innerHTML = `<div class="form-spinner d-flex align-items-center" style="height: 20px;" ><span class="loader2"></span></div>`;
+    // formElement.innerHTML = `<div class="form-spinner d-flex align-items-center" style="height: 20px;" ><span class="loader2"></span></div>`;
     formInputs.forEach((inp) => {
       const formInput = element.forms.find(
         (a) => a.fieldId == inp.dataset.fieldId

@@ -333,7 +333,10 @@ export async function receiveMessage(data) {
                                         >
                                             <span class="spinner hidden absolute inset-0 flex justify-center items-center">
                                             </span>
-                                          ${myContent.button}
+                                      
+                                        <span id="buttonTextFormD" class="">  ${myContent.button}</span>
+                                        <span id="spinnerFormD" class="hidden spinner h-5 w-5 animate-spin rounded-full border-[3px] border-primary/30 border-r-primary dark:border-accent/30 dark:border-r-accent"></span>                                        </button>
+
                                         </button>
                                     `
                                         : ""

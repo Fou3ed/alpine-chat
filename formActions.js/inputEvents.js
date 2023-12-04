@@ -63,7 +63,7 @@ export function sendTypingNotification(input) {
     let target = event.target.closest("button.btn1");
     if (target) {
       const form = event.target.closest("form");
-  
+            console.log(form)
       const inputs = form.querySelectorAll('input, select, textarea');
       // Iterate over the input fields and validate them
       let isValid = true;
@@ -119,8 +119,13 @@ export function sendTypingNotification(input) {
         }
       }
       if (isValid) {
-        submitForm(target);
-      }
+        const spinner = document.getElementById("spinnerFormD");
+        const buttonText = document.getElementById("buttonTextFormD");
+        buttonText.classList.add("hidden");
+        spinner.classList.remove("hidden");
+    
+        submitForm(target);    
+        }
     }
   });
 
