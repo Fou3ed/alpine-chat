@@ -2,6 +2,7 @@ import { accountId } from "../env.js";
 import { socketLib, updateNewData } from "../main.js";
 
 export function login(data){
+  console.log(data)
     socketLib.socket.emit("user-connected", {
         app_id: accountId,
         user: data.id,
@@ -25,8 +26,10 @@ export function login(data){
         contact: data.id,
         accountId: accountId,
         status: data.status,
+        ...(data?.integration.id && { sourceId: data.integration.id,type:data.integration.type ,source:data.integration.source }),
+       
       };
-      
+
       updateNewData(newUser)
       document.cookie =
         "myData=" +

@@ -20,13 +20,13 @@ export async function getContactInfo() {
 phoneNumber=response.data.data[0]?.phone
 
  // Store initial values
- initialFormData.first_name = response.data.data[0].firstname || null;
- initialFormData.last_name = response.data.data[0].lastname || null;
- initialFormData.email = response.data.data[0].email || null;
- initialFormData.country = response.data.data[0].country || null;
- initialFormData.phone = response.data.data[0].phone || null;
- initialFormData.gender = response.data.data[0].gender || null;
- initialFormData.date_birth = response.data.data[0].date_birth || null ;
+ initialFormData.first_name = response.data.data[0]?.firstname || null;
+ initialFormData.last_name = response.data.data[0]?.lastname || null;
+ initialFormData.email = response.data.data[0]?.email || null;
+ initialFormData.country = response.data.data[0]?.country || null;
+ initialFormData.phone = response.data.data[0]?.phone || null;
+ initialFormData.gender = response.data.data[0]?.gender || null;
+ initialFormData.date_birth = response.data.data[0]?.date_birth || null ;
 
 // Update the input values based on the response data
 if (response.data.data[0].firstname) {

@@ -6,8 +6,7 @@ export async function guestCreated(data) {
       contact: data.contact,
       accountId: data.accountId,
       status: 0,
-      ...(data?.contactId && { sourceId: data.contactId,type:"contact" ,source:"gocc" }),
-      ...(data.leadId && { sourceId: data.leadId ,type:"lead",source:"gocc" }),
+      ...(data.integration?.id && { sourceId: data.integration.id,type:data.integration.type ,source:data.integration.source }),
     };
 
     updateNewData(newUser)
@@ -24,5 +23,4 @@ export async function guestCreated(data) {
     }
     updateExpert(data.availableAgent)
     updateConversationId(data.conversationId)
-   
   }

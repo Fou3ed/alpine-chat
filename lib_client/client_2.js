@@ -1112,6 +1112,8 @@ export default class event {
 
   accountExist = () => {
     this.socket.on("accountExist", (data) => {
+      //42["accountExist",{"gocc":"26508","source_type":"contact"}]	
+      //source_type == "contact" ? contact_id = gocc else if source_type=="lead" then lead_id=gocc
       this.socket.emit(
         "login",
         {
@@ -1121,11 +1123,15 @@ export default class event {
           accountId: accountId,
           username: data.firstname + " " + data.lastname,
           profile_id: data.id,
-          contact_id: data.contact_id,
+          contact_id: data.source_type === "contact" ? data.gocc : undefined,
+          lead_id: data.source_type === "lead" ? data.gocc : undefined,
+          gocc: data.gocc,
+          source_type: data.source_type,
           action: "login",
         },
         (error) => {}
       );
+      
       return;
       
     });

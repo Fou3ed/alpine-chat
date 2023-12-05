@@ -148,7 +148,11 @@ $(document).ready(async function () {
           username:params.username,
           profile_id:params.profile_id,
           contact_id:params.contact_id,
-          action:params.action
+          action:params.action,
+          ...(params.contact
+            ? { source: "gocc", contact_id: params.contact }
+            : {}),
+          ...(params.lead ? { source: "gocc", lead_id: params.lead } : {}),
         },
         (error) => {}
       );
