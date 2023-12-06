@@ -69,14 +69,20 @@ export async function getAllAgents(response) {
         <p class="text-xs mt-2">
         ${truncateMessage(agent.presentation || '', 180)}
         </p>
-        
-        
       </div>`;
   
         $(".all-agents").append(html);
         $(`#left-agent-${agent._id}`).on("click", async () => {
-          clickedAgent(agent._id, agent.nickname,agent.UserID);
-        });
+          // Disable the button by adding the 'disabled' attribute
+          $(`#left-agent-${agent._id}`).addClass("selectedAgent");
+      
+          // Perform your action (e.g., calling clickedAgent function)
+          clickedAgent(agent._id, agent.nickname, agent.UserID);
+
+        
+      });
+      
+      
       });
     }
   }

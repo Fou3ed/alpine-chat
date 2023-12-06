@@ -1117,3 +1117,6 @@ input, select, textarea {
 .button-with-min-width {
   min-width: 100px;
 }
+.selectedAgent{
+  pointer-events: none;
+}

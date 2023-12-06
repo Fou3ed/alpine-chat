@@ -35,6 +35,7 @@ export async function selectAgent(agentId, agentName, UserID) {
   }
   
   export async function onCheckConversation(convId, agentContactId, agentName) {
+    document.querySelectorAll(".selectedAgent").forEach(element=>element.classList.remove("selectedAgent"))
     if (!convId) {
       updateConversationId("");
       messagesContainer.innerHTML = "";

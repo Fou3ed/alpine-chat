@@ -31,12 +31,15 @@ export async function selectExpert() {
           // const response = await axios.get(
           //   `https://socketLib.local.itwise.pro/socket_api/conversation/?user1=${newData.user}&user2=${agent}`
           // );
+          
           socketLib.checkConversation({
             userId: newData.user,
             agentId: agent,
             accountId: newData.accountId,
             source:newData?.source
           });
+          $(this).addClass("selectedAgent")
+
           conversationHeaderStatus.dataset.translation = connectUsers.find(
             (user) => user._id === agent
           )
@@ -48,46 +51,7 @@ export async function selectExpert() {
           const activeUser = document.getElementById("active-user-header");
           activeUser.classList.remove("bg-slate-300");
           activeUser.classList.add("bg-success");
-          // if (!response.data.data) {
-          //   conversationId = "";
-          //   messagesContainer.innerHTML = "";
-  
-          //   let activeChat = {
-          //     chatId: conversationId,
-          //     name: name,
-          //     avatar_url: `images/avatar/avatar-${agentContactId.id}` + ".jpg",
-          //   };
-          //   window.dispatchEvent(
-          //     new CustomEvent("change-active-chat", {
-          //       detail: activeChat,
-          //     })
-          //   );
-  
-          //   $conversationContainer.attr("data-conversation-id", null);
-          // } else {
-          //   conversationId = !response.data.data.conversation
-          //     ? response.data.data[0]._id
-          //     : response.data.data.conversation[0]._id;
-          //   // Update the active chat with the conversation data
-          //   window.dispatchEvent(
-          //     new CustomEvent("change-active-chat", {
-          //       detail: {
-          //         chatId: conversationId,
-          //         name: name,
-          //         avatar_url:
-          //           `images/avatar/avatar-${agentContactId.id}` + ".jpg",
-          //       },
-          //     })
-          //   );
-          //   expert = agent;
-          //   $conversationContainer.attr("data-conversation-id", conversationId);
-          //   // Load the first page of messages on page load
-          //   let currentPage = 1;
-          //   socketLib.loadMessages({
-          //     page: currentPage,
-          //     conversationId: conversationId,
-          //   });
-          // }
+         
         }
       } else {
         const modalDiv = document.createElement("div");

@@ -322,9 +322,6 @@ $(document).ready(async function () {
   });
   
 
-  
-
-
 
     // Get the current URL
 
@@ -413,10 +410,4 @@ window.history.replaceState({}, document.title, newURL);
 if(newData){
   getContactInfo()
 }
-
-
-
-
-  
-
 });
