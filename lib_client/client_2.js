@@ -120,6 +120,8 @@ export default class event {
     });
   };
 
+
+
   onConnected = function () {
     const loader = document.querySelector(".app-preloader");
 

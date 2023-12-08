@@ -376,7 +376,7 @@ export function displayMessages(messages) {
           tableRows = `
           <div class="mr-4 max-w-lg sm:mr-10">
                 <form name="form1" class="box" onsubmit="">
-                    <div class="rounded-2xl rounded-tl-none bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 ${
+                    <div class="rounded-2xl  bg-white p-3 text-slate-700 shadow-sm dark:bg-navy-700 dark:text-navy-100 ${
                       newData?.source ? "gocc" : ""
                     } card-form" style="position: relative;">
                         <div class=" w-full max-w-xl p-4 sm:p-5">
@@ -466,7 +466,7 @@ export function displayMessages(messages) {
           message.user == newData.user ? "justify-end" : "justify-start";
         const msgStyle =
           message.user == newData.user && !message.paid
-            ? ` rounded-2xl break-words  rounded-tl-none bg-msg p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
+            ? ` rounded-2xl break-words  bg-msg p-3 text-slate-700 relative shadow-sm dark:bg-navy-700 dark:text-navy-100`
             : ` rounded-2xl break-words  relative rounded-tr-none bg-info/10 p-3 text-slate-700 shadow-sm dark:bg-accent dark:text-white`;
         messagesContainer.insertAdjacentHTML(
           "afterbegin",

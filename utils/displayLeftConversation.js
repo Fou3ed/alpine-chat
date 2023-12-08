@@ -32,7 +32,7 @@ export function displayLeftConversation(data) {
         (user) => user._id === data.agentId
       );
       const html = `
-      <div class="conversationItem conversation bg-slate-150" data-conversation-id="${
+      <div class="conversationItem conversation  data-conversation-id="${
         data.conversationId
       }" data-name=${
         data.senderName

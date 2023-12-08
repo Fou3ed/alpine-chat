@@ -106,7 +106,6 @@ export async function sendMessage() {
 
   if (messageInput.value.trim() !== "") {
     isSendingMessage = true;
-
     if (!emoji.classList.contains("hidden")) emoji.classList.add("hidden");
     if (conversationId) {
       try {

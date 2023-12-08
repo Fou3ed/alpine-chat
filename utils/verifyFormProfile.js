@@ -60,7 +60,8 @@ let isChanged=false
       phone: formData?.phone || null,
       gender: formData.gender || null ,
       name: formData?.first_name + " " + formData?.last_name || null,
-      date_birth: formData?.date_birth || null
+      date_birth: formData?.date_birth || null,
+      accountId:newData.accountId
     });
   }else {
         const messageElement = document.getElementById("ProfileSideBarForm");
